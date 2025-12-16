@@ -912,41 +912,6 @@ const faqs = [
         </div>
       </div>
 
-      <!-- Bérletek -->
-      <h3 class="font-heading text-xl text-gray-900 mb-4">Bérletek területenként</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full bg-white shadow-lg rounded-lg overflow-hidden text-sm">
-          <thead class="bg-[#e497a2] text-white">
-            <tr>
-              <th class="py-4 px-3 text-left font-semibold">Terület</th>
-              <th class="py-4 px-3 text-right font-semibold">1 alk.</th>
-              <th class="py-4 px-3 text-right font-semibold">
-                <span class="block">3 alk.</span>
-                <span class="block text-xs font-normal opacity-90">-20%</span>
-              </th>
-              <th class="py-4 px-3 text-right font-semibold">
-                <span class="block">6 alk.</span>
-                <span class="block text-xs font-normal opacity-90">-20%</span>
-              </th>
-              <th class="py-4 px-3 text-right font-semibold">
-                <span class="block">10 alk.</span>
-                <span class="block text-xs font-normal opacity-90">-17%</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {priceList.map((item, index) => (
-              <tr class={index % 2 === 0 ? 'bg-white' : 'bg-[#f6f6f6]'}>
-                <td class="py-2 px-3 font-medium text-gray-900">{item.area}</td>
-                <td class="py-2 px-3 text-right text-gray-600">{item.p1}</td>
-                <td class="py-2 px-3 text-right text-gray-600">{item.p3}</td>
-                <td class="py-2 px-3 text-right text-gray-600">{item.p6}</td>
-                <td class="py-2 px-3 text-right font-semibold text-[#c53f75]">{item.p10}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   </section>
 

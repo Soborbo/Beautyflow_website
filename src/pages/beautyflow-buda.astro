@@ -53,25 +53,25 @@ const services = [
     name: 'Dióda Lézeres Szőrtelenítés',
     description: 'Budai szalonunkban a legmodernebb 808nm diódalézer technológiával végezzük a tartós szőrtelenítést. Fájdalommentes, gyors és hatékony kezelés minden bőrtípusra.',
     link: '/dioda-lezeres-szortelenites',
-    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+    image: '/images/lezeres-szortelenites-beautyflow.jpg',
   },
   {
     name: 'HydraBeauty Arckezelés',
-    description: 'Mélytisztító és hidratáló arckezelés, amely azonnal látható eredményt ad. A budai szalonban csendes, nyugodt környezetben relaxálhat a kezelés alatt.',
+    description: 'Mélytisztító és hidratáló arckezelés, amely azonnal látható eredményt ad. A budai szalonban csendes, nyugodt környezetben relaxálhatsz a kezelés alatt.',
     link: '/hydrabeauty',
-    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>`,
+    image: '/images/hydrabeauty-arckezeles.jpg',
   },
   {
     name: 'Tartós Sminktetoválás',
     description: 'Professzionális szemöldök, szemhéj és ajak tetoválás tapasztalt szakembereinkkel. Természetes hatás, személyre szabott forma és szín.',
     link: '/sminktetovalas',
-    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>`,
+    image: '/images/sminktetovalas-budapest.jpg',
   },
   {
     name: 'Carbon Peeling',
     description: 'Hollywood sztárok kedvenc bőrfiatalító kezelése. Pórusösszehúzó, bőrtisztító és kollagénstimuláló hatás egyetlen kezelésben.',
     link: '/carbon-peeling',
-    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
+    image: '/images/carbon-peeling-lezeres.jpg',
   },
 ];
 
@@ -195,7 +195,7 @@ const notinoUrl = location.bookingUrl;
 
 <Layout
   title="Beautyflow Buda Szépségszalon | Lézeres Szőrtelenítés Újbuda | XI. kerület"
-  description="Beautyflow Buda szépségszalon Újbudán. Dióda lézeres szőrtelenítés, HydraBeauty arckezelés, sminktetoválás. Cím: 1116 Budapest, Vegyész u. 1. Tel: +36 1 300 9414. Foglaljon online!"
+  description="Beautyflow Buda szépségszalon Újbudán. Dióda lézeres szőrtelenítés, HydraBeauty arckezelés, sminktetoválás. Cím: 1116 Budapest, Vegyész u. 1. Tel: +36 1 300 9414. Foglalj online!"
 >
   <!-- Structured Data -->
   <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
@@ -345,7 +345,7 @@ const notinoUrl = location.bookingUrl;
               </p>
               <p>
                 Szakképzett kozmetikusaink és sminktetováló művészeink személyre szabott tanácsadással
-                segítenek megtalálni az Önnek legmegfelelőbb kezelést. Minden új vendégünknek
+                segítenek megtalálni a számodra legmegfelelőbb kezelést. Minden új vendégünknek
                 <strong>ingyenes konzultációt</strong> biztosítunk.
               </p>
             </div>
@@ -360,20 +360,22 @@ const notinoUrl = location.bookingUrl;
               {services.map((service) => (
                 <a
                   href={service.link}
-                  class="group bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-[#c53f75]/20 transition-all"
+                  class="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:border-[#c53f75]/20 transition-all"
                 >
-                  <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 bg-[#fdf8f6] rounded-lg flex items-center justify-center text-[#c53f75] group-hover:bg-[#c53f75] group-hover:text-white transition-colors">
-                      <Fragment set:html={service.icon} />
-                    </div>
-                    <div>
-                      <h3 class="font-semibold text-gray-900 mb-1 group-hover:text-[#c53f75] transition-colors">
-                        {service.name}
-                      </h3>
-                      <p class="text-sm text-gray-600 leading-relaxed">
-                        {service.description}
-                      </p>
-                    </div>
+                  <div class="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div class="p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 group-hover:text-[#c53f75] transition-colors">
+                      {service.name}
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                      {service.description}
+                    </p>
                   </div>
                 </a>
               ))}
@@ -462,12 +464,12 @@ const notinoUrl = location.bookingUrl;
           <div class="sticky top-24 space-y-6">
 
             <!-- Contact Card -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div class="bg-gradient-to-r from-[#c53f75] to-[#a33460] p-6 text-white">
-                <h3 class="font-heading text-xl mb-2">Kapcsolat</h3>
-                <p class="text-white/80 text-sm">Hívjon minket vagy foglaljon online!</p>
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div class="bg-white p-8">
+                <h3 class="font-heading text-2xl text-gray-900 mb-2">Kapcsolat</h3>
+                <p class="text-gray-600">Hívj minket vagy foglalj online!</p>
               </div>
-              <div class="p-6 space-y-4">
+              <div class="p-8 pt-0 space-y-5">
                 <!-- Address -->
                 <div class="flex items-start gap-3">
                   <svg class="w-5 h-5 text-[#c53f75] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -605,7 +607,7 @@ const notinoUrl = location.bookingUrl;
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner px-6 pb-6 text-gray-600">
-                <p>Időpontot a Notino felületén keresztül foglalhat online bármikor, vagy telefonon a {location.phoneDisplay} számon nyitvatartási időben. Online foglalás esetén válassza ki a Beautyflow Buda helyszínt, a kívánt kezelést és az Önnek megfelelő időpontot.</p>
+                <p>Időpontot a Notino felületén keresztül foglalhatsz online bármikor, vagy telefonon a {location.phoneDisplay} számon nyitvatartási időben. Online foglalás esetén válaszd ki a Beautyflow Buda helyszínt, a kívánt kezelést és a neked megfelelő időpontot.</p>
               </div>
             </div>
           </div>
@@ -647,7 +649,7 @@ const notinoUrl = location.bookingUrl;
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner px-6 pb-6 text-gray-600">
-                <p>Készpénzes és bankkártyás fizetést is elfogadunk. Nagyobb összegű kezeléssorozatok esetén részletfizetési lehetőségről érdeklődjön a helyszínen.</p>
+                <p>Készpénzes és bankkártyás fizetést is elfogadunk. Nagyobb összegű kezeléssorozatok esetén részletfizetési lehetőségről érdeklődj a helyszínen.</p>
               </div>
             </div>
           </div>
@@ -674,10 +676,10 @@ const notinoUrl = location.bookingUrl;
     <div class="container mx-auto px-4 relative z-10">
       <div class="max-w-2xl mx-auto text-center text-white">
         <h2 class="font-heading text-3xl lg:text-4xl mb-4">
-          Látogasson el hozzánk Budára!
+          Látogass el hozzánk Budára!
         </h2>
         <p class="text-white/80 mb-8">
-          Foglaljon időpontot online és tapasztalja meg a Beautyflow minőséget!
+          Foglalj időpontot online és tapasztald meg a Beautyflow minőséget!
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a
