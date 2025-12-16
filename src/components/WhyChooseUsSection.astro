@@ -1,0 +1,110 @@
+---
+const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
+const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
+
+const features = [
+  {
+    image: '/images/mesterseges-intelligencia-szortelenito-gep.jpg',
+    title: 'AI-vezérelt gépek\ncsúcstechnológiával',
+    description: 'Folyamatosan bővülő gépparkkal, a legmodernebb eszközökkel dolgozunk. A kezeléseink teljes precizitásáról a munkatársaink szakértelme mellett a mesterséges intelligencia gondoskodik.'
+  },
+  {
+    image: '/images/szegyenlos.jpg',
+    title: 'Szégyenlős vagy?\nSemmi gond, segítünk!',
+    description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.'
+  },
+  {
+    image: '/images/konya-fanni-szepsegszalonja-1.jpg',
+    title: 'Barátságos, „csajos",\nfelszabadító légkör',
+    description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.'
+  },
+  {
+    image: '/images/higienia.jpg',
+    title: 'Orvosi szintű tisztaság\nés higiénia',
+    description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
+  },
+  {
+    image: '/images/testmeret.jpg',
+    title: 'Minden testalkat\nugyanannyit fizet',
+    description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.'
+  },
+  {
+    image: '/images/nyitva.jpg',
+    title: 'Heti 7 napos\nnyitvatartás',
+    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.'
+  },
+  {
+    image: '/images/dioda-lezeres-szortelenites-mob.jpg',
+    title: 'Mi rád fogjuk szánni\naz időt',
+    description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.'
+  },
+  {
+    image: '/images/pcos-szortelenites.jpg',
+    title: 'Sokéves gyakorlat\nPCOS-es vendégekkel',
+    description: 'A policisztás ovárium szindróma rengeteg nőnek keseríti meg az életét. Különleges odafigyeléssel és a megszokottnál jelentősen jobb eredményekkel várunk!'
+  },
+  {
+    image: '/images/beautyflow-dijak.webp',
+    title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás',
+    description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.'
+  }
+];
+---
+
+<section class="py-16 bg-gradient-to-b from-white via-[#fefcfb] to-[#fdf8f6]">
+  <div class="max-w-[1100px] mx-auto px-4">
+    <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
+      Miért a<br />
+      <span class="text-[#c53f75]">Beautyflow szépségszalont</span> válaszd?
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature) => (
+        <div class="text-center group cursor-pointer bg-white border border-gray-100 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="overflow-hidden">
+            <img
+              src={feature.image}
+              alt={feature.title.replace('\n', ' ')}
+              class="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <div class="p-5">
+            <h3 class="font-heading text-xl text-gray-900 mb-3 whitespace-pre-line leading-tight transition-colors duration-300 group-hover:text-[#c53f75]">
+              {feature.title}
+            </h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              {feature.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Dual Booking Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+      <a
+        href={notinoUrlBuda}
+        target="_blank"
+        rel="noopener"
+        class="px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all"
+      >
+        Időpontok Budára
+      </a>
+
+      <img
+        src="/images/notino-ikon.png"
+        alt="Notino"
+        class="w-12 h-12 hidden sm:block"
+      />
+
+      <a
+        href={notinoUrlPest}
+        target="_blank"
+        rel="noopener"
+        class="px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all"
+      >
+        Időpontok Pestre
+      </a>
+    </div>
+  </div>
+</section>

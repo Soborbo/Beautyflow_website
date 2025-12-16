@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "A legcsajosabb szépségszalon a környékeden. Kiváló értékelések, a legmodernebb gépek, nagyszerű hangulat és sokéves szakmai tapasztalat vár." } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:locale" content="hu_HU" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://beautyflow.pro/" />
+    <meta property="og:site_name" content="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest" />
+    <meta property="og:image" content="/images/beautyflow-fb.jpg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body class="min-h-screen flex flex-col overflow-x-hidden">
+    <Header />
+    <main class="flex-grow">
+      <slot />
+    </main>
+    <Footer />
+    <StickyMobileCTA />
+  </body>
+</html>

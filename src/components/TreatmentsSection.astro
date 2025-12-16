@@ -1,0 +1,92 @@
+---
+const treatments = [
+  {
+    image: '/images/hydrabeauty.jpg',
+    title: 'HydraBeauty arckezelés',
+    description: 'Ragyogó bőr azonnal - tisztítsd, hidratáld, frissítsd fel az arcod. Azonnali hatás!',
+    link: '/hydrabeauty',
+    color: '#0d9488', // teal
+    bgColor: '#f0fdfa'
+  },
+  {
+    image: '/images/sminktetovalas-mb-2.jpg',
+    title: 'Sminktetoválás',
+    description: 'Nézz ki mindig tökéletesen rögtön az ágyból felkelve is.',
+    link: '/sminktetovalas',
+    color: '#6366f1', // indigo
+    bgColor: '#eef2ff'
+  },
+  {
+    image: '/images/carbon-peeling-mb.jpg',
+    title: 'Carbon Peeling',
+    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
+    link: '/carbon-peeling',
+    color: '#8b5cf6', // purple
+    bgColor: '#f5f3ff'
+  },
+  {
+    image: '/images/dioda-lezeres-szortelenites-mob.jpg',
+    title: 'Dióda lézeres szőrtelenítés',
+    description: 'Legyen mindig tökéletesen sima és vonzó a bőrőd és mondj búcsút a szőrtüszőgyulladásnak',
+    link: '/dioda-lezeres-szortelenites',
+    color: '#3b82f6', // blue
+    bgColor: '#eff6ff'
+  },
+  {
+    image: '/images/sminktetovalas-mb.jpg',
+    title: 'Tetoválás-eltávolítás',
+    description: 'Megbántad egy tetoválásodat? Semmi gond, segítünk, hogy ne zavarjon többé.',
+    link: '/lezeres-tetovalas-eltavolitas',
+    color: '#ef4444', // red
+    bgColor: '#fef2f2'
+  },
+  {
+    image: '/images/pigmentfolt-eltavoitas.webp',
+    title: 'Pigmentfolt-eltávolítás',
+    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
+    link: '/hydrabeauty',
+    color: '#f59e0b', // amber
+    bgColor: '#fffbeb'
+  }
+];
+---
+
+<section class="py-16">
+  <div class="max-w-[1060px] mx-auto px-4">
+    <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase font-bold">
+      Kezeléseink
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {treatments.map((treatment) => (
+        <div
+          class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)] border-t-4"
+          style={`border-top-color: ${treatment.color}; background: linear-gradient(to bottom, ${treatment.bgColor}, white 30%);`}
+        >
+          <div class="relative overflow-hidden">
+            <img
+              src={treatment.image}
+              alt={treatment.title}
+              class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <div class="absolute top-0 left-0 right-0 h-1" style={`background-color: ${treatment.color};`}></div>
+          </div>
+          <div class="p-6 flex flex-col flex-1">
+            <h3 class="font-heading text-[1.4rem] text-gray-900 mb-3 text-center font-bold">
+              {treatment.title}
+            </h3>
+            <p class="text-gray-600 mb-6 text-sm leading-relaxed flex-1">
+              {treatment.description}
+            </p>
+            <a
+              href={treatment.link}
+              class="block w-full text-center py-3 font-semibold uppercase text-sm tracking-wide border-2 transition-colors mt-auto text-white bg-[#c53f75] border-[#c53f75] hover:bg-transparent hover:text-[#c53f75]"
+            >
+              Tovább a kezelésre
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

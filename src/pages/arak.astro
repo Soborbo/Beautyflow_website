@@ -1,0 +1,527 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Color scheme matching FAQ page
+const categoryColors = {
+  'lezeres': { primary: '#3b82f6', light: '#93c5fd', bg: '#eff6ff' },
+  'hydrabeauty': { primary: '#0d9488', light: '#5eead4', bg: '#f0fdfa' },
+  'sminktetovalas': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff' },
+  'tetovalas-eltavolitas': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2' },
+  'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff' },
+};
+
+// Lézeres Szőrtelenítés Csomagok
+const lezerCsomagok = [
+  { name: 'Diamond', zones: 'Teljes intim + Popsi belső + Teljes kar + Hónalj + Teljes láb', price: '55 000', popular: true },
+  { name: 'Gold', zones: 'Teljes intim + Popsi belső + Hónalj + Teljes láb', price: '45 000' },
+  { name: 'Silver', zones: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '35 000' },
+  { name: 'White', zones: 'Teljes intim + Popsi belső + Hónalj', price: '23 000' },
+  { name: 'Pearl', zones: 'Hónalj + Lábszár térdig', price: '21 000' },
+  { name: 'Shine', zones: 'Hónalj + Bikinivonal', price: '16 000' },
+];
+
+// Lézeres Szőrtelenítés Bérletek - csoportosítva
+const lezerBerletekGrouped = [
+  {
+    group: 'Arc',
+    items: [
+      { zone: 'Bajusz', prices: ['6 000', '15 000', '30 000', '51 000'] },
+      { zone: 'Áll', prices: ['6 000', '15 000', '30 000', '51 000'] },
+      { zone: 'Bajusz + Áll', prices: ['10 000', '25 000', '50 000', '85 000'] },
+      { zone: 'Teljes arc', prices: ['15 000', '37 500', '75 000', '127 500'] },
+    ]
+  },
+  {
+    group: 'Kar',
+    items: [
+      { zone: 'Alkar', prices: ['10 000', '25 000', '50 000', '85 000'] },
+      { zone: 'Teljes kar', prices: ['16 000', '40 000', '80 000', '136 000'] },
+      { zone: 'Hónalj', prices: ['10 000', '25 000', '50 000', '85 000'] },
+    ]
+  },
+  {
+    group: 'Mellkas',
+    items: [
+      { zone: 'Mellek közt', prices: ['5 000', '12 500', '25 000', '42 500'] },
+    ]
+  },
+  {
+    group: 'Törzs',
+    items: [
+      { zone: 'Hascsík', prices: ['6 000', '15 000', '30 000', '51 000'] },
+      { zone: 'Has', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Hát', prices: ['20 000', '50 000', '100 000', '170 000'] },
+    ]
+  },
+  {
+    group: 'Intim',
+    items: [
+      { zone: 'Bikinivonal', prices: ['9 000', '22 500', '45 000', '76 500'] },
+      { zone: 'Teljes intim', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Teljes intim + popsi belső', prices: ['17 000', '42 500', '85 000', '144 500'] },
+      { zone: 'Popsi belső ív', prices: ['8 000', '20 000', '40 000', '68 000'] },
+    ]
+  },
+  {
+    group: 'Fenék',
+    items: [
+      { zone: 'Farpofák', prices: ['12 000', '30 000', '60 000', '102 000'] },
+      { zone: 'Teljes far + popsi belső', prices: ['15 000', '37 500', '75 000', '127 500'] },
+    ]
+  },
+  {
+    group: 'Láb',
+    items: [
+      { zone: 'Lábszár térdig', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Comb', prices: ['17 000', '42 500', '85 000', '144 500'] },
+      { zone: 'Teljes láb', prices: ['28 000', '70 000', '140 000', '238 000'] },
+    ]
+  },
+];
+
+// HydraBeauty Árak
+const hydrabeautyArak = [
+  { service: 'Hydrafacial (arc)', duration: '60 perc', price: '20 000' },
+  { service: 'Hydrafacial (hát)', duration: '90 perc', price: '25 000' },
+  { service: 'Hydrafacial (arc + nyak + dekoltázs)', duration: '100 perc', price: '30 000' },
+  { service: 'Hydrafacial + Carbon peeling (arc)', duration: '100 perc', price: '40 000' },
+  { service: 'Hydrafacial + Carbon peeling (arc + dekoltázs)', duration: '120 perc', price: '45 000' },
+  { service: 'Hydrafacial + Carbon peeling (hát)', duration: '120 perc', price: '45 000' },
+];
+
+// Sminktetoválás Árak
+const sminktetovalasArak = [
+  { service: 'Szemöldök tetoválás (púderes)', price: '75 000' },
+  { service: 'Szemöldök tetoválás (ombre)', price: '75 000' },
+  { service: 'Rontott szemöldök tetoválás javítása', price: '80 000' },
+  { service: 'Szemhéj tetoválás (pillató sűrítő)', price: '35 000' },
+  { service: 'Fél ajaksatír', price: '55 000' },
+  { service: 'Teljes ajaksatír', price: '65 000' },
+];
+
+// Tetoválás eltávolítás Árak
+const tetovalasEltavolitasArak = [
+  { area: 'Arc', size: 'szemöldök', price: '20 000' },
+  { area: 'Arc', size: 'ajakkontúr', price: '15 000' },
+  { area: 'Arc', size: 'smink (részleges)', price: '15 000' },
+  { area: 'Test', size: '2x2 cm', price: '10 000' },
+  { area: 'Test', size: '5x5 cm', price: '20 000' },
+  { area: 'Test', size: '8x8 cm', price: '25 000' },
+  { area: 'Test', size: '10x10 cm', price: '30 000-tól' },
+];
+
+// Carbon Peeling Árak
+const carbonPeelingAlkalom = [
+  { service: 'Pigmentfolt eltávolítás', price: '10 000' },
+  { service: 'Kézfej (mindkettő)', price: '15 000' },
+  { service: 'Hónalj világosítás (mindkettő)', price: '15 000' },
+  { service: 'Szemöldök', price: '15 000' },
+  { service: 'Teljes arc', price: '25 000' },
+  { service: 'Dekoltázs', price: '25 000' },
+  { service: 'Teljes hát', price: '35 000' },
+  { service: 'Arc + nyak + dekoltázs', price: '40 000' },
+];
+
+const carbonPeelingBerlet = [
+  { service: 'Teljes arc (5 alkalom)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
+  { service: 'Dekoltázs (5 alkalom)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
+  { service: 'Teljes arc + nyak + dekoltázs (5 alkalom)', price: '160 000', originalPrice: '200 000', discount: '-20%' },
+  { service: 'Teljes hát (5 alkalom)', price: '140 000', originalPrice: '175 000', discount: '-20%' },
+  { service: 'Kézfej (mindkettő, 5 alkalom)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
+  { service: 'Hónalj világosítás (mindkettő, 5 alkalom)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
+];
+
+const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
+
+const categories = [
+  { id: 'lezeres-csomagok', label: 'Lézeres Csomagok', color: categoryColors['lezeres'] },
+  { id: 'lezeres-berletek', label: 'Lézeres Bérletek', color: categoryColors['lezeres'] },
+  { id: 'hydrabeauty', label: 'HydraBeauty', color: categoryColors['hydrabeauty'] },
+  { id: 'sminktetovalas', label: 'Sminktetoválás', color: categoryColors['sminktetovalas'] },
+  { id: 'tetovalas-eltavolitas', label: 'Tetoválás eltávolítás', color: categoryColors['tetovalas-eltavolitas'] },
+  { id: 'carbon-peeling', label: 'Carbon Peeling', color: categoryColors['carbon-peeling'] },
+];
+---
+
+<Layout title="Árak - Beautyflow Szépségszalon Budapest">
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc] py-8 lg:py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="font-heading text-3xl lg:text-5xl text-gray-900 mb-3">
+        Áraink
+      </h1>
+      <p class="text-gray-600 max-w-2xl mx-auto text-sm lg:text-base">
+        Átlátható árazás, minőségi szolgáltatások. Válassz a kezelések közül és foglalj időpontot online!
+      </p>
+    </div>
+  </section>
+
+  <!-- Sticky Navigation -->
+  <nav id="price-nav" class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <div class="container mx-auto px-4">
+      <div class="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
+        {categories.map((cat, index) => (
+          <button
+            class={`price-nav-btn whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full transition-all ${index === 0 ? 'active' : ''}`}
+            data-target={cat.id}
+            data-color={cat.color.primary}
+            style={index === 0 ? `background-color: ${cat.color.primary}; color: white;` : ''}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-8 lg:py-12 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-5xl">
+
+      <!-- Lézeres Szőrtelenítés Csomagok -->
+      <section id="lezeres-csomagok" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['lezeres'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Lézeres Szőrtelenítés Csomagok</h2>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {lezerCsomagok.map((csomag) => (
+            <div class={`bg-white rounded-lg p-5 shadow-sm border ${csomag.popular ? 'border-blue-300 ring-2 ring-blue-100' : 'border-gray-200'} relative`}>
+              {csomag.popular && (
+                <span class="absolute -top-3 left-4 bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  Legnépszerűbb
+                </span>
+              )}
+              <h3 class="font-semibold text-lg text-gray-900 mb-2">{csomag.name} csomag</h3>
+              <p class="text-gray-600 text-sm mb-4 leading-relaxed">{csomag.zones}</p>
+              <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-bold text-gray-900">{csomag.price} Ft</span>
+                <span class="text-gray-500 text-sm">/ alkalom</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- Lézeres Szőrtelenítés Bérletek -->
+      <section id="lezeres-berletek" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['lezeres'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Lézeres Szőrtelenítés Bérletek</h2>
+        </div>
+
+        <p class="text-gray-600 text-sm mb-4">Bérletekkel akár 30% kedvezményt kaphatsz! Minél több alkalmat választasz, annál többet spórolsz.</p>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-blue-50">
+                <tr>
+                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Terület</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">1 alk.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">3 alk.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">6 alk.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">10 alk.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lezerBerletekGrouped.map((group, groupIndex) => (
+                  <>
+                    {/* Group header row */}
+                    <tr class={`bg-blue-100/50 ${groupIndex > 0 ? 'border-t-2 border-blue-200' : ''}`}>
+                      <td colspan="5" class="py-2 px-4 font-semibold text-blue-800 text-xs uppercase tracking-wider">
+                        {group.group}
+                      </td>
+                    </tr>
+                    {/* Items in group */}
+                    {group.items.map((item) => (
+                      <tr class="hover:bg-gray-50 border-b border-gray-100">
+                        <td class="py-3 px-4 font-medium text-gray-900">{item.zone}</td>
+                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[0]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[1]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[2]} Ft</td>
+                        <td class="py-3 px-3 text-center text-blue-600 font-semibold">{item.prices[3]} Ft</td>
+                      </tr>
+                    ))}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- HydraBeauty Árak -->
+      <section id="hydrabeauty" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-teal-50/50 via-white to-teal-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['hydrabeauty'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">HydraBeauty Árak</h2>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-teal-50">
+                <tr>
+                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Szolgáltatás</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">Időtartam</th>
+                  <th class="text-right py-3 px-4 font-semibold text-gray-700">Ár</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {hydrabeautyArak.map((item) => (
+                  <tr class="hover:bg-gray-50">
+                    <td class="py-4 px-4 font-medium text-gray-900">{item.service}</td>
+                    <td class="py-4 px-3 text-center text-gray-600">{item.duration}</td>
+                    <td class="py-4 px-4 text-right">
+                      <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- Sminktetoválás Árak -->
+      <section id="sminktetovalas" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-indigo-50/50 via-white to-indigo-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['sminktetovalas'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Sminktetoválás Árak</h2>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {sminktetovalasArak.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-4 px-5 font-medium text-gray-900">{item.service}</td>
+                  <td class="py-4 px-5 text-right">
+                    <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+          <p class="text-sm text-gray-700">
+            <strong>Megjegyzés:</strong> Az árak a korrekció árát (60 napon belül) tartalmazzák!
+            További korrekciók: 15 000 Ft / alkalom.
+          </p>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- Tetoválás eltávolítás -->
+      <section id="tetovalas-eltavolitas" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-red-50/50 via-white to-red-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['tetovalas-eltavolitas'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Tetoválás eltávolítás</h2>
+        </div>
+
+        <p class="text-gray-600 text-sm mb-4">Az ár a tetoválás méretétől és helyétől függ. Konzultáción pontosan felmérjük és megadjuk a várható kezelések számát.</p>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-red-50">
+                <tr>
+                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Terület</th>
+                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Méret</th>
+                  <th class="text-right py-3 px-4 font-semibold text-gray-700">Ár / alkalom</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {tetovalasEltavolitasArak.map((item) => (
+                  <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 text-gray-600">{item.area}</td>
+                    <td class="py-3 px-4 font-medium text-gray-900">{item.size}</td>
+                    <td class="py-3 px-4 text-right">
+                      <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href="/ingyenes-konzultacio" class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Ingyenes konzultáció
+          </a>
+        </div>
+      </section>
+
+      <!-- Carbon Peeling Árak -->
+      <section id="carbon-peeling" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-purple-50/50 via-white to-purple-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['carbon-peeling'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Carbon Peeling Árak</h2>
+        </div>
+
+        <!-- Alkalmi árak -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Alkalmi kezelés</h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {carbonPeelingAlkalom.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Bérlet árak -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Bérletek <span class="text-purple-600">(-20% kedvezmény)</span></h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {carbonPeelingBerlet.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
+                    <span class="text-lg font-bold text-purple-600">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-purple-500 hover:bg-purple-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-lg p-8 text-center text-white">
+        <h2 class="font-heading text-2xl lg:text-3xl mb-3">Kérdésed van az árakkal kapcsolatban?</h2>
+        <p class="mb-6 opacity-90">Hívj minket vagy kérj ingyenes konzultációt és segítünk megtalálni a számodra ideális kezelést!</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="tel:+3613009414" class="inline-flex items-center justify-center gap-2 bg-white text-[#c53f75] font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            +36 1 300 9414
+          </a>
+          <a href="/ingyenes-konzultacio" class="inline-flex items-center justify-center gap-2 bg-white/20 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/30 transition-colors border border-white/30">
+            Ingyenes konzultáció
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .price-nav-btn {
+    color: #4b5563;
+    background-color: #f3f4f6;
+  }
+
+  .price-nav-btn:hover:not(.active) {
+    background-color: #e5e7eb;
+  }
+
+  .price-nav-btn.active {
+    color: white;
+  }
+
+  /* Smooth scroll offset for sticky nav */
+  .price-section {
+    scroll-margin-top: 140px;
+  }
+</style>
+
+<script>
+  function initPriceNav() {
+    const navBtns = document.querySelectorAll('.price-nav-btn');
+    const sections = document.querySelectorAll('.price-section');
+
+    // Click handler for nav buttons
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Scroll spy - highlight active section in nav
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navBtns.forEach(btn => {
+            const isActive = btn.getAttribute('data-target') === id;
+            const color = btn.getAttribute('data-color');
+
+            if (isActive) {
+              btn.classList.add('active');
+              btn.style.backgroundColor = color;
+              btn.style.color = 'white';
+            } else {
+              btn.classList.remove('active');
+              btn.style.backgroundColor = '';
+              btn.style.color = '';
+            }
+          });
+        }
+      });
+    }, {
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(section => observer.observe(section));
+  }
+
+  document.addEventListener('DOMContentLoaded', initPriceNav);
+  document.addEventListener('astro:page-load', initPriceNav);
+</script>

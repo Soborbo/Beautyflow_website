@@ -1,16 +1,26 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import HeroSection from '../components/HeroSection.astro';
+import ConsultationSection from '../components/ConsultationSection.astro';
+import AtmosphereSection from '../components/AtmosphereSection.astro';
+import LocationsSection from '../components/LocationsSection.astro';
+import BookingSection from '../components/BookingSection.astro';
+import SafetySection from '../components/SafetySection.astro';
+import TreatmentsSection from '../components/TreatmentsSection.astro';
+import TestimonialsSection from '../components/TestimonialsSection.astro';
+import WhyChooseUsSection from '../components/WhyChooseUsSection.astro';
+import SecondaryHero from '../components/SecondaryHero.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Buda és Pest">
+  <HeroSection />
+  <ConsultationSection />
+  <AtmosphereSection />
+  <LocationsSection />
+  <BookingSection />
+  <SafetySection />
+  <TreatmentsSection />
+  <TestimonialsSection />
+  <WhyChooseUsSection />
+  <SecondaryHero />
+</Layout>

@@ -1,0 +1,793 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// FAQ data organized by categories - Általános kérdések FIRST
+const faqCategories = [
+  {
+    id: 'altalanos',
+    title: 'Általános Kérdések',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    questions: [
+      {
+        q: "Hogyan foglalhatok időpontot?",
+        a: "Időpontot a Notino felületén keresztül foglalhat online, vagy telefonon a +36 1 300 9414 számon. Online foglalás esetén válassza ki a kívánt kezelést, helyszínt és időpontot. Visszaigazolást e-mailben küldünk."
+      },
+      {
+        q: "Hol találom a szalonokat?",
+        a: "Két helyszínen várjuk: Beautyflow Buda (1116 Budapest, Vegyész u. 1.) és Beautyflow Pest (1135 Budapest, Reitter Ferenc u. 90.). Mindkét szalon könnyen megközelíthető tömegközlekedéssel és autóval is."
+      },
+      {
+        q: "Mik a nyitvatartási idők?",
+        a: "Beautyflow Buda: Hétfő-Péntek 08:00-20:00, Szombat 10:00-20:00, Vasárnap 10:00-19:00. Beautyflow Pest: Hétfő-Péntek 08:00-18:00, Szombat 10:00-20:00, Vasárnap zárva."
+      },
+      {
+        q: "Van ingyenes konzultáció?",
+        a: "Igen, minden kezelés előtt ingyenes konzultációt biztosítunk! A konzultáció során felmérjük az igényeit, megválaszoljuk kérdéseit, és személyre szabott kezelési tervet készítünk. Az ingyenes konzultáció oldalunkon tud időpontot foglalni."
+      },
+      {
+        q: "Milyen fizetési módokat fogadnak el?",
+        a: "Készpénzes és bankkártyás fizetést is elfogadunk. Nagyobb összegű kezeléssorozatok esetén részletfizetési lehetőséget is biztosítunk. Kérjük, érdeklődjön a részletekről a szalonban."
+      },
+      {
+        q: "Van parkolási lehetőség?",
+        a: "Mindkét szalonunk közelében van parkolási lehetőség. A Buda szalonnál utcai parkolás és közeli parkolóház érhető el. A Pest szalonnál szintén utcai parkolás lehetséges. Pontos útmutatót a helyszín oldalán talál."
+      },
+      {
+        q: "Lemondhatom vagy módosíthatom az időpontomat?",
+        a: "Igen, időpontját 24 órával a kezelés előtt ingyenesen lemondhatja vagy módosíthatja. Kérjük, telefonon vagy online értesítsen minket. 24 órán belüli lemondás esetén lemondási díjat számíthatunk fel."
+      },
+      {
+        q: "Ajándékutalványt lehet vásárolni?",
+        a: "Igen, ajándékutalványokat kínálunk bármilyen kezelésre vagy tetszőleges összegre. Az ajándékutalvány a szalonokban vásárolható meg, és kiváló ajándék születésnapra, névnapra vagy bármilyen alkalomra."
+      }
+    ]
+  },
+  {
+    id: 'lezeres-szortelenites',
+    title: 'Lézeres Szőrtelenítés',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a diódalézer és miben különbözik a többi lézertípustól?",
+        a: "A diódalézer egy olyan lézertechnológia, amely 808 nm-es hullámhosszon működik, és kiválóan alkalmas a szőrtüszők célzott kezelésére. Más lézerekkel (alexandrit, Nd:YAG) szemben a diódalézer hatékonyabb a melaninban gazdag szőrszálak kezelésében, miközben kíméletesebb a bőrrel szemben. A Beautyflow szalonokban használt professzionális diódalézer készülékek a legmodernebb hűtési technológiával rendelkeznek, ami komfortosabbá teszi a kezelést."
+      },
+      {
+        q: "Hány kezelés szükséges a tartós eredményhez?",
+        a: "Általában 6-10 kezelés szükséges a tartós eredmény eléréséhez, 4-6 hetes időközönként. A szükséges alkalmak száma függ a kezelt terület méretétől, a szőrzet sűrűségétől és színétől, valamint az egyéni hormonális állapottól. A kezelések után éves szinten 1-2 karbantartó kezelés javasolt."
+      },
+      {
+        q: "Fájdalmas a lézeres szőrtelenítés?",
+        a: "A modern diódalézer készülékek beépített hűtőrendszerrel rendelkeznek, ami jelentősen csökkenti a kellemetlen érzést. A legtöbb páciens enyhe csípést vagy melegérzetet tapasztal. Az érzékenység egyéni, de a kezelés jól tolerálható. Szükség esetén érzéstelenítő krém is alkalmazható."
+      },
+      {
+        q: "Milyen bőrtípusokra alkalmas a kezelés?",
+        a: "A diódalézer szőrtelenítés szinte minden bőrtípusra alkalmas, a világostól a sötétebb bőrtónusokig (Fitzpatrick I-V). A leghatékonyabb eredményt sötét szőrzet és világosabb bőr esetén érhetjük el, de a modern készülékek barnább bőrön is biztonságosan használhatók. Szőke, vörös vagy ősz szőrzet esetén a kezelés kevésbé hatékony."
+      },
+      {
+        q: "Mit kell tennem a kezelés előtt és után?",
+        a: "Kezelés előtt: Kerülje a napozást és az önbarnítókat 2 hétig, ne epiláljon vagy gyantázzon 4 hétig, a szőrszálakat borotválja le 24 órával a kezelés előtt. Kezelés után: Kerülje a napozást és használjon fényvédőt, ne használjon szaunát vagy forró fürdőt 48 óráig, kerülje az intenzív sportolást 24 óráig, hidratálja rendszeresen a bőrt."
+      },
+      {
+        q: "Van-e mellékhatása a kezelésnek?",
+        a: "A lézeres szőrtelenítés általában biztonságos eljárás. Átmeneti mellékhatásként előfordulhat enyhe bőrpír, duzzanat vagy érzékenység, amelyek általában néhány órán belül elmúlnak. Ritka esetben előfordulhat pigmentációs változás vagy hólyagképződés, ezért fontos a szakszerű kezelés és az utókezelési tanácsok betartása."
+      },
+      {
+        q: "Milyen gyakran kell ismételni a kezeléseket?",
+        a: "A kezeléseket általában 4-6 hetente végezzük, igazodva a szőrnövekedési ciklushoz. Az arcon gyakoribb (3-4 hét), a testen ritkább (5-6 hét) intervallum javasolt. A kezeléssorozat befejezése után évente 1-2 karbantartó alkalom elegendő."
+      },
+      {
+        q: "Mikor látható az eredmény?",
+        a: "Az első eredmények már 1-2 kezelés után láthatóak: a szőrszálak elvékonyodnak és ritkábbá válnak. A kezelés után 1-3 héttel a kezelt szőrszálak kihullanak. A tartós eredmény a teljes kezeléssorozat (6-10 alkalom) után érhető el."
+      },
+      {
+        q: "Terhesség vagy szoptatás alatt végezhető a kezelés?",
+        a: "Terhesség és szoptatás alatt nem javasoljuk a lézeres szőrtelenítést. Bár nincs bizonyíték arra, hogy ártalmas lenne, az óvatosság elvét követve és a hormonális változások miatt érdemes a kezelést elhalasztani."
+      },
+      {
+        q: "Intim területen is végezhető a kezelés?",
+        a: "Igen, az intim területek (bikini vonal, brazil, teljes intim) kezelése népszerű és biztonságos. A modern készülékek hűtési rendszere különösen fontos ezeken az érzékeny területeken. Szakembereink diszkréten és professzionálisan végzik a kezelést."
+      },
+      {
+        q: "Férfiak is igénybe vehetik a szolgáltatást?",
+        a: "Természetesen! A férfiak körében egyre népszerűbb a lézeres szőrtelenítés. Gyakori területek: hát, váll, mellkas, has, arc (szakáll vonala). A férfi szőrzet általában vastagabb, ezért néhány plusz kezelés szükséges lehet."
+      },
+      {
+        q: "Mennyibe kerül a lézeres szőrtelenítés?",
+        a: "Az árak a kezelt terület méretétől függnek. Kisebb területek (hónalj, bajusz) már néhány ezer forinttól elérhetők, nagyobb területek (teljes láb, hát) drágábbak. Csomagajánlatainkkal jelentős kedvezményt biztosítunk. Pontos árakért látogasson el az Árak oldalunkra vagy kérjen személyre szabott árajánlatot."
+      },
+      {
+        q: "Tetoválás felett végezhető a kezelés?",
+        a: "Tetoválás felett NEM végezhető lézeres szőrtelenítés, mert a lézer a festéket is megcélozhatja, ami égési sérülést vagy a tetoválás elszíneződését okozhatja. A tetovált területeket ki kell hagyni a kezelés során."
+      },
+      {
+        q: "Anyajegyek, szeplők környékén biztonságos?",
+        a: "Az anyajegyeket és más pigmentált bőrelváltozásokat ki kell hagyni a kezelés során. A lézer előtt szakemberünk felméri a bőrt és jelöli a kerülendő területeket. Nagyméretű vagy gyanús anyajegy esetén bőrgyógyászati konzultáció javasolt."
+      },
+      {
+        q: "Mi történik, ha kihagyok egy kezelést?",
+        a: "Egy alkalom kihagyása nem befolyásolja jelentősen az eredményt, de a rendszeres kezelés hatékonyabb. Ha hosszabb szünetet tart, a szőrnövekedés újraindulhat, és több utókezelés válhat szükségessé. Próbálja tartani a javasolt 4-6 hetes intervallumot."
+      }
+    ]
+  },
+  {
+    id: 'hydrabeauty',
+    title: 'HydraBeauty Arckezelés',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a HydraBeauty kezelés?",
+        a: "A HydraBeauty egy többlépcsős, nem invazív arckezelés, amely tisztítást, hámlasztást, bőrfeszesítést és intenzív hidratálást biztosít egyetlen kezelés során. A kezelés speciális vákuumos technológiát használ, amely mélyen tisztítja a pórusokat és bejuttatja a hatóanyagokat a bőrbe."
+      },
+      {
+        q: "Milyen bőrproblémákra ajánlott a HydraBeauty?",
+        a: "A HydraBeauty kiválóan alkalmas: vízhiányos, dehidratált bőrre, tág pórusokra és mitesszerekre, fakó, fáradt bőrre, finom ráncokra, egyenetlen bőrtónusra, aknéra hajlamos bőrre. Szinte minden bőrtípusnak ajánlott, érzékeny bőrre is alkalmas."
+      },
+      {
+        q: "Fájdalmas-e a HydraBeauty kezelés?",
+        a: "Nem, a kezelés teljesen fájdalommentes. A legtöbb páciens kellemesnek, relaxálónak találja. A vákuumos tisztítás enyhe szívóhatást okoz, de ez nem kellemetlen. A kezelés után azonnal visszatérhet a mindennapi tevékenységeihez."
+      },
+      {
+        q: "Mennyi ideig tart egy kezelés?",
+        a: "Egy teljes HydraBeauty kezelés körülbelül 45-60 percet vesz igénybe. Ez magában foglalja a bőr előkészítését, a többlépcsős kezelést és a záró ápolást."
+      },
+      {
+        q: "Milyen gyakran ajánlott a HydraBeauty?",
+        a: "Optimális eredmény érdekében havonta 1-2 kezelés javasolt. Intenzív bőrmegújuláshoz kezdetben 4-6 kezelés ajánlott 2 hetes időközönként, majd havonta fenntartó kezelés. Az egyéni igényektől és bőrállapottól függően szakemberünk személyre szabott kezelési tervet készít."
+      },
+      {
+        q: "Mikor látható az eredmény?",
+        a: "Az eredmény azonnal látható! Már az első kezelés után ragyogóbb, hidratáltabb és frissebb lesz a bőr. A tartós eredmény és a mélyebb problémák javulása több kezelés után érhető el."
+      },
+      {
+        q: "Van-e felépülési idő a kezelés után?",
+        a: "Nincs felépülési idő. A kezelés után azonnal sminkelhet és folytathatja napi rutinját. Enyhe bőrpír előfordulhat, ami néhány órán belül elmúlik. A kezelés 'ebédidős kezelésként' is ismert, mert gyorsan elvégezhető."
+      },
+      {
+        q: "Kombinálható más kezelésekkel?",
+        a: "Igen, a HydraBeauty kiválóan kombinálható más kezelésekkel, például: LED fényterápiával, mezoterápiával, ráncfeltöltéssel. A kombinált kezelésekről szakemberünk ad felvilágosítást a konzultáció során."
+      },
+      {
+        q: "Alkalmas érzékeny bőrre is?",
+        a: "Igen, a HydraBeauty kifejezetten kíméletes és érzékeny bőrre is alkalmas. A kezelés intenzitása állítható, és a használt szérumok is személyre szabhatók az egyéni bőrállapotnak megfelelően."
+      },
+      {
+        q: "Terhesség alatt végezhető a kezelés?",
+        a: "A HydraBeauty alapvetően biztonságos, de terhesség alatt javasolt konzultálni a kezelő szakemberrel. Egyes intenzív hatóanyagok (pl. retinol) kerülendők, de a tisztító és hidratáló lépések általában elvégezhetők."
+      }
+    ]
+  },
+  {
+    id: 'tetovalas-eltavolitas',
+    title: 'Tetoválás Eltávolítás',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`,
+    questions: [
+      {
+        q: "Hogyan működik a lézeres tetoválás eltávolítás?",
+        a: "A lézeres tetoválás eltávolítás során a lézer nagy energiájú fénypulzusokkal bontja le a bőrben lévő festékrészecskéket apró darabokra. Ezeket a részecskéket a test immunrendszere természetes úton távolítja el a következő hetekben. A kezelés biztonságos és hatékony módja a nem kívánt tetoválások eltüntetésének."
+      },
+      {
+        q: "Hány kezelés szükséges egy tetoválás eltávolításához?",
+        a: "A szükséges kezelések száma függ a tetoválás méretétől, színétől, mélységétől és korától. Általában 6-12 kezelés szükséges, 6-8 hetes időközönként. Amatőr tetoválások gyorsabban halványulnak, míg professzionális, színes tetoválások több kezelést igényelnek."
+      },
+      {
+        q: "Fájdalmas-e a tetoválás eltávolítás?",
+        a: "A kezelés némi kellemetlenséggel jár, sokan egy gumiszalag pattanásához hasonlítják az érzést. A modern lézereken hűtőrendszer csökkenti a fájdalmat. Nagyobb területeknél vagy érzékenyebb pácienseknél érzéstelenítő krém alkalmazható."
+      },
+      {
+        q: "Milyen színű tetoválások távolíthatók el?",
+        a: "A fekete és sötétkék tetoválások a legkönnyebben eltávolíthatók. Zöld, világoskék és lila színek több kezelést igényelnek. A sárga, narancssárga és fehér színek a legnehezebbek. Modern multiwave lézerekkel szinte minden szín kezelhető."
+      },
+      {
+        q: "Marad-e heg a kezelés után?",
+        a: "Szakszerű kezelés és megfelelő utóápolás mellett a hegképződés kockázata minimális. A lézer nem a bőrt, hanem a festéket célozza. Fontos a kezelések közötti megfelelő gyógyulási idő betartása és a szakértői utasítások követése."
+      },
+      {
+        q: "Mikor látható az eredmény?",
+        a: "A tetoválás halványulása fokozatosan, kezelésenként történik. Az első jelentős változás általában 2-3 kezelés után látható. Minden kezelés után a test 6-8 hétig dolgozik a festékrészecskék eltávolításán."
+      },
+      {
+        q: "Van-e felépülési idő a kezelés után?",
+        a: "A kezelt területen 1-2 hétig pír, duzzanat és hólyagosodás fordulhat elő - ez normális reakció. A terület 2-4 hétig érzékeny lehet. Kerülje a napozást, úszást és intenzív sportot a gyógyulás idején."
+      },
+      {
+        q: "Sminktetoválás is eltávolítható?",
+        a: "Igen, a sminktetoválások (szemöldök, szemhéj, ajak) is eltávolíthatók lézerrel, de ezek speciális kezelést igényelnek a terület érzékenysége miatt. Fontos tudni, hogy bizonyos sminktetoválás pigmentek oxidálódhatnak és sötétedhetnek az első kezelésnél."
+      },
+      {
+        q: "Friss tetoválás eltávolítható?",
+        a: "Friss tetoválás kezelését legalább 6-8 héttel a tetoválás elkészülte után javasoljuk kezdeni, hogy a bőr teljesen meggyógyuljon. Az új tetoválások gyakran könnyebben eltávolíthatók, mert a festék még nem mélyült el annyira."
+      },
+      {
+        q: "Mennyibe kerül a tetoválás eltávolítás?",
+        a: "Az ár a tetoválás méretétől függ. Kisebb tetoválások (pl. 5x5 cm) kezelése kezelésenként kb. 15-25 ezer forint, nagyobb területek arányosan drágábbak. Csomagajánlatokkal kedvezőbb árat biztosítunk."
+      }
+    ]
+  },
+  {
+    id: 'sminktetovalas',
+    title: 'Tartós Sminktetoválás',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a tartós sminktetoválás?",
+        a: "A tartós sminktetoválás (permanens smink) egy kozmetikai tetoválási technika, amely természetes hatású, tartós sminket eredményez. A bőr felső rétegeibe juttatott speciális pigmentek segítségével hangsúlyozhatók a szemöldökök, szemek és ajkak. Az eredmény 1-3 évig tart, majd fokozatosan halványul."
+      },
+      {
+        q: "Milyen sminktetoválás technikák léteznek?",
+        a: "Népszerű technikák: Microblading (szemöldök szálazás), Ombre/powder brows (púderes szemöldök), Combination brows (kombinált technika), Szemhéjtetoválás (liner), Ajakkontúr és ajaktetoválás. Minden technikának megvan a maga előnye, a választás az egyéni igényektől és arc-jellemzőktől függ."
+      },
+      {
+        q: "Fájdalmas-e a sminktetoválás?",
+        a: "A kezelés előtt érzéstelenítő krémet alkalmazunk, így a fájdalom minimális. Legtöbben enyhe kaparást vagy nyomást éreznek. Az érzékenység egyéni, az ajaknál és szemhéjnál intenzívebb érzés lehet."
+      },
+      {
+        q: "Mennyi ideig tart a sminktetoválás?",
+        a: "A tartósság 1-3 év között változik, függően a bőrtípustól, az alkalmazott technikától, a pigment színétől és az életmódtól. Zsírosabb bőrön gyorsabban halványul. A frissítő kezelés (touch-up) évente egyszer javasolt a tökéletes eredmény fenntartásához."
+      },
+      {
+        q: "Milyen a gyógyulási folyamat?",
+        a: "A gyógyulás 7-14 napot vesz igénybe. Az első napokban a szín intenzívebb, majd pörk képződik és fokozatosan leválik. A végleges szín és forma 4-6 hét után látható. Fontos: ne kaparjon, ne áztassa a területet a gyógyulás alatt!"
+      },
+      {
+        q: "Szükséges-e korrekció?",
+        a: "Igen, az első kezelés után 4-6 héttel korrekciós kezelés javasolt. Ez része a folyamatnak és általában az árban benne van. A korrekció során finomítjuk a formát, pótoljuk az esetlegesen kihullott pigmentet és véglegesítjük az eredményt."
+      },
+      {
+        q: "Alkalmas vagyok-e sminktetoválásra?",
+        a: "A sminktetoválás a legtöbb ember számára alkalmas. Ellenjavallatok: terhesség, szoptatás, cukorbetegség, véralvadási zavarok, epilepszia, aktív bőrbetegségek, keloid hajlam. A konzultáció során felmérjük az alkalmasságot."
+      },
+      {
+        q: "Hogyan válasszak megfelelő formát és színt?",
+        a: "A konzultáció során szakemberünk figyelembe veszi arcformáját, bőrtónusát, szemszínét és személyes preferenciáit. A tetoválás előtt megrajzoljuk a formát, hogy lássa és jóváhagyja. A szín 30-40%-kal halványul a gyógyulás után."
+      },
+      {
+        q: "Sminkelhetem a szemöldökömet a kezelés után?",
+        a: "A gyógyulás alatt (7-14 nap) kerülje a sminkelést a kezelt területen. Utána már sminkelhet, de a tartós smink lényege, hogy kevesebb vagy semmilyen sminkre nem lesz szüksége. Sokan csak különleges alkalmakkor egészítik ki."
+      },
+      {
+        q: "Mi történik, ha nem tetszik az eredmény?",
+        a: "A kezelés előtti alapos konzultáció és előzetes formarajzolás minimalizálja ezt a kockázatot. Ha mégis elégedetlen, a korrekciós alkalommal módosíthatunk. Végső esetben a sminktetoválás lézerrel eltávolítható, bár ez időigényes folyamat."
+      }
+    ]
+  },
+  {
+    id: 'carbon-peeling',
+    title: 'Carbon Peeling',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a Carbon Peeling kezelés?",
+        a: "A Carbon Peeling (más néven Hollywood Peeling vagy Carbon Laser) egy innovatív bőrfiatalító és tisztító kezelés. A bőrre speciális szénrészecskéket tartalmazó maszkot viszünk fel, majd Nd:YAG lézerrel kezeljük. A lézer elpárologtatja a szenet a szennyeződésekkel együtt, miközben kollagéntermelést stimulál."
+      },
+      {
+        q: "Milyen bőrproblémákra ajánlott?",
+        a: "A Carbon Peeling ideális: tág pórusok kezelésére, zsíros, aknés bőrre, mitesszerek eltávolítására, egyenetlen bőrtónusra, finom ráncokra, fakó, élettelen bőrre, pigmentfoltokra. Szinte minden bőrtípusnak megfelelő."
+      },
+      {
+        q: "Fájdalmas-e a kezelés?",
+        a: "A kezelés fájdalommentes. A lézer enyhe meleget és bizsergést okoz, amit a legtöbb páciens kellemesnek talál. Nincs szükség érzéstelenítésre."
+      },
+      {
+        q: "Mennyi ideig tart egy kezelés?",
+        a: "Egy Carbon Peeling kezelés körülbelül 30-45 percet vesz igénybe. A kezelés gyors és kényelmes, nincs felépülési idő, azonnal visszatérhet mindennapi tevékenységeihez."
+      },
+      {
+        q: "Milyen gyakran ismételhető a kezelés?",
+        a: "Optimális eredményhez 4-6 kezelés ajánlott, 2-4 hetes időközönként. Fenntartó kezelésként havonta egyszer elegendő. Speciális események előtt egyszeri kezelés is látványos eredményt ad."
+      },
+      {
+        q: "Mikor látható az eredmény?",
+        a: "Az eredmény azonnal látható! A bőr ragyogóbb, tisztább és feszesebb lesz már az első kezelés után. A pórusok összehúzódnak, a bőr egyenletesebb. A kollagéntermelés stimulálása révén az eredmények hetekig javulnak."
+      },
+      {
+        q: "Van-e mellékhatása?",
+        a: "A Carbon Peeling rendkívül biztonságos. Enyhe bőrpír előfordulhat, ami általában néhány órán belül elmúlik. Ritka esetben múló érzékenység jelentkezhet. Fontos a napvédelem használata a kezelés után."
+      },
+      {
+        q: "Kombinálható más kezelésekkel?",
+        a: "Igen, kiválóan kombinálható más kezelésekkel: HydraBeauty-val (mélyebb tisztítás), LED fényterápiával, mezoterápiával. A kombinált kezelésekről szakemberünk ad személyre szabott javaslatot."
+      },
+      {
+        q: "Alkalmas érzékeny bőrre?",
+        a: "A Carbon Peeling általában érzékeny bőrre is alkalmas, de javasolt előzetes konzultáció. A kezelés intenzitása állítható. Aktív gyulladások, nyílt sebek esetén a kezelés ellenjavallt."
+      },
+      {
+        q: "Nyáron is végezhető a kezelés?",
+        a: "Igen, a Carbon Peeling egész évben végezhető. Fontos azonban a megfelelő fényvédelem (SPF 30+) használata a kezelés utáni napokban, különösen nyáron."
+      }
+    ]
+  },
+  {
+    id: 'pigmentfolt',
+    title: 'Pigmentfolt Eltávolítás',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`,
+    questions: [
+      {
+        q: "Milyen típusú pigmentfoltok kezelhetők lézerrel?",
+        a: "Lézerrel kezelhetők: napfoltok, öregségi foltok, szeplők, melasma (bizonyos típusai), posztinflammatorikus hiperpigmentáció (pl. akne utáni foltok), café-au-lait foltok. A kezelés előtt fontos a pontos diagnózis, ezért konzultáció szükséges."
+      },
+      {
+        q: "Hogyan működik a lézeres pigmentfolt eltávolítás?",
+        a: "A lézer célzottan a pigmentet (melanint) tartalmazó sejtekre hat. A nagy energiájú fénypulzusok feldarabolják a pigmentrészecskéket, amelyeket a test immunrendszere természetes úton eltávolít. A környező bőr sértetlen marad."
+      },
+      {
+        q: "Hány kezelés szükséges?",
+        a: "A szükséges kezelések száma a pigmentfolt típusától, méretétől és mélységétől függ. Felszínes foltok 1-3 kezeléssel eltávolíthatók, mélyebb pigmentációk 4-6 kezelést igényelhetnek. A kezeléseket 4-6 hetes időközönként végezzük."
+      },
+      {
+        q: "Fájdalmas-e a kezelés?",
+        a: "A kezelés enyhe csípéssel jár, amit a legtöbb páciens jól tolerál. A készülékek beépített hűtéssel rendelkeznek, ami növeli a komfortot. Szükség esetén érzéstelenítő krém alkalmazható."
+      },
+      {
+        q: "Milyen a gyógyulási folyamat?",
+        a: "A kezelt területen átmenetileg sötétedés, majd pörkképződés várható. A pörk 7-14 nap alatt természetesen leválik, alatta új, egészséges bőr képződik. Fontos: ne kaparjuk le a pörköt, és használjunk napvédőt!"
+      },
+      {
+        q: "Visszajöhetnek a pigmentfoltok?",
+        a: "A sikeresen eltávolított pigmentfoltok általában nem térnek vissza, DE új foltok keletkezhetnek napozás vagy hormonális változások hatására. A megelőzés kulcsa: rendszeres napvédő használat (SPF 30+) és a túlzott napozás kerülése."
+      },
+      {
+        q: "Bármilyen bőrtípuson végezhető?",
+        a: "A kezelés világosabb bőrtípusokon (Fitzpatrick I-III) a legbiztonságosabb és leghatékonyabb. Sötétebb bőrön nagyobb a hipopigmentáció (világos foltok) kockázata, ezért óvatosabb beállítások szükségesek. Konzultáción felmérjük az alkalmasságot."
+      },
+      {
+        q: "Melasma kezelhető lézerrel?",
+        a: "A melasma összetett probléma, ahol a lézeres kezelés csak egyik eleme a komplex terápiának. Egyes típusoknál hatékony lehet, másoknál akár ronthat is. Melasma esetén mindenképp szakértői konzultáció és személyre szabott kezelési terv szükséges."
+      },
+      {
+        q: "Mikor a legjobb időszak a kezelésre?",
+        a: "A pigmentfolt kezelésre az őszi-téli hónapok az ideálisak, amikor kisebb a napfény intenzitása. Nyáron fokozott napvédelem mellett is végezhető, de a visszapigmentálódás kockázata nagyobb."
+      },
+      {
+        q: "Mit kell tenni a kezelés előtt és után?",
+        a: "Kezelés előtt: kerülje a napozást és önbarnítókat 2-4 hétig. Kezelés után: használjon napvédőt (SPF 50), kerülje a közvetlen napfényt, ne kaparjon, hidratáljon rendszeresen. A pontos protokollt szakemberünk ismerteti."
+      }
+    ]
+  }
+];
+
+// Color scheme for each category
+const categoryColors: Record<string, { primary: string; light: string; bg: string; shadow: string }> = {
+  'altalanos': { primary: '#c53f75', light: '#e497a2', bg: '#fdf8f6', shadow: 'rgba(197, 63, 117, 0.15)' },
+  'lezeres-szortelenites': { primary: '#3b82f6', light: '#93c5fd', bg: '#eff6ff', shadow: 'rgba(59, 130, 246, 0.15)' },
+  'hydrabeauty': { primary: '#0d9488', light: '#5eead4', bg: '#f0fdfa', shadow: 'rgba(13, 148, 136, 0.15)' },
+  'tetovalas-eltavolitas': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2', shadow: 'rgba(239, 68, 68, 0.15)' },
+  'sminktetovalas': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff', shadow: 'rgba(99, 102, 241, 0.15)' },
+  'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff', shadow: 'rgba(139, 92, 246, 0.15)' },
+  'pigmentfolt': { primary: '#f59e0b', light: '#fcd34d', bg: '#fffbeb', shadow: 'rgba(245, 158, 11, 0.15)' },
+};
+
+// Generate FAQ Schema for SEO
+const allQuestions = faqCategories.flatMap(cat => cat.questions);
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": allQuestions.map(q => ({
+    "@type": "Question",
+    "name": q.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": q.a
+    }
+  }))
+};
+---
+
+<Layout title="Gyakran Ismételt Kérdések (GYIK) - Beautyflow Szépségszalon" description="Válaszok a lézeres szőrtelenítéssel, HydraBeauty kezeléssel, sminktetoválással és egyéb kozmetikai kezelésekkel kapcsolatos leggyakoribb kérdésekre.">
+  <!-- FAQ Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-8 lg:py-12 bg-gradient-to-br from-[#fdf8f6] via-white to-[#f8f4f9]">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-[#c53f75]/5 rounded-full blur-3xl animate-float"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#e497a2]/10 rounded-full blur-3xl animate-float-delayed"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="font-heading text-4xl lg:text-6xl text-gray-900 mb-6 animate-fade-in">
+          Gyakran Ismételt <span class="text-[#c53f75]">Kérdések</span>
+        </h1>
+        <p class="text-lg text-gray-600 leading-relaxed animate-fade-in-delayed">
+          Összegyűjtöttük a kezeléseinkkel kapcsolatos leggyakoribb kérdéseket és válaszokat,
+          hogy minden fontos információt megtaláljon egy helyen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Navigation -->
+  <section class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div class="container mx-auto px-4">
+      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide justify-center" id="faq-nav">
+        {faqCategories.map((category, index) => {
+          const colors = categoryColors[category.id];
+          return (
+          <button
+            class={`faq-nav-btn flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer ${index === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md'}`}
+            style={index === 0 ? `background-color: ${colors.primary}; box-shadow: 0 10px 15px -3px ${colors.shadow}` : ''}
+            data-target={category.id}
+            data-color={colors.primary}
+            data-shadow={colors.shadow}
+          >
+            <span class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" set:html={category.icon} />
+            {category.title}
+          </button>
+        )})}
+      </nav>
+    </div>
+  </section>
+
+  <!-- FAQ Content -->
+  <section class="py-12 lg:py-20 bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc]">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        {faqCategories.map((category, catIndex) => {
+          const colors = categoryColors[category.id];
+          return (
+          <div
+            id={category.id}
+            class={`faq-category mb-16 scroll-mt-32 ${catIndex > 0 ? 'pt-12 border-t border-gray-200' : ''}`}
+            data-color={colors.primary}
+            data-shadow={colors.shadow}
+          >
+            <!-- Category Header -->
+            <div class="flex items-center gap-4 mb-10">
+              <div
+                class="category-icon w-16 h-16 rounded-xl flex items-center justify-center text-white shadow-xl transition-all duration-500 hover:scale-110 hover:rotate-3"
+                style={`background: linear-gradient(135deg, ${colors.primary}, ${colors.light}); box-shadow: 0 10px 25px -5px ${colors.shadow}`}
+              >
+                <span class="w-7 h-7" set:html={category.icon} />
+              </div>
+              <div>
+                <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">
+                  {category.title}
+                </h2>
+                <p class="text-sm text-gray-500 flex items-center gap-2">
+                  <span class="inline-block w-2 h-2 rounded-full animate-pulse" style={`background-color: ${colors.primary}`}></span>
+                  {category.questions.length} kérdés
+                </p>
+              </div>
+            </div>
+
+            <!-- Questions Accordion - Two Columns -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {category.questions.map((item, index) => (
+                <div
+                  class="faq-item group bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-xl shadow-md"
+                  style={`animation-delay: ${index * 50}ms; --accent-color: ${colors.primary}; --accent-bg: ${colors.bg}; --accent-shadow: ${colors.shadow}`}
+                  data-color={colors.primary}
+                >
+                  <button
+                    class="faq-question w-full text-left px-5 py-4 flex items-start justify-between gap-3 transition-colors duration-300 cursor-pointer"
+                    aria-expanded="false"
+                  >
+                    <span class="faq-question-text font-semibold text-gray-900 pr-2 text-base transition-colors duration-300">{item.q}</span>
+                    <span class="faq-icon flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110" style={`background-color: ${colors.bg}`}>
+                      <svg class="faq-icon-svg w-4 h-4 transition-transform duration-500" style={`color: ${colors.primary}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </span>
+                  </button>
+                  <div class="faq-answer">
+                    <div class="faq-answer-inner px-5 pb-5 text-gray-600 leading-relaxed text-sm">
+                      <p>{item.a}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )})}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-[#1a1a2e] to-[#2d2d44] relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute top-0 left-1/4 w-64 h-64 bg-[#c53f75]/20 rounded-full blur-3xl animate-float"></div>
+      <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-[#e497a2]/10 rounded-full blur-3xl animate-float-delayed"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-[768px] mx-auto text-center">
+        <h2 class="font-heading text-3xl lg:text-4xl text-white mb-4">
+          Nem találta meg a választ?
+        </h2>
+        <p class="text-gray-300 mb-8">
+          Foglaljon ingyenes konzultációt, és személyesen megválaszoljuk minden kérdését!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/ingyenes-konzultacio"
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 shadow-lg shadow-[#c53f75]/30 hover:shadow-xl hover:shadow-[#c53f75]/40 hover:-translate-y-1"
+          >
+            <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Ingyenes konzultáció
+          </a>
+          <a
+            href="tel:+3613009414"
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-semibold uppercase text-sm rounded-full hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
+          >
+            <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            +36 1 300 9414
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Hide scrollbar for category nav */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Floating animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(-3deg); }
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 10s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  /* Fade in animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in-delayed {
+    animation: fadeIn 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  /* FAQ Answer slide animation - hidden by default */
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-answer-inner {
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.4s, opacity 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .faq-item.active .faq-answer-inner {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.3s ease 0.1s;
+  }
+
+  /* FAQ Item active state - uses CSS custom properties */
+  .faq-item.active {
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 40px var(--accent-shadow);
+    transform: translateY(-2px);
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+    background-color: var(--accent-color) !important;
+  }
+
+  .faq-item.active .faq-icon-svg {
+    color: white !important;
+  }
+
+  .faq-item.active .faq-question-text {
+    color: var(--accent-color);
+  }
+
+  /* Hover color change for question text */
+  .faq-item:hover .faq-question-text {
+    color: var(--accent-color);
+  }
+
+  .faq-item:hover .faq-icon {
+    background-color: var(--accent-bg) !important;
+  }
+
+  /* Smooth scroll padding for header */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Ripple effect on nav buttons */
+  .faq-nav-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-nav-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease-out;
+  }
+
+  .faq-nav-btn:active::after {
+    transform: scale(2);
+  }
+
+  /* Stagger animation for FAQ items */
+  .faq-item {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Category icon pulse */
+  .category-icon {
+    position: relative;
+  }
+
+  .category-icon::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(135deg, #c53f75, #e497a2);
+    border-radius: inherit;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+  }
+
+  .category-icon:hover::before {
+    opacity: 0.3;
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.3; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+</style>
+
+<script>
+  function initFAQ() {
+    // Accordion functionality with smooth animation
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach((item, idx) => {
+      // Set stagger animation delay
+      (item as HTMLElement).style.animationDelay = `${idx * 30}ms`;
+
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+
+      question?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+
+        // Close all other items in the same category
+        const parentCategory = item.closest('.faq-category');
+        parentCategory?.querySelectorAll('.faq-item.active').forEach(activeItem => {
+          if (activeItem !== item) {
+            activeItem.classList.remove('active');
+            activeItem.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Toggle current item
+        item.classList.toggle('active');
+        question.setAttribute('aria-expanded', (!isActive).toString());
+      });
+    });
+
+    // Category navigation with smooth scroll
+    const navButtons = document.querySelectorAll('.faq-nav-btn');
+    const categories = document.querySelectorAll('.faq-category');
+
+    // Helper to set nav button active state with dynamic color
+    function setNavButtonActive(btn: Element, isActive: boolean) {
+      const color = btn.getAttribute('data-color');
+      const shadow = btn.getAttribute('data-shadow');
+      const htmlBtn = btn as HTMLElement;
+
+      if (isActive) {
+        htmlBtn.style.backgroundColor = color || '#6366f1';
+        htmlBtn.style.boxShadow = `0 10px 15px -3px ${shadow || 'rgba(99, 102, 241, 0.15)'}`;
+        btn.classList.add('text-white', 'shadow-lg');
+        btn.classList.remove('bg-gray-100', 'text-gray-600');
+      } else {
+        htmlBtn.style.backgroundColor = '';
+        htmlBtn.style.boxShadow = '';
+        btn.classList.remove('text-white', 'shadow-lg');
+        btn.classList.add('bg-gray-100', 'text-gray-600');
+      }
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const targetCategory = document.getElementById(targetId || '');
+
+        if (targetCategory) {
+          targetCategory.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Update active nav button with animation
+        navButtons.forEach(b => setNavButtonActive(b, b === btn));
+      });
+    });
+
+    // Update nav on scroll with Intersection Observer
+    const observerOptions = {
+      rootMargin: '-150px 0px -50% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navButtons.forEach(btn => {
+            const isTarget = btn.getAttribute('data-target') === id;
+            setNavButtonActive(btn, isTarget);
+          });
+        }
+      });
+    }, observerOptions);
+
+    categories.forEach(category => observer.observe(category));
+
+    // Add entrance animation to FAQ items when they come into view
+    const itemObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-visible');
+          itemObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    faqItems.forEach(item => itemObserver.observe(item));
+  }
+
+  document.addEventListener('DOMContentLoaded', initFAQ);
+  document.addEventListener('astro:page-load', initFAQ);
+</script>

@@ -1,0 +1,166 @@
+---
+const locations = [
+  {
+    name: 'Beautyflow Buda',
+    address: '1116 Budapest, Vegyész u. 1.',
+    addressMobile: '1116 Budapest,\nVegyész utca 1.',
+    image: '/images/Beautyflow-buda.jpg',
+    bookingUrl: 'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
+    hours: [
+      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
+      { days: 'Szombat', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: '10:00 – 19:00' },
+    ],
+    slideFrom: 'left'
+  },
+  {
+    name: 'Beautyflow Pest',
+    address: '1135 Budapest, Reitter Ferenc u. 90.',
+    addressMobile: '1135 Budapest,\nReitter Ferenc utca 90.',
+    image: '/images/Beautyflow-Pest.jpg',
+    bookingUrl: 'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
+    hours: [
+      { days: 'Hétfő – Péntek', time: '08:00 – 18:00' },
+      { days: 'Szombat', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: 'Zárva' },
+    ],
+    slideFrom: 'right'
+  }
+];
+---
+
+<section id="locations-section" class="overflow-hidden">
+  <div class="flex flex-col lg:flex-row">
+    {locations.map((location, index) => (
+      <div
+        class="location-card relative min-h-[400px] lg:min-h-[450px] flex-1 flex items-center justify-center py-12"
+        data-slide-from={location.slideFrom}
+      >
+        <!-- Background image -->
+        <div
+          class="location-bg absolute inset-0 bg-cover bg-center"
+          style={`background-image: url('${location.image}');`}
+        ></div>
+
+        <!-- White content box - positioned on the inner edge -->
+        <div class={`location-content relative z-10 bg-white shadow-xl p-8 w-[320px] ${index === 0 ? 'lg:ml-auto lg:mr-[10px]' : 'lg:mr-auto lg:ml-[10px]'}`}>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-1">
+            {location.name}
+          </h2>
+
+          <p class="text-gray-600 mb-4 hidden lg:block text-sm">
+            {location.address}
+          </p>
+          <p class="text-gray-600 mb-4 lg:hidden whitespace-pre-line text-sm">
+            {location.addressMobile}
+          </p>
+
+          <div class="text-center mb-6">
+            <a
+              href={location.bookingUrl}
+              target="_blank"
+              rel="noopener"
+              class="inline-block bg-[#c53f75] text-white font-semibold uppercase text-sm px-8 py-3 rounded-full hover:bg-[#a33460] transition-colors"
+            >
+              Időpontfoglalás
+            </a>
+          </div>
+
+          <!-- Opening Hours Table -->
+          <table class="w-full text-sm border-t border-gray-300">
+            <thead>
+              <tr>
+                <th colspan="2" class="font-semibold py-3 text-center border-b border-gray-300">
+                  Nyitvatartás
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {location.hours.map((hour) => (
+                <tr class="border-b border-gray-200">
+                  <td class="py-2 text-left font-medium text-gray-700">{hour.days}</td>
+                  <td class="py-2 text-right text-gray-600">{hour.time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  /* Both background and content slide together */
+  .location-bg,
+  .location-content {
+    transition: transform 0.8s ease-out;
+  }
+
+  /* Slide from left */
+  .location-card.animate-ready[data-slide-from="left"] .location-bg,
+  .location-card.animate-ready[data-slide-from="left"] .location-content {
+    transform: translateX(-100%);
+  }
+
+  /* Slide from right */
+  .location-card.animate-ready[data-slide-from="right"] .location-bg,
+  .location-card.animate-ready[data-slide-from="right"] .location-content {
+    transform: translateX(100%);
+  }
+
+  /* Animated in state */
+  .location-bg.animate-in,
+  .location-content.animate-in {
+    transform: translateX(0) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .location-bg,
+    .location-content {
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  function initLocationAnimations() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    const cards = document.querySelectorAll('.location-card');
+
+    // Add animate-ready class to enable hidden state
+    cards.forEach(card => {
+      card.classList.add('animate-ready');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const bg = entry.target.querySelector('.location-bg');
+          const content = entry.target.querySelector('.location-content');
+          if (bg && content) {
+            setTimeout(() => {
+              bg.classList.add('animate-in');
+              content.classList.add('animate-in');
+            }, 100);
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    cards.forEach((card) => observer.observe(card));
+  }
+
+  document.addEventListener('DOMContentLoaded', initLocationAnimations);
+  document.addEventListener('astro:page-load', initLocationAnimations);
+</script>
