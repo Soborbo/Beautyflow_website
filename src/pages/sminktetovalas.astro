@@ -109,53 +109,6 @@ const howItWorks = [
     number: '3.',
     title: 'Gyógyulási szakasz',
     description: 'A friss tetoválás pár napig intenzívebb színű, majd a var leesése után kicsit fakóbbnak tűnik. Ez teljesen normális, természetes folyamat. A szemöldöknél kb. 4 hét, az ajaknál kb. 2 hónap alatt érik be a végleges szín.'
-  },
-  {
-    number: '4.',
-    title: 'Akár 3 évig tartó eredmény',
-    description: 'A sminktetoválás akár 1,5–3 évig tartós lehet, és fokozatosan halványodik el. Ha szeretnéd, 12 hónapon belül kedvezményesen frissítjük, hogy mindig tökéletes maradjon.'
-  }
-];
-
-const priceList = [
-  { service: 'Szemöldök tetoválás (púderes)', price: '75 000 Ft' },
-  { service: 'Szemöldök tetoválás (ombre)', price: '75 000 Ft' },
-  { service: 'Rontott szemöldök tetoválás javítása', price: '80 000 Ft' },
-  { service: 'Szemhéj tetoválás (pillató sűrítő)', price: '35 000 Ft' },
-  { service: 'Fél ajaksatír', price: '55 000 Ft' },
-  { service: 'Teljes ajaksatír', price: '65 000 Ft' },
-];
-
-const whyChooseUs = [
-  {
-    image: '/images/sminktetovalas-budapest.jpg',
-    title: 'Fájdalom és\ntrauma nélkül',
-    description: 'Sokéves tapasztalatunknak és a modern technológiának köszönhetően a nálunk végzett sminktetoválás fájdalommentes. Annyira finoman dolgozunk, hogy a bőr csak felületes irritációt szenved, ezért nem lesz szükséged fárasztó és körülményes utóápolásra.'
-  },
-  {
-    image: '/images/higienia.jpg',
-    title: 'Csak a legjobb\npigmenteket használjuk',
-    description: 'A sminktetoválás egyik legfőbb titka a megfelelő pigment kiválasztása. Nem csak a színezőanyag minőségének kell tökéletesnek lennie, de szakszerűen kell kiválasztanunk a te bőrödnek és szőrtípusodnak legmegfelelőbb, legtermészetesebb pigmenteket.'
-  },
-  {
-    image: '/images/sminktetovalas-bemeres.webp',
-    title: 'Sablon helyett\negyedi tervezéssel',
-    description: 'Nagyon sok helyen mindig ugyanúgy végzik a sminktetoválást – a Beautyflownál mi mindig egyedi beméréssel, egyedileg a te arcodhoz és személyiségedhez illően tervezzük meg általános klisék és sablonok helyett.'
-  },
-  {
-    image: '/images/konya-fanni-szepsegszalonja-1.jpg',
-    title: 'Egy kezelés -\ntöbb éves hatás',
-    description: 'Képzeld el, milyen felszabadító érzés lehet, ha nem kell naponta állandóan újraalkotnod a sminkedet! Egyetlen kezelés eredménye akár 1,5–3 évig is tarthat, ami hosszú távon nem csak időt és energiát, de pénzt is spórol neked.'
-  },
-  {
-    image: '/images/sminktetovalas-budapest-beautyflow.jpg',
-    title: 'Legyél magabiztos\nminden helyzetben',
-    description: 'A sminktetoválással edzés közben, egy hosszú munkanap után vagy a dinnyeérlelő nyári melegben is tökéletes marad a sminked. Nem kell aggódnod a kenődés, az izzadás vagy az elhalványulás miatt.'
-  },
-  {
-    image: '/images/beautyflow-dijak.webp',
-    title: 'Díjnyertes\nszalon',
-    description: 'A Notino "Hónap Szalonja" díj és számos egyéb elismerés bizonyítja munkánk minőségét. Kapj extra önbizalmat és tudd, hogy mindig a legjobb formádat adod odafigyelés nélkül is!'
   }
 ];
 
@@ -342,6 +295,36 @@ const faqs = [
     </div>
   </section>
 
+  <!-- Intro Section with Fanni -->
+  <section class="section-animate">
+    <div class="flex flex-col lg:flex-row">
+      <div class="w-full lg:w-1/2 relative overflow-hidden">
+        <img
+          src="/images/konya-fanni-konzultacio.webp"
+          alt="Kónya Fanni sminktetoválás szakértő"
+          class="w-full h-64 lg:h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+        />
+      </div>
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
+        <div class="px-[8%] lg:px-[10%] text-center lg:text-left">
+          <p class="text-gray-700 mb-5" style="font-size: 16px;">
+            Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
+          </p>
+          <p class="text-gray-700 mb-5" style="font-size: 16px;">
+            Mi, a Beautyflow szépségszalonban kizárólag tapasztalt munkatársakkal és a legújabb gépekkel dolgozunk, és minden sminktetoválás, ami a kezünk közül kikerül <strong>egyénre szabott és magas minőségű, orvosi tisztaságú, bevizsgált pigmenteket</strong> tartalmaz.
+          </p>
+          <p class="text-gray-700 mb-6" style="font-size: 16px;">
+            <strong>Azt az odafigyelést és minőséget kapod nálunk, amit mi magunk is elvárunk.</strong>
+          </p>
+          <p class="text-[#c53f75] font-semibold">
+            Kónya Fanni<br />
+            <span class="text-gray-500 font-normal text-sm">ügyvezető</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Treatment Types Section -->
   <section class="py-16 bg-white">
     <div class="max-w-[1000px] mx-auto px-4">
@@ -369,12 +352,22 @@ const faqs = [
         ))}
       </div>
 
-      <div class="mt-10 text-center">
+      <!-- Korrekció információ -->
+      <div class="mt-8 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
+        <p class="text-white font-bold text-lg mb-2">
+          Az árak a korrekció árát (60 napon belül) tartalmazzák!
+        </p>
+        <p class="text-white/90">
+          További korrekciók: <span class="font-bold">15 000 Ft</span> / alkalom
+        </p>
+      </div>
+
+      <div class="mt-8 text-center">
         <a
           href="/ingyenes-konzultacio"
           class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
-          Kérj Ingyenes konzultációt
+          Ingyenes konzultációt kérek
         </a>
       </div>
     </div>
@@ -554,38 +547,6 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Why Choose Us Section -->
-  <section class="bg-white">
-    <div class="py-12 px-4">
-      <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért minket válassz?
-      </h2>
-      <p class="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
-        A Beautyflow-nál a minőség és a vendégelégedettség az első
-      </p>
-    </div>
-
-    <!-- Grid with touching corners - no gaps -->
-    <div class="grid grid-cols-1 md:grid-cols-2">
-      {whyChooseUs.map((item) => (
-        <div class="relative group overflow-hidden">
-          <img
-            src={item.image}
-            alt={item.title}
-            class="w-full h-64 md:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <!-- Overlay with text -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
-            <div class="p-5 md:p-6 text-white">
-              <h3 class="font-heading text-lg md:text-xl mb-2 whitespace-pre-line">{item.title}</h3>
-              <p class="text-white/90 text-sm leading-relaxed">{item.description}</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
   <!-- Consultation Section -->
   <section class="py-12 bg-[#c53f75]">
     <div class="container mx-auto px-4">
@@ -673,60 +634,14 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <img
-                src={testimonial.image}
-                alt={testimonial.author}
-                class="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
                 src="/images/notino-ikon.png"
                 alt="Notino"
-                class="w-8 h-8 object-contain flex-shrink-0"
+                class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1 flex-shrink-0"
               />
+              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Price List Section -->
-  <section class="py-16 bg-white">
-    <div class="max-w-[800px] mx-auto px-4">
-      <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Áraink
-      </h2>
-
-      <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg">
-        <table class="w-full">
-          <tbody class="divide-y divide-gray-200">
-            {priceList.map((item) => (
-              <tr class="hover:bg-white/50 transition-colors">
-                <td class="py-4 px-6 text-gray-900 font-medium">{item.service}</td>
-                <td class="py-4 px-6 text-right text-[#6366f1] font-bold">{item.price}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Korrekció információ - kiemelt -->
-      <div class="mt-6 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
-        <p class="text-white font-bold text-lg mb-2">
-          Az árak a korrekció árát (60 napon belül) tartalmazzák!
-        </p>
-        <p class="text-white/90">
-          További korrekciók: <span class="font-bold">15 000 Ft</span> / alkalom
-        </p>
-      </div>
-
-      <div class="mt-8 text-center">
-        <a
-          href="/ingyenes-konzultacio"
-          class="inline-block px-8 py-3 bg-[#6366f1] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#4f46e5] transition-all duration-300 hover:scale-105"
-        >
-          Ingyenes konzultációt kérek
-        </a>
       </div>
     </div>
   </section>
