@@ -284,7 +284,7 @@ const faqs = [
     </div>
 
     <!-- Stats Section -->
-    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
@@ -368,7 +368,7 @@ const faqs = [
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {treatmentTypes.map((treatment) => (
           <div
-            class="bg-white rounded-lg overflow-hidden shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-300 border-t-4"
+            class="bg-white rounded-lg overflow-hidden shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-300 border-t-4 flex flex-col"
             style="border-top-color: #5851e4; background: linear-gradient(to bottom, #eef2ff, white 30%);"
           >
             <div class="relative overflow-hidden">
@@ -379,10 +379,10 @@ const faqs = [
               />
               <div class="absolute top-0 left-0 right-0 h-1 bg-[#5851e4]"></div>
             </div>
-            <div class="p-3 md:p-5 text-center md:text-left">
+            <div class="p-3 md:p-5 text-center md:text-left flex flex-col flex-1">
               <h3 class="font-heading text-base md:text-lg text-gray-900 mb-1 md:mb-2">{treatment.title}</h3>
-              <p class="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">{treatment.description}</p>
-              <p class="text-[#5851e4] font-bold text-base md:text-lg">{treatment.price}</p>
+              <p class="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block flex-1">{treatment.description}</p>
+              <p class="text-[#5851e4] font-bold text-base md:text-lg mt-auto">{treatment.price}</p>
             </div>
           </div>
         ))}
