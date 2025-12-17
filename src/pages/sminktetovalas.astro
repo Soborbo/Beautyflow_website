@@ -109,6 +109,11 @@ const howItWorks = [
     number: '3.',
     title: 'Gyógyulási szakasz',
     description: 'A friss tetoválás pár napig intenzívebb színű, majd a var leesése után kicsit fakóbbnak tűnik. Ez teljesen normális, természetes folyamat. A szemöldöknél kb. 4 hét, az ajaknál kb. 2 hónap alatt érik be a végleges szín.'
+  },
+  {
+    number: '4.',
+    title: 'Akár 3 évig tartó eredmény',
+    description: 'A sminktetoválás akár 1,5–3 évig tartós lehet, és fokozatosan halványodik el. Ha szeretnéd, 12 hónapon belül kedvezményesen frissítjük, hogy mindig tökéletes maradjon.'
   }
 ];
 
@@ -296,30 +301,46 @@ const faqs = [
   </section>
 
   <!-- Intro Section with Fanni -->
-  <section class="section-animate">
-    <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/konya-fanni-konzultacio.webp"
-          alt="Kónya Fanni sminktetoválás szakértő"
-          class="w-full h-64 lg:h-full object-cover object-top transition-transform duration-700 hover:scale-105"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-[8%] lg:px-[10%] text-center lg:text-left">
-          <p class="text-gray-700 mb-5" style="font-size: 16px;">
-            Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
-          </p>
-          <p class="text-gray-700 mb-5" style="font-size: 16px;">
-            Mi, a Beautyflow szépségszalonban kizárólag tapasztalt munkatársakkal és a legújabb gépekkel dolgozunk, és minden sminktetoválás, ami a kezünk közül kikerül <strong>egyénre szabott és magas minőségű, orvosi tisztaságú, bevizsgált pigmenteket</strong> tartalmaz.
-          </p>
-          <p class="text-gray-700 mb-6" style="font-size: 16px;">
-            <strong>Azt az odafigyelést és minőséget kapod nálunk, amit mi magunk is elvárunk.</strong>
-          </p>
-          <p class="text-[#c53f75] font-semibold">
-            Kónya Fanni<br />
-            <span class="text-gray-500 font-normal text-sm">ügyvezető</span>
-          </p>
+  <section class="section-animate py-12 lg:py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fff] to-[#f8f4f9]">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <!-- Image - sized to match text height -->
+        <div class="w-full lg:w-2/5 flex-shrink-0">
+          <div class="relative rounded-2xl overflow-hidden shadow-xl">
+            <img
+              src="/images/konya-fanni-konzultacio.webp"
+              alt="Kónya Fanni sminktetoválás szakértő"
+              class="w-full h-auto aspect-[3/4] object-cover object-top"
+            />
+            <!-- Decorative corner accent -->
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#c53f75]/20 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#6366f1]/10 to-transparent"></div>
+          </div>
+        </div>
+        <!-- Text content -->
+        <div class="w-full lg:w-3/5">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-gray-100">
+            <p class="text-gray-700 mb-5 text-base leading-relaxed">
+              Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
+            </p>
+            <p class="text-gray-700 mb-5 text-base leading-relaxed">
+              Mi, a Beautyflow szépségszalonban kizárólag tapasztalt munkatársakkal és a legújabb gépekkel dolgozunk, és minden sminktetoválás, ami a kezünk közül kikerül <strong>egyénre szabott és magas minőségű, orvosi tisztaságú, bevizsgált pigmenteket</strong> tartalmaz.
+            </p>
+            <p class="text-gray-700 mb-6 text-base leading-relaxed">
+              <strong>Azt az odafigyelést és minőséget kapod nálunk, amit mi magunk is elvárunk.</strong>
+            </p>
+            <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+              <div class="w-12 h-12 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[#c53f75] font-semibold">Kónya Fanni</p>
+                <p class="text-gray-500 text-sm">ügyvezető</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -378,7 +399,7 @@ const faqs = [
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/sminktetovalas-budapest.jpg"
+          src="/images/sminktetovalas-budapest-beautyflow.jpg"
           alt="Fájdalommentes sminktetoválás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -411,7 +432,7 @@ const faqs = [
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/higienia.jpg"
+          src="/images/sminktetovalas.webp"
           alt="Prémium minőségű pigmentek"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -457,7 +478,7 @@ const faqs = [
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/konya-fanni-szepsegszalonja-1.jpg"
+          src="/images/szemhej-tetovalas-smink.jpg"
           alt="Tartós sminktetoválás eredmények"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -506,19 +527,29 @@ const faqs = [
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
-    <!-- Mobile background - cropped to show face -->
+    <!-- Mobile background -->
     <div class="lg:hidden absolute inset-0 bg-[#e8e4e1]"></div>
 
     <div class="relative z-10 py-16">
       <div class="max-w-[1200px] mx-auto px-4">
-        <h2 class="font-heading text-3xl lg:text-4xl text-[#1e3a5f] mb-10 text-center lg:text-left uppercase">
+        <h2 class="font-heading text-3xl lg:text-4xl text-[#1e3a5f] mb-10 text-center uppercase">
           Hogyan működik?
         </h2>
 
+        <!-- Mobile image showing face - BEFORE cards -->
+        <div class="lg:hidden mb-8 flex justify-center">
+          <img
+            src="/images/sminktetovalas-bg.jpg"
+            alt="Sminktetoválás kezelés"
+            class="w-full max-w-md h-80 object-cover object-[center_20%] rounded-lg shadow-lg"
+          />
+        </div>
+
         <div class="flex flex-col lg:flex-row gap-8">
-          <!-- Cards Grid - Left side -->
+          <!-- Cards - Swipeable on mobile -->
           <div class="lg:w-[60%]">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <!-- Desktop: 2x2 grid -->
+            <div class="hidden md:grid md:grid-cols-2 gap-4 md:gap-5">
               {howItWorks.map((step) => (
                 <div class="bg-white rounded-lg shadow-md p-5 md:p-6">
                   <p class="text-[#1e3a5f] font-bold text-sm mb-1">{step.number}</p>
@@ -527,21 +558,25 @@ const faqs = [
                 </div>
               ))}
             </div>
+
+            <!-- Mobile: Horizontal swipeable cards -->
+            <div class="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <div class="flex gap-4 pb-4" style="width: max-content;">
+                {howItWorks.map((step) => (
+                  <div class="bg-white rounded-lg shadow-md p-5 flex-shrink-0" style="width: 280px;">
+                    <p class="text-[#1e3a5f] font-bold text-sm mb-1">{step.number}</p>
+                    <h3 class="font-heading text-base text-[#1e3a5f] mb-2 uppercase">{step.title}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <!-- Image placeholder for desktop - takes remaining space -->
           <div class="hidden lg:block lg:w-[40%]">
             <!-- Space for background image to show through -->
           </div>
-        </div>
-
-        <!-- Mobile image showing face -->
-        <div class="lg:hidden mt-8 flex justify-center">
-          <img
-            src="/images/sminktetovalas-bg.jpg"
-            alt="Sminktetoválás kezelés"
-            class="w-full max-w-md h-80 object-cover object-[center_20%] rounded-lg shadow-lg"
-          />
         </div>
       </div>
     </div>
@@ -797,6 +832,15 @@ const faqs = [
 <style>
   .stat-item {
     opacity: 1;
+  }
+
+  /* Hide scrollbar for horizontal swipe */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   .faq-answer {
