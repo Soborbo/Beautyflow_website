@@ -39,46 +39,58 @@ const stats = [
 
 const testimonials = [
   {
-    text: 'Fantasztikus munkát végeztek a szemöldökömön! Minden reggel örülök, hogy nem kell sminkelnem, és mégis tökéletesen nézek ki.',
-    author: 'Kiss Petra',
-    image: '/images/laszlo-eszter.png'
+    text: 'Szemöldök tetováláson voltam nála, amivel nagyon elégedett vagyok. Évek óta tartós és sokan megdícsérik, hogy milyen szép és természetes hatása van!',
+    author: 'Brigitta',
+    useNotinoIcon: true
   },
   {
-    text: 'A szájtetoválás után annyira természetes lett az ajkam színe, mintha mindig is ilyen lett volna. Profi munka!',
-    author: 'Nagy Anita',
-    image: '/images/kitti.png'
+    text: 'Fanni a legprecizebb legjobbfej szakember. Lézeres szőrtelenítésen és szemöldök tetováláson voltam nála! Mindenkinek szívesen ajánlom!',
+    author: 'Rita',
+    useNotinoIcon: true
   },
   {
-    text: 'A szemhéjtetoválásom csodás lett! Reggel már készen vagyok, nem kell bajlódnom a szemceruza felhúzásával.',
-    author: 'Szabó Réka',
-    image: '/images/dora.png'
+    text: '2020 óta járok hozzá, és remélem még sokáig fogok, sminktetoválásban is kiváló szakember. A szalon gyönyörű, tiszta és rendezett.',
+    author: 'Kovács Bernadett',
+    useNotinoIcon: true
   }
 ];
 
 const treatmentTypes = [
   {
-    title: 'Szemöldök tetoválás',
-    description: 'Természetes hatású, szálazott vagy púderes technikával készült szemöldök, ami tökéletesen illik az arcformádhoz.',
+    title: 'Szemöldök tetoválás (púderes)',
+    description: 'Természetes, púderes hatású szemöldök tetoválás, ami lágy, sminkelten tartós megjelenést biztosít.',
     image: '/images/szemoldok-sminktetovalas.jpg',
-    price: '75 000 - 80 000 Ft'
+    price: '75 000 Ft'
   },
   {
-    title: 'Szempillaalap tetoválás',
+    title: 'Szemöldök tetoválás (ombre)',
+    description: 'Ombre technikával készült szemöldök, ami a tőtől a csúcsig fokozatosan halványodik a természetes hatásért.',
+    image: '/images/szemoldok-sminktetovalas.jpg',
+    price: '75 000 Ft'
+  },
+  {
+    title: 'Rontott szemöldök tetoválás javítása',
+    description: 'Máshol készült, nem megfelelő szemöldök tetoválás szakszerű javítása és korrekciója.',
+    image: '/images/szemoldok-sminktetovalas.jpg',
+    price: '80 000 Ft'
+  },
+  {
+    title: 'Szemhéj tetoválás (pillató sűrítő)',
     description: 'Dúsabb, kifejezőbb pillák illúziója, ami kiemeli a szemed szépségét smink nélkül is.',
     image: '/images/szemhej-sminktetovalas-budapest.jpg',
-    price: '20 000 - 100 000 Ft'
+    price: '35 000 Ft'
   },
   {
-    title: 'Ajak tetoválás',
-    description: 'Természetes rózsaszíntől az intenzív rúzs hatásig – az ajkad mindig tökéletes lesz.',
+    title: 'Fél ajaksatír',
+    description: 'Az ajkak felső vagy alsó kontúrjának kiemelése természetes, tartós eredménnyel.',
     image: '/images/ajak-sminktetovalas.jpg',
-    price: '100 000 Ft'
+    price: '55 000 Ft'
   },
   {
-    title: 'Szájkontúr tetoválás',
-    description: 'Precíz kontúrvonallal hangsúlyozd ajkaid természetes formáját és tedd őket teltebbé.',
+    title: 'Teljes ajaksatír',
+    description: 'Teljes ajakkontúr tetoválás, ami hangsúlyozza és tökéletesíti az ajkak formáját.',
     image: '/images/sminktetovalas-mb.jpg',
-    price: '80 000 Ft'
+    price: '65 000 Ft'
   }
 ];
 
@@ -86,65 +98,64 @@ const howItWorks = [
   {
     number: '1.',
     title: 'Ingyenes konzultáció',
-    description: 'Az első találkozáskor megbeszéljük az elképzeléseidet, megnézzük az arcformádat és bőrtípusodat, majd közösen kiválasztjuk a legjobb megoldást.'
+    description: 'Először átbeszéljük, mit szeretnél, és közösen megtervezzük a számodra legelőnyösebb formát és színt. Minden sminktetoválás alapos előrajzolással kezdődik, így pontosan látod előre, hogyan fog állni rajtad.'
   },
   {
     number: '2.',
-    title: 'Előrajzolás és egyeztetés',
-    description: 'A kezelés előtt precízen megtervezzük és felrajzoljuk a kívánt formát. Csak akkor kezdünk el dolgozni, ha 100%-ban elégedett vagy az előrajzzal.'
+    title: 'Érzéstelenítés és tetoválás',
+    description: 'A kezelés teljesen biztonságos, és érzéstelenítés alatt történik, így a kellemetlenség minimális. Ha elégedett vagy az előrajzolással, professzionális gépünkkel precízen visszük fel a pigmentet a bőrödbe.'
   },
   {
     number: '3.',
-    title: 'A tetoválás elkészítése',
-    description: 'Érzéstelenítő krém segítségével a folyamat szinte teljesen fájdalommentes. A kezelés kb. 1-2 óra, és rögtön látható az eredmény.'
+    title: 'Gyógyulási szakasz',
+    description: 'A friss tetoválás pár napig intenzívebb színű, majd a var leesése után kicsit fakóbbnak tűnik. Ez teljesen normális, természetes folyamat. A szemöldöknél kb. 4 hét, az ajaknál kb. 2 hónap alatt érik be a végleges szín.'
   },
   {
     number: '4.',
-    title: 'Utókezelés és javítás',
-    description: 'A gyógyulás után (4-6 hét) egy ingyenes korrekciós kezelésen finomítjuk az eredményt, hogy tökéletes legyen.'
+    title: 'Akár 3 évig tartó eredmény',
+    description: 'A sminktetoválás akár 1,5–3 évig tartós lehet, és fokozatosan halványodik el. Ha szeretnéd, 12 hónapon belül kedvezményesen frissítjük, hogy mindig tökéletes maradjon.'
   }
 ];
 
 const priceList = [
-  { service: 'Szemöldök tetoválás (szálazás)', price: '75 000 Ft' },
-  { service: 'Szemöldök tetoválás (púderes)', price: '80 000 Ft' },
-  { service: 'Szemöldök korrekció (saját munka)', price: '40 000 Ft' },
-  { service: 'Szempillaalap tetoválás', price: '20 000 - 100 000 Ft' },
-  { service: 'Ajak tetoválás (teljes)', price: '100 000 Ft' },
-  { service: 'Szájkontúr tetoválás', price: '80 000 Ft' },
-  { service: 'Ajak korrekció (saját munka)', price: '50 000 Ft' },
+  { service: 'Szemöldök tetoválás (púderes)', price: '75 000 Ft' },
+  { service: 'Szemöldök tetoválás (ombre)', price: '75 000 Ft' },
+  { service: 'Rontott szemöldök tetoválás javítása', price: '80 000 Ft' },
+  { service: 'Szemhéj tetoválás (pillató sűrítő)', price: '35 000 Ft' },
+  { service: 'Fél ajaksatír', price: '55 000 Ft' },
+  { service: 'Teljes ajaksatír', price: '65 000 Ft' },
 ];
 
 const whyChooseUs = [
   {
-    image: '/images/sminktetovalas-bemeres.webp',
-    title: 'Precíz előrajzolás\nés tervezés',
-    description: 'Mielőtt bármit is csinálnánk, részletesen megtervezzük és felrajzoljuk a kívánt formát. Csak akkor kezdünk el dolgozni, ha 100%-ban elégedett vagy.'
-  },
-  {
     image: '/images/sminktetovalas-budapest.jpg',
-    title: 'Természetes\nhatás',
-    description: 'A cél mindig a természetes, harmonikus megjelenés. A sminktetoválás úgy néz ki, mintha mindig is ilyen lett volna.'
+    title: 'Fájdalom és\ntrauma nélkül',
+    description: 'Sokéves tapasztalatunknak és a modern technológiának köszönhetően a nálunk végzett sminktetoválás fájdalommentes. Annyira finoman dolgozunk, hogy a bőr csak felületes irritációt szenved, ezért nem lesz szükséged fárasztó és körülményes utóápolásra.'
   },
   {
     image: '/images/higienia.jpg',
-    title: 'Steril környezet\nés biztonság',
-    description: 'Kizárólag egyszerhasználatos tűket és sterile eszközöket használunk. A higiénia nálunk alapkövetelmény.'
+    title: 'Csak a legjobb\npigmenteket használjuk',
+    description: 'A sminktetoválás egyik legfőbb titka a megfelelő pigment kiválasztása. Nem csak a színezőanyag minőségének kell tökéletesnek lennie, de szakszerűen kell kiválasztanunk a te bőrödnek és szőrtípusodnak legmegfelelőbb, legtermészetesebb pigmenteket.'
+  },
+  {
+    image: '/images/sminktetovalas-bemeres.webp',
+    title: 'Sablon helyett\negyedi tervezéssel',
+    description: 'Nagyon sok helyen mindig ugyanúgy végzik a sminktetoválást – a Beautyflownál mi mindig egyedi beméréssel, egyedileg a te arcodhoz és személyiségedhez illően tervezzük meg általános klisék és sablonok helyett.'
   },
   {
     image: '/images/konya-fanni-szepsegszalonja-1.jpg',
-    title: 'Tapasztalt\nszakemberek',
-    description: '10+ év tapasztalattal rendelkező sminktetováló szakemberek várnak, akik folyamatosan képzik magukat a legújabb technikákból.'
+    title: 'Egy kezelés -\ntöbb éves hatás',
+    description: 'Képzeld el, milyen felszabadító érzés lehet, ha nem kell naponta állandóan újraalkotnod a sminkedet! Egyetlen kezelés eredménye akár 1,5–3 évig is tarthat, ami hosszú távon nem csak időt és energiát, de pénzt is spórol neked.'
   },
   {
     image: '/images/sminktetovalas-budapest-beautyflow.jpg',
-    title: 'Ingyenes\nkorrekció',
-    description: 'Minden sminktetováláshoz tartozik egy ingyenes korrekciós kezelés 4-6 hét után, hogy az eredmény tökéletes legyen.'
+    title: 'Legyél magabiztos\nminden helyzetben',
+    description: 'A sminktetoválással edzés közben, egy hosszú munkanap után vagy a dinnyeérlelő nyári melegben is tökéletes marad a sminked. Nem kell aggódnod a kenődés, az izzadás vagy az elhalványulás miatt.'
   },
   {
     image: '/images/beautyflow-dijak.webp',
     title: 'Díjnyertes\nszalon',
-    description: 'A Notino "Hónap Szalonja" díj és számos egyéb elismerés bizonyítja munkánk minőségét.'
+    description: 'A Notino "Hónap Szalonja" díj és számos egyéb elismerés bizonyítja munkánk minőségét. Kapj extra önbizalmat és tudd, hogy mindig a legjobb formádat adod odafigyelés nélkül is!'
   }
 ];
 
@@ -166,6 +177,69 @@ const faqs = [
   title="Tartós Sminktetoválás Budapest - Szemöldök, Ajak, Szempilla | Beautyflow"
   description="Professzionális sminktetoválás Budapesten. Szemöldök, szempillaalap és ajak tetoválás természetes hatással. 10+ év tapasztalat. Kérj ingyenes konzultációt!"
 >
+  <!-- FAQ Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  })} />
+
+  <!-- Service Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Sminktetoválás",
+    "name": "Tartós Sminktetoválás Budapest",
+    "description": "Professzionális sminktetoválás Budapesten. Szemöldök, szempillaalap és ajak tetoválás természetes hatással.",
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Beautyflow Szépségszalon",
+      "image": "https://beautyflow.hu/images/beautyflow-logo.png",
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "streetAddress": "Vegyész u. 1.",
+          "addressLocality": "Budapest",
+          "postalCode": "1116",
+          "addressCountry": "HU"
+        },
+        {
+          "@type": "PostalAddress",
+          "streetAddress": "Reitter Ferenc u. 90.",
+          "addressLocality": "Budapest",
+          "postalCode": "1135",
+          "addressCountry": "HU"
+        }
+      ],
+      "telephone": "+36 1 300 9414",
+      "priceRange": "$$"
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Budapest"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Sminktetoválás szolgáltatások",
+      "itemListElement": priceList.map(item => ({
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": item.service
+        },
+        "price": item.price.replace(/[^0-9]/g, ''),
+        "priceCurrency": "HUF"
+      }))
+    }
+  })} />
+
   <!-- Hero Section -->
   <section class="hero-section relative lg:h-[calc(100dvh-60px)] flex flex-col">
     <div class="flex flex-col lg:flex-row flex-1 min-h-0">
@@ -191,11 +265,14 @@ const faqs = [
             </div>
           </div>
 
-          <h1 class="font-heading text-3xl lg:text-5xl text-gray-900 mb-4 uppercase leading-tight">
-            Tartós Sminktetoválás
+          <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2">
+            Fájdalommentes sminktetoválás Budapest
           </h1>
+          <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight">
+            Ébredj reggel tökéletes sminkben, ami nem mosódik el a nap során
+          </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Nézz ki mindig tökéletesen, rögtön az ágyból felkelve is. Szemöldök, szempillaalap és ajak tetoválás természetes hatással.
+            A Beautyflow tartós sminktetoválás akár 3 évig is tökéletes maradhat egyetlen fájdalommentes alkalom után.
           </p>
 
           <!-- CTA row -->
@@ -355,9 +432,9 @@ const faqs = [
           <div class="bg-white rounded-xl p-6 shadow-sm">
             <div class="flex items-center gap-4 mb-4">
               <img
-                src={testimonial.image}
-                alt={testimonial.author}
-                class="w-12 h-12 rounded-full object-cover"
+                src="/images/notino-ikon.png"
+                alt="Notino vélemény"
+                class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1"
               />
               <div>
                 <p class="font-semibold text-gray-900">{testimonial.author}</p>
@@ -381,9 +458,6 @@ const faqs = [
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
         Áraink
       </h2>
-      <p class="text-gray-600 text-center mb-8">
-        Minden ár tartalmazza az ingyenes korrekciós kezelést
-      </p>
 
       <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg">
         <table class="w-full">
@@ -396,6 +470,16 @@ const faqs = [
             ))}
           </tbody>
         </table>
+      </div>
+
+      <!-- Korrekció információ - kiemelt -->
+      <div class="mt-6 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
+        <p class="text-white font-bold text-lg mb-2">
+          Az árak a korrekció árát (60 napon belül) tartalmazzák!
+        </p>
+        <p class="text-white/90">
+          További korrekciók: <span class="font-bold">15 000 Ft</span> / alkalom
+        </p>
       </div>
 
       <div class="mt-8 text-center">
