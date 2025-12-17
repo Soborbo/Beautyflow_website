@@ -449,31 +449,29 @@ const faqs = [
       </p>
 
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Single Treatments with Body Image -->
+        <!-- Single Treatments -->
         <div class="lg:w-1/2">
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
 
-          <div class="flex flex-col md:flex-row gap-6">
-            <!-- Body Image -->
-            <div class="w-full md:w-2/5 flex justify-center">
-              <img
-                src="/images/lezeres-szortelenites-ar-modell.jpg"
-                alt="Carbon Peeling kezelési területek"
-                class="w-full max-w-[200px] md:max-w-none h-auto rounded-2xl shadow-lg"
-              />
-            </div>
+          <!-- Treatment Image -->
+          <div class="mb-6">
+            <img
+              src="/images/carbon-peeling-archamlasztas.jpg"
+              alt="Carbon Peeling kezelési területek"
+              class="w-full h-48 object-cover object-top rounded-2xl shadow-lg"
+            />
+          </div>
 
-            <!-- Price List -->
-            <div class="w-full md:w-3/5 space-y-3">
-              {singlePrices.map((item) => (
-                <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-800 font-medium">{item.area}</span>
-                    <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
-                  </div>
+          <!-- Price List -->
+          <div class="space-y-3">
+            {singlePrices.map((item) => (
+              <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-800 font-medium">{item.area}</span>
+                  <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -518,18 +516,18 @@ const faqs = [
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
       <img
-        src="/images/glass-skin-carbon-peeling.webp"
+        src="/images/depositphotos_183275188-stock-photo-young-woman-with-carbon-nanogel.jpg"
         alt="Carbon Peeling kezelés folyamata"
-        class="w-full h-64 object-cover object-[center_20%]"
+        class="w-full h-64 object-cover object-top"
       />
     </div>
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
       <img
-        src="/images/glass-skin-carbon-peeling.webp"
+        src="/images/depositphotos_183275188-stock-photo-young-woman-with-carbon-nanogel.jpg"
         alt=""
-        class="w-full h-full object-cover object-right"
+        class="w-full h-full object-cover object-[center_30%]"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
