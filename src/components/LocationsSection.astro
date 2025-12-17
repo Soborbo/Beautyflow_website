@@ -1,10 +1,14 @@
 ---
+import { Image } from 'astro:assets';
+import budaImage from '../assets/images/Beautyflow-buda.jpg';
+import pestImage from '../assets/images/Beautyflow-Pest.jpg';
+
 const locations = [
   {
     name: 'Beautyflow Buda',
     address: '1116 Budapest, Vegyész u. 1.',
     addressMobile: '1116 Budapest,\nVegyész utca 1.',
-    image: '/images/Beautyflow-buda.jpg',
+    image: budaImage,
     bookingUrl: 'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
     hours: [
       { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
@@ -17,7 +21,7 @@ const locations = [
     name: 'Beautyflow Pest',
     address: '1135 Budapest, Reitter Ferenc u. 90.',
     addressMobile: '1135 Budapest,\nReitter Ferenc utca 90.',
-    image: '/images/Beautyflow-Pest.jpg',
+    image: pestImage,
     bookingUrl: 'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
     hours: [
       { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
@@ -37,10 +41,18 @@ const locations = [
         data-slide-from={location.slideFrom}
       >
         <!-- Background image -->
-        <div
-          class="location-bg absolute inset-0 bg-cover bg-center"
-          style={`background-image: url('${location.image}');`}
-        ></div>
+        <div class="location-bg absolute inset-0 overflow-hidden">
+          <Image
+            src={location.image}
+            alt={location.name}
+            class="w-full h-full object-cover"
+            width={800}
+            height={600}
+            format="webp"
+            quality={80}
+            loading="lazy"
+          />
+        </div>
 
         <!-- White content box - positioned on the inner edge -->
         <div class={`location-content relative z-10 bg-white shadow-xl p-8 w-[320px] ${index === 0 ? 'lg:ml-auto lg:mr-[10px]' : 'lg:mr-auto lg:ml-[10px]'}`}>

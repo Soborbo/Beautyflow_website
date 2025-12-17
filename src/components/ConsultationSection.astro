@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import consultationImage from '../assets/images/konya-fanni-konzultacio.webp';
 ---
 
 <section class="py-12 bg-[#c53f75]">
@@ -7,11 +9,16 @@
       <div class="flex flex-col lg:flex-row">
         <!-- Image Column - 50% width -->
         <div class="lg:w-1/2 relative">
-          <img
-            src="/images/konya-fanni-konzultacio.webp"
+          <Image
+            src={consultationImage}
             alt="Kónya Fanni konzultáció"
             class="w-full h-full object-cover object-top"
             style="min-height: 350px;"
+            width={400}
+            height={500}
+            format="webp"
+            quality={80}
+            loading="lazy"
           />
           <!-- Name overlay on image -->
           <div class="absolute bottom-6 left-0 right-0 text-center">

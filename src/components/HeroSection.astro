@@ -1,4 +1,9 @@
 ---
+import { Image } from 'astro:assets';
+import heroImage from '../assets/images/breautyflow-fokep.jpg';
+import googleLogo from '../assets/images/google-logo.jpg';
+import notinoIcon from '../assets/images/notino-ikon.png';
+
 const stats = [
   { value: '10+ év', label: 'tapasztalat' },
   { value: '10 000+', label: 'kezelés' },
@@ -11,15 +16,21 @@ const stats = [
   <div class="flex flex-col lg:flex-row lg:flex-1 lg:min-h-0">
     <!-- Left side - Image with Google rating badge -->
     <div class="hidden lg:flex lg:w-1/2 relative">
-      <img
-        src="/images/breautyflow-fokep.jpg"
+      <Image
+        src={heroImage}
         alt="Beautyflow szépségszalon"
         class="absolute inset-0 w-full h-full object-cover"
+        width={800}
+        height={600}
+        format="webp"
+        quality={85}
+        loading="eager"
+        fetchpriority="high"
       />
       <!-- Google Rating Badge - bottom right corner -->
       <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-4 google-rating-badge">
         <div class="flex items-center gap-3">
-          <img src="/images/google-logo.jpg" alt="Google" class="w-10 h-10 rounded-full" />
+          <Image src={googleLogo} alt="Google" class="w-10 h-10 rounded-full" width={40} height={40} format="webp" />
           <div>
             <div class="flex items-center gap-1 mb-1">
               <span class="text-2xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
@@ -42,15 +53,21 @@ const stats = [
       <div class="w-full px-5 text-center">
         <!-- Mobile image with Google rating -->
         <div class="relative lg:hidden -mx-5 mb-6">
-          <img
-            src="/images/breautyflow-fokep.jpg"
+          <Image
+            src={heroImage}
             alt="Beautyflow szépségszalon"
             class="w-full h-48 object-cover"
+            width={720}
+            height={192}
+            format="webp"
+            quality={80}
+            loading="eager"
+            fetchpriority="high"
           />
           <!-- Mobile Google Rating Badge -->
           <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-2 google-rating-badge">
             <div class="flex items-center gap-2">
-              <img src="/images/google-logo.jpg" alt="Google" class="w-6 h-6 rounded-full" />
+              <Image src={googleLogo} alt="Google" class="w-6 h-6 rounded-full" width={24} height={24} format="webp" />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-lg font-bold text-gray-900 rating-number" data-target="4.9">0</span>
@@ -66,7 +83,7 @@ const stats = [
 
         <!-- Notino Badge - ABOVE H1 -->
         <div class="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg mb-5">
-          <img src="/images/notino-ikon.png" alt="Notino" class="w-10 h-10" />
+          <Image src={notinoIcon} alt="Notino" class="w-10 h-10" width={40} height={40} format="webp" />
           <span class="text-base font-bold text-gray-800">Notino "Hónap Szalonja"</span>
         </div>
 
