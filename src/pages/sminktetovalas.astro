@@ -181,11 +181,11 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Sminktetoválás szolgáltatások",
-      "itemListElement": priceList.map(item => ({
+      "itemListElement": treatmentTypes.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": item.service
+          "name": item.title
         },
         "price": item.price.replace(/[^0-9]/g, ''),
         "priceCurrency": "HUF"
