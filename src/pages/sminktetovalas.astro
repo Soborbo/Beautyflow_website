@@ -41,17 +41,17 @@ const testimonials = [
   {
     text: 'Szemöldök tetováláson voltam nála, amivel nagyon elégedett vagyok. Évek óta tartós és sokan megdícsérik, hogy milyen szép és természetes hatása van!',
     author: 'Brigitta',
-    useNotinoIcon: true
+    image: '/images/laszlo-eszter.png'
   },
   {
     text: 'Fanni a legprecizebb legjobbfej szakember. Lézeres szőrtelenítésen és szemöldök tetováláson voltam nála! Mindenkinek szívesen ajánlom!',
     author: 'Rita',
-    useNotinoIcon: true
+    image: '/images/kitti.png'
   },
   {
     text: '2020 óta járok hozzá, és remélem még sokáig fogok, sminktetoválásban is kiváló szakember. A szalon gyönyörű, tiszta és rendezett.',
     author: 'Kovács Bernadett',
-    useNotinoIcon: true
+    image: '/images/dora.png'
   }
 ];
 
@@ -344,7 +344,7 @@ const faqs = [
 
   <!-- Treatment Types Section -->
   <section class="py-16 bg-white">
-    <div class="max-w-[1100px] mx-auto px-4">
+    <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
         Sminktetoválás típusok
       </h2>
@@ -352,18 +352,18 @@ const faqs = [
         Válaszd ki, melyik területet szeretnéd tökéletesíteni. Minden kezeléshez ingyenes korrekció tartozik.
       </p>
 
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {treatmentTypes.map((treatment) => (
           <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
             <img
               src={treatment.image}
               alt={treatment.title}
-              class="w-full h-56 object-cover"
+              class="w-full h-40 md:h-48 object-cover"
             />
-            <div class="p-6">
-              <h3 class="font-heading text-xl text-gray-900 mb-2">{treatment.title}</h3>
-              <p class="text-gray-600 text-sm mb-4">{treatment.description}</p>
-              <p class="text-[#6366f1] font-bold text-lg">{treatment.price}</p>
+            <div class="p-3 md:p-5">
+              <h3 class="font-heading text-sm md:text-lg text-gray-900 mb-1 md:mb-2">{treatment.title}</h3>
+              <p class="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">{treatment.description}</p>
+              <p class="text-[#6366f1] font-bold text-sm md:text-lg">{treatment.price}</p>
             </div>
           </div>
         ))}
@@ -372,80 +372,188 @@ const faqs = [
   </section>
 
   <!-- How It Works Section -->
-  <section class="py-16 bg-[#fff9f7]">
-    <div class="max-w-[1000px] mx-auto px-4">
-      <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
-        A sminktetoválás menete
-      </h2>
+  <section class="how-it-works-section relative overflow-hidden">
+    <!-- Background image for desktop -->
+    <div class="hidden lg:block absolute inset-0">
+      <img
+        src="/images/sminktetovalas-bg.jpg"
+        alt=""
+        class="w-full h-full object-cover object-right"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
+    </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {howItWorks.map((step) => (
-          <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-[#6366f1] rounded-full flex items-center justify-center">
-              <span class="text-2xl font-bold text-white">{step.number}</span>
+    <!-- Mobile background - cropped to show face -->
+    <div class="lg:hidden absolute inset-0 bg-[#e8e4e1]"></div>
+
+    <div class="relative z-10 py-16">
+      <div class="max-w-[1200px] mx-auto px-4">
+        <h2 class="font-heading text-3xl lg:text-4xl text-[#1e3a5f] mb-10 text-center lg:text-left uppercase">
+          Hogyan működik?
+        </h2>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Cards Grid - Left side -->
+          <div class="lg:w-[60%]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              {howItWorks.map((step) => (
+                <div class="bg-white rounded-lg shadow-md p-5 md:p-6">
+                  <p class="text-[#1e3a5f] font-bold text-sm mb-1">{step.number}</p>
+                  <h3 class="font-heading text-base md:text-lg text-[#1e3a5f] mb-2 uppercase">{step.title}</h3>
+                  <p class="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                </div>
+              ))}
             </div>
-            <h3 class="font-heading text-lg text-gray-900 mb-2">{step.title}</h3>
-            <p class="text-gray-600 text-sm">{step.description}</p>
           </div>
-        ))}
+
+          <!-- Image placeholder for desktop - takes remaining space -->
+          <div class="hidden lg:block lg:w-[40%]">
+            <!-- Space for background image to show through -->
+          </div>
+        </div>
+
+        <!-- Mobile image showing face -->
+        <div class="lg:hidden mt-8 flex justify-center">
+          <img
+            src="/images/sminktetovalas-bg.jpg"
+            alt="Sminktetoválás kezelés"
+            class="w-full max-w-md h-80 object-cover object-[center_20%] rounded-lg shadow-lg"
+          />
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Why Choose Us Section -->
-  <section class="py-16 bg-white">
-    <div class="max-w-[1200px] mx-auto px-4">
+  <section class="bg-white">
+    <div class="py-12 px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
         Miért minket válassz?
       </h2>
-      <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+      <p class="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
         A Beautyflow-nál a minőség és a vendégelégedettség az első
       </p>
+    </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {whyChooseUs.map((item) => (
-          <div class="bg-[#fdf8f6] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <img
-              src={item.image}
-              alt={item.title}
-              class="w-full h-48 object-cover"
-            />
-            <div class="p-5">
-              <h3 class="font-heading text-lg text-gray-900 mb-2 whitespace-pre-line">{item.title}</h3>
-              <p class="text-gray-600 text-sm">{item.description}</p>
+    <!-- Grid with touching corners - no gaps -->
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      {whyChooseUs.map((item) => (
+        <div class="relative group overflow-hidden">
+          <img
+            src={item.image}
+            alt={item.title}
+            class="w-full h-64 md:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <!-- Overlay with text -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+            <div class="p-5 md:p-6 text-white">
+              <h3 class="font-heading text-lg md:text-xl mb-2 whitespace-pre-line">{item.title}</h3>
+              <p class="text-white/90 text-sm leading-relaxed">{item.description}</p>
             </div>
           </div>
-        ))}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Consultation Section -->
+  <section class="py-12 bg-[#c53f75]">
+    <div class="container mx-auto px-4">
+      <div class="bg-white overflow-hidden max-w-[768px] mx-auto">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Image Column -->
+          <div class="lg:w-1/2 relative">
+            <img
+              src="/images/konya-fanni-konzultacio.webp"
+              alt="Kónya Fanni konzultáció"
+              class="w-full h-full object-cover object-top"
+              style="min-height: 350px;"
+            />
+            <div class="absolute bottom-6 left-0 right-0 text-center">
+              <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2">
+                Kónya Fanni<br />
+                <span class="text-sm text-gray-500 font-normal">ügyvezető</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Content Column -->
+          <div class="lg:w-1/2 p-6 lg:p-8 flex flex-col justify-center">
+            <h2 class="font-heading text-xl lg:text-2xl text-gray-900 mb-4 uppercase leading-tight font-bold">
+              Igényeld az ingyenes<br />konzultációdat!
+            </h2>
+
+            <p class="text-gray-700 mb-2 text-sm">
+              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a sminktetoválásba!</span>
+            </p>
+            <p class="text-gray-600 mb-3 text-sm">
+              Egy kb. 15 perc hosszú INGYENES alkalom során megbeszéljük, hogy
+            </p>
+
+            <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
+              <li>melyik sminktetoválás típus illik hozzád (szemöldök, ajak, szemhéj)</li>
+              <li>milyen formát és színárnyalatot választunk az arcodhoz</li>
+              <li>van-e bármilyen ellenjavallata a kezelésnek</li>
+              <li>milyen eredményre és gyógyulási időre számíthatsz</li>
+            </ul>
+
+            <div class="text-center">
+              <p class="text-gray-600 mb-1 text-sm">
+                Kérd az ingyenes konzultációt telefonon az alábbi számon
+              </p>
+              <a
+                href="tel:+3613009414"
+                class="text-xl text-[#c53f75] font-bold hover:underline block mb-1"
+              >
+                +36 1 300 9414
+              </a>
+              <p class="text-gray-500 mb-3 text-sm">vagy</p>
+              <a
+                href="/ingyenes-konzultacio"
+                class="inline-block px-6 py-2 bg-[#c53f75] text-white font-semibold uppercase text-xs tracking-wide hover:bg-[#a33460] transition-colors rounded-full"
+              >
+                Kérj Ingyenes konzultációt
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Testimonials Section -->
-  <section class="py-16 bg-[#fff9f7]">
-    <div class="max-w-[1000px] mx-auto px-4">
+  <!-- Testimonials Section (Google Reviews) -->
+  <section class="py-16 bg-[#f8f8f8]">
+    <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
         Vendégeink mondták
       </h2>
 
-      <div class="grid md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {testimonials.map((testimonial) => (
-          <div class="bg-white rounded-xl p-6 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-              <img
-                src="/images/notino-ikon.png"
-                alt="Notino vélemény"
-                class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1"
-              />
-              <div>
-                <p class="font-semibold text-gray-900">{testimonial.author}</p>
-                <div class="flex text-yellow-400">
-                  {[1,2,3,4,5].map(() => (
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                  ))}
-                </div>
-              </div>
+          <div class="bg-white p-6 rounded-lg flex flex-col border border-[#d6d6d6] shadow-[12px_12px_5px_5px_#e6e6e6]">
+            <div class="flex gap-0.5 mb-4">
+              {[1, 2, 3, 4, 5].map(() => (
+                <svg class="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
             </div>
-            <p class="text-gray-600 text-sm italic">"{testimonial.text}"</p>
+            <p class="text-gray-700 mb-4 leading-relaxed text-sm flex-1">
+              {testimonial.text}
+            </p>
+            <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
+              <img
+                src={testimonial.image}
+                alt={testimonial.author}
+                class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+              />
+              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
+              <img
+                src="/images/google-logo.jpg"
+                alt="Google"
+                class="w-7 h-7 object-contain flex-shrink-0"
+              />
+            </div>
           </div>
         ))}
       </div>
