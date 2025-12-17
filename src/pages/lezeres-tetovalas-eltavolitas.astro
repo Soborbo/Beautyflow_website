@@ -16,27 +16,31 @@ const testimonials = [
   {
     text: '6 éve járok hozzá, kedves, pontos és nagyon igényes a munkájára. A "neves" sminktetoválók által elrontott szemöldöktetoválásomat is Fanni tette tökéletessé. Szívből ajánlom őt!',
     author: 'Keresztesi-Szabó Szilvia',
-    image: '/images/google-logo.jpg'
+    image: '/images/keresztesi.png'
   },
   {
-    text: 'Tetoválás eltávolításon voltam, nagyon profin és kíméletesen csinálták. A bőröm gyorsan regenerálódott és a tetoválás szépen halványodik. Mindenkinek ajánlom!',
-    author: 'Kata',
-    image: '/images/google-logo.jpg'
+    text: 'Fannihoz járok szőrtelenítésre, és nagyon elégedett vagyok Vele. Kedvességével, profizmusával, mindig hamar elrepül az ott töltött idő. Csak ajánlani tudom.',
+    author: 'Keul Kitti',
+    image: '/images/kitti.png'
   },
   {
-    text: 'Már 4 alkalom után látványos az eredmény! A csapat nagyon kedves és figyelmes. A hidegkalapácsos technika tényleg sokkal kevésbé fáj.',
-    author: 'Dóri',
-    image: '/images/google-logo.jpg'
+    text: 'Lézeres szőrtelenítésre járok hozzá és nagyon örülök, hogy őt választottam. Amit eddig kezelt nekem, az baromi látványos.. Figyelmes és a szalonja is tip-top.',
+    author: 'Erdei Dóra',
+    image: '/images/dora.png'
   }
 ];
 
-const priceList = [
-  { size: '1-5 cm²', description: 'Apró tetoválások, sminktetoválás részek', price: '15 000 Ft' },
-  { size: '5-10 cm²', description: 'Kis tetoválások (pl. csuklón, bokán)', price: '20 000 Ft' },
-  { size: '10-25 cm²', description: 'Közepes méretű tetoválások', price: '30 000 Ft' },
-  { size: '25-50 cm²', description: 'Nagyobb tetoválások (pl. alkar)', price: '45 000 Ft' },
-  { size: '50-100 cm²', description: 'Nagy tetoválások (pl. felkar, vádli)', price: '60 000 Ft' },
-  { size: '100+ cm²', description: 'Extra nagy tetoválások', price: 'Egyedi árazás' },
+const arcPrices = [
+  { area: 'Szemöldök', price: '20 000 Ft' },
+  { area: 'Ajakkontúr', price: '15 000 Ft' },
+  { area: 'Smink (részleges)', price: '15 000 Ft' },
+];
+
+const testPrices = [
+  { size: '2x2 cm', price: '10 000 Ft' },
+  { size: '5x5 cm', price: '20 000 Ft' },
+  { size: '8x8 cm', price: '25 000 Ft' },
+  { size: '10x10 cm', price: '30 000 Ft-tól' },
 ];
 
 const howItWorks = [
@@ -131,15 +135,26 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Tetoválás eltávolítás árak",
-      "itemListElement": priceList.map(item => ({
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": `Tetoválás eltávolítás ${item.size}`
-        },
-        "price": item.price.replace(/[^0-9]/g, '') || "0",
-        "priceCurrency": "HUF"
-      }))
+      "itemListElement": [
+        ...arcPrices.map(item => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": `Tetoválás eltávolítás (arc) - ${item.area}`
+          },
+          "price": item.price.replace(/[^0-9]/g, '') || "0",
+          "priceCurrency": "HUF"
+        })),
+        ...testPrices.map(item => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": `Tetoválás eltávolítás (test) - ${item.size}`
+          },
+          "price": item.price.replace(/[^0-9]/g, '') || "0",
+          "priceCurrency": "HUF"
+        }))
+      ]
     }
   })} />
 
@@ -229,7 +244,7 @@ const faqs = [
     </div>
 
     <!-- Stats Section -->
-    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
@@ -315,7 +330,7 @@ const faqs = [
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/lezeres-tetovalas-eltavolitas.jpg"
+          src="/images/sminktetovalas-eltavolitas.jpg"
           alt="Sebhelymentes tetoválás eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -350,17 +365,19 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             Ezen felül nem fóliát használunk, hanem <strong>steril Second Skin védelemmel</strong> engedjük el vendégeinket. Ez a speciális anyag megóvja a frissen kezelt bőrt a kórokozóktól, így biztonságosabb és higiénikusabb a tetoválás eltávolítás utáni időszak.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/tetovalas-eltavolitas.jpg"
+          src="/images/tetovalas-eltavolitas-agy.jpg"
           alt="Fájdalommentes tetoválás eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -373,7 +390,7 @@ const faqs = [
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/tetovalas-eltavolitas-bp.jpg"
+          src="/images/szemoldok-tetovalas-eltavolitas.jpg"
           alt="Különböző méretű tetoválások eltávolítása"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -402,18 +419,20 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             Minden tetoválás eltávolító kezeléshez <strong>speciális, egyedi utóápolókrémet adunk</strong>. Ez nyugtatja és gyógyítja a bőrt, gyorsítja a regenerációt, és már benne van az árban – nem kell külön költened rá.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/tetovalas-eltavolitas-agy.jpg"
-          alt="Tetoválás eltávolítás utóápolás"
+          src="/images/utorapolo-krem-jar.jpg"
+          alt="Tetoválás eltávolítás utóápoló krém"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -427,25 +446,37 @@ const faqs = [
         Tetoválás eltávolítás árak
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Az ár a tetoválás méretétől függ. Az ingyenes konzultáción pontos árajánlatot adunk.
+        Az ár a tetoválás típusától és méretétől függ. Az ingyenes konzultáción pontos árajánlatot adunk.
       </p>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-        {priceList.map((item) => (
-          <div
-            class="bg-white rounded-lg overflow-hidden shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-300 border-t-4"
-            style="border-top-color: #5851e4; background: linear-gradient(to bottom, #eef2ff, white 30%);"
-          >
-            <div class="p-4 md:p-5 text-center">
-              <h3 class="font-heading text-lg md:text-xl text-gray-900 mb-1">{item.size}</h3>
-              <p class="text-gray-600 text-xs md:text-sm mb-3 hidden md:block">{item.description}</p>
-              <p class="text-[#5851e4] font-bold text-lg md:text-xl">{item.price}</p>
-            </div>
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <!-- Table Header -->
+        <div class="bg-[#c53f75] text-white grid grid-cols-3 text-center py-4 px-4">
+          <div class="font-bold">Szolgáltatás</div>
+          <div class="font-bold">Terület</div>
+          <div class="font-bold">Ár (Ft / alkalom)</div>
+        </div>
+
+        <!-- Arc prices -->
+        {arcPrices.map((item, index) => (
+          <div class={`grid grid-cols-3 text-center py-4 px-4 items-center ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+            <div class="text-gray-700">Tetoválás eltávolítás (arc)</div>
+            <div class="text-gray-600">{item.area}</div>
+            <div class="text-gray-900 font-bold">{item.price}</div>
+          </div>
+        ))}
+
+        <!-- Test prices -->
+        {testPrices.map((item, index) => (
+          <div class={`grid grid-cols-3 text-center py-4 px-4 items-center ${(index + arcPrices.length) % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+            <div class="text-gray-700">Tetoválás eltávolítás (test)</div>
+            <div class="text-gray-600">{item.size}</div>
+            <div class="text-gray-900 font-bold">{item.price}</div>
           </div>
         ))}
       </div>
 
-      <div class="mt-8 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
+      <div class="mt-8 bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-xl p-6 text-center">
         <p class="text-white font-bold text-lg mb-2">
           Cover-up előkészítés: halványítás kedvezményesen!
         </p>
