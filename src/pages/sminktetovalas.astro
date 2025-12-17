@@ -303,23 +303,24 @@ const faqs = [
   <!-- Intro Section with Fanni -->
   <section class="section-animate py-12 lg:py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fff] to-[#f8f4f9]">
     <div class="max-w-[1100px] mx-auto px-4">
-      <div class="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
-        <!-- Image - same height as text -->
+      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <!-- Image - max 400px height -->
         <div class="w-full lg:w-2/5 flex-shrink-0">
-          <div class="relative rounded-2xl overflow-hidden shadow-xl h-full">
+          <div class="relative rounded-2xl overflow-hidden shadow-xl" style="max-height: 400px;">
             <img
               src="/images/konya-fanni-konzultacio.webp"
               alt="Kónya Fanni sminktetoválás szakértő"
               class="w-full h-full object-cover object-top"
+              style="max-height: 400px;"
             />
             <!-- Decorative corner accent -->
             <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#c53f75]/20 to-transparent"></div>
             <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#6366f1]/10 to-transparent"></div>
           </div>
         </div>
-        <!-- Text content -->
-        <div class="w-full lg:w-3/5 flex">
-          <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-gray-100 flex flex-col justify-center">
+        <!-- Text content - no card background -->
+        <div class="w-full lg:w-3/5">
+          <div class="flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
               Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
             </p>
