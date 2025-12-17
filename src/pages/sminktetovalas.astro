@@ -303,14 +303,14 @@ const faqs = [
   <!-- Intro Section with Fanni -->
   <section class="section-animate py-12 lg:py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fff] to-[#f8f4f9]">
     <div class="max-w-[1100px] mx-auto px-4">
-      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <!-- Image - sized to match text height -->
+      <div class="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
+        <!-- Image - same height as text -->
         <div class="w-full lg:w-2/5 flex-shrink-0">
-          <div class="relative rounded-2xl overflow-hidden shadow-xl">
+          <div class="relative rounded-2xl overflow-hidden shadow-xl h-full">
             <img
               src="/images/konya-fanni-konzultacio.webp"
               alt="Kónya Fanni sminktetoválás szakértő"
-              class="w-full h-auto aspect-[3/4] object-cover object-top"
+              class="w-full h-full object-cover object-top"
             />
             <!-- Decorative corner accent -->
             <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#c53f75]/20 to-transparent"></div>
@@ -318,8 +318,8 @@ const faqs = [
           </div>
         </div>
         <!-- Text content -->
-        <div class="w-full lg:w-3/5">
-          <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-gray-100">
+        <div class="w-full lg:w-3/5 flex">
+          <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-gray-100 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
               Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
             </p>
@@ -347,7 +347,7 @@ const faqs = [
   </section>
 
   <!-- Treatment Types Section -->
-  <section class="py-16 bg-white">
+  <section class="py-16 bg-[#fdf8f6]">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
         Sminktetoválás típusok
@@ -358,16 +358,22 @@ const faqs = [
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {treatmentTypes.map((treatment) => (
-          <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-            <img
-              src={treatment.image}
-              alt={treatment.title}
-              class="w-full h-40 md:h-48 object-cover"
-            />
+          <div
+            class="bg-white rounded-lg overflow-hidden shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-300 border-t-4"
+            style="border-top-color: #5851e4; background: linear-gradient(to bottom, #eef2ff, white 30%);"
+          >
+            <div class="relative overflow-hidden">
+              <img
+                src={treatment.image}
+                alt={treatment.title}
+                class="w-full h-40 md:h-48 object-cover transition-transform duration-300 hover:scale-105"
+              />
+              <div class="absolute top-0 left-0 right-0 h-1 bg-[#5851e4]"></div>
+            </div>
             <div class="p-3 md:p-5">
               <h3 class="font-heading text-sm md:text-lg text-gray-900 mb-1 md:mb-2">{treatment.title}</h3>
               <p class="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">{treatment.description}</p>
-              <p class="text-[#6366f1] font-bold text-sm md:text-lg">{treatment.price}</p>
+              <p class="text-[#5851e4] font-bold text-sm md:text-lg">{treatment.price}</p>
             </div>
           </div>
         ))}
