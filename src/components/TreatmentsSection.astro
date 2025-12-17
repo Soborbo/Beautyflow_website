@@ -60,8 +60,7 @@ const treatments = [
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {treatments.map((treatment) => (
         <div
-          class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)] border-t-4"
-          style={`border-top-color: ${treatment.color}; background: linear-gradient(to bottom, ${treatment.bgColor}, white 30%);`}
+          class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)]"
         >
           <div class="relative overflow-hidden">
             <img
@@ -69,7 +68,6 @@ const treatments = [
               alt={treatment.title}
               class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            <div class="absolute top-0 left-0 right-0 h-1" style={`background-color: ${treatment.color};`}></div>
           </div>
           <div class="p-6 flex flex-col flex-1">
             <h3 class="font-heading text-[1.4rem] text-gray-900 mb-3 text-center font-bold">

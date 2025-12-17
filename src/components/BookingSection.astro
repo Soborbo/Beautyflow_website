@@ -26,30 +26,27 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
         </p>
 
         <!-- Connected buttons with centered Notino logo -->
-        <div class="inline-flex flex-col sm:flex-row items-stretch justify-center">
+        <div class="inline-flex flex-col sm:flex-row items-stretch justify-center rounded-full overflow-hidden border-2 border-[#c53f75]">
           <a
             href={notinoUrlBuda}
             target="_blank"
             rel="noopener"
-            class="px-6 py-3 bg-[#1a1a2e] text-white font-semibold uppercase text-sm tracking-wide hover:bg-[#16213e] transition-colors rounded-l-none sm:rounded-l-md rounded-t-md sm:rounded-t-none sm:rounded-tl-md"
+            class="px-6 py-3 bg-[#fdf8f6] text-gray-800 font-semibold uppercase text-sm tracking-wide hover:bg-[#f5ebe6] transition-colors flex items-center gap-2"
           >
+            <img src="/images/notino-ikon.png" alt="Notino" class="w-5 h-5" />
             Időpontok Budára
           </a>
 
-          <div class="flex items-center justify-center bg-white border-y-2 sm:border-y-0 sm:border-x-0 border-[#1a1a2e] px-3 py-2">
-            <img
-              src="/images/notino-ikon.png"
-              alt="Notino"
-              class="w-8 h-8"
-            />
-          </div>
+          <div class="w-px bg-[#c53f75] hidden sm:block"></div>
+          <div class="h-px bg-[#c53f75] sm:hidden"></div>
 
           <a
             href={notinoUrlPest}
             target="_blank"
             rel="noopener"
-            class="px-6 py-3 bg-[#1a1a2e] text-white font-semibold uppercase text-sm tracking-wide hover:bg-[#16213e] transition-colors rounded-r-none sm:rounded-r-md rounded-b-md sm:rounded-b-none sm:rounded-br-md"
+            class="px-6 py-3 bg-[#fdf8f6] text-gray-800 font-semibold uppercase text-sm tracking-wide hover:bg-[#f5ebe6] transition-colors flex items-center gap-2"
           >
+            <img src="/images/notino-ikon.png" alt="Notino" class="w-5 h-5" />
             Időpontok Pestre
           </a>
         </div>
