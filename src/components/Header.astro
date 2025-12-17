@@ -320,11 +320,13 @@ const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&sh
 
     window.addEventListener('scroll', () => {
       const currentScrollY = window.scrollY;
+      const scrollingUp = currentScrollY < lastScrollY;
+      const scrollingDown = currentScrollY > lastScrollY;
 
-      // Desktop behavior: hide header on scroll down, show sticky CTA
+      // Desktop behavior: show menu on scroll up, hide on scroll down
       if (isDesktop()) {
-        // Scrolled down past threshold and scrolling down
-        if (currentScrollY > 100 && currentScrollY > lastScrollY && !headerHidden) {
+        // Scrolled down past threshold and scrolling down - hide header, show CTA bar
+        if (currentScrollY > 100 && scrollingDown && !headerHidden) {
           headerHidden = true;
           header.style.transform = 'translateY(-100%)';
           if (stickyCTABar) {
@@ -332,8 +334,17 @@ const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&sh
             stickyCTABar.classList.add('translate-y-0');
           }
         }
-        // Scrolled back to top
-        else if (currentScrollY <= 10 && headerHidden) {
+        // Scrolling up - show header (menu), hide CTA bar
+        else if (scrollingUp && headerHidden) {
+          headerHidden = false;
+          header.style.transform = 'translateY(0)';
+          if (stickyCTABar) {
+            stickyCTABar.classList.remove('translate-y-0');
+            stickyCTABar.classList.add('-translate-y-full');
+          }
+        }
+        // At top of page - always show header
+        else if (currentScrollY <= 10) {
           headerHidden = false;
           header.style.transform = 'translateY(0)';
           if (stickyCTABar) {

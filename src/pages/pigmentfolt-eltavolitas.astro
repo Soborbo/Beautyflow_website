@@ -2,90 +2,84 @@
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 
-const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
-const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
-
 const stats = [
   { value: '10+ év', label: 'tapasztalat' },
-  { value: '60 perc', label: 'kezelés hossza' },
+  { value: '95%', label: 'halványodás' },
   { value: '100%', label: 'elégedett vendég' },
-  { value: '1x', label: 'látványos eredmény' },
+  { value: '3-6', label: 'kezelés elegendő' },
 ];
 
 const testimonials = [
   {
-    text: 'Nagyon kedvesek, közvetlenek, igényes munka, a szalon szép, tiszta, otthonosan berendezve, abszolút pozitív élmény volt!',
-    author: 'Blanka',
+    text: 'Évek óta küzdöttem a napfoltokkal az arcomon. 4 kezelés után szinte teljesen eltűntek! Végre magabiztosan mehetek smink nélkül is.',
+    author: 'Katalin',
   },
   {
-    text: 'Gyönyörű, igényes, tiszta szalon A lányok nagyon kedveses és igényesek munkájukra. Csak ajánlani tudom őket 🙂',
-    author: 'Czár Barbara',
+    text: 'A terhesség után megjelent pigmentfoltok nagyon zavartak. A Beautyflow csapata csodát tett – a bőröm újra egyenletes és ragyogó.',
+    author: 'Réka',
   },
   {
-    text: 'Szívből ajanlom Fannit és csapatát. Mindenki nagyon profi és kedves. A legjobb döntés volt felkeresni a szalont',
-    author: 'Lázár Anita',
+    text: 'Profi csapat, látványos eredmény. A kezelés fájdalommentes volt, és már az első alkalom után láttam a változást.',
+    author: 'Zsófia',
   }
 ];
 
-const singlePrices = [
-  { area: 'Pigmentfolt eltávolítás', price: '10 000 Ft' },
-  { area: 'Kézfej (mindkettő)', price: '15 000 Ft' },
-  { area: 'Hónalj világosítás (mindkettő)', price: '15 000 Ft' },
-  { area: 'Szemöldök', price: '15 000 Ft' },
-  { area: 'Teljes arc', price: '25 000 Ft' },
-  { area: 'Dekoltázs', price: '25 000 Ft' },
-  { area: 'Teljes hát', price: '35 000 Ft' },
+const treatments = [
+  { area: 'Arc (teljes)', sessions: '1 alkalom', price: '25 000 Ft' },
+  { area: 'Arc (célzott terület)', sessions: '1 alkalom', price: '15 000 Ft' },
+  { area: 'Kézfej (mindkettő)', sessions: '1 alkalom', price: '20 000 Ft' },
+  { area: 'Dekoltázs', sessions: '1 alkalom', price: '25 000 Ft' },
+  { area: 'Hát (felső rész)', sessions: '1 alkalom', price: '30 000 Ft' },
+  { area: 'Váll', sessions: '1 alkalom', price: '20 000 Ft' },
 ];
 
 const packages = [
-  { area: 'Teljes arc', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Dekoltázs', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Teljes arc + nyak + dekoltázs', originalPrice: '200 000', price: '160 000 Ft', discount: '-20%' },
-  { area: 'Teljes hát', originalPrice: '175 000', price: '140 000 Ft', discount: '-20%' },
-  { area: 'Kézfej (mindkettő)', originalPrice: '75 000', price: '60 000 Ft', discount: '-20%' },
-  { area: 'Hónalj világosítás (mindkettő)', originalPrice: '75 000', price: '60 000 Ft', discount: '-20%' },
+  { area: 'Arc (teljes) - 5 alkalom', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
+  { area: 'Kézfej - 5 alkalom', originalPrice: '100 000', price: '80 000 Ft', discount: '-20%' },
+  { area: 'Dekoltázs - 5 alkalom', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
+  { area: 'Arc + kézfej kombi - 5 alkalom', originalPrice: '200 000', price: '150 000 Ft', discount: '-25%' },
 ];
 
 const howItWorks = [
   {
     number: '1.',
-    title: 'Ingyenes konzultáció',
-    description: 'Először átbeszéljük a bőröd igényeit, és megtervezzük a számodra legelőnyösebb kezelést. Megmutatjuk, hogyan zajlik a carbon peeling, és milyen eredményekre számíthatsz.'
+    title: 'Bőranalízis és konzultáció',
+    description: 'Alaposan megvizsgáljuk a pigmentfoltjaid típusát, mélységét és okát. Személyre szabott kezelési tervet készítünk, hogy a lehető legjobb eredményt érjük el.'
   },
   {
     number: '2.',
-    title: 'Előkészítés',
-    description: 'A bőrre egy speciális szénpasztát kenünk, amely mélyen behatol a pórusokba. Ez szolgál vezetőanyagként a lézerhez, és segít a faggyútermelés szabályozásában.'
+    title: 'Előkészítés és védelem',
+    description: 'A kezelendő területet megtisztítjuk és előkészítjük. A szemet védőszemüveggel védjük, a környező bőrfelületet pedig speciális géllel kezeljük.'
   },
   {
     number: '3.',
-    title: 'Lézeres kezelés',
-    description: 'A lézer a szénpasztát mikro-lövésekkel összetöri, így eltávolítja a szennyeződéseket és az elhalt hámsejteket. A kezelés összehúzza a pórusokat, csökkenti a gyulladást, és halványítja a pigmentfoltokat.'
+    title: 'IPL/Lézer kezelés',
+    description: 'A fényimpulzusok célzottan a melaninra hatnak, lebontják a pigmentet anélkül, hogy károsítanák a környező szöveteket. A kezelés gyors és kíméletes.'
   },
   {
     number: '4.',
-    title: 'Azonnali eredmény',
-    description: 'Már az első kezelés után frissebb, simább és ragyogóbb lesz a bőröd. A pórusok szűkülnek, a bőr textúrája látványosan javul, és a faggyútermelés is normalizálódik, így gyorsan elérhető a "glass skin".'
+    title: 'Utóápolás és eredmény',
+    description: 'A kezelt terület 1-2 héten belül hámlani kezd, és a pigmentfolt fokozatosan halványodik. 3-6 kezelés után a foltok akár 95%-ban eltűnhetnek.'
   }
 ];
 
 const faqs = [
-  { question: 'Mennyire fájdalmas a Carbon Peeling?', answer: 'A kezelés szinte teljesen fájdalommentes. A legtöbb vendégünk csak enyhe melegséget és bizsergést érez a lézer alkalmazása közben.' },
-  { question: 'Kinek ajánlott a Carbon Peeling?', answer: 'Zsíros, aknés, tág pórusú, pigmentfoltos vagy fakó bőrűeknek ideális. Kiválóan alkalmas bőrfiatalításra és a bőrtónus javítására is.' },
-  { question: 'Hány kezelés szükséges a látványos eredményhez?', answer: 'Már az első kezelés után látványos az eredmény! Az optimális hatásért 4-6 kezelés javasolt, 2-4 hetes időközönként.' },
-  { question: 'Milyen az utóápolás?', answer: 'A kezelés után nem szükséges speciális utóápolás. Ajánlott 48 órán belül kerülni az erős napsütést és a szaunázást.' },
-  { question: 'Sminkelhetek a kezelés után?', answer: 'Igen, a kezelés után azonnal sminkelhet. Sőt, a sima, tiszta bőrön a smink még szebben mutat!' },
-  { question: 'Van-e leállási idő?', answer: 'Nincs! A Carbon Peeling "ebédidő kezelés" - azonnal visszatérhet a mindennapi tevékenységéhez, nincs látható bőrpír vagy hámlás.' },
-  { question: 'Terhesség alatt végezhető a kezelés?', answer: 'Terhesség és szoptatás alatt nem javasolt a Carbon Peeling kezelés.' },
-  { question: 'Milyen gyakran ismételhető?', answer: 'A kezelés 2-4 hetente ismételhető. Fenntartó kezelésként havonta egyszer elegendő.' },
-  { question: 'Miben különbözik más hámlasztó kezeléstől?', answer: 'A Carbon Peeling kíméletes, nincs hámlási időszak, és már az első alkalom után látványos az eredmény. A lézer nem csak tisztít, hanem kollagéntermelést is serkent.' },
-  { question: 'Érzékeny bőrre is alkalmas?', answer: 'Igen, a Carbon Peeling kifejezetten kíméletes, érzékeny bőrre is alkalmazható. A konzultáción felmérjük a bőröd állapotát.' },
+  { question: 'Milyen típusú pigmentfoltokat lehet kezelni?', answer: 'Napfoltokat, öregségi foltokat, terhességi chloasmát, szeplőket és egyéb melanin-túltermelésből adódó elszíneződéseket egyaránt kezelhetünk. A konzultáción meghatározzuk a folt típusát és a megfelelő kezelési módszert.' },
+  { question: 'Fájdalmas a pigmentfolt eltávolítás?', answer: 'A kezelés enyhe csípést vagy melegséget okozhat, hasonlót, mint egy gumiszalag pattintása. A legtöbb vendégünk jól tolerálja, és nem igényel érzéstelenítést.' },
+  { question: 'Hány kezelés szükséges?', answer: 'A pigmentfolt mélységétől és méretétől függően általában 3-6 kezelés elegendő a kívánt eredményhez. A kezelések között 3-4 hetet kell várni.' },
+  { question: 'Mikor látható az eredmény?', answer: 'Az első kezelés után 1-2 héttel a folt sötétedik, majd hámlani kezd. A teljes eredmény a kezeléssorozat befejezése után 4-6 héttel látható.' },
+  { question: 'Van-e leállási idő?', answer: 'Minimális. A kezelt terület 1-3 napig enyhén pirosas lehet. A hámlás természetes folyamat, nem kell miatta aggódni. Sminkelni már másnap lehet.' },
+  { question: 'Milyen évszakban érdemes elkezdeni?', answer: 'Ősszel és télen ideális, amikor kevesebb a napsugárzás. Nyáron fokozott fényvédelem mellett is végezhető, de a napozást kerülni kell a kezelés előtt és után.' },
+  { question: 'Visszajöhetnek a pigmentfoltok?', answer: 'A kezelt foltok nem térnek vissza, de új foltok kialakulhatnak UV-sugárzás hatására. Ezért fontos a rendszeres fényvédő használata.' },
+  { question: 'Ki nem alkalmas a kezelésre?', answer: 'Terhesség, szoptatás, aktív bőrgyulladás, friss barnulás vagy bizonyos gyógyszerszedés esetén nem javasolt. A konzultáción minden ellenjavallatot átbeszélünk.' },
+  { question: 'Kombinálható más kezelésekkel?', answer: 'Igen! A HydraBeauty vagy Carbon Peeling kezelés kiválóan kiegészíti a pigmentfolt eltávolítást, serkenti a bőrmegújulást és fokozza az eredményt.' },
+  { question: 'Mennyire biztonságos a kezelés?', answer: 'Teljesen biztonságos. EU-minősített, orvostechnikai eszközökkel dolgozunk, és csak képzett szakemberek végzik a kezelést.' },
 ];
 ---
 
 <Layout
-  title="Carbon Peeling Archámlasztás Budapest - Glass Skin Kezelés | Beautyflow"
-  description="Forradalmi Carbon Peeling kezelés Budapesten. Lézeres bőrtisztítás és fiatalítás 60 perces luxus programmal. Glass skin hatás már az első alkalomtól. Kérj ingyenes konzultációt!"
+  title="Pigmentfolt Eltávolítás Budapest - IPL Lézerkezelés | Beautyflow"
+  description="Professzionális pigmentfolt eltávolítás Budapesten IPL lézerrel. Napfoltok, öregségi foltok, terhességi foltok hatékony kezelése. 95% halványodás 3-6 kezelés alatt. Kérj ingyenes konzultációt!"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -105,9 +99,9 @@ const faqs = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": "Carbon Peeling",
-    "name": "Carbon Peeling Archámlasztás Budapest",
-    "description": "Forradalmi Carbon Peeling kezelés Budapesten. Lézeres bőrtisztítás és fiatalítás 60 perces luxus programmal.",
+    "serviceType": "Pigmentfolt eltávolítás",
+    "name": "Pigmentfolt Eltávolítás Budapest",
+    "description": "Professzionális pigmentfolt eltávolítás Budapesten IPL lézerrel. Napfoltok, öregségi foltok hatékony kezelése.",
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
@@ -137,12 +131,12 @@ const faqs = [
     },
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "Carbon Peeling szolgáltatások",
-      "itemListElement": singlePrices.map(item => ({
+      "name": "Pigmentfolt eltávolítás szolgáltatások",
+      "itemListElement": treatments.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": `Carbon Peeling - ${item.area}`
+          "name": `Pigmentfolt eltávolítás - ${item.area}`
         },
         "price": item.price.replace(/[^0-9]/g, ''),
         "priceCurrency": "HUF"
@@ -176,13 +170,13 @@ const faqs = [
           </div>
 
           <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2">
-            Carbon Peeling archámlasztó kezelés Budapesten
+            Pigmentfolt eltávolítás Budapesten
           </h1>
           <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight">
-            Forradalmi bőrtisztítás és fiatalítás lézerrel
+            Búcsúzz el a zavaró foltoktól és nyerd vissza egyenletes bőröd
           </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Zsíros, pattanásos, tág pórusú vagy fakó arcbőröd? Kényeztesd vadonatúj kíméletes, de rendkívül hatékony hámlasztó módszerünkkel
+            Napfoltok, öregségi foltok vagy terhességi pigmentáció? Modern IPL technológiánkkal akár 95%-os halványodást érhetünk el mindössze 3-6 kezelés alatt.
           </p>
 
           <!-- CTA row -->
@@ -191,7 +185,7 @@ const faqs = [
               href="/ingyenes-konzultacio"
               class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm lg:text-base"
             >
-              Foglalj időpontot most!
+              Ingyenes konzultációt kérek
             </a>
             <a
               href="tel:+3613009414"
@@ -209,8 +203,8 @@ const faqs = [
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
         <img
-          src="/images/carbon-peeling-fo.jpg"
-          alt="Carbon Peeling Budapest"
+          src="/images/pigmentfolt-arckezeles.jpg"
+          alt="Pigmentfolt eltávolítás Budapest"
           class="w-full h-full object-cover"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
@@ -262,7 +256,7 @@ const faqs = [
           <div class="w-full lg:w-2/5 flex-shrink-0">
             <img
               src="/images/Konya-Fanni-szepsegszalon.jpg"
-              alt="Kónya Fanni Carbon Peeling szakértő"
+              alt="Kónya Fanni pigmentfolt kezelés szakértő"
               class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
             />
             <!-- Mobile signature - right below image -->
@@ -281,13 +275,13 @@ const faqs = [
           <!-- Text content -->
           <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              Hiába tisztítod és ápolod a bőröd, mégis újra és újra megjelennek a mitesszerek és a makacs pórusok? Ez nem a te hibád – egyszerűen mélyebb tisztításra van szüksége a bőrödnek.
+              Tudom, milyen bosszantó lehet, amikor a tükörben a bőröd helyett csak a zavaró foltokat látod. Lehet, hogy a nyaralások emlékei, a terhesség nyomai, vagy egyszerűen az idő múlása hagyta rajtad a jelét – <strong>de ez nem jelenti azt, hogy együtt kell élned velük</strong>.
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              A Carbon Peeling ebben segít: az aktív szén és a lézer kombinációja hatékonyan szabadítja meg a pórusaidat a szennyeződésektől, miközben serkenti a kollagéntermelést. Az eredmény? <strong>Friss, sima és feszesebb arcbőr</strong>, ami már az első alkalom után látványosan üdébbnek hat.
+              A Beautyflow szalonban <strong>modern IPL technológiával</strong> dolgozunk, amely célzottan a pigmentsejtekre hat, miközben a környező bőrt érintetlenül hagyja. Az eredmény? Egyenletes, ragyogó bőr, amit végre büszkén mutathatsz meg.
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>Ha eleged van a fakó, problémás bőrből, és szeretnél végre önbizalommal belenézni a tükörbe, a Carbon Peeling kezelés a Beautyflow szalonban a te megoldásod.</strong>
+              <strong>Ha eleged van abból, hogy folyton az alapozóval próbálod elfedni a foltokat, gyere el hozzánk egy ingyenes konzultációra, és mutassuk meg, hogyan segíthetünk!</strong>
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -307,39 +301,39 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Benefits Section 1: Dupla hosszúságú kezelés - Image left, Text right -->
+  <!-- Benefits Section 1: Célzott kezelés - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/carbon-peeling-archamlasztas.jpg"
-          alt="60 perces Carbon Peeling kezelés"
+          src="/images/pigmentfolt-lezer.jpg"
+          alt="IPL pigmentfolt kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Dupla hosszúságú kezelés
+            Célzott fényimpulzus technológia
           </h2>
           <p class="text-gray-700 mb-6">
-            A carbon peeling kezelés a legtöbb helyen egy sima, 30 perces rutin. A Beautyflownál viszont <strong>német, orvosi tisztaságú krémekkel és 60 perces kozmetikai programmal</strong> kombináljuk a carbon peelinget, így a bőröd nemcsak tisztább és simább lesz, hanem extra ápolást is kap minden alkalommal.
+            Az IPL (Intenzív Pulzáló Fény) kezelés <strong>szelektíven csak a pigmentált sejtekre hat</strong>. A fényenergia hővé alakul a melaninban, lebontja a pigmentet, miközben az egészséges bőrszövet sértetlen marad. Biztonságos, hatékony és orvosi háttérrel rendelkező technológia.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 2: Garantált glass skin - Text left, Image right -->
+  <!-- Benefits Section 2: Minden folttípusra - Text left, Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Garantált glass skin
+            Minden pigmentfolt típusra megoldás
           </h2>
           <p class="text-gray-700 mb-6">
-            Különleges karbonpasztás kezeléssel nemcsak a tetoválás halványítását, hanem a bőr fiatalítását is elérjük. A lézer <strong>szabályozza a faggyútermelést, összehúzza a pórusokat, kisimítja a mikroráncokat</strong>, halványítja a pigmentfoltokat, és garantálja a ragyogó „glass skin" hatást.
+            Legyen szó <strong>napfoltokról, öregségi foltokról, terhességi melaszmáról vagy szeplőkről</strong> – az IPL kezelés mindegyikre hatékony. A konzultáción meghatározzuk a foltok típusát és mélységét, hogy személyre szabott kezelési tervet készíthessünk.
           </p>
           <a
             href="/ingyenes-konzultacio"
@@ -351,77 +345,77 @@ const faqs = [
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/carbon-peeling-lezeres.jpg"
-          alt="Glass skin Carbon Peeling"
+          src="/images/pigmentfolt-kezeles.jpg"
+          alt="Pigmentfolt típusok kezelése"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 3: Azonnali hatás - Image left, Text right -->
+  <!-- Benefits Section 3: Látványos eredmény - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/carbon-peeling-mb.jpg"
-          alt="Azonnali Carbon Peeling eredmény"
+          src="/images/pigmentfolt-konzultacio.jpg"
+          alt="Pigmentfolt eltávolítás eredmény"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Azonnali hatás
+            Akár 95%-os halványodás
           </h2>
           <p class="text-gray-700 mb-6">
-            A kezelés után a bőr azonnal látványosan simább, frissebb és élettel telibb lesz, így <strong>akár smink nélkül is magabiztosan indulhatsz el otthonról</strong> – hiszen a természetes szépséged kerül előtérbe.
+            A kezeléssorozat végére a pigmentfoltok <strong>akár 95%-ban elhalványodhatnak vagy teljesen eltűnhetnek</strong>. Az eredmény fokozatosan, természetes módon jelentkezik – a környezeted észre sem veszi, csak azt, hogy egyre ragyogóbb a bőröd.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 4: Vigyázz, rászoksz! - Text left, Image right -->
+  <!-- Benefits Section 4: Gyors és kényelmes - Text left, Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Vigyázz, aki kipróbálja, rászokik!
+            Gyors kezelés, minimális leállás
           </h2>
           <p class="text-gray-700 mb-6">
-            Az a tapasztalatunk, hogy a Carbon Peeling annyira látványos, hatékony és kényelmes, hogy azok, akik egyszer kipróbálják <strong>utána nem is értik, eddig hogyan lehettek meg nélküle</strong>.
+            Egy kezelés mindössze <strong>15-30 percet vesz igénybe</strong>, és utána azonnal visszatérhetsz a mindennapokhoz. Enyhe pirosság 1-3 napig előfordulhat, de sminkelni már másnap lehet. Nincs hosszú regenerációs időszak!
           </p>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <img
-          src="/images/carbon-peeling-tetovalas.webp"
-          alt="Carbon Peeling eredmények"
+          src="/images/pigmentfolt-arckezeles.jpg"
+          alt="Gyors pigmentfolt kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 5: Éleszd újra a sminktetoválást - Image left, Text right -->
+  <!-- Benefits Section 5: Tartós eredmény - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <img
-          src="/images/szemoldok-sminktetovalas.jpg"
-          alt="Sminktetoválás felfrissítés Carbon Peelinggel"
+          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+          alt="Tartós pigmentfolt eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Éleszd újra a sminktetoválást
+            Tartós eredmény, ha vigyázol a bőrödre
           </h2>
           <p class="text-gray-700 mb-6">
-            A kiszürkült szemöldököt újra élővé tudjuk varázsolni akár egy ülés alatt. <strong>Sminktetoválás halványításával természetesebb, frissebb megjelenést kapsz</strong> – hegmentesen és biztonságosan.
+            A sikeresen kezelt pigmentfoltok <strong>nem térnek vissza</strong>. A megfelelő fényvédelemmel és bőrápolással az eredmény hosszú távon megőrizhető. Tanácsot adunk az otthoni ápoláshoz is, hogy a bőröd mindig ragyogó maradjon.
           </p>
           <a
             href="/ingyenes-konzultacio"
@@ -438,38 +432,29 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        Carbon Peeling Árak
+        Pigmentfolt Eltávolítás Árak
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Válaszd ki a számodra megfelelő területet és kezelési csomagot
+        Válaszd ki a kezelendő területet – az ár a kezelés méretétől függ
       </p>
 
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Single Treatments with Body Image -->
+        <!-- Single Treatments -->
         <div class="lg:w-1/2">
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
 
-          <div class="flex flex-col md:flex-row gap-6">
-            <!-- Body Image -->
-            <div class="w-full md:w-2/5 flex justify-center">
-              <img
-                src="/images/lezeres-szortelenites-ar-modell.jpg"
-                alt="Carbon Peeling kezelési területek"
-                class="w-full max-w-[200px] md:max-w-none h-auto rounded-2xl shadow-lg"
-              />
-            </div>
-
-            <!-- Price List -->
-            <div class="w-full md:w-3/5 space-y-3">
-              {singlePrices.map((item) => (
-                <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-800 font-medium">{item.area}</span>
-                    <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
+          <div class="space-y-3">
+            {treatments.map((item) => (
+              <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <span class="text-gray-800 font-medium block">{item.area}</span>
+                    <span class="text-gray-500 text-sm">{item.sessions}</span>
                   </div>
+                  <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -514,8 +499,8 @@ const faqs = [
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
       <img
-        src="/images/glass-skin-carbon-peeling.webp"
-        alt="Carbon Peeling kezelés folyamata"
+        src="/images/pigmentfolt-lezer.jpg"
+        alt="Pigmentfolt kezelés folyamata"
         class="w-full h-64 object-cover object-[center_20%]"
       />
     </div>
@@ -523,7 +508,7 @@ const faqs = [
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
       <img
-        src="/images/glass-skin-carbon-peeling.webp"
+        src="/images/pigmentfolt-lezer.jpg"
         alt=""
         class="w-full h-full object-cover object-right"
       />
@@ -604,17 +589,17 @@ const faqs = [
             </h2>
 
             <p class="text-gray-700 mb-2 text-sm">
-              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a Carbon Peeling kezelésbe!</span>
+              <span class="font-semibold">Vizsgáljuk meg együtt a pigmentfoltjaidat!</span>
             </p>
             <p class="text-gray-600 mb-3 text-sm">
               Egy kb. 15 perc hosszú INGYENES alkalom során megbeszéljük, hogy
             </p>
 
             <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
-              <li>milyen bőrproblémákat szeretnél kezelni</li>
-              <li>hány kezelés javasolt a kívánt eredményhez</li>
-              <li>melyik területeket érdemes kezelni (arc, dekoltázs, hát)</li>
-              <li>milyen azonnali és hosszú távú eredményre számíthatsz</li>
+              <li>milyen típusú pigmentfoltokról van szó</li>
+              <li>hány kezelés szükséges a kívánt eredményhez</li>
+              <li>mire számíthatsz a kezelés során és után</li>
+              <li>hogyan őrizheted meg az eredményt hosszú távon</li>
             </ul>
 
             <div class="text-center">
@@ -696,94 +681,94 @@ const faqs = [
   <section class="py-16 bg-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért a Beautyflow Carbon Peeling kezelést válaszd?
+        Miért a Beautyflow pigmentfolt kezelést válaszd?
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Több mint egy évtizedes tapasztalattal és prémium technológiával garantáljuk a ragyogó eredményt.
+        Több mint egy évtizedes tapasztalattal és orvosi háttérrel rendelkező technológiával dolgozunk.
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- 60 perces kezelés -->
+        <!-- Orvosi technológia -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
             <img
-              src="/images/carbon-peeling-archamlasztas.jpg"
-              alt="60 perces Carbon Peeling kezelés"
+              src="/images/ai-vezrelt-gepek.jpg"
+              alt="IPL orvosi technológia"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">60 perces luxus kezelés</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Orvosi háttérrel</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Míg máshol 30 perc a Carbon Peeling, nálunk dupla időt szánunk rád német, orvosi tisztaságú krémekkel kiegészítve a maximális eredményért.
+              EU-minősített, orvostechnikai besorolású IPL készülékkel dolgozunk, amely biztonságos és klinikailag bizonyított hatékonyságú.
             </p>
           </div>
         </div>
 
-        <!-- Azonnali eredmény -->
-        <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/carbon-peeling-lezeres.jpg"
-              alt="Azonnali Carbon Peeling eredmény"
-              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            />
-          </div>
-          <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Azonnali, látványos eredmény</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">
-              Már az első kezelés után észrevehető a különbség: kisebb pórusok, simább bőrfelszín és ragyogóbb arctónus – mindezt leállási idő nélkül.
-            </p>
-          </div>
-        </div>
-
-        <!-- Barátságos légkör -->
+        <!-- Tapasztalt szakemberek -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src="/images/konya-fanni-szepsegszalonja.jpg"
-              alt="Beautyflow szalon barátságos légköre"
+              alt="Tapasztalt pigmentfolt kezelő szakemberek"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Kényelmes, relaxáló élmény</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Tapasztalt szakemberek</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              A Carbon Peeling nálunk nem csak kezelés, hanem igazi kikapcsolódás. Kávéval, kellemes beszélgetéssel várunk, hogy igazán ellazulhass.
+              Képzett, tapasztalt kozmetikusaink pontosan tudják, hogyan kell kezelni a különböző pigmentfolt típusokat a legjobb eredményért.
             </p>
           </div>
         </div>
 
-        <!-- Orvosi tisztaság -->
-        <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/higienia.jpg"
-              alt="Steril Carbon Peeling környezet"
-              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            />
-          </div>
-          <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Orvosi szintű tisztaság</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">
-              Prémium minőségű, EU-bevizsgált termékeket és orvosi tisztaságú környezetet biztosítunk minden Carbon Peeling kezeléshez.
-            </p>
-          </div>
-        </div>
-
-        <!-- Minden bőrtípushoz -->
+        <!-- Személyre szabott -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src="/images/testmeret.jpg"
-              alt="Egyénre szabott Carbon Peeling"
+              alt="Személyre szabott pigmentfolt kezelés"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Egyénre szabott protokoll</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Személyre szabott kezelés</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Legyen zsíros, száraz, aknés vagy érzékeny a bőröd – a kezelést egyedileg állítjuk be a te bőrtípusodhoz és problémáidhoz.
+              A bőrtípusodat és a foltjaid jellegét figyelembe véve állítjuk be a kezelési paramétereket az optimális eredményért.
+            </p>
+          </div>
+        </div>
+
+        <!-- Biztonságos -->
+        <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img
+              src="/images/higienia.jpg"
+              alt="Biztonságos pigmentfolt kezelés"
+              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+          <div class="p-5">
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">100% biztonságos</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              A kezelés nem invazív, nincs sebzés, nincs hegképződés. A bőr integritása megmarad, csak a pigment bomlik le.
+            </p>
+          </div>
+        </div>
+
+        <!-- Látványos eredmény -->
+        <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img
+              src="/images/pigmentfolt-kezeles.jpg"
+              alt="Látványos pigmentfolt eltávolítás eredmény"
+              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+          <div class="p-5">
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Bizonyított hatékonyság</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Vendégeink 95%-ánál jelentős halványodást érünk el 3-6 kezelés alatt. Az eredmény hosszú távon is megmarad.
             </p>
           </div>
         </div>
@@ -798,9 +783,9 @@ const faqs = [
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Heti 7 napos nyitvatartás</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Rugalmas időpontok</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Hétvégén is várunk! Tudjuk, hogy a hétköznapok zsúfoltak – ezért Carbon Peeling kezelésre szombaton és vasárnap is foglalhatsz.
+              Heti 7 napos nyitvatartás – hétvégén és munkaidő után is tudsz időpontot foglalni pigmentfolt kezelésre.
             </p>
           </div>
         </div>
@@ -844,10 +829,10 @@ const faqs = [
   <section class="py-16 bg-gradient-to-r from-[#6366f1] to-[#4f46e5]">
     <div class="max-w-[800px] mx-auto px-4 text-center">
       <h2 class="font-heading text-3xl lg:text-4xl text-white mb-4 uppercase">
-        Készen állsz a ragyogó bőrre?
+        Készen állsz az egyenletes bőrre?
       </h2>
       <p class="text-white/90 mb-8 text-lg">
-        Foglalj időpontot ingyenes konzultációra és tapasztald meg a Carbon Peeling csodáját!
+        Foglalj időpontot ingyenes konzultációra és kezdd el a változást még ma!
       </p>
       <a
         href="/ingyenes-konzultacio"

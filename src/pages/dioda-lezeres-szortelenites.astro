@@ -12,9 +12,13 @@ const locations = [
     image: '/images/Beautyflow-buda.jpg',
     bookingUrl: notinoUrlBuda,
     hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 19:00' },
+      { days: 'H', time: '8:00-20:00' },
+      { days: 'K', time: '8:00-20:00' },
+      { days: 'Sz', time: '8:00-20:00' },
+      { days: 'Cs', time: '8:00-20:00' },
+      { days: 'P', time: '8:00-20:00' },
+      { days: 'Szo', time: '10:00-20:00' },
+      { days: 'V', time: '10:00-20:00' },
     ]
   },
   {
@@ -23,9 +27,13 @@ const locations = [
     image: '/images/Beautyflow-Pest.jpg',
     bookingUrl: notinoUrlPest,
     hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 18:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: 'Zárva' },
+      { days: 'H', time: '8:00-20:00' },
+      { days: 'K', time: '8:00-20:00' },
+      { days: 'Sz', time: '8:00-20:00' },
+      { days: 'Cs', time: '8:00-20:00' },
+      { days: 'P', time: '8:00-20:00' },
+      { days: 'Szo', time: '10:00-20:00' },
+      { days: 'V', time: '10:00-20:00' },
     ]
   }
 ];
@@ -173,12 +181,49 @@ const faqs = [
   { question: 'Mi a helyzet terhesség és szoptatás alatt?', answer: 'Terhesség és szoptatás alatt nem javasolt a kezelés.' },
   { question: 'Mikor nem javasolt a lézeres szőrtelenítés?', answer: 'Terhesség, szoptatás, aktív bőrfertőzés, friss barnulás, bizonyos gyógyszerszedés esetén nem javasolt.' },
 ];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Dióda Lézeres Szőrtelenítés",
+  "description": "Végleges dióda lézeres szőrtelenítés AI-vezérelt technológiával. Fájdalommentes kezelés, garantált eredmény.",
+  "provider": {
+    "@type": "BeautySalon",
+    "name": "Beautyflow Szépségszalon",
+    "url": "https://beautyflow.hu"
+  },
+  "areaServed": "Budapest",
+  "serviceType": "Lézeres szőrtelenítés",
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "HUF",
+    "lowPrice": "5000",
+    "highPrice": "55000",
+    "offerCount": packages.length + priceList.length
+  }
+};
 ---
 
 <Layout
   title="Dióda Lézeres Szőrtelenítés Budapest - Végleges Szőrtelenítés | Beautyflow"
   description="Végleges dióda lézeres szőrtelenítés Budapesten. AI-vezérelt technológia, fájdalommentes kezelés, garantált eredmény. Kérj ingyenes konzultációt!"
 >
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+
   <!-- Hero Section - Full viewport height minus header (60px) and stats (80px) -->
   <section class="hero-section relative lg:h-[calc(100dvh-60px)] flex flex-col">
     <!-- Top row: Text + Image - takes remaining space -->
