@@ -2,6 +2,47 @@
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Beautyflow Szépségszalon",
+  "url": "https://beautyflow.hu",
+  "logo": "https://beautyflow.hu/images/Beautyflow-favicon.png",
+  "description": "Többszörösen díjnyertes szépségszalon Budapesten. Lézeres szőrtelenítés, sminktetoválás, arckezelések.",
+  "foundingDate": "2014",
+  "founder": {
+    "@type": "Person",
+    "name": "Kónya Fanni"
+  },
+  "numberOfEmployees": "6",
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+36 1 300 9414",
+    "contactType": "customer service",
+    "availableLanguage": "Hungarian"
+  },
+  "sameAs": [
+    "https://www.instagram.com/beautyflow.hu/",
+    "https://www.facebook.com/beautyflow.hu/"
+  ]
+};
+
 const milestones = [
   { year: '2015', event: 'Kónya Fanni elvégzi a kozmetikusképzést' },
   { year: '2020', event: 'Megnyílik a Beautyflow Buda' },
@@ -94,6 +135,7 @@ const values = [
 ---
 
 <Layout title="Rólunk - Beautyflow Szépségszalon Budapest" description="Ismerd meg a Beautyflow történetét, csapatát és értékeit. Többszörösen díjnyertes szépségszalon Budapesten, ahol a vendég mindig az első.">
+  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 
   <!-- Hero Section -->
   <section class="py-16 lg:py-20 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">

@@ -10,9 +10,59 @@ import TreatmentsSection from '../components/TreatmentsSection.astro';
 import TestimonialsSection from '../components/TestimonialsSection.astro';
 import WhyChooseUsSection from '../components/WhyChooseUsSection.astro';
 import SecondaryHero from '../components/SecondaryHero.astro';
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "name": "Beautyflow Szépségszalon",
+  "image": "https://beautyflow.hu/images/Beautyflow-buda.jpg",
+  "url": "https://beautyflow.hu",
+  "telephone": "+36 1 300 9414",
+  "priceRange": "$$",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "500"
+  },
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ],
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "08:00",
+      "closes": "20:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday", "Sunday"],
+      "opens": "10:00",
+      "closes": "20:00"
+    }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/beautyflow.hu/",
+    "https://www.facebook.com/beautyflow.hu/"
+  ]
+};
 ---
 
 <Layout title="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Buda és Pest">
+  <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
   <HeroSection />
   <ConsultationSection />
   <AtmosphereSection />
