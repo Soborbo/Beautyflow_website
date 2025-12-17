@@ -284,11 +284,11 @@ const faqs = [
     </div>
 
     <!-- Stats Section -->
-    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
-        <div class="grid grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
-            <div class="text-center stat-item" style={`animation-delay: ${index * 100}ms`}>
+            <div class="text-center stat-item py-2 md:py-0" style={`animation-delay: ${index * 100}ms`}>
               <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
                 {stat.value}
               </p>
@@ -303,24 +303,31 @@ const faqs = [
   <!-- Intro Section with Fanni -->
   <section class="section-animate py-12 lg:py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fff] to-[#f8f4f9]">
     <div class="max-w-[1100px] mx-auto px-4">
-      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <!-- Image - max 400px height -->
-        <div class="w-full lg:w-2/5 flex-shrink-0">
-          <div class="relative rounded-2xl overflow-hidden shadow-xl" style="max-height: 400px;">
+      <!-- White card containing both image and text -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Image - full width on mobile, max 400px height on desktop -->
+          <div class="w-full lg:w-2/5 flex-shrink-0">
             <img
               src="/images/konya-fanni-konzultacio.webp"
               alt="Kónya Fanni sminktetoválás szakértő"
-              class="w-full h-full object-cover object-top"
-              style="max-height: 400px;"
+              class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
             />
-            <!-- Decorative corner accent -->
-            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#c53f75]/20 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#6366f1]/10 to-transparent"></div>
+            <!-- Mobile signature - right below image -->
+            <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
+              <div class="w-10 h-10 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[#c53f75] font-semibold text-sm">Kónya Fanni</p>
+                <p class="text-gray-500 text-xs">ügyvezető</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <!-- Text content - no card background -->
-        <div class="w-full lg:w-3/5">
-          <div class="flex flex-col justify-center">
+          <!-- Text content -->
+          <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
               Ha tudnád, hány elrontott sminktetoválást láttam már a pályám során! Sajnos a gyenge minőségű, zavarbaejtően csúnya munkák miatt sokan meg se fontolják a sminktetoválást – pedig ez egy nagyon hatékony és egyszerű módja annak, hogy már rögtön reggel, az ágyból felkelve is rendezetten nézz ki.
             </p>
@@ -330,7 +337,8 @@ const faqs = [
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
               <strong>Azt az odafigyelést és minőséget kapod nálunk, amit mi magunk is elvárunk.</strong>
             </p>
-            <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+            <!-- Desktop signature -->
+            <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
               <div class="w-12 h-12 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
                 <svg class="w-6 h-6 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -371,10 +379,10 @@ const faqs = [
               />
               <div class="absolute top-0 left-0 right-0 h-1 bg-[#5851e4]"></div>
             </div>
-            <div class="p-3 md:p-5">
-              <h3 class="font-heading text-sm md:text-lg text-gray-900 mb-1 md:mb-2">{treatment.title}</h3>
+            <div class="p-3 md:p-5 text-center md:text-left">
+              <h3 class="font-heading text-base md:text-lg text-gray-900 mb-1 md:mb-2">{treatment.title}</h3>
               <p class="text-gray-600 text-xs md:text-sm mb-2 md:mb-4 hidden md:block">{treatment.description}</p>
-              <p class="text-[#5851e4] font-bold text-sm md:text-lg">{treatment.price}</p>
+              <p class="text-[#5851e4] font-bold text-base md:text-lg">{treatment.price}</p>
             </div>
           </div>
         ))}
@@ -412,7 +420,7 @@ const faqs = [
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-[10%] text-center lg:text-left">
+        <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Fájdalom és trauma nélkül
           </h2>
@@ -428,13 +436,19 @@ const faqs = [
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
-        <div class="px-[10%] text-center lg:text-left">
+        <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Csak a legjobb pigmenteket használjuk
           </h2>
           <p class="text-gray-700 mb-6">
             A sminktetoválás egyik legfőbb titka a megfelelő pigment kiválasztása. Nem csak a színezőanyag minőségének kell tökéletesnek lennie, de <strong>szakszerűen kell kiválasztanunk a te bőrödnek és szőrtípusodnak legmegfelelőbb</strong>, legtermészetesebb pigmenteket.
           </p>
+          <a
+            href="/ingyenes-konzultacio"
+            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
+            Kérj Ingyenes konzultációt
+          </a>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
@@ -458,7 +472,7 @@ const faqs = [
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-[10%] text-center lg:text-left">
+        <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Sablon helyett egyedi tervezéssel
           </h2>
@@ -474,7 +488,7 @@ const faqs = [
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
-        <div class="px-[10%] text-center lg:text-left">
+        <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Egy kezelés – több éves hatás
           </h2>
@@ -504,7 +518,7 @@ const faqs = [
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-[10%] text-center lg:text-left">
+        <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Legyél magabiztos minden helyzetben
           </h2>
@@ -524,6 +538,15 @@ const faqs = [
 
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
+    <!-- Mobile: Image above everything like benefit sections -->
+    <div class="lg:hidden">
+      <img
+        src="/images/sminktetovalas-bg.jpg"
+        alt="Sminktetoválás kezelés"
+        class="w-full h-64 object-cover object-[center_20%]"
+      />
+    </div>
+
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
       <img
@@ -534,23 +557,14 @@ const faqs = [
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
-    <!-- Mobile background -->
-    <div class="lg:hidden absolute inset-0 bg-[#e8e4e1]"></div>
+    <!-- Mobile background for content area -->
+    <div class="lg:hidden absolute inset-0 top-64 bg-[#e8e4e1]"></div>
 
-    <div class="relative z-10 py-16">
+    <div class="relative z-10 py-12 lg:py-16">
       <div class="max-w-[1200px] mx-auto px-4">
         <h2 class="font-heading text-3xl lg:text-4xl text-[#1e3a5f] mb-10 text-center uppercase">
           Hogyan működik?
         </h2>
-
-        <!-- Mobile image showing face - BEFORE cards -->
-        <div class="lg:hidden mb-8 flex justify-center">
-          <img
-            src="/images/sminktetovalas-bg.jpg"
-            alt="Sminktetoválás kezelés"
-            class="w-full max-w-md h-80 object-cover object-[center_20%] rounded-lg shadow-lg"
-          />
-        </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
           <!-- Cards - Swipeable on mobile -->
