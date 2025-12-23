@@ -66,10 +66,14 @@ const teamMembers = [
     name: 'Kónya Fanni',
     role: 'Tulajdonos, Vezető kozmetikus',
     image: konyaFanniSq,
-    description: 'A Beautyflow alapítója és lelke. Fanni több mint 10 éves tapasztalattal rendelkezik a szépségiparban. Szakterülete a lézeres szőrtelenítés és a sminktetoválás.',
+    description: 'A Beautyflow alapítója és lelke. Fanni több mint 10 éves tapasztalattal rendelkezik a szépségiparban, és szinte minden kezelést végez a szalonban. A telefonos konzultációkat is ő intézi – ha kérdésed van, nyugodtan hívj!',
     treatments: [
-      { name: 'Lézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Sminktetoválás', url: '/sminktetovalas' },
+      { name: 'Tetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' },
+      { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
       { name: 'Konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
@@ -81,28 +85,30 @@ const teamMembers = [
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
   {
     name: 'Nagy Piroska',
     role: 'Kozmetikus',
     image: nagyPiroska,
-    description: '2016 óta kozmetikus. A precizitás nálam nem opció – alap. Gyöngyösön kezdtem, Budapesten folytattam. Több város, több szalon, több ezer kezelés – és mindegyikből tanultam valamit. A lézeres szőrtelenítés alatt szeretek beszélgetni, nevetni, lazítani. De amikor dolgozom, a kezem nem viccel.',
+    description: '2016 óta kozmetikus. A precizitás nálam nem opció – alap. Gyöngyösön kezdtem, Budapesten folytattam. Több város, több szalon, több ezer kezelés – és mindegyikből tanultam valamit. Jelenleg a diódalézeres szőrtelenítésre specializálódtam. A kezelés alatt szeretek beszélgetni, nevetni, lazítani. De amikor dolgozom, a kezem nem viccel.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
   {
     name: 'Désvári Lili Rozi',
     role: 'Kozmetikus',
     image: desvariLiliRozi,
-    description: 'Vasárnaponként Budán, péntekenként Pesten – és folyamatosan fejlődve. A Beautyflow csapat tagjaként rendszeresen képzem magam, mert a szépségipar nem áll meg, és én sem akarok. Diódalézeres szőrtelenítést, Hydrabeauty-t és carbon peelinget kínálok – mindig a legfrissebb tudással.',
+    description: 'Vasárnaponként Budán várlak – és folyamatosan fejlődve. A Beautyflow csapat tagjaként rendszeresen képzem magam, mert a szépségipar nem áll meg, és én sem akarok. Diódalézeres szőrtelenítést, Hydrabeauty-t és carbon peelinget kínálok – mindig a legfrissebb tudással.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
   {
@@ -113,18 +119,22 @@ const teamMembers = [
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
   {
     name: 'Varga Andrea',
     role: 'Kozmetikus, Sminktetováló',
     image: vargaAndrea,
-    description: 'Kozmetikus és sminktetováló – a részletekben hiszek. Évek óta dolgozom a szépségiparban, és egy dolog nem változott: minden vendéget egyénileg kezelek. Szó szerint. Carbon peeling, lézer, Hydrabeauty, vagy éppen sminktetoválás eltávolítás – mindig az adott bőrhöz és igényhez igazítom a kezelést.',
+    description: 'Kozmetikus és sminktetováló – a részletekben hiszek. Évek óta dolgozom a szépségiparban, és egy dolog nem változott: minden vendéget egyénileg kezelek. Szó szerint. Carbon peeling, lézer, Hydrabeauty, pigmentfolt eltávolítás vagy éppen sminktetoválás eltávolítás – mindig az adott bőrhöz és igényhez igazítom a kezelést.',
     treatments: [
       { name: 'Carbon Peeling', url: '/carbon-peeling' },
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' }
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
+      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' },
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   },
   {
@@ -135,7 +145,8 @@ const teamMembers = [
     description: 'A csapat legújabb tagja vagyok – de a lelkesedésben nem maradok le. Diódalézeres szőrtelenítéssel és carbon peelinggel foglalkozom, és imádok beszélgetni közben. Nálam gyorsan telik az idő, mert nem csak kezelés van, hanem kapcsolat is. Ha kicsit izgulsz az első alkalom előtt, ne tedd. Közvetlen vagyok, figyelek rád.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
+      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
     ]
   }
 ];
@@ -289,13 +300,13 @@ const values = [
             </div>
 
             <!-- Content -->
-            <div class="p-6 text-left flex flex-col flex-1">
+            <div class="p-6 text-center md:text-left flex flex-col flex-1">
               <h3 class="font-heading text-xl text-gray-900 mb-1">{member.name}</h3>
               <p class="text-[#c53f75] text-sm font-medium mb-3">{member.role}</p>
-              <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-1">{member.description}</p>
+              <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-1 text-left">{member.description}</p>
 
               <!-- Treatments as buttons -->
-              <div class="flex flex-wrap justify-start gap-2 mt-auto">
+              <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-auto">
                 {member.treatments.map((treatment) => (
                   <a
                     href={treatment.url}
