@@ -410,7 +410,7 @@ const faqSchema = {
             data-color={colors.primary}
             data-shadow={colors.shadow}
           >
-            <span class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" set:html={category.icon} />
+            <span class="hidden md:inline-block w-5 h-5 transition-transform duration-300 group-hover:rotate-12" set:html={category.icon} />
             {category.title}
           </button>
         )})}

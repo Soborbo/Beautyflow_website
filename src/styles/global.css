@@ -157,4 +157,18 @@
       padding: 40px 0;
     }
   }
+
+  /* Price table scrollable wrapper */
+  .price-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure prices never break to multiple lines */
+  .price-nowrap,
+  td[class*="text-right"],
+  .text-\[\#c53f75\][class*="font-bold"],
+  span[class*="font-bold"][class*="text-"] {
+    white-space: nowrap;
+  }
 }
