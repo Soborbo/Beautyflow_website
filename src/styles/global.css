@@ -181,4 +181,10 @@
   span[class*="font-bold"][class*="text-"] {
     white-space: nowrap;
   }
+
+  /* Below-fold content optimization - skip rendering until visible */
+  .below-fold {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
 }
