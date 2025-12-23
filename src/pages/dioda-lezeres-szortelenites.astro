@@ -340,15 +340,15 @@ const serviceSchema = {
     </div>
 
     <!-- Stats Section - Full width bar at bottom of hero -->
-    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
-        <div class="grid grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
-            <div class="text-center stat-item" style={`animation-delay: ${index * 100}ms`}>
-              <p class="text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
+            <div class="text-center stat-item py-2 lg:py-0" style={`animation-delay: ${index * 100}ms`}>
+              <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
                 {stat.value}
               </p>
-              <p class="text-white/80 text-[16px] leading-[0.9]">{stat.label}</p>
+              <p class="text-white/80 text-[12px] lg:text-[16px] leading-[0.9]">{stat.label}</p>
             </div>
           ))}
         </div>
