@@ -267,7 +267,7 @@ const values = [
 
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {teamMembers.map((member) => (
-          <div class="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+          <div class="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow flex flex-col">
             <!-- Image or Initials -->
             <div class="flex justify-center pt-6">
               {member.image ? (
@@ -289,13 +289,13 @@ const values = [
             </div>
 
             <!-- Content -->
-            <div class="p-6 text-center">
+            <div class="p-6 text-left flex flex-col flex-1">
               <h3 class="font-heading text-xl text-gray-900 mb-1">{member.name}</h3>
               <p class="text-[#c53f75] text-sm font-medium mb-3">{member.role}</p>
-              <p class="text-gray-600 text-sm mb-4 leading-relaxed">{member.description}</p>
+              <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-1">{member.description}</p>
 
               <!-- Treatments as buttons -->
-              <div class="flex flex-wrap justify-center gap-2">
+              <div class="flex flex-wrap justify-start gap-2 mt-auto">
                 {member.treatments.map((treatment) => (
                   <a
                     href={treatment.url}
