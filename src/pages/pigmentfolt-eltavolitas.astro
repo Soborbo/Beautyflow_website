@@ -1,6 +1,23 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+
+// Image imports
+import notinoIcon from '../assets/images/notino-ikon.png';
+import pigmentfoltArckezeles from '../assets/images/pigmentfolt-arckezeles.jpg';
+import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import pigmentfoltLezer from '../assets/images/pigmentfolt-lezer.jpg';
+import pigmentfoltKezeles from '../assets/images/pigmentfolt-kezeles.jpg';
+import pigmentfoltKonzultacio from '../assets/images/pigmentfolt-konzultacio.jpg';
+import hydrabeautyArckezeles from '../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
+import notinoLogo from '../assets/images/logok/notino-logo-sm.jpg';
+import skinlabLogo from '../assets/images/logok/skinlab.webp';
+import mestersegesIntelligenciaGep from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
+import testmeretImg from '../assets/images/testmeret.jpg';
+import higieniaImg from '../assets/images/higienia.jpg';
+import nyitvaImg from '../assets/images/nyitva.jpg';
 
 const stats = [
   { value: '10+ év', label: 'tapasztalat' },
@@ -156,7 +173,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <Image src={notinoIcon} alt="Notino" class="w-8 h-8" width={32} height={32} format="webp" quality={80} loading="lazy" />
                 </div>
               </div>
             </div>
@@ -202,17 +219,21 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <img
-          src="/images/pigmentfolt-arckezeles.jpg"
+        <Image
+          src={pigmentfoltArckezeles}
           alt="Pigmentfolt eltávolítás Budapest"
           class="w-full h-full object-cover"
+          format="webp"
+          quality={80}
+          loading="eager"
+          fetchpriority="high"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Notino Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/notino-ikon.png" alt="Notino" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <Image src={notinoIcon} alt="Notino" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} format="webp" quality={80} loading="lazy" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
@@ -254,10 +275,13 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, max 400px height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni pigmentfolt kezelés szakértő"
               class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -305,10 +329,13 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/pigmentfolt-lezer.jpg"
+        <Image
+          src={pigmentfoltLezer}
           alt="IPL pigmentfolt kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -346,10 +373,13 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/pigmentfolt-kezeles.jpg"
+        <Image
+          src={pigmentfoltKezeles}
           alt="Pigmentfolt típusok kezelése"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -359,10 +389,13 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/pigmentfolt-konzultacio.jpg"
+        <Image
+          src={pigmentfoltKonzultacio}
           alt="Pigmentfolt eltávolítás eredmény"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -392,10 +425,13 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/pigmentfolt-arckezeles.jpg"
+        <Image
+          src={pigmentfoltArckezeles}
           alt="Gyors pigmentfolt kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -405,10 +441,13 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        <Image
+          src={hydrabeautyArckezeles}
           alt="Tartós pigmentfolt eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -502,19 +541,25 @@ const faqs = [
   <section class="how-it-works-section relative overflow-hidden">
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
-      <img
-        src="/images/pigmentfolt-lezer.jpg"
+      <Image
+        src={pigmentfoltLezer}
         alt="Pigmentfolt kezelés folyamata"
         class="w-full h-64 object-cover object-[center_20%]"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
     </div>
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
-      <img
-        src="/images/pigmentfolt-lezer.jpg"
+      <Image
+        src={pigmentfoltLezer}
         alt=""
         class="w-full h-full object-cover object-right"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
@@ -572,11 +617,14 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2">
@@ -651,10 +699,15 @@ const faqs = [
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <img
-                src="/images/notino-ikon.png"
+              <Image
+                src={notinoIcon}
                 alt="Notino"
                 class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1 flex-shrink-0"
+                width={48}
+                height={48}
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
             </div>
@@ -672,10 +725,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogo} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
       </div>
     </div>
@@ -695,10 +748,13 @@ const faqs = [
         <!-- Orvosi technológia -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/ai-vezrelt-gepek.jpg"
+            <Image
+              src={mestersegesIntelligenciaGep}
               alt="IPL orvosi technológia"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -712,10 +768,13 @@ const faqs = [
         <!-- Tapasztalt szakemberek -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/konya-fanni-szepsegszalonja.jpg"
+            <Image
+              src={konyaFanniSzepsegszalonja}
               alt="Tapasztalt pigmentfolt kezelő szakemberek"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -729,10 +788,13 @@ const faqs = [
         <!-- Személyre szabott -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/testmeret.jpg"
+            <Image
+              src={testmeretImg}
               alt="Személyre szabott pigmentfolt kezelés"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -746,10 +808,13 @@ const faqs = [
         <!-- Biztonságos -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/higienia.jpg"
+            <Image
+              src={higieniaImg}
               alt="Biztonságos pigmentfolt kezelés"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -763,10 +828,13 @@ const faqs = [
         <!-- Látványos eredmény -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/pigmentfolt-kezeles.jpg"
+            <Image
+              src={pigmentfoltKezeles}
               alt="Látványos pigmentfolt eltávolítás eredmény"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -780,10 +848,13 @@ const faqs = [
         <!-- Heti 7 napos nyitvatartás -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/nyitva.jpg"
+            <Image
+              src={nyitvaImg}
               alt="Heti 7 napos nyitvatartás"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">

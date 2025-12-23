@@ -1,6 +1,16 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+
+// Image imports
+import beautyflowDijak from '../assets/images/beautyflow-dijak.webp';
+import konyaFanniSq from '../assets/images/Konya-Fanni-sq.jpg';
+import fodorInez from '../assets/images/fodor-inez.jpg';
+import nagyPiroska from '../assets/images/Nagy-Piroska.jpg';
+import desvariLiliRozi from '../assets/images/Desvari-Lili-Rozi.jpg';
+import trexlerJanka from '../assets/images/trexler-janka-kozmetikus.jpg';
+import vargaAndrea from '../assets/images/Varga-Andrea.jpg';
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -55,7 +65,7 @@ const teamMembers = [
   {
     name: 'Kónya Fanni',
     role: 'Tulajdonos, Vezető kozmetikus',
-    image: '/images/Konya-Fanni-sq.jpg',
+    image: konyaFanniSq,
     description: 'A Beautyflow alapítója és lelke. Fanni több mint 10 éves tapasztalattal rendelkezik a szépségiparban. Szakterülete a lézeres szőrtelenítés és a sminktetoválás.',
     treatments: [
       { name: 'Lézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
@@ -66,7 +76,7 @@ const teamMembers = [
   {
     name: 'Fodor Inez Vivien',
     role: 'Kozmetikus',
-    image: '/images/fodor-inez.jpg',
+    image: fodorInez,
     description: 'A Beautyflow Pest szalonjában várlak titeket! Főként diódalézeres szőrtelenítéssel és carbon peeling kezelésekkel foglalkozom. Fontos számomra, hogy a kezelések kellemes hangulatban, nyugodt környezetben történjenek.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
@@ -76,7 +86,7 @@ const teamMembers = [
   {
     name: 'Nagy Piroska',
     role: 'Kozmetikus',
-    image: '/images/Nagy-Piroska.jpg',
+    image: nagyPiroska,
     description: '2016 óta kozmetikus, Gyöngyösön és Budapesten végeztem. A legfontosabb számomra, hogy a munkám precízen végezzem, a vendég elégedett legyen és feltöltődve távozzon.',
     treatments: [
       { name: 'Arckezelések', url: '/hydrabeauty' },
@@ -86,7 +96,7 @@ const teamMembers = [
   {
     name: 'Désvári Lili Rozi',
     role: 'Kozmetikus',
-    image: '/images/Desvari-Lili-Rozi.jpg',
+    image: desvariLiliRozi,
     description: 'Péntekenként a pesti, vasárnaponként a budai szalonban várlak titeket! Folyamatos önfejlesztésemnek hála a szolgáltatásaim köre folyamatosan bővül.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' }
@@ -95,7 +105,7 @@ const teamMembers = [
   {
     name: 'Trexler Janka',
     role: 'Kozmetikus',
-    image: '/images/trexler-janka-kozmetikus.jpg',
+    image: trexlerJanka,
     description: 'A Sisyben tanultam ki ezt a gyönyörű szakmát. Célom, hogy a kezelések jó hangulatban teljenek és vendégeim elégedetten, mosollyal az arcukon távozzanak!',
     treatments: [
       { name: 'Arckezelések', url: '/hydrabeauty' },
@@ -105,7 +115,7 @@ const teamMembers = [
   {
     name: 'Varga Andrea',
     role: 'Kozmetikus, Sminktetováló',
-    image: '/images/Varga-Andrea.jpg',
+    image: vargaAndrea,
     description: 'Hatalmas öröm, hogy a Beautyflow csapatát erősíthetem! Hiszem, hogy a szépség belülről fakad, de egy kis szakértelemmel és odafigyeléssel kívül is ragyogtatható.',
     treatments: [
       { name: 'Carbon Peeling', url: '/carbon-peeling' },
@@ -170,11 +180,14 @@ const values = [
           </div>
         </div>
         <div>
-          <img
-            src="/images/beautyflow-dijak.webp"
+          <Image
+            src={beautyflowDijak}
             alt="Beautyflow - Notino Hónap Szalonja díj"
             class="w-full rounded-2xl shadow-lg"
-            loading="lazy"
+            format="webp"
+            quality={80}
+            loading="eager"
+            fetchpriority="high"
           />
         </div>
       </div>
@@ -243,11 +256,15 @@ const values = [
             <!-- Image or Initials -->
             <div class="flex justify-center pt-6">
               {member.image ? (
-                <img
+                <Image
                   src={member.image}
                   alt={member.name}
                   class="w-32 h-32 rounded-full object-cover shadow-md"
+                  format="webp"
+                  quality={80}
                   loading="lazy"
+                  width={128}
+                  height={128}
                 />
               ) : (
                 <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">

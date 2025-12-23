@@ -1,6 +1,41 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+import { Image } from 'astro:assets';
+
+// Image imports
+import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
+import beautyflowPest from '../assets/images/Beautyflow-Pest.jpg';
+import notinoIkon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
+import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import konyaFanniKonzultacio from '../assets/images/konya-fanni-konzultacio.webp';
+import lezeresSzortelenitesBg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+import lezeresLabSzortelenites from '../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+import lezeresSzortelenites from '../assets/images/lezeres-szortelenites-eredmenye.jpg';
+import intimSzortelenites from '../assets/images/intim-szortelenites-lezerrel.jpg';
+import lezeresHonaljSzortelenites from '../assets/images/lezeres-honalj-szortelenites.jpg';
+import borotvalas from '../assets/images/borotvalas.jpg';
+import lezeresArModell from '../assets/images/lezeres-szortelenites-ar-modell.jpg';
+import hajdu from '../assets/images/hajdu.png';
+import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
+import skinlab from '../assets/images/logok/skinlab.webp';
+import beautyflowDijak from '../assets/images/beautyflow-dijak.webp';
+import diodaLezeresMob from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
+import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
+import higienia from '../assets/images/higienia.jpg';
+import testmeret from '../assets/images/testmeret.jpg';
+import nyitva from '../assets/images/nyitva.jpg';
+import szegyenlos from '../assets/images/szegyenlos.jpg';
+import mestIntSzortelenito from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import pcosSzortelenites from '../assets/images/pcos-szortelenites.jpg';
+import laszloEszter from '../assets/images/laszlo-eszter.png';
+import kitti from '../assets/images/kitti.png';
+import dora from '../assets/images/dora.png';
+import szepsegszalonVirag from '../assets/images/szepsegszalon-virag.jpg';
+import szepsegszalonRuzs from '../assets/images/szepsegszalon-ruzs.jpg';
+import szepsegszalonTrofea from '../assets/images/szepsegszalon-trofea.jpg';
+import szepsegszalonUgyfel from '../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -9,7 +44,7 @@ const locations = [
   {
     name: 'Beautyflow Buda',
     address: '1116 Budapest, Vegyész u. 1.',
-    image: '/images/Beautyflow-buda.jpg',
+    image: beautyflowBuda,
     bookingUrl: notinoUrlBuda,
     hours: [
       { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
@@ -20,7 +55,7 @@ const locations = [
   {
     name: 'Beautyflow Pest',
     address: '1135 Budapest, Reitter Ferenc u. 90.',
-    image: '/images/Beautyflow-Pest.jpg',
+    image: beautyflowPest,
     bookingUrl: notinoUrlPest,
     hours: [
       { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
@@ -31,27 +66,27 @@ const locations = [
 ];
 
 const stats = [
-  { icon: '/images/szepsegszalon-virag.jpg', value: '10+ év', label: 'tapasztalat' },
-  { icon: '/images/szepsegszalon-ruzs.jpg', value: '10 000+', label: 'elvégzett kezelés' },
-  { icon: '/images/szepsegszalon-trofea.jpg', value: '12', label: 'legmodernebb gép' },
-  { icon: '/images/szepsegszalon-ugyfelvelemeny.jpg', value: '1500+', label: 'elégedett vendég' },
+  { icon: szepsegszalonVirag, value: '10+ év', label: 'tapasztalat' },
+  { icon: szepsegszalonRuzs, value: '10 000+', label: 'elvégzett kezelés' },
+  { icon: szepsegszalonTrofea, value: '12', label: 'legmodernebb gép' },
+  { icon: szepsegszalonUgyfel, value: '1500+', label: 'elégedett vendég' },
 ];
 
 const testimonials = [
   {
     text: 'A szalon hangulata nagyon jó, csodás a berendezés is. A lézerezés elkezdése pedig életem egyik legjobb döntése volt! Ajánlom mindenkinek!',
     author: 'László Eszter',
-    image: '/images/laszlo-eszter.png'
+    image: laszloEszter
   },
   {
     text: 'Fannihoz járok szőrtelenítésre, és nagyon elégedett vagyok Vele. Kedvességével, profizmusával, mindig hamar elrepül az ott töltött idő. Csak ajánlani tudom.',
     author: 'Keul Kitti',
-    image: '/images/kitti.png'
+    image: kitti
   },
   {
     text: 'Lézeres szőrtelenítésre járok hozzá és nagyon örülök, hogy őt választottam. Amit eddig kezelt nekem, az baromi látványos.. Figyelmes és a szalonja is tip-top.',
     author: 'Erdei Dóra',
-    image: '/images/dora.png'
+    image: dora
   }
 ];
 
@@ -113,47 +148,47 @@ const priceList = [
 
 const whyChooseUs = [
   {
-    image: '/images/mesterseges-intelligencia-szortelenito-gep.jpg',
+    image: mestIntSzortelenito,
     title: 'AI-vezérelt gépek\ncsúcstechnológiával',
     description: 'A legmodernebb dióda lézeres szőrtelenítő géppel dolgozunk, amelyet mesterséges intelligencia segít a bőr- és szőrtípushoz igazítani – minden alkalommal tökéletes precizitással.'
   },
   {
-    image: '/images/szegyenlos.jpg',
+    image: szegyenlos,
     title: 'Szégyenlős vagy?\nSemmi gond, segítünk!',
     description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.'
   },
   {
-    image: '/images/konya-fanni-szepsegszalonja-1.jpg',
+    image: konyaFanniSzepsegszalonja,
     title: 'Barátságos, „csajos",\nfelszabadító légkör',
     description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.'
   },
   {
-    image: '/images/higienia.jpg',
+    image: higienia,
     title: 'Orvosi szintű tisztaság\nés higiénia',
     description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
   },
   {
-    image: '/images/testmeret.jpg',
+    image: testmeret,
     title: 'Minden testalkat\nugyanannyi fizet',
     description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.'
   },
   {
-    image: '/images/nyitva.jpg',
+    image: nyitva,
     title: 'Heti 7 napos\nnyitvatartás',
     description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.'
   },
   {
-    image: '/images/dioda-lezeres-szortelenites-mob.jpg',
+    image: diodaLezeresMob,
     title: 'Nem futószalagon\ndolgozunk',
     description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
   },
   {
-    image: '/images/pcos-szortelenites.jpg',
+    image: pcosSzortelenites,
     title: 'Akkor is számíthatsz ránk,\nha más nem járt sikerrel',
     description: 'Főleg PCOS-es vendégeink szoktak számos korábbi sikertelen próbálkozásról beszámolni, amit a hormonális okok miatt kialakult különösen erős szőrzet okoz. Mi rászánjuk az időt és az energiát, hogy minden'
   },
   {
-    image: '/images/beautyflow-dijak.webp',
+    image: beautyflowDijak,
     title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás',
     description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.'
   }
@@ -229,7 +264,7 @@ const serviceSchema = {
                 <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
                 <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                   <div class="bg-white rounded-full p-1">
-                    <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                    <Image src={notinoIkon} alt="Notino" class="w-8 h-8" format="webp" quality={80} loading="eager" fetchpriority="high" />
                   </div>
                 </div>
               </div>
@@ -275,15 +310,19 @@ const serviceSchema = {
 
         <!-- Right column: Hero image - full width, no padding -->
         <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[250px] bg-[#fff9f7]">
-          <img
-            src="/images/lezeres-szortelenites-beautyflow-bg.jpg"
+          <Image
+            src={lezeresSzortelenitesBg}
             alt="Dióda lézeres szőrtelenítés kezelés"
             class="w-full h-full object-contain animate-zoom-in"
+            format="webp"
+            quality={80}
+            loading="eager"
+            fetchpriority="high"
           />
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">
             <div class="flex items-center gap-2">
-              <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+              <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" format="webp" quality={80} loading="eager" />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
@@ -325,10 +364,13 @@ const serviceSchema = {
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, max 400px height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni lézeres szőrtelenítés szakértő"
               class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -417,11 +459,14 @@ const serviceSchema = {
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/konya-fanni-konzultacio.webp"
+            <Image
+              src={konyaFanniKonzultacio}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2">
@@ -492,16 +537,22 @@ const serviceSchema = {
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <img
+              <Image
                 src={testimonial.image}
                 alt={testimonial.author}
                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src="/images/google-logo.jpg"
+              <Image
+                src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -515,10 +566,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/lezeres-lab-szortelenites-eredmenye.jpg"
+        <Image
+          src={lezeresLabSzortelenites}
           alt="Lézeres lábszőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -559,10 +613,13 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/lezeres-szortelenites-eredmenye.jpg"
+        <Image
+          src={lezeresSzortelenites}
           alt="Szőrtüszőgyulladás előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -573,10 +630,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/intim-szortelenites-lezerrel.jpg"
+        <Image
+          src={intimSzortelenites}
           alt="Lézeres szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -612,10 +672,13 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/lezeres-honalj-szortelenites.jpg"
+        <Image
+          src={lezeresHonaljSzortelenites}
           alt="Hónalj szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -626,10 +689,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/borotvalas.jpg"
+        <Image
+          src={borotvalas}
           alt="Borotva"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -764,7 +830,7 @@ const serviceSchema = {
               <th class="py-4 px-6 text-left font-semibold">Szempont</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
-                  <img src="/images/notino-ikon.png" alt="Beautyflow" class="w-6 h-6" />
+                  <Image src={notinoIkon} alt="Beautyflow" class="w-6 h-6" format="webp" quality={80} loading="lazy" />
                   Beautyflow
                 </div>
               </th>
@@ -889,10 +955,13 @@ const serviceSchema = {
         <div class="w-full lg:w-1/2 relative flex justify-center">
           <div class="relative body-map-container">
             <!-- Body model image -->
-            <img
-              src="/images/lezeres-szortelenites-ar-modell.jpg"
+            <Image
+              src={lezeresArModell}
               alt="Lézeres szőrtelenítés testtájak"
               class="w-full h-auto rounded-2xl"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
 
             <!-- Clickable Hotspots - positioned for the new image -->
@@ -1030,10 +1099,13 @@ const serviceSchema = {
           A legjobb hely a dióda lézeres szőrtelenítéshez. Fanni és Piroska elképesztő, alapos munkát végeznek, és mindig gondoskodnak arról, hogy a lehető legkényelmesebb legyen. Az eljáráshoz használt gép fenomenális, és az első kezelés után lenyűgöző eredményeket fog látni.
         </p>
         <div class="flex items-center justify-center gap-3">
-          <img
-            src="/images/hajdu.png"
+          <Image
+            src={hajdu}
             alt="László Eszter"
             class="w-12 h-12 rounded-full object-cover"
+            format="webp"
+            quality={80}
+            loading="lazy"
           />
           <p class="font-semibold text-gray-900">László Eszter</p>
         </div>
@@ -1055,10 +1127,13 @@ const serviceSchema = {
         {whyChooseUs.map((feature) => (
           <div class="bg-white border-2 border-[#d9baaf] rounded-lg overflow-hidden shadow-[10px_10px_5px_5px_#cccccc] hover:shadow-[12px_12px_8px_5px_#bbbbbb] transition-shadow duration-300">
             <div class="overflow-hidden">
-              <img
+              <Image
                 src={feature.image}
                 alt={feature.title.replace('\n', ' ')}
                 class="w-full h-48 object-cover"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
             </div>
             <div class="p-5 text-center">
@@ -1089,10 +1164,10 @@ const serviceSchema = {
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
       </div>
     </div>
@@ -1133,10 +1208,13 @@ const serviceSchema = {
     <div class="max-w-[1000px] mx-auto px-4">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <img
-            src="/images/beautyflow-dijak.webp"
+          <Image
+            src={beautyflowDijak}
             alt="Beautyflow csapat és díjak"
             class="w-full rounded-2xl shadow-lg"
+            format="webp"
+            quality={80}
+            loading="lazy"
           />
         </div>
         <div>
