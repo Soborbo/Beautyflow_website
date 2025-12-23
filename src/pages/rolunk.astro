@@ -77,9 +77,10 @@ const teamMembers = [
     name: 'Fodor Inez Vivien',
     role: 'Kozmetikus',
     image: fodorInez,
-    description: 'A Beautyflow Pest szalonjában várlak titeket! Főként diódalézeres szőrtelenítéssel és carbon peeling kezelésekkel foglalkozom. Fontos számomra, hogy a kezelések kellemes hangulatban, nyugodt környezetben történjenek.',
+    description: 'A részletekre figyelek, nem az órára. Évek óta diódalézeres szőrtelenítéssel foglalkozom, és egy dolgot tanultam meg biztosan: a jó eredményhez idő kell. Nálam nincs kapkodás, nincs "gyorsan letudni" mentalitás. Minden kezelést a te bőrödre szabok – legyen szó lézerről, Hydrabeauty-ról vagy carbon peelingről.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
@@ -87,9 +88,9 @@ const teamMembers = [
     name: 'Nagy Piroska',
     role: 'Kozmetikus',
     image: nagyPiroska,
-    description: '2016 óta kozmetikus, Gyöngyösön és Budapesten végeztem. A legfontosabb számomra, hogy a munkám precízen végezzem, a vendég elégedett legyen és feltöltődve távozzon.',
+    description: '2016 óta kozmetikus. A precizitás nálam nem opció – alap. Gyöngyösön kezdtem, Budapesten folytattam. Több város, több szalon, több ezer kezelés – és mindegyikből tanultam valamit. A lézeres szőrtelenítés alatt szeretek beszélgetni, nevetni, lazítani. De amikor dolgozom, a kezem nem viccel.',
     treatments: [
-      { name: 'Arckezelések', url: '/hydrabeauty' },
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
@@ -97,18 +98,21 @@ const teamMembers = [
     name: 'Désvári Lili Rozi',
     role: 'Kozmetikus',
     image: desvariLiliRozi,
-    description: 'Péntekenként a pesti, vasárnaponként a budai szalonban várlak titeket! Folyamatos önfejlesztésemnek hála a szolgáltatásaim köre folyamatosan bővül.',
+    description: 'Vasárnaponként Budán, péntekenként Pesten – és folyamatosan fejlődve. A Beautyflow csapat tagjaként rendszeresen képzem magam, mert a szépségipar nem áll meg, és én sem akarok. Diódalézeres szőrtelenítést, Hydrabeauty-t és carbon peelinget kínálok – mindig a legfrissebb tudással.',
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' }
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
     name: 'Trexler Janka',
     role: 'Kozmetikus',
     image: trexlerJanka,
-    description: 'A Sisyben tanultam ki ezt a gyönyörű szakmát. Célom, hogy a kezelések jó hangulatban teljenek és vendégeim elégedetten, mosollyal az arcukon távozzanak!',
+    description: 'A Sisiben tanultam a szakmát. A jó hangulatot magamtól hoztam. Kozmetikusnak lenni számomra azt jelenti, hogy segíthetek. Nem csak a bőrödön, hanem azon is, hogy egy kicsit feltöltődj a mindennapokból. Carbon peeling, Hydrabeauty, diódalézeres szőrtelenítés – bármelyiket választod, egy biztos: mosollyal fogsz távozni.',
     treatments: [
-      { name: 'Arckezelések', url: '/hydrabeauty' },
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
@@ -116,11 +120,22 @@ const teamMembers = [
     name: 'Varga Andrea',
     role: 'Kozmetikus, Sminktetováló',
     image: vargaAndrea,
-    description: 'Hatalmas öröm, hogy a Beautyflow csapatát erősíthetem! Hiszem, hogy a szépség belülről fakad, de egy kis szakértelemmel és odafigyeléssel kívül is ragyogtatható.',
+    description: 'Kozmetikus és sminktetováló – a részletekben hiszek. Évek óta dolgozom a szépségiparban, és egy dolog nem változott: minden vendéget egyénileg kezelek. Szó szerint. Carbon peeling, lézer, Hydrabeauty, vagy éppen sminktetoválás eltávolítás – mindig az adott bőrhöz és igényhez igazítom a kezelést.',
     treatments: [
       { name: 'Carbon Peeling', url: '/carbon-peeling' },
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Sminktetoválás', url: '/sminktetovalas' }
+      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' }
+    ]
+  },
+  {
+    name: 'Niki',
+    role: 'Kozmetikus',
+    image: null,
+    initials: 'N',
+    description: 'A csapat legújabb tagja vagyok – de a lelkesedésben nem maradok le. Diódalézeres szőrtelenítéssel és carbon peelinggel foglalkozom, és imádok beszélgetni közben. Nálam gyorsan telik az idő, mert nem csak kezelés van, hanem kapcsolat is. Ha kicsit izgulsz az első alkalom előtt, ne tedd. Közvetlen vagyok, figyelek rád.',
+    treatments: [
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   }
 ];
