@@ -26,6 +26,8 @@ import konnyaFanniSzepsegszalon from '../assets/images/konya-fanni-szepsegszalon
 import higieniaImage from '../assets/images/higienia.jpg';
 import testmeretImage from '../assets/images/testmeret.jpg';
 import nyitvaImage from '../assets/images/nyitva.jpg';
+import lezeresGep from '../assets/images/lezeres-gep.jpg';
+import lezerBeallitas from '../assets/images/lezer-beallitas.jpg';
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -408,46 +410,10 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Benefits Section 3: Hidegkalapácsos hűtés -->
+  <!-- Benefits Section 3: Kevesebb fájdalommal járó technika -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
-          src={hidegkalapacs}
-          alt="Hidegkalapácsos hűtés tetoválás eltávolításnál"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-5 lg:px-[10%] text-left">
-          <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Hidegkalapácsos hűtés
-          </h2>
-          <p class="text-gray-700 mb-6">
-            Jégzselé helyett <strong>hidegkalapáccsal hűtjük a bőrt</strong> kezelés közben. Ez érezhetően kevésbé fájdalmas és minimalizálja a duzzanatot.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Benefits Section 4: Kevesebb fájdalommal járó technika -->
-  <section class="section-animate bg-gray-50">
-    <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
-        <div class="px-5 lg:px-[10%] text-left">
-          <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Kevesebb fájdalommal járó technika
-          </h2>
-          <p class="text-gray-700 mb-6">
-            Ezen felül nem fóliát használunk, hanem <strong>steril Second Skin védelemmel</strong> engedjük el vendégeinket. Ez a speciális anyag megóvja a frissen kezelt bőrt a kórokozóktól, így biztonságosabb és higiénikusabb a tetoválás eltávolítás utáni időszak.
-          </p>
-        </div>
-      </div>
-      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <Image
           src={szemoldokTetovalasEltavolitas}
           alt="Kevesebb fájdalommal járó tetoválás eltávolítás"
@@ -457,23 +423,23 @@ const faqs = [
           loading="lazy"
         />
       </div>
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
+        <div class="px-5 lg:px-[10%] text-left">
+          <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
+            Kevesebb fájdalommal járó technika
+          </h2>
+          <p class="text-gray-700 mb-6">
+            Ezen felül nem fóliát használunk, hanem <strong>steril Second Skin védelemmel</strong> engedjük el vendégeinket. Ez a speciális anyag megóvja a frissen kezelt bőrt a kórokozóktól, így biztonságosabb és higiénikusabb a tetoválás eltávolítás utáni időszak.
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Benefits Section 5: Szemöldöktől a teljes hátig -->
-  <section class="section-animate">
+  <!-- Benefits Section 4: Szemöldöktől a teljes hátig -->
+  <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
-          src={tetovalasEltavolitasBp}
-          alt="Tetoválás eltávolítás minden testtájon"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Szemöldöktől a teljes hátig
@@ -483,13 +449,33 @@ const faqs = [
           </p>
         </div>
       </div>
+      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
+        <Image
+          src={tetovalasEltavolitasBp}
+          alt="Tetoválás eltávolítás minden testtájon"
+          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
+      </div>
     </div>
   </section>
 
-  <!-- Benefits Section 6: Second Skin védelem -->
-  <section class="section-animate bg-gray-50">
+  <!-- Benefits Section 5: Second Skin védelem -->
+  <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
+      <div class="w-full lg:w-1/2 relative overflow-hidden">
+        <Image
+          src={secondSkinVedelem}
+          alt="Second Skin védelem tetoválás eltávolítás után"
+          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
+      </div>
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Second Skin védelem – nem fólia!
@@ -523,33 +509,13 @@ const faqs = [
           </p>
         </div>
       </div>
-      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
-          src={secondSkinVedelem}
-          alt="Second Skin védelem tetoválás eltávolítás után"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
     </div>
   </section>
 
-  <!-- Benefits Section 7: Egyedi utóápoló krém -->
-  <section class="section-animate">
+  <!-- Benefits Section 6: Egyedi utóápoló krém -->
+  <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
-          src={egyediUtoapoloKrem}
-          alt="Egyedi utóápoló krém tetoválás eltávolítás után"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Egyedi utóápoló krém – ingyen
@@ -569,6 +535,16 @@ const faqs = [
             </a>
           </div>
         </div>
+      </div>
+      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
+        <Image
+          src={egyediUtoapoloKrem}
+          alt="Egyedi utóápoló krém tetoválás eltávolítás után"
+          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
       </div>
     </div>
   </section>
@@ -781,8 +757,8 @@ const faqs = [
   <section class="how-it-works-section relative overflow-hidden">
     <div class="lg:hidden">
       <Image
-        src={szemoldokTetovalasEltavolitas}
-        alt="Tetoválás eltávolítás kezelés"
+        src={lezeresGep}
+        alt="Lézeres tetoválás eltávolítás kezelés"
         class="w-full h-64 object-cover object-center"
         format="webp"
         quality={80}
@@ -792,7 +768,7 @@ const faqs = [
 
     <div class="hidden lg:block absolute inset-0">
       <Image
-        src={szemoldokTetovalasEltavolitas}
+        src={lezeresGep}
         alt=""
         class="w-full h-full object-cover object-right"
         format="webp"
@@ -974,7 +950,7 @@ const faqs = [
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image src={aiVezreltGepek} alt="Modern tetoválás eltávolító lézer" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
+            <Image src={lezerBeallitas} alt="Modern tetoválás eltávolító lézer" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Egyedileg beállított frekvencia</h3>
@@ -986,7 +962,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image src={szegyenlosVendeg} alt="Kényelmes tetoválás eltávolítás" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
+            <Image src={hidegkalapacs} alt="Hidegkalapácsos hűtés" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Hidegkalapácsos hűtés</h3>
