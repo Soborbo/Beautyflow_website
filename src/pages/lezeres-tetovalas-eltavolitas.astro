@@ -1,6 +1,28 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+
+// Image imports
+import notinoIkon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
+import heroImage from '../assets/images/tetovalas-eltavolitas-budapest.jpg';
+import konnyaFanniKonzultacio from '../assets/images/konya-fanni-konzultacio.webp';
+import sminktetovalasEltavolitas from '../assets/images/sminktetovalas-eltavolitas.jpg';
+import tetovalasEltavolitasAgy from '../assets/images/tetovalas-eltavolitas-agy.jpg';
+import szemoldokTetovalasEltavolitas from '../assets/images/szemoldok-tetovalas-eltavolitas.jpg';
+import utorapoloKrem from '../assets/images/utorapolo-krem-jar.jpg';
+import keresztesiImage from '../assets/images/keresztesi.png';
+import kittiImage from '../assets/images/kitti.png';
+import doraImage from '../assets/images/dora.png';
+import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
+import skinlabLogo from '../assets/images/logok/skinlab.webp';
+import aiVezreltGepek from '../assets/images/ai-vezrelt-gepek.jpg';
+import szegyenlosVendeg from '../assets/images/szegyenlos-vendeg.jpg';
+import konnyaFanniSzepsegszalon from '../assets/images/konya-fanni-szepsegszalonja.jpg';
+import higieniaImage from '../assets/images/higienia.jpg';
+import testmeretImage from '../assets/images/testmeret.jpg';
+import nyitvaImage from '../assets/images/nyitva.jpg';
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -16,27 +38,31 @@ const testimonials = [
   {
     text: '6 éve járok hozzá, kedves, pontos és nagyon igényes a munkájára. A "neves" sminktetoválók által elrontott szemöldöktetoválásomat is Fanni tette tökéletessé. Szívből ajánlom őt!',
     author: 'Keresztesi-Szabó Szilvia',
-    image: '/images/google-logo.jpg'
+    image: keresztesiImage
   },
   {
-    text: 'Tetoválás eltávolításon voltam, nagyon profin és kíméletesen csinálták. A bőröm gyorsan regenerálódott és a tetoválás szépen halványodik. Mindenkinek ajánlom!',
-    author: 'Kata',
-    image: '/images/google-logo.jpg'
+    text: 'Fannihoz járok szőrtelenítésre, és nagyon elégedett vagyok Vele. Kedvességével, profizmusával, mindig hamar elrepül az ott töltött idő. Csak ajánlani tudom.',
+    author: 'Keul Kitti',
+    image: kittiImage
   },
   {
-    text: 'Már 4 alkalom után látványos az eredmény! A csapat nagyon kedves és figyelmes. A hidegkalapácsos technika tényleg sokkal kevésbé fáj.',
-    author: 'Dóri',
-    image: '/images/google-logo.jpg'
+    text: 'Lézeres szőrtelenítésre járok hozzá és nagyon örülök, hogy őt választottam. Amit eddig kezelt nekem, az baromi látványos.. Figyelmes és a szalonja is tip-top.',
+    author: 'Erdei Dóra',
+    image: doraImage
   }
 ];
 
-const priceList = [
-  { size: '1-5 cm²', description: 'Apró tetoválások, sminktetoválás részek', price: '15 000 Ft' },
-  { size: '5-10 cm²', description: 'Kis tetoválások (pl. csuklón, bokán)', price: '20 000 Ft' },
-  { size: '10-25 cm²', description: 'Közepes méretű tetoválások', price: '30 000 Ft' },
-  { size: '25-50 cm²', description: 'Nagyobb tetoválások (pl. alkar)', price: '45 000 Ft' },
-  { size: '50-100 cm²', description: 'Nagy tetoválások (pl. felkar, vádli)', price: '60 000 Ft' },
-  { size: '100+ cm²', description: 'Extra nagy tetoválások', price: 'Egyedi árazás' },
+const arcPrices = [
+  { area: 'Szemöldök', price: '20 000 Ft' },
+  { area: 'Ajakkontúr', price: '15 000 Ft' },
+  { area: 'Smink (részleges)', price: '15 000 Ft' },
+];
+
+const testPrices = [
+  { size: '2x2 cm', price: '10 000 Ft' },
+  { size: '5x5 cm', price: '20 000 Ft' },
+  { size: '8x8 cm', price: '25 000 Ft' },
+  { size: '10x10 cm', price: '30 000 Ft-tól' },
 ];
 
 const howItWorks = [
@@ -131,15 +157,26 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Tetoválás eltávolítás árak",
-      "itemListElement": priceList.map(item => ({
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": `Tetoválás eltávolítás ${item.size}`
-        },
-        "price": item.price.replace(/[^0-9]/g, '') || "0",
-        "priceCurrency": "HUF"
-      }))
+      "itemListElement": [
+        ...arcPrices.map(item => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": `Tetoválás eltávolítás (arc) - ${item.area}`
+          },
+          "price": item.price.replace(/[^0-9]/g, '') || "0",
+          "priceCurrency": "HUF"
+        })),
+        ...testPrices.map(item => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": `Tetoválás eltávolítás (test) - ${item.size}`
+          },
+          "price": item.price.replace(/[^0-9]/g, '') || "0",
+          "priceCurrency": "HUF"
+        }))
+      ]
     }
   })} />
 
@@ -155,7 +192,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" format="webp" quality={80} loading="lazy" />
                 </div>
               </div>
             </div>
@@ -201,27 +238,31 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <img
-          src="/images/tetovalas-eltavolitas-budapest.jpg"
+        <Image
+          src={heroImage}
           alt="Lézeres tetoválás eltávolítás Budapest"
           class="w-full h-full object-cover"
+          format="webp"
+          quality={80}
+          loading="eager"
+          fetchpriority="high"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" format="webp" quality={80} loading="lazy" />
             <div>
               <div class="flex items-center gap-1">
-                <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
+                <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
                 <div class="flex">
                   {[1,2,3,4,5].map(() => (
                     <svg class="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                   ))}
                 </div>
               </div>
-              <p class="text-[9px] lg:text-[11px] text-gray-600">130 Google értékelés alapján</p>
+              <p class="text-[9px] lg:text-[11px] text-gray-600">Google értékelés alapján</p>
             </div>
           </div>
         </div>
@@ -229,7 +270,7 @@ const faqs = [
     </div>
 
     <!-- Stats Section -->
-    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
@@ -251,10 +292,13 @@ const faqs = [
       <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="flex flex-col lg:flex-row">
           <div class="w-full lg:w-2/5 flex-shrink-0">
-            <img
-              src="/images/konya-fanni-konzultacio.webp"
+            <Image
+              src={konnyaFanniKonzultacio}
               alt="Kónya Fanni tetoválás eltávolítás szakértő"
               class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
               <div class="w-10 h-10 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
@@ -314,10 +358,13 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/lezeres-tetovalas-eltavolitas.jpg"
+        <Image
+          src={sminktetovalasEltavolitas}
           alt="Sebhelymentes tetoválás eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -350,19 +397,24 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             Ezen felül nem fóliát használunk, hanem <strong>steril Second Skin védelemmel</strong> engedjük el vendégeinket. Ez a speciális anyag megóvja a frissen kezelt bőrt a kórokozóktól, így biztonságosabb és higiénikusabb a tetoválás eltávolítás utáni időszak.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/tetovalas-eltavolitas.jpg"
+        <Image
+          src={tetovalasEltavolitasAgy}
           alt="Fájdalommentes tetoválás eltávolítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -372,10 +424,13 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/tetovalas-eltavolitas-bp.jpg"
+        <Image
+          src={szemoldokTetovalasEltavolitas}
           alt="Különböző méretű tetoválások eltávolítása"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -402,19 +457,24 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             Minden tetoválás eltávolító kezeléshez <strong>speciális, egyedi utóápolókrémet adunk</strong>. Ez nyugtatja és gyógyítja a bőrt, gyorsítja a regenerációt, és már benne van az árban – nem kell külön költened rá.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/tetovalas-eltavolitas-agy.jpg"
-          alt="Tetoválás eltávolítás utóápolás"
+        <Image
+          src={utorapoloKrem}
+          alt="Tetoválás eltávolítás utóápoló krém"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -427,25 +487,37 @@ const faqs = [
         Tetoválás eltávolítás árak
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Az ár a tetoválás méretétől függ. Az ingyenes konzultáción pontos árajánlatot adunk.
+        Az ár a tetoválás típusától és méretétől függ. Az ingyenes konzultáción pontos árajánlatot adunk.
       </p>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-        {priceList.map((item) => (
-          <div
-            class="bg-white rounded-lg overflow-hidden shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-300 border-t-4"
-            style="border-top-color: #5851e4; background: linear-gradient(to bottom, #eef2ff, white 30%);"
-          >
-            <div class="p-4 md:p-5 text-center">
-              <h3 class="font-heading text-lg md:text-xl text-gray-900 mb-1">{item.size}</h3>
-              <p class="text-gray-600 text-xs md:text-sm mb-3 hidden md:block">{item.description}</p>
-              <p class="text-[#5851e4] font-bold text-lg md:text-xl">{item.price}</p>
-            </div>
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <!-- Table Header -->
+        <div class="bg-[#c53f75] text-white grid grid-cols-3 text-center py-4 px-4">
+          <div class="font-bold">Szolgáltatás</div>
+          <div class="font-bold">Terület</div>
+          <div class="font-bold">Ár (Ft / alkalom)</div>
+        </div>
+
+        <!-- Arc prices -->
+        {arcPrices.map((item, index) => (
+          <div class={`grid grid-cols-3 text-center py-4 px-4 items-center ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+            <div class="text-gray-700">Tetoválás eltávolítás (arc)</div>
+            <div class="text-gray-600">{item.area}</div>
+            <div class="text-gray-900 font-bold">{item.price}</div>
+          </div>
+        ))}
+
+        <!-- Test prices -->
+        {testPrices.map((item, index) => (
+          <div class={`grid grid-cols-3 text-center py-4 px-4 items-center ${(index + arcPrices.length) % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+            <div class="text-gray-700">Tetoválás eltávolítás (test)</div>
+            <div class="text-gray-600">{item.size}</div>
+            <div class="text-gray-900 font-bold">{item.price}</div>
           </div>
         ))}
       </div>
 
-      <div class="mt-8 bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
+      <div class="mt-8 bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-xl p-6 text-center">
         <p class="text-white font-bold text-lg mb-2">
           Cover-up előkészítés: halványítás kedvezményesen!
         </p>
@@ -468,18 +540,24 @@ const faqs = [
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
     <div class="lg:hidden">
-      <img
-        src="/images/szemoldok-tetovalas-eltavolitas.jpg"
+      <Image
+        src={szemoldokTetovalasEltavolitas}
         alt="Tetoválás eltávolítás kezelés"
         class="w-full h-64 object-cover object-center"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
     </div>
 
     <div class="hidden lg:block absolute inset-0">
-      <img
-        src="/images/szemoldok-tetovalas-eltavolitas.jpg"
+      <Image
+        src={szemoldokTetovalasEltavolitas}
         alt=""
         class="w-full h-full object-cover object-right"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
@@ -529,11 +607,14 @@ const faqs = [
       <div class="bg-white overflow-hidden max-w-[768px] mx-auto">
         <div class="flex flex-col lg:flex-row">
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/konya-fanni-konzultacio.webp"
+            <Image
+              src={konnyaFanniKonzultacio}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2">
@@ -607,10 +688,13 @@ const faqs = [
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <img
+              <Image
                 src={testimonial.image}
                 alt="Google"
                 class="w-10 h-10 rounded-full object-contain bg-gray-50 p-1 flex-shrink-0"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
             </div>
@@ -628,10 +712,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
       </div>
     </div>
@@ -650,7 +734,7 @@ const faqs = [
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/ai-vezrelt-gepek.jpg" alt="Modern tetoválás eltávolító lézer" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={aiVezreltGepek} alt="Modern tetoválás eltávolító lézer" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Egyedileg beállított frekvencia</h3>
@@ -662,7 +746,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/szegyenlos-vendeg.jpg" alt="Kényelmes tetoválás eltávolítás" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={szegyenlosVendeg} alt="Kényelmes tetoválás eltávolítás" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Hidegkalapácsos hűtés</h3>
@@ -674,7 +758,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/konya-fanni-szepsegszalonja.jpg" alt="Beautyflow szalon" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={konnyaFanniSzepsegszalon} alt="Beautyflow szalon" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Second Skin védelem</h3>
@@ -686,7 +770,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/higienia.jpg" alt="Orvosi tisztaság" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={higieniaImage} alt="Orvosi tisztaság" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Orvosi szintű higiénia</h3>
@@ -698,7 +782,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/testmeret.jpg" alt="Ingyenes utóápoló" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={testmeretImage} alt="Ingyenes utóápoló" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Ingyenes utóápoló krém</h3>
@@ -710,7 +794,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img src="/images/nyitva.jpg" alt="Heti 7 napos nyitvatartás" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            <Image src={nyitvaImage} alt="Heti 7 napos nyitvatartás" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Heti 7 napos nyitvatartás</h3>
@@ -784,7 +868,7 @@ const faqs = [
 
     if (prefersReducedMotion) {
       ratingElements.forEach(el => {
-        el.textContent = el.getAttribute('data-target') || '4.9';
+        el.textContent = el.getAttribute('data-target') || '5.0';
       });
       return;
     }
@@ -793,7 +877,7 @@ const faqs = [
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const el = entry.target as HTMLElement;
-          const target = parseFloat(el.getAttribute('data-target') || '4.9');
+          const target = parseFloat(el.getAttribute('data-target') || '5.0');
           animateRating(el, target);
           observer.unobserve(entry.target);
         }

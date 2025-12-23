@@ -1,6 +1,41 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+import { Image } from 'astro:assets';
+
+// Image imports
+import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
+import beautyflowPest from '../assets/images/Beautyflow-Pest.jpg';
+import notinoIkon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
+import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import konyaFanniKonzultacio from '../assets/images/konya-fanni-konzultacio.webp';
+import lezeresSzortelenitesBg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+import lezeresLabSzortelenites from '../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+import lezeresSzortelenites from '../assets/images/lezeres-szortelenites-eredmenye.jpg';
+import intimSzortelenites from '../assets/images/intim-szortelenites-lezerrel.jpg';
+import lezeresHonaljSzortelenites from '../assets/images/lezeres-honalj-szortelenites.jpg';
+import borotvalas from '../assets/images/borotvalas.jpg';
+import lezeresArModell from '../assets/images/lezeres-szortelenites-ar-modell.jpg';
+import hajdu from '../assets/images/hajdu.png';
+import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
+import skinlab from '../assets/images/logok/skinlab.webp';
+import beautyflowDijak from '../assets/images/beautyflow-dijak.webp';
+import diodaLezeresMob from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
+import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
+import higienia from '../assets/images/higienia.jpg';
+import testmeret from '../assets/images/testmeret.jpg';
+import nyitva from '../assets/images/nyitva.jpg';
+import szegyenlos from '../assets/images/szegyenlos.jpg';
+import mestIntSzortelenito from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import pcosSzortelenites from '../assets/images/pcos-szortelenites.jpg';
+import laszloEszter from '../assets/images/laszlo-eszter.png';
+import kitti from '../assets/images/kitti.png';
+import dora from '../assets/images/dora.png';
+import szepsegszalonVirag from '../assets/images/szepsegszalon-virag.jpg';
+import szepsegszalonRuzs from '../assets/images/szepsegszalon-ruzs.jpg';
+import szepsegszalonTrofea from '../assets/images/szepsegszalon-trofea.jpg';
+import szepsegszalonUgyfel from '../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -9,57 +44,49 @@ const locations = [
   {
     name: 'Beautyflow Buda',
     address: '1116 Budapest, Vegyész u. 1.',
-    image: '/images/Beautyflow-buda.jpg',
+    image: beautyflowBuda,
     bookingUrl: notinoUrlBuda,
     hours: [
-      { days: 'H', time: '8:00-20:00' },
-      { days: 'K', time: '8:00-20:00' },
-      { days: 'Sz', time: '8:00-20:00' },
-      { days: 'Cs', time: '8:00-20:00' },
-      { days: 'P', time: '8:00-20:00' },
-      { days: 'Szo', time: '10:00-20:00' },
-      { days: 'V', time: '10:00-20:00' },
+      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
+      { days: 'Szombat', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: '10:00 – 20:00' },
     ]
   },
   {
     name: 'Beautyflow Pest',
     address: '1135 Budapest, Reitter Ferenc u. 90.',
-    image: '/images/Beautyflow-Pest.jpg',
+    image: beautyflowPest,
     bookingUrl: notinoUrlPest,
     hours: [
-      { days: 'H', time: '8:00-20:00' },
-      { days: 'K', time: '8:00-20:00' },
-      { days: 'Sz', time: '8:00-20:00' },
-      { days: 'Cs', time: '8:00-20:00' },
-      { days: 'P', time: '8:00-20:00' },
-      { days: 'Szo', time: '10:00-20:00' },
-      { days: 'V', time: '10:00-20:00' },
+      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
+      { days: 'Szombat', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: '10:00 – 20:00' },
     ]
   }
 ];
 
 const stats = [
-  { icon: '/images/szepsegszalon-virag.jpg', value: '10+ év', label: 'tapasztalat' },
-  { icon: '/images/szepsegszalon-ruzs.jpg', value: '10 000+', label: 'elvégzett kezelés' },
-  { icon: '/images/szepsegszalon-trofea.jpg', value: '12', label: 'legmodernebb gép' },
-  { icon: '/images/szepsegszalon-ugyfelvelemeny.jpg', value: '1500+', label: 'elégedett vendég' },
+  { icon: szepsegszalonVirag, value: '10+ év', label: 'tapasztalat' },
+  { icon: szepsegszalonRuzs, value: '10 000+', label: 'elvégzett kezelés' },
+  { icon: szepsegszalonTrofea, value: '12', label: 'legmodernebb gép' },
+  { icon: szepsegszalonUgyfel, value: '1500+', label: 'elégedett vendég' },
 ];
 
 const testimonials = [
   {
     text: 'A szalon hangulata nagyon jó, csodás a berendezés is. A lézerezés elkezdése pedig életem egyik legjobb döntése volt! Ajánlom mindenkinek!',
     author: 'László Eszter',
-    image: '/images/laszlo-eszter.png'
+    image: laszloEszter
   },
   {
     text: 'Fannihoz járok szőrtelenítésre, és nagyon elégedett vagyok Vele. Kedvességével, profizmusával, mindig hamar elrepül az ott töltött idő. Csak ajánlani tudom.',
     author: 'Keul Kitti',
-    image: '/images/kitti.png'
+    image: kitti
   },
   {
     text: 'Lézeres szőrtelenítésre járok hozzá és nagyon örülök, hogy őt választottam. Amit eddig kezelt nekem, az baromi látványos.. Figyelmes és a szalonja is tip-top.',
     author: 'Erdei Dóra',
-    image: '/images/dora.png'
+    image: dora
   }
 ];
 
@@ -121,47 +148,47 @@ const priceList = [
 
 const whyChooseUs = [
   {
-    image: '/images/mesterseges-intelligencia-szortelenito-gep.jpg',
+    image: mestIntSzortelenito,
     title: 'AI-vezérelt gépek\ncsúcstechnológiával',
     description: 'A legmodernebb dióda lézeres szőrtelenítő géppel dolgozunk, amelyet mesterséges intelligencia segít a bőr- és szőrtípushoz igazítani – minden alkalommal tökéletes precizitással.'
   },
   {
-    image: '/images/szegyenlos.jpg',
+    image: szegyenlos,
     title: 'Szégyenlős vagy?\nSemmi gond, segítünk!',
     description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.'
   },
   {
-    image: '/images/konya-fanni-szepsegszalonja-1.jpg',
+    image: konyaFanniSzepsegszalonja,
     title: 'Barátságos, „csajos",\nfelszabadító légkör',
     description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.'
   },
   {
-    image: '/images/higienia.jpg',
+    image: higienia,
     title: 'Orvosi szintű tisztaság\nés higiénia',
     description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
   },
   {
-    image: '/images/testmeret.jpg',
+    image: testmeret,
     title: 'Minden testalkat\nugyanannyi fizet',
     description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.'
   },
   {
-    image: '/images/nyitva.jpg',
+    image: nyitva,
     title: 'Heti 7 napos\nnyitvatartás',
     description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.'
   },
   {
-    image: '/images/dioda-lezeres-szortelenites-mob.jpg',
+    image: diodaLezeresMob,
     title: 'Nem futószalagon\ndolgozunk',
     description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
   },
   {
-    image: '/images/pcos-szortelenites.jpg',
+    image: pcosSzortelenites,
     title: 'Akkor is számíthatsz ránk,\nha más nem járt sikerrel',
     description: 'Főleg PCOS-es vendégeink szoktak számos korábbi sikertelen próbálkozásról beszámolni, amit a hormonális okok miatt kialakult különösen erős szőrzet okoz. Mi rászánjuk az időt és az energiát, hogy minden'
   },
   {
-    image: '/images/beautyflow-dijak.webp',
+    image: beautyflowDijak,
     title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás',
     description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.'
   }
@@ -237,7 +264,7 @@ const serviceSchema = {
                 <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
                 <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                   <div class="bg-white rounded-full p-1">
-                    <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                    <Image src={notinoIkon} alt="Notino" class="w-8 h-8" format="webp" quality={80} loading="eager" fetchpriority="high" />
                   </div>
                 </div>
               </div>
@@ -283,25 +310,29 @@ const serviceSchema = {
 
         <!-- Right column: Hero image - full width, no padding -->
         <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[250px] bg-[#fff9f7]">
-          <img
-            src="/images/lezeres-szortelenites-beautyflow-bg.jpg"
+          <Image
+            src={lezeresSzortelenitesBg}
             alt="Dióda lézeres szőrtelenítés kezelés"
             class="w-full h-full object-contain animate-zoom-in"
+            format="webp"
+            quality={80}
+            loading="eager"
+            fetchpriority="high"
           />
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">
             <div class="flex items-center gap-2">
-              <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+              <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" format="webp" quality={80} loading="eager" />
               <div>
                 <div class="flex items-center gap-1">
-                  <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
+                  <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
                   <div class="flex">
                     {[1,2,3,4,5].map(() => (
                       <svg class="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                     ))}
                   </div>
                 </div>
-                <p class="text-[9px] lg:text-[11px] text-gray-600">130 Google értékelés alapján</p>
+                <p class="text-[9px] lg:text-[11px] text-gray-600">Google értékelés alapján</p>
               </div>
             </div>
           </div>
@@ -320,6 +351,64 @@ const serviceSchema = {
               <p class="text-white/80 text-[16px] leading-[0.9]">{stat.label}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro Section with Fanni -->
+  <section class="section-animate py-12 lg:py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fff] to-[#f8f4f9]">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <!-- White card containing both image and text -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Image - full width on mobile, max 400px height on desktop -->
+          <div class="w-full lg:w-2/5 flex-shrink-0">
+            <Image
+              src={konyaFanniSzepsegszalon}
+              alt="Kónya Fanni lézeres szőrtelenítés szakértő"
+              class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              format="webp"
+              quality={80}
+              loading="lazy"
+            />
+            <!-- Mobile signature - right below image -->
+            <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
+              <div class="w-10 h-10 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[#c53f75] font-semibold text-sm">Kónya Fanni</p>
+                <p class="text-gray-500 text-xs">ügyvezető</p>
+              </div>
+            </div>
+          </div>
+          <!-- Text content -->
+          <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
+            <p class="text-gray-700 mb-5 leading-relaxed" style="font-size: 18px;">
+              Ha volt már olyan, hogy visszatetted a szoknyát reggel, mert nem volt időd szőrteleníteni, vagy kényelmetlenül érezted magad egy rövid ujjú felsőben, mert borostás vagy piros pöttyös volt a bőröd – nem vagy egyedül.
+            </p>
+            <p class="text-gray-700 mb-5 text-base leading-relaxed">
+              A dióda lézeres szőrtelenítés nemcsak tartósan eltávolítja a szőrszálakat, de véget vet a gyulladt, benőtt szőrszálaknak és a borotválás okozta irritációnak is. <strong>Már az első kezelés után érezhető a különbség</strong>: a bőr simább, puhább lesz, és minden alkalom után egyre ritkábban kell borotválkoznod. Igen, még PCOS esetén is!
+            </p>
+            <p class="text-gray-700 mb-6 text-base leading-relaxed">
+              <strong>A dióda lézeres szőrtelenítés fájdalommentes, hatékony, és ma már mindenki számára elérhető, mindennapi luxus</strong>: egy kihagyhatatlan esély, hogy végre felszabadultan, magabiztosan élvezheted a nőiességedet.
+            </p>
+            <!-- Desktop signature -->
+            <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
+              <div class="w-12 h-12 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[#c53f75] font-semibold">Kónya Fanni</p>
+                <p class="text-gray-500 text-sm">ügyvezető</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -370,11 +459,14 @@ const serviceSchema = {
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/konya-fanni-konzultacio.webp"
+            <Image
+              src={konyaFanniKonzultacio}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2">
@@ -445,16 +537,22 @@ const serviceSchema = {
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <img
+              <Image
                 src={testimonial.image}
                 alt={testimonial.author}
                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src="/images/google-logo.jpg"
+              <Image
+                src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -468,10 +566,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/lezeres-lab-szortelenites-eredmenye.jpg"
+        <Image
+          src={lezeresLabSzortelenites}
           alt="Lézeres lábszőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -483,12 +584,14 @@ const serviceSchema = {
           <p class="text-gray-700 mb-6">
             A sima, irritációmentes bőr nemcsak egészségesebb, de magabiztossá is tesz. Többé nem kell azon aggódnod, hogy látható-e a borosta, van-e egy-két benőtt szőrszál, vagy pöttyös-e a bőröd borotválás után. A dióda lézeres szőrtelenítéssel <strong>újra élvezheted az öltözködés szabadságát</strong> – és nem azért takarod el magad, mert kell, hanem mert épp úgy érzed.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -510,10 +613,13 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/lezeres-szortelenites-eredmenye.jpg"
+        <Image
+          src={lezeresSzortelenites}
           alt="Szőrtüszőgyulladás előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -524,10 +630,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/intim-szortelenites-lezerrel.jpg"
+        <Image
+          src={intimSzortelenites}
           alt="Lézeres szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -563,10 +672,13 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/lezeres-honalj-szortelenites.jpg"
+        <Image
+          src={lezeresHonaljSzortelenites}
           alt="Hónalj szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
@@ -577,10 +689,13 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/borotvalas.jpg"
+        <Image
+          src={borotvalas}
           alt="Borotva"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -594,7 +709,7 @@ const serviceSchema = {
           </p>
 
           <!-- CTA -->
-          <div class="text-center lg:text-left">
+          <div class="text-center">
             <p class="text-gray-600 mb-2 text-sm">Hívj minket most!</p>
             <a
               href="tel:+3613009414"
@@ -715,7 +830,7 @@ const serviceSchema = {
               <th class="py-4 px-6 text-left font-semibold">Szempont</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
-                  <img src="/images/notino-ikon.png" alt="Beautyflow" class="w-6 h-6" />
+                  <Image src={notinoIkon} alt="Beautyflow" class="w-6 h-6" format="webp" quality={80} loading="lazy" />
                   Beautyflow
                 </div>
               </th>
@@ -825,7 +940,7 @@ const serviceSchema = {
   </section>
 
   <!-- Csomagok és Bérletek Section -->
-  <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
+  <section id="arlista" class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[960px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
         Lézeres szőrtelenítés árak 2025
@@ -840,10 +955,13 @@ const serviceSchema = {
         <div class="w-full lg:w-1/2 relative flex justify-center">
           <div class="relative body-map-container">
             <!-- Body model image -->
-            <img
-              src="/images/lezeres-szortelenites-ar-modell.jpg"
+            <Image
+              src={lezeresArModell}
               alt="Lézeres szőrtelenítés testtájak"
               class="w-full h-auto rounded-2xl"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
 
             <!-- Clickable Hotspots - positioned for the new image -->
@@ -955,6 +1073,12 @@ const serviceSchema = {
             </div>
           ))}
         </div>
+        <!-- Button to price table -->
+        <div class="text-center mt-6">
+          <a href="#arlista" class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            Tovább az ártáblázathoz
+          </a>
+        </div>
       </div>
 
     </div>
@@ -975,10 +1099,13 @@ const serviceSchema = {
           A legjobb hely a dióda lézeres szőrtelenítéshez. Fanni és Piroska elképesztő, alapos munkát végeznek, és mindig gondoskodnak arról, hogy a lehető legkényelmesebb legyen. Az eljáráshoz használt gép fenomenális, és az első kezelés után lenyűgöző eredményeket fog látni.
         </p>
         <div class="flex items-center justify-center gap-3">
-          <img
-            src="/images/hajdu.png"
+          <Image
+            src={hajdu}
             alt="László Eszter"
             class="w-12 h-12 rounded-full object-cover"
+            format="webp"
+            quality={80}
+            loading="lazy"
           />
           <p class="font-semibold text-gray-900">László Eszter</p>
         </div>
@@ -1000,10 +1127,13 @@ const serviceSchema = {
         {whyChooseUs.map((feature) => (
           <div class="bg-white border-2 border-[#d9baaf] rounded-lg overflow-hidden shadow-[10px_10px_5px_5px_#cccccc] hover:shadow-[12px_12px_8px_5px_#bbbbbb] transition-shadow duration-300">
             <div class="overflow-hidden">
-              <img
+              <Image
                 src={feature.image}
                 alt={feature.title.replace('\n', ' ')}
                 class="w-full h-48 object-cover"
+                format="webp"
+                quality={80}
+                loading="lazy"
               />
             </div>
             <div class="p-5 text-center">
@@ -1026,132 +1156,6 @@ const serviceSchema = {
     </div>
   </section>
 
-  <!-- Comparison Table Section -->
-  <section class="py-16 bg-white">
-    <div class="max-w-[1000px] mx-auto px-4">
-      <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért minket válassz?
-      </h2>
-      <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Nézd meg, miben különbözünk a többi szalontól. A Beautyflow-nál a minőség és a személyes odafigyelés az első.
-      </p>
-
-      <div class="overflow-x-auto">
-        <table class="w-full bg-white rounded-2xl shadow-lg overflow-hidden">
-          <thead>
-            <tr class="bg-gradient-to-r from-[#c53f75] to-[#a33460] text-white">
-              <th class="py-4 px-6 text-left font-semibold">Szempont</th>
-              <th class="py-4 px-6 text-center font-semibold">
-                <div class="flex items-center justify-center gap-2">
-                  <img src="/images/notino-ikon.png" alt="Beautyflow" class="w-6 h-6" />
-                  Beautyflow
-                </div>
-              </th>
-              <th class="py-4 px-6 text-center font-semibold text-white/80">Átlagos szalon</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">AI-vezérelt, 4 hullámhosszú gép</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </td>
-            </tr>
-            <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Mindig ugyanaz a kezelő</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </td>
-            </tr>
-            <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Nincs időkorlát a kezelésekre</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </td>
-            </tr>
-            <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Ingyenes konzultáció</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Fizetős vagy nincs</td>
-            </tr>
-            <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Minden testalkat ugyanannyit fizet</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Pótdíj felszámítás</td>
-            </tr>
-            <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">PCOS-es vendégek kezelése</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Elutasítják</td>
-            </tr>
-            <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Heti 7 napos nyitvatartás</td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Hétköznap csak</td>
-            </tr>
-            <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Díjnyertes szalon</td>
-              <td class="py-4 px-6 text-center">
-                <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded-full">
-                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                  Notino Hónap Szalonja
-                </span>
-              </td>
-              <td class="py-4 px-6 text-center">
-                <svg class="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                </svg>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="text-center mt-8">
-        <a href="/ingyenes-konzultacio" class="inline-block px-8 py-4 bg-[#c53f75] text-white font-bold uppercase text-sm rounded-full hover:bg-[#a33460] transition-colors">
-          Kérj ingyenes konzultációt
-        </a>
-      </div>
-    </div>
-  </section>
-
   <!-- Partners Section -->
   <section class="py-12 bg-gray-50">
     <div class="max-w-[1000px] mx-auto px-4">
@@ -1160,10 +1164,10 @@ const serviceSchema = {
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
       </div>
     </div>
@@ -1183,7 +1187,7 @@ const serviceSchema = {
               class="faq-question w-full text-left flex items-center justify-between p-5 cursor-pointer"
               aria-expanded="false"
             >
-              <h3 class="faq-question-text font-semibold text-gray-900 pr-4 transition-colors duration-300 text-sm">{faq.question}</h3>
+              <h3 class="faq-question-text font-semibold text-gray-900 pr-4 transition-colors duration-300 text-base">{faq.question}</h3>
               <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
@@ -1204,10 +1208,13 @@ const serviceSchema = {
     <div class="max-w-[1000px] mx-auto px-4">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <img
-            src="/images/beautyflow-dijak.webp"
+          <Image
+            src={beautyflowDijak}
             alt="Beautyflow csapat és díjak"
             class="w-full rounded-2xl shadow-lg"
+            format="webp"
+            quality={80}
+            loading="lazy"
           />
         </div>
         <div>
@@ -1604,7 +1611,7 @@ const serviceSchema = {
 
     if (prefersReducedMotion) {
       ratingElements.forEach(el => {
-        el.textContent = el.getAttribute('data-target') || '4.9';
+        el.textContent = el.getAttribute('data-target') || '5.0';
       });
       return;
     }
@@ -1613,7 +1620,7 @@ const serviceSchema = {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const el = entry.target as HTMLElement;
-          const target = parseFloat(el.getAttribute('data-target') || '4.9');
+          const target = parseFloat(el.getAttribute('data-target') || '5.0');
           animateRating(el, target);
           observer.unobserve(entry.target);
         }

@@ -24,13 +24,23 @@ const testimonials = [
   }
 ];
 
-const services = [
-  { id: 'hydra-arc', name: 'Hydrafacial - arc', duration: '60 perc', price: 20000, area: 'arc' },
-  { id: 'hydra-hat', name: 'Hydrafacial - hát', duration: '90 perc', price: 25000, area: 'hát' },
-  { id: 'hydra-arc-nyak-dekoltazs', name: 'Hydrafacial - arc + nyak + dekoltázs', duration: '100 perc', price: 30000, area: 'arc + nyak + dekoltázs' },
-  { id: 'hydra-carbon-arc', name: 'Hydrafacial + Carbon peeling - arc', duration: '100 perc', price: 40000, area: 'arc' },
-  { id: 'hydra-carbon-dekoltazs', name: 'Hydrafacial + Carbon peeling - arc + dekoltázs', duration: '120 perc', price: 45000, area: 'arc + dekoltázs' },
-  { id: 'hydra-carbon-hat', name: 'Hydrafacial + Carbon peeling - hát', duration: '120 perc', price: 45000, area: 'hát' },
+// Treatment types for step 1
+const treatmentTypes = [
+  { id: 'hydrofacial', name: 'HydroFacial', description: 'Mélytisztító és hidratáló arckezelés' },
+  { id: 'hydrofacial-carbon', name: 'HydroFacial + Carbon Peeling', description: 'Komplex kezelés bőrfiatalítással' },
+];
+
+// Areas for step 2 - shown based on selected treatment type
+const hydrofacialAreas = [
+  { id: 'arc', name: 'Arc', duration: '60 perc', price: 20000 },
+  { id: 'hat', name: 'Hát', duration: '90 perc', price: 25000 },
+  { id: 'arc-nyak-dekoltazs', name: 'Arc + nyak + dekoltázs', duration: '100 perc', price: 30000 },
+];
+
+const hydrofacialCarbonAreas = [
+  { id: 'arc', name: 'Arc', duration: '100 perc', price: 40000 },
+  { id: 'arc-dekoltazs', name: 'Arc + dekoltázs', duration: '120 perc', price: 45000 },
+  { id: 'hat', name: 'Hát', duration: '120 perc', price: 45000 },
 ];
 
 const howItWorks = [
@@ -125,11 +135,11 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "HydraBeauty szolgáltatások",
-      "itemListElement": services.map(item => ({
+      "itemListElement": hydrofacialAreas.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": item.name
+          "name": `HydraBeauty - ${item.name}`
         },
         "price": item.price.toString(),
         "priceCurrency": "HUF"
@@ -208,14 +218,14 @@ const faqs = [
             <img src="/images/notino-ikon.png" alt="Notino" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
             <div>
               <div class="flex items-center gap-1">
-                <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="4.9">0</span>
+                <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
                 <div class="flex">
                   {[1,2,3,4,5].map(() => (
                     <svg class="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                   ))}
                 </div>
               </div>
-              <p class="text-[9px] lg:text-[11px] text-gray-600">Notino értékelés alapján</p>
+              <p class="text-[9px] lg:text-[11px] text-gray-600">Google értékelés alapján</p>
             </div>
           </div>
         </div>
@@ -223,7 +233,7 @@ const faqs = [
     </div>
 
     <!-- Stats Section -->
-    <div class="w-full bg-gradient-to-r from-[#6366f1] to-[#4f46e5] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
@@ -328,12 +338,14 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             Vákuumos technológiával kíméletesen, mégis alaposan eltávolítjuk az elhalt hámsejteket és a szennyeződéseket, így <strong>a bőröd fellélegzik, a pórusok kitisztulnak</strong>, és végre nem kell állandóan a mitesszerekkel küzdened.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
@@ -410,12 +422,14 @@ const faqs = [
           <p class="text-gray-700 mb-6">
             A kezelés után a bőr azonnal látványosan simább, frissebb és élettel telibb lesz, így <strong>akár smink nélkül is magabiztosan indulhatsz el otthonról</strong> – hiszen a természetes szépséged kerül előtérbe.
           </p>
-          <a
-            href="/ingyenes-konzultacio"
-            class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          >
-            Kérj Ingyenes konzultációt
-          </a>
+          <div class="text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -428,103 +442,108 @@ const faqs = [
         HydraBeauty Árkalkulátor
       </h2>
       <p class="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
-        Válaszd ki a számodra megfelelő kezelést és számold ki az árat!
+        Válaszd ki a kezelés típusát és a kezelendő területet az azonnali árkiszámításhoz!
       </p>
 
       <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
-        <!-- Service Selection -->
-        <div class="space-y-4 mb-8">
-          <h3 class="font-heading text-lg text-gray-900 uppercase mb-4">Válassz kezelést</h3>
+        <!-- Step 1: Treatment Type Selection -->
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 bg-[#c53f75] text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+            <h3 class="font-heading text-lg text-gray-900 uppercase">Válassz kezelés típust</h3>
+          </div>
 
-          <div class="grid gap-3">
-            {services.map((service) => (
+          <div class="grid sm:grid-cols-2 gap-4">
+            {treatmentTypes.map((treatment) => (
               <label
-                class="service-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#c53f75] hover:bg-[#fdf8f6]"
-                data-price={service.price}
-                data-id={service.id}
+                class="treatment-type-option flex flex-col p-5 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#c53f75] hover:bg-[#fdf8f6]"
+                data-treatment={treatment.id}
+              >
+                <div class="flex items-center gap-3 mb-2">
+                  <input
+                    type="radio"
+                    name="treatment-type"
+                    value={treatment.id}
+                    class="w-5 h-5 text-[#c53f75] border-gray-300 focus:ring-[#c53f75]"
+                  />
+                  <span class="font-bold text-gray-900 text-lg">{treatment.name}</span>
+                </div>
+                <p class="text-sm text-gray-500 ml-8">{treatment.description}</p>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <!-- Step 2: Area Selection - Hidden until treatment type is selected -->
+        <div id="area-selection" class="mb-8 hidden">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 bg-[#c53f75] text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+            <h3 class="font-heading text-lg text-gray-900 uppercase">Válassz területet</h3>
+          </div>
+
+          <!-- HydroFacial Areas -->
+          <div id="hydrofacial-areas" class="grid gap-3 hidden">
+            {hydrofacialAreas.map((area) => (
+              <label
+                class="area-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#c53f75] hover:bg-[#fdf8f6]"
+                data-price={area.price}
+                data-duration={area.duration}
+                data-name={area.name}
               >
                 <input
                   type="radio"
-                  name="service"
-                  value={service.id}
+                  name="area"
+                  value={area.id}
                   class="w-5 h-5 text-[#c53f75] border-gray-300 focus:ring-[#c53f75]"
                 />
-                <div class="flex-1">
-                  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                    <span class="font-semibold text-gray-900">{service.name}</span>
-                    <span class="text-[#c53f75] font-bold text-lg">{service.price.toLocaleString('hu-HU')} Ft</span>
+                <div class="flex-1 flex justify-between items-center">
+                  <div>
+                    <span class="font-semibold text-gray-900">{area.name}</span>
+                    <p class="text-sm text-gray-500">{area.duration}</p>
                   </div>
-                  <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {service.duration}
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {service.area}
-                    </span>
+                  <span class="text-[#c53f75] font-bold text-xl">{area.price.toLocaleString('hu-HU')} Ft</span>
+                </div>
+              </label>
+            ))}
+          </div>
+
+          <!-- HydroFacial + Carbon Peeling Areas -->
+          <div id="hydrofacial-carbon-areas" class="grid gap-3 hidden">
+            {hydrofacialCarbonAreas.map((area) => (
+              <label
+                class="area-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#c53f75] hover:bg-[#fdf8f6]"
+                data-price={area.price}
+                data-duration={area.duration}
+                data-name={area.name}
+              >
+                <input
+                  type="radio"
+                  name="area"
+                  value={area.id}
+                  class="w-5 h-5 text-[#c53f75] border-gray-300 focus:ring-[#c53f75]"
+                />
+                <div class="flex-1 flex justify-between items-center">
+                  <div>
+                    <span class="font-semibold text-gray-900">{area.name}</span>
+                    <p class="text-sm text-gray-500">{area.duration}</p>
                   </div>
+                  <span class="text-[#c53f75] font-bold text-xl">{area.price.toLocaleString('hu-HU')} Ft</span>
                 </div>
               </label>
             ))}
           </div>
         </div>
 
-        <!-- Extras -->
-        <div class="border-t border-gray-200 pt-6 mb-8">
-          <h3 class="font-heading text-lg text-gray-900 uppercase mb-4">Kiegészítők (opcionális)</h3>
-
-          <div class="grid gap-3">
-            <label class="extra-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#6366f1] hover:bg-[#eef2ff]" data-price="5000">
-              <input type="checkbox" class="w-5 h-5 text-[#6366f1] border-gray-300 rounded focus:ring-[#6366f1]" />
-              <div class="flex-1 flex justify-between items-center">
-                <div>
-                  <span class="font-semibold text-gray-900">Kollagén maszk</span>
-                  <p class="text-sm text-gray-500">Extra hidratálás és feszesítés</p>
-                </div>
-                <span class="text-[#6366f1] font-bold">+5 000 Ft</span>
-              </div>
-            </label>
-
-            <label class="extra-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#6366f1] hover:bg-[#eef2ff]" data-price="3000">
-              <input type="checkbox" class="w-5 h-5 text-[#6366f1] border-gray-300 rounded focus:ring-[#6366f1]" />
-              <div class="flex-1 flex justify-between items-center">
-                <div>
-                  <span class="font-semibold text-gray-900">Szemkörnyék kezelés</span>
-                  <p class="text-sm text-gray-500">Karikák és ráncok halványítása</p>
-                </div>
-                <span class="text-[#6366f1] font-bold">+3 000 Ft</span>
-              </div>
-            </label>
-
-            <label class="extra-option flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#6366f1] hover:bg-[#eef2ff]" data-price="4000">
-              <input type="checkbox" class="w-5 h-5 text-[#6366f1] border-gray-300 rounded focus:ring-[#6366f1]" />
-              <div class="flex-1 flex justify-between items-center">
-                <div>
-                  <span class="font-semibold text-gray-900">LED fényterápia</span>
-                  <p class="text-sm text-gray-500">Bőrmegújítás és gyulladáscsökkentés</p>
-                </div>
-                <span class="text-[#6366f1] font-bold">+4 000 Ft</span>
-              </div>
-            </label>
-          </div>
-        </div>
-
         <!-- Total Price Display -->
-        <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-xl p-6 text-center">
-          <p class="text-white/80 text-sm uppercase tracking-wide mb-2">Összesen</p>
+        <div class="bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-xl p-6 text-center">
+          <p class="text-white/80 text-sm uppercase tracking-wide mb-2">Kezelés ára</p>
           <p class="text-white text-4xl lg:text-5xl font-bold mb-4">
-            <span id="total-price">0</span> Ft
+            <span id="total-price">-</span> <span id="price-suffix" class="hidden">Ft</span>
           </p>
-          <p class="text-white/70 text-sm mb-4" id="selected-summary">Válassz kezelést a kalkuláláshoz</p>
+          <p class="text-white/70 text-sm mb-4" id="selected-summary">Válassz kezelés típust és területet</p>
           <a
             href="/ingyenes-konzultacio"
-            class="inline-block px-8 py-3 bg-white text-[#6366f1] font-bold uppercase text-sm tracking-wide rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+            class="inline-block px-8 py-3 bg-white text-[#c53f75] font-bold uppercase text-sm tracking-wide rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105"
           >
             Foglalás most
           </a>
@@ -538,18 +557,18 @@ const faqs = [
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
       <img
-        src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        src="/images/hydrabeauty-arckezeles.jpg"
         alt="HydraBeauty kezelés folyamata"
-        class="w-full h-64 object-cover object-[center_20%]"
+        class="w-full h-64 object-cover object-top"
       />
     </div>
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
       <img
-        src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        src="/images/hydrabeauty-arckezeles.jpg"
         alt=""
-        class="w-full h-full object-cover object-right"
+        class="w-full h-full object-cover object-[center_30%]"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
@@ -893,7 +912,7 @@ const faqs = [
 
     if (prefersReducedMotion) {
       ratingElements.forEach(el => {
-        el.textContent = el.getAttribute('data-target') || '4.9';
+        el.textContent = el.getAttribute('data-target') || '5.0';
       });
       return;
     }
@@ -902,7 +921,7 @@ const faqs = [
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const el = entry.target as HTMLElement;
-          const target = parseFloat(el.getAttribute('data-target') || '4.9');
+          const target = parseFloat(el.getAttribute('data-target') || '5.0');
           animateRating(el, target);
           observer.unobserve(entry.target);
         }
@@ -954,52 +973,83 @@ const faqs = [
   }
 
   function initPriceCalculator() {
-    const serviceOptions = document.querySelectorAll('.service-option');
-    const extraOptions = document.querySelectorAll('.extra-option');
+    const treatmentTypeOptions = document.querySelectorAll('.treatment-type-option');
+    const areaSelectionContainer = document.getElementById('area-selection');
+    const hydrofacialAreasContainer = document.getElementById('hydrofacial-areas');
+    const hydrofacialCarbonAreasContainer = document.getElementById('hydrofacial-carbon-areas');
     const totalPriceEl = document.getElementById('total-price');
+    const priceSuffixEl = document.getElementById('price-suffix');
     const summaryEl = document.getElementById('selected-summary');
 
-    let selectedServicePrice = 0;
-    let selectedServiceName = '';
+    let selectedTreatmentType = '';
+    let selectedTreatmentName = '';
+    let selectedAreaPrice = 0;
+    let selectedAreaName = '';
 
-    function updateTotal() {
-      let extraTotal = 0;
-      const selectedExtras: string[] = [];
-
-      extraOptions.forEach(option => {
-        const checkbox = option.querySelector('input[type="checkbox"]') as HTMLInputElement;
-        if (checkbox?.checked) {
-          extraTotal += parseInt(option.getAttribute('data-price') || '0');
-          const name = option.querySelector('.font-semibold')?.textContent;
-          if (name) selectedExtras.push(name);
+    function updatePrice() {
+      if (selectedAreaPrice > 0) {
+        if (totalPriceEl) {
+          totalPriceEl.textContent = selectedAreaPrice.toLocaleString('hu-HU');
         }
-      });
-
-      const total = selectedServicePrice + extraTotal;
-
-      if (totalPriceEl) {
-        totalPriceEl.textContent = total.toLocaleString('hu-HU');
-      }
-
-      if (summaryEl) {
-        if (selectedServiceName) {
-          let summary = selectedServiceName;
-          if (selectedExtras.length > 0) {
-            summary += ' + ' + selectedExtras.join(', ');
+        if (priceSuffixEl) {
+          priceSuffixEl.classList.remove('hidden');
+        }
+        if (summaryEl) {
+          summaryEl.textContent = `${selectedTreatmentName} - ${selectedAreaName}`;
+        }
+      } else {
+        if (totalPriceEl) {
+          totalPriceEl.textContent = '-';
+        }
+        if (priceSuffixEl) {
+          priceSuffixEl.classList.add('hidden');
+        }
+        if (summaryEl) {
+          if (selectedTreatmentType) {
+            summaryEl.textContent = 'Válassz területet';
+          } else {
+            summaryEl.textContent = 'Válassz kezelés típust és területet';
           }
-          summaryEl.textContent = summary;
-        } else {
-          summaryEl.textContent = 'Válassz kezelést a kalkuláláshoz';
         }
       }
     }
 
-    serviceOptions.forEach(option => {
+    function showAreas(treatmentType: string) {
+      // Hide all area containers
+      hydrofacialAreasContainer?.classList.add('hidden');
+      hydrofacialCarbonAreasContainer?.classList.add('hidden');
+
+      // Show the appropriate container
+      if (treatmentType === 'hydrofacial') {
+        hydrofacialAreasContainer?.classList.remove('hidden');
+      } else if (treatmentType === 'hydrofacial-carbon') {
+        hydrofacialCarbonAreasContainer?.classList.remove('hidden');
+      }
+
+      // Show the area selection section
+      areaSelectionContainer?.classList.remove('hidden');
+
+      // Reset area selection
+      const allAreaOptions = document.querySelectorAll('.area-option');
+      allAreaOptions.forEach(opt => {
+        opt.classList.remove('border-[#c53f75]', 'bg-[#fdf8f6]');
+        opt.classList.add('border-gray-200');
+        const radio = opt.querySelector('input[type="radio"]') as HTMLInputElement;
+        if (radio) radio.checked = false;
+      });
+
+      selectedAreaPrice = 0;
+      selectedAreaName = '';
+      updatePrice();
+    }
+
+    // Treatment type selection
+    treatmentTypeOptions.forEach(option => {
       const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
 
       option.addEventListener('click', () => {
-        // Remove selected state from all options
-        serviceOptions.forEach(opt => {
+        // Remove selected state from all treatment type options
+        treatmentTypeOptions.forEach(opt => {
           opt.classList.remove('border-[#c53f75]', 'bg-[#fdf8f6]');
           opt.classList.add('border-gray-200');
         });
@@ -1013,32 +1063,43 @@ const faqs = [
           radio.checked = true;
         }
 
-        // Update price
-        selectedServicePrice = parseInt(option.getAttribute('data-price') || '0');
-        selectedServiceName = option.querySelector('.font-semibold')?.textContent || '';
-        updateTotal();
+        // Get treatment type
+        selectedTreatmentType = option.getAttribute('data-treatment') || '';
+        selectedTreatmentName = option.querySelector('.font-bold')?.textContent || '';
+
+        // Show appropriate areas
+        showAreas(selectedTreatmentType);
       });
     });
 
-    extraOptions.forEach(option => {
-      option.addEventListener('click', (e) => {
-        const checkbox = option.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    // Area selection
+    const allAreaOptions = document.querySelectorAll('.area-option');
+    allAreaOptions.forEach(option => {
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
 
-        // Don't toggle if clicking on the checkbox itself (it handles itself)
-        if ((e.target as HTMLElement).tagName !== 'INPUT') {
-          checkbox.checked = !checkbox.checked;
+      option.addEventListener('click', () => {
+        // Remove selected state from all area options in same container
+        const parentContainer = option.closest('#hydrofacial-areas, #hydrofacial-carbon-areas');
+        if (parentContainer) {
+          parentContainer.querySelectorAll('.area-option').forEach(opt => {
+            opt.classList.remove('border-[#c53f75]', 'bg-[#fdf8f6]');
+            opt.classList.add('border-gray-200');
+          });
         }
 
-        // Update styling
-        if (checkbox.checked) {
-          option.classList.remove('border-gray-200');
-          option.classList.add('border-[#6366f1]', 'bg-[#eef2ff]');
-        } else {
-          option.classList.remove('border-[#6366f1]', 'bg-[#eef2ff]');
-          option.classList.add('border-gray-200');
+        // Add selected state to clicked option
+        option.classList.remove('border-gray-200');
+        option.classList.add('border-[#c53f75]', 'bg-[#fdf8f6]');
+
+        // Update radio
+        if (radio) {
+          radio.checked = true;
         }
 
-        updateTotal();
+        // Update price
+        selectedAreaPrice = parseInt(option.getAttribute('data-price') || '0');
+        selectedAreaName = option.getAttribute('data-name') || '';
+        updatePrice();
       });
     });
   }
@@ -1120,7 +1181,8 @@ const faqs = [
   }
 
   /* Price calculator custom radio styles */
-  .service-option input[type="radio"]:checked {
+  .treatment-type-option input[type="radio"]:checked,
+  .area-option input[type="radio"]:checked {
     background-color: #c53f75;
     border-color: #c53f75;
   }

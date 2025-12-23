@@ -1,52 +1,48 @@
 ---
+import { Image } from 'astro:assets';
+import hydrabeautyImg from '../assets/images/hydrabeauty.jpg';
+import sminktetovalasImg from '../assets/images/sminktetovalas-mb-2.jpg';
+import carbonPeelingImg from '../assets/images/carbon-peeling-mb.jpg';
+import diodaImg from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
+import tetovalasImg from '../assets/images/sminktetovalas-mb.jpg';
+import pigmentfoltImg from '../assets/images/pigmentfolt-eltavoitas.webp';
+
 const treatments = [
   {
-    image: '/images/hydrabeauty.jpg',
+    image: hydrabeautyImg,
     title: 'HydraBeauty arckezelés',
     description: 'Ragyogó bőr azonnal - tisztítsd, hidratáld, frissítsd fel az arcod. Azonnali hatás!',
     link: '/hydrabeauty',
-    color: '#0d9488', // teal
-    bgColor: '#f0fdfa'
   },
   {
-    image: '/images/sminktetovalas-mb-2.jpg',
+    image: sminktetovalasImg,
     title: 'Sminktetoválás',
     description: 'Nézz ki mindig tökéletesen rögtön az ágyból felkelve is.',
     link: '/sminktetovalas',
-    color: '#6366f1', // indigo
-    bgColor: '#eef2ff'
   },
   {
-    image: '/images/carbon-peeling-mb.jpg',
+    image: carbonPeelingImg,
     title: 'Carbon Peeling',
     description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
     link: '/carbon-peeling',
-    color: '#8b5cf6', // purple
-    bgColor: '#f5f3ff'
   },
   {
-    image: '/images/dioda-lezeres-szortelenites-mob.jpg',
+    image: diodaImg,
     title: 'Dióda lézeres szőrtelenítés',
     description: 'Legyen mindig tökéletesen sima és vonzó a bőrőd és mondj búcsút a szőrtüszőgyulladásnak',
     link: '/dioda-lezeres-szortelenites',
-    color: '#3b82f6', // blue
-    bgColor: '#eff6ff'
   },
   {
-    image: '/images/sminktetovalas-mb.jpg',
+    image: tetovalasImg,
     title: 'Tetoválás-eltávolítás',
     description: 'Megbántad egy tetoválásodat? Semmi gond, segítünk, hogy ne zavarjon többé.',
     link: '/lezeres-tetovalas-eltavolitas',
-    color: '#ef4444', // red
-    bgColor: '#fef2f2'
   },
   {
-    image: '/images/pigmentfolt-eltavoitas.webp',
+    image: pigmentfoltImg,
     title: 'Pigmentfolt-eltávolítás',
     description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
-    link: '/hydrabeauty',
-    color: '#f59e0b', // amber
-    bgColor: '#fffbeb'
+    link: '/pigmentfolt-eltavolitas',
   }
 ];
 ---
@@ -60,16 +56,19 @@ const treatments = [
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {treatments.map((treatment) => (
         <div
-          class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)] border-t-4"
-          style={`border-top-color: ${treatment.color}; background: linear-gradient(to bottom, ${treatment.bgColor}, white 30%);`}
+          class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)]"
         >
           <div class="relative overflow-hidden">
-            <img
+            <Image
               src={treatment.image}
               alt={treatment.title}
               class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
+              width={400}
+              height={224}
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
-            <div class="absolute top-0 left-0 right-0 h-1" style={`background-color: ${treatment.color};`}></div>
           </div>
           <div class="p-6 flex flex-col flex-1">
             <h3 class="font-heading text-[1.4rem] text-gray-900 mb-3 text-center font-bold">

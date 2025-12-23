@@ -6,7 +6,24 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: 'compile',
+    routes: {
+      strategy: 'include',
+      include: ['/*'],
+      exclude: ['/_astro/*', '/images/*', '/favicon.svg']
+    }
+  }),
+  image: {
+    // Enable image optimization
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    },
+    // Default quality for optimized images
+    quality: 80,
+    // Domains that are allowed for remote images
+    domains: [],
+  },
   vite: {
     plugins: [tailwindcss()]
   }

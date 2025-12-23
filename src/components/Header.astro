@@ -17,6 +17,7 @@ const menuItems: MenuItem[] = [
       { label: 'Tetoválás eltávolítás', href: '/lezeres-tetovalas-eltavolitas' },
       { label: 'Carbon Peeling', href: '/carbon-peeling' },
       { label: 'Hydrabeauty', href: '/hydrabeauty' },
+      { label: 'Pigmentfolt eltávolítás', href: '/pigmentfolt-eltavolitas' },
     ]
   },
   { label: 'Gy. I. K.', href: '/gyakran-ismetelt-kerdesek' },
@@ -93,7 +94,7 @@ const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&sh
           <div class="relative group">
             {item.children ? (
               <>
-                <button class="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-[#c53f75] transition-colors py-2">
+                <button class="flex items-center gap-1 text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase">
                   {item.label}
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -113,7 +114,7 @@ const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&sh
                 </div>
               </>
             ) : (
-              <a href={item.href} class="text-sm font-medium text-gray-700 hover:text-[#c53f75] transition-colors py-2">
+              <a href={item.href} class="text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase">
                 {item.label}
               </a>
             )}
