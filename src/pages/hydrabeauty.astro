@@ -135,11 +135,11 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "HydraBeauty szolgáltatások",
-      "itemListElement": services.map(item => ({
+      "itemListElement": hydrofacialAreas.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": item.name
+          "name": `HydraBeauty - ${item.name}`
         },
         "price": item.price.toString(),
         "priceCurrency": "HUF"
