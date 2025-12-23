@@ -277,9 +277,9 @@ const faqs = [
     <!-- Stats Section -->
     <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
-            <div class="text-center stat-item py-2 md:py-0" style={`animation-delay: ${index * 100}ms`}>
+            <div class="text-center stat-item py-2 lg:py-0" style={`animation-delay: ${index * 100}ms`}>
               <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
                 {stat.value}
               </p>
@@ -602,7 +602,7 @@ const faqs = [
                     <span class="font-medium text-gray-800">{item.area}</span>
                   </div>
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-[#c53f75]">{item.price.replace(' Ft', '')}</span>
+                    <span class="text-2xl font-bold text-[#c53f75] whitespace-nowrap">{item.price.replace(' Ft', '')}</span>
                     <span class="text-sm text-gray-500"> Ft</span>
                     <p class="text-xs text-gray-400">/ alkalom</p>
                   </div>
@@ -658,7 +658,7 @@ const faqs = [
             <p class="text-sm text-gray-600 mb-1">Válassz méretet a fenti négyzetekre kattintva</p>
             <div id="price-result" class="hidden">
               <p class="text-sm text-gray-500">Kiválasztott méret: <span id="selected-size" class="font-semibold text-gray-700"></span></p>
-              <p class="text-3xl font-bold text-[#6366f1] mt-1"><span id="selected-price"></span> Ft <span class="text-sm font-normal text-gray-500">/ alkalom</span></p>
+              <p class="text-3xl font-bold text-[#6366f1] mt-1 whitespace-nowrap"><span id="selected-price"></span> Ft <span class="text-sm font-normal text-gray-500">/ alkalom</span></p>
             </div>
           </div>
 

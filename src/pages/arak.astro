@@ -195,7 +195,7 @@ const categories = [
               <h3 class="font-semibold text-lg text-gray-900 mb-2">{csomag.name} csomag</h3>
               <p class="text-gray-600 text-sm mb-4 leading-relaxed">{csomag.zones}</p>
               <div class="flex items-baseline justify-between">
-                <span class="text-2xl font-bold text-gray-900">{csomag.price} Ft</span>
+                <span class="text-2xl font-bold text-gray-900 whitespace-nowrap">{csomag.price} Ft</span>
                 <span class="text-gray-500 text-sm">/ alkalom</span>
               </div>
             </div>
@@ -242,11 +242,11 @@ const categories = [
                     {/* Items in group */}
                     {group.items.map((item) => (
                       <tr class="hover:bg-gray-50 border-b border-gray-100">
-                        <td class="py-3 px-4 font-medium text-gray-900">{item.zone}</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[0]} Ft</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[1]} Ft</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[2]} Ft</td>
-                        <td class="py-3 px-3 text-center text-blue-600 font-semibold">{item.prices[3]} Ft</td>
+                        <td class="py-3 px-4 font-medium text-gray-900 whitespace-nowrap">{item.zone}</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[0]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[1]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[2]} Ft</td>
+                        <td class="py-3 px-3 text-center text-blue-600 font-semibold whitespace-nowrap">{item.prices[3]} Ft</td>
                       </tr>
                     ))}
                   </>
@@ -286,7 +286,7 @@ const categories = [
                     <td class="py-4 px-4 font-medium text-gray-900">{item.service}</td>
                     <td class="py-4 px-3 text-center text-gray-600">{item.duration}</td>
                     <td class="py-4 px-4 text-right">
-                      <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                      <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
                     </td>
                   </tr>
                 ))}
@@ -316,7 +316,7 @@ const categories = [
                 <tr class="hover:bg-gray-50">
                   <td class="py-4 px-5 font-medium text-gray-900">{item.service}</td>
                   <td class="py-4 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
                   </td>
                 </tr>
               ))}
@@ -363,7 +363,7 @@ const categories = [
                     <td class="py-3 px-4 text-gray-600">{item.area}</td>
                     <td class="py-3 px-4 font-medium text-gray-900">{item.size}</td>
                     <td class="py-3 px-4 text-right">
-                      <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                      <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
                     </td>
                   </tr>
                 ))}
@@ -395,7 +395,7 @@ const categories = [
                 <tr class="hover:bg-gray-50">
                   <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
                   <td class="py-3 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900">{item.price} Ft</span>
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
                   </td>
                 </tr>
               ))}
@@ -413,7 +413,7 @@ const categories = [
                   <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
                   <td class="py-3 px-5 text-right">
                     <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
-                    <span class="text-lg font-bold text-purple-600">{item.price} Ft</span>
+                    <span class="text-lg font-bold text-purple-600 whitespace-nowrap">{item.price} Ft</span>
                   </td>
                 </tr>
               ))}

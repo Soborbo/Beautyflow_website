@@ -24,9 +24,9 @@ import nyitvaImg from '../assets/images/nyitva.jpg';
 
 const stats = [
   { value: '10+ év', label: 'tapasztalat' },
-  { value: '95%', label: 'halványodás' },
+  { value: 'Nd:YAG', label: 'lézeres kezelés' },
   { value: '100%', label: 'elégedett vendég' },
-  { value: '3-6', label: 'kezelés elegendő' },
+  { value: '1', label: 'kezelés elegendő' },
 ];
 
 const testimonials = [
@@ -45,20 +45,15 @@ const testimonials = [
 ];
 
 const treatments = [
-  { area: 'Arc (teljes)', sessions: '1 alkalom', price: '25 000 Ft' },
-  { area: 'Arc (célzott terület)', sessions: '1 alkalom', price: '15 000 Ft' },
-  { area: 'Kézfej (mindkettő)', sessions: '1 alkalom', price: '20 000 Ft' },
-  { area: 'Dekoltázs', sessions: '1 alkalom', price: '25 000 Ft' },
-  { area: 'Hát (felső rész)', sessions: '1 alkalom', price: '30 000 Ft' },
-  { area: 'Váll', sessions: '1 alkalom', price: '20 000 Ft' },
+  { area: '1 pigmentfolt', sessions: '1 alkalom', price: '10 000 Ft' },
+  { area: '2 pigmentfolt', sessions: '1 alkalom', price: '15 000 Ft' },
+  { area: '3 pigmentfolt', sessions: '1 alkalom', price: '20 000 Ft' },
+  { area: '4 pigmentfolt', sessions: '1 alkalom', price: '25 000 Ft' },
+  { area: '5 pigmentfolt', sessions: '1 alkalom', price: '30 000 Ft' },
+  { area: 'Minden további pigmentfolt', sessions: '', price: '+5 000 Ft / folt' },
 ];
 
-const packages = [
-  { area: 'Arc (teljes) - 5 alkalom', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Kézfej - 5 alkalom', originalPrice: '100 000', price: '80 000 Ft', discount: '-20%' },
-  { area: 'Dekoltázs - 5 alkalom', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Arc + kézfej kombi - 5 alkalom', originalPrice: '200 000', price: '150 000 Ft', discount: '-25%' },
-];
+const packages: { area: string; originalPrice: string; price: string; discount: string }[] = [];
 
 const howItWorks = [
   {
@@ -73,33 +68,33 @@ const howItWorks = [
   },
   {
     number: '3.',
-    title: 'IPL/Lézer kezelés',
-    description: 'A fényimpulzusok célzottan a melaninra hatnak, lebontják a pigmentet anélkül, hogy károsítanák a környező szöveteket. A kezelés gyors és kíméletes.'
+    title: 'Nd:YAG lézeres kezelés',
+    description: 'A lézer energiája célzottan a pigmentben nyelődik el, lebontja a pigmentet anélkül, hogy károsítaná a környező szöveteket. A kezelés gyors és kíméletes.'
   },
   {
     number: '4.',
     title: 'Utóápolás és eredmény',
-    description: 'A kezelt terület 1-2 héten belül hámlani kezd, és a pigmentfolt fokozatosan halványodik. 3-6 kezelés után a foltok akár 95%-ban eltűnhetnek.'
+    description: 'A kezelt területen 7–10 nap alatt a pörk magától leesik. A regenerációs időszakban speciális krémmel és 50 SPF fényvédővel kell ápolni a bőrt.'
   }
 ];
 
 const faqs = [
-  { question: 'Milyen típusú pigmentfoltokat lehet kezelni?', answer: 'Napfoltokat, öregségi foltokat, terhességi chloasmát, szeplőket és egyéb melanin-túltermelésből adódó elszíneződéseket egyaránt kezelhetünk. A konzultáción meghatározzuk a folt típusát és a megfelelő kezelési módszert.' },
-  { question: 'Fájdalmas a pigmentfolt eltávolítás?', answer: 'A kezelés enyhe csípést vagy melegséget okozhat, hasonlót, mint egy gumiszalag pattintása. A legtöbb vendégünk jól tolerálja, és nem igényel érzéstelenítést.' },
-  { question: 'Hány kezelés szükséges?', answer: 'A pigmentfolt mélységétől és méretétől függően általában 3-6 kezelés elegendő a kívánt eredményhez. A kezelések között 3-4 hetet kell várni.' },
-  { question: 'Mikor látható az eredmény?', answer: 'Az első kezelés után 1-2 héttel a folt sötétedik, majd hámlani kezd. A teljes eredmény a kezeléssorozat befejezése után 4-6 héttel látható.' },
-  { question: 'Van-e leállási idő?', answer: 'Minimális. A kezelt terület 1-3 napig enyhén pirosas lehet. A hámlás természetes folyamat, nem kell miatta aggódni. Sminkelni már másnap lehet.' },
+  { question: 'Milyen típusú pigmentfoltokat lehet kezelni?', answer: 'Napfoltokat, öregségi foltokat, terhességi melazmát, szeplőket és egyéb melanin-túltermelésből adódó elszíneződéseket egyaránt kezelhetünk az Nd:YAG lézerrel. A konzultáción meghatározzuk a folt típusát és a megfelelő kezelési módszert.' },
+  { question: 'Fájdalmas a pigmentfolt eltávolítás?', answer: 'A kezelés enyhe csípést vagy melegséget okozhat. A legtöbb vendégünk jól tolerálja, és nem igényel érzéstelenítést.' },
+  { question: 'Hány kezelés szükséges?', answer: 'Általában 1 kezelés elegendő a kívánt eredmény eléréséhez. Amennyiben a pigmentáció jellege miatt ismétlő kezelés válik szükségessé, annak díja az aktuális kezelés árának 50%-a.' },
+  { question: 'Mikor látható az eredmény?', answer: 'A kezelt területen ideiglenes pörk alakulhat ki, amely egyénfüggően általában 7–10 nap alatt magától leesik. Az eredmény ezt követően válik láthatóvá.' },
+  { question: 'Van-e leállási idő?', answer: 'A kezelt területen 7-10 napig pörk lehet a bőrön. Amíg nincs pörk a bőrön, a sminkelés nem megengedett. A gyógyulási idő alatt a kezelt területet speciális krémmel és 50 SPF fényvédővel kell ápolni.' },
   { question: 'Milyen évszakban érdemes elkezdeni?', answer: 'Ősszel és télen ideális, amikor kevesebb a napsugárzás. Nyáron fokozott fényvédelem mellett is végezhető, de a napozást kerülni kell a kezelés előtt és után.' },
-  { question: 'Visszajöhetnek a pigmentfoltok?', answer: 'A kezelt foltok nem térnek vissza, de új foltok kialakulhatnak UV-sugárzás hatására. Ezért fontos a rendszeres fényvédő használata.' },
+  { question: 'Visszajöhetnek a pigmentfoltok?', answer: 'A sikeresen kezelt pigmentfoltok nem térnek vissza, de új foltok kialakulhatnak UV-sugárzás hatására. Ezért fontos a rendszeres 50 SPF fényvédő használata.' },
   { question: 'Ki nem alkalmas a kezelésre?', answer: 'Terhesség, szoptatás, aktív bőrgyulladás, friss barnulás vagy bizonyos gyógyszerszedés esetén nem javasolt. A konzultáción minden ellenjavallatot átbeszélünk.' },
   { question: 'Kombinálható más kezelésekkel?', answer: 'Igen! A HydraBeauty vagy Carbon Peeling kezelés kiválóan kiegészíti a pigmentfolt eltávolítást, serkenti a bőrmegújulást és fokozza az eredményt.' },
-  { question: 'Mennyire biztonságos a kezelés?', answer: 'Teljesen biztonságos. EU-minősített, orvostechnikai eszközökkel dolgozunk, és csak képzett szakemberek végzik a kezelést.' },
+  { question: 'Mennyire biztonságos a kezelés?', answer: 'Teljesen biztonságos. EU-minősített, orvostechnikai Nd:YAG lézer készülékkel dolgozunk, és csak képzett szakemberek végzik a kezelést.' },
 ];
 ---
 
 <Layout
-  title="Pigmentfolt Eltávolítás Budapest - IPL Lézerkezelés | Beautyflow"
-  description="Professzionális pigmentfolt eltávolítás Budapesten IPL lézerrel. Napfoltok, öregségi foltok, terhességi foltok hatékony kezelése. 95% halványodás 3-6 kezelés alatt. Kérj ingyenes konzultációt!"
+  title="Pigmentfolt Eltávolítás Budapest - Nd:YAG Lézerkezelés | Beautyflow"
+  description="Professzionális pigmentfolt eltávolítás Budapesten Nd:YAG lézerrel. Napfoltok, öregségi foltok, terhességi foltok hatékony kezelése. Általában 1 kezelés elegendő! Kérj ingyenes konzultációt!"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -121,7 +116,7 @@ const faqs = [
     "@type": "Service",
     "serviceType": "Pigmentfolt eltávolítás",
     "name": "Pigmentfolt Eltávolítás Budapest",
-    "description": "Professzionális pigmentfolt eltávolítás Budapesten IPL lézerrel. Napfoltok, öregségi foltok hatékony kezelése.",
+    "description": "Professzionális pigmentfolt eltávolítás Budapesten Nd:YAG lézerrel. Napfoltok, öregségi foltok hatékony kezelése.",
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
@@ -196,7 +191,7 @@ const faqs = [
             Búcsúzz el a zavaró foltoktól és nyerd vissza egyenletes bőröd
           </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Napfoltok, öregségi foltok vagy terhességi pigmentáció? Modern IPL technológiánkkal akár 95%-os halványodást érhetünk el mindössze 3-6 kezelés alatt.
+            Napfoltok, öregségi foltok vagy terhességi pigmentáció? Modern Nd:YAG lézeres technológiánkkal célzottan kezeljük a pigmentfoltokat – általában már 1 kezelés elegendő!
           </p>
 
           <!-- CTA row -->
@@ -256,9 +251,9 @@ const faqs = [
     <!-- Stats Section -->
     <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
       <div class="max-w-[1000px] mx-auto px-4 w-full">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
           {stats.map((stat, index) => (
-            <div class="text-center stat-item py-2 md:py-0" style={`animation-delay: ${index * 100}ms`}>
+            <div class="text-center stat-item py-2 lg:py-0" style={`animation-delay: ${index * 100}ms`}>
               <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
                 {stat.value}
               </p>
@@ -302,13 +297,16 @@ const faqs = [
           <!-- Text content -->
           <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              Tudom, milyen bosszantó lehet, amikor a tükörben a bőröd helyett csak a zavaró foltokat látod. Lehet, hogy a nyaralások emlékei, a terhesség nyomai, vagy egyszerűen az idő múlása hagyta rajtad a jelét – <strong>de ez nem jelenti azt, hogy együtt kell élned velük</strong>.
+              Tudom, mennyire bosszantó lehet, amikor a tükörben az egyenletes bőr helyett zavaró pigmentfoltokat látsz. Lehetnek ezek a nyaralások emlékei, a terhesség nyomai, vagy egyszerűen az idő múlásának jelei – <strong>de ez nem jelenti azt, hogy együtt kell élned velük</strong>.
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              A Beautyflow szalonban <strong>modern IPL technológiával</strong> dolgozunk, amely célzottan a pigmentsejtekre hat, miközben a környező bőrt érintetlenül hagyja. Az eredmény? Egyenletes, ragyogó bőr, amit végre büszkén mutathatsz meg.
+              A Beautyflow szalonban <strong>Nd:YAG lézeres kezeléssel</strong> dolgozunk, amely célzottan a pigmentsejtekre hat, miközben a környező bőrt kíméletesen kezeli. A kezelés során a lézer energiája a pigmentben nyelődik el, így segít halványítani és eltüntetni a nem kívánt foltokat.
+            </p>
+            <p class="text-gray-700 mb-5 text-base leading-relaxed">
+              Fontos tudnod, hogy a regeneráció egyénfüggő: általában <strong>7–10 nap alatt</strong> a kezelt területen kialakuló var leesik, és amint már nincs pörk a bőrön, a sminkelés újra megengedett.
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>Ha eleged van abból, hogy folyton az alapozóval próbálod elfedni a foltokat, gyere el hozzánk egy ingyenes konzultációra, és mutassuk meg, hogyan segíthetünk!</strong>
+              <strong>Ha eleged van abból, hogy alapozóval próbálod elfedni a pigmentfoltokat, gyere el hozzánk egy ingyenes konzultációra, és megmutatjuk, hogyan segíthetünk!</strong>
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -344,10 +342,10 @@ const faqs = [
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Célzott fényimpulzus technológia
+            Nd:YAG lézeres technológia
           </h2>
           <p class="text-gray-700 mb-6">
-            Az IPL (Intenzív Pulzáló Fény) kezelés <strong>szelektíven csak a pigmentált sejtekre hat</strong>. A fényenergia hővé alakul a melaninban, lebontja a pigmentet, miközben az egészséges bőrszövet sértetlen marad. Biztonságos, hatékony és orvosi háttérrel rendelkező technológia.
+            Az Nd:YAG lézeres kezelés <strong>célzottan a pigmentet tartalmazó sejtekre hat</strong>. A lézer energiája a pigmentben nyelődik el, így a kezelés a foltok mélységéhez és jellegéhez igazítható, miközben az egészséges bőrszövet kíméletesen kezelt marad.
           </p>
         </div>
       </div>
@@ -363,7 +361,7 @@ const faqs = [
             Minden pigmentfolt típusra megoldás
           </h2>
           <p class="text-gray-700 mb-6">
-            Legyen szó <strong>napfoltokról, öregségi foltokról, terhességi melaszmáról vagy szeplőkről</strong> – az IPL kezelés mindegyikre hatékony. A konzultáción meghatározzuk a foltok típusát és mélységét, hogy személyre szabott kezelési tervet készíthessünk.
+            Legyen szó <strong>napfoltokról, öregségi foltokról, terhességi melazmáról vagy szeplőkről</strong> – az Nd:YAG lézeres kezelés hatékony megoldást nyújt a különböző típusú pigmentációk kezelésére. A konzultáció során meghatározzuk a pigmentfoltok típusát és mélységét, hogy személyre szabott kezelési tervet állíthassunk össze a lehető legszebb és legbiztonságosabb eredmény érdekében.
           </p>
           <div class="text-center">
             <a
@@ -404,10 +402,10 @@ const faqs = [
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Akár 95%-os halványodás
+            Látványos eredmény
           </h2>
           <p class="text-gray-700 mb-6">
-            A kezeléssorozat végére a pigmentfoltok <strong>akár 95%-ban elhalványodhatnak vagy teljesen eltűnhetnek</strong>. Az eredmény fokozatosan, természetes módon jelentkezik – a környezeted észre sem veszi, csak azt, hogy egyre ragyogóbb a bőröd.
+            Az Nd:YAG lézeres kezelés során a pigmentfoltok <strong>hatékonyan halványodnak vagy teljesen eltűnnek</strong>. Az eredmény fokozatosan, természetes módon jelentkezik – a környezeted észre sem veszi, csak azt, hogy egyre ragyogóbb a bőröd.
           </p>
         </div>
       </div>
@@ -420,10 +418,10 @@ const faqs = [
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Gyors kezelés, minimális leállás
+            Gyors kezelés, kontrollált regeneráció
           </h2>
           <p class="text-gray-700 mb-6">
-            Egy kezelés mindössze <strong>15-30 percet vesz igénybe</strong>, és utána azonnal visszatérhetsz a mindennapokhoz. Enyhe pirosság 1-3 napig előfordulhat, de sminkelni már másnap lehet. Nincs hosszú regenerációs időszak!
+            Egy kezelés általában <strong>15–30 percet vesz igénybe</strong>, azonban a lézeres beavatkozást követően a bőrnek időre van szüksége a regenerálódáshoz. A kezelt területen ideiglenes pörk alakulhat ki, amely egyénfüggően általában <strong>7–10 nap alatt</strong> magától leesik.
           </p>
         </div>
       </div>
@@ -458,8 +456,11 @@ const faqs = [
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Tartós eredmény, ha vigyázol a bőrödre
           </h2>
+          <p class="text-gray-700 mb-4">
+            A sikeresen kezelt pigmentfoltok <strong>nem térnek vissza</strong>, azonban az új pigmentáció kialakulása nagyban függ a bőr további ápolásától és a fényvédelemtől. A lézeres kezelés után különösen fontos a következetes <strong>50 SPF fényvédelem</strong>, valamint a megfelelő bőrápolás.
+          </p>
           <p class="text-gray-700 mb-6">
-            A sikeresen kezelt pigmentfoltok <strong>nem térnek vissza</strong>. A megfelelő fényvédelemmel és bőrápolással az eredmény hosszú távon megőrizhető. Tanácsot adunk az otthoni ápoláshoz is, hogy a bőröd mindig ragyogó maradjon.
+            A regenerációs időszakban és azt követően is <strong>személyre szabott otthoni ápolási tanácsokkal</strong> látunk el, hogy a bőröd egészségesen gyógyuljon, és az elért eredmény hosszú távon is megmaradjon. A tudatos bőrápolás és a rendszeres fényvédelem kulcsszerepet játszik abban, hogy a bőröd egyenletesebb, tisztább és ragyogóbb maradjon.
           </p>
           <div class="text-center">
             <a
@@ -476,65 +477,48 @@ const faqs = [
 
   <!-- Pricing Section -->
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
-    <div class="max-w-[1000px] mx-auto px-4">
+    <div class="max-w-[700px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
         Pigmentfolt Eltávolítás Árak
       </h2>
-      <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Válaszd ki a kezelendő területet – az ár a kezelés méretétől függ
+      <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+        A pigmentfolt kezelések kizárólag a kezelt foltok számára vonatkoznak, nem teljes arckezelést jelentenek. Az ár a kezelt pigmentfoltok számától függ.
       </p>
 
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Single Treatments -->
-        <div class="lg:w-1/2">
-          <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
+      <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Árak alkalmanként</h3>
 
-          <div class="space-y-3">
-            {treatments.map((item) => (
-              <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <span class="text-gray-800 font-medium block">{item.area}</span>
-                    <span class="text-gray-500 text-sm">{item.sessions}</span>
-                  </div>
-                  <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
-                </div>
+      <div class="space-y-3 mb-8">
+        {treatments.map((item) => (
+          <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-gray-800 font-medium block">{item.area}</span>
+                {item.sessions && <span class="text-gray-500 text-sm">{item.sessions}</span>}
               </div>
-            ))}
+              <span class="text-[#c53f75] font-bold text-lg whitespace-nowrap">{item.price}</span>
+            </div>
           </div>
-        </div>
-
-        <!-- Packages -->
-        <div class="lg:w-1/2">
-          <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
-            Bérletek <span class="text-[#c53f75]">(5 alkalom)</span>
-          </h3>
-
-          <div class="space-y-3">
-            {packages.map((pkg) => (
-              <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <span class="text-white font-medium block">{pkg.area}</span>
-                    <span class="text-white/70 text-sm line-through">{pkg.originalPrice} Ft helyett</span>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-white font-bold text-lg block">{pkg.price}</span>
-                    <span class="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-0.5 rounded">{pkg.discount}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div class="mt-10 text-center">
+      <div class="bg-[#f0ebe8] rounded-lg p-5 mb-8">
+        <p class="text-gray-700 mb-3">
+          <strong>Általánosságban elmondható</strong>, hogy a kívánt eredmény eléréséhez legtöbbször <strong>1 kezelés elegendő</strong>.
+        </p>
+        <p class="text-gray-700 mb-3">
+          Amennyiben a pigmentáció jellege miatt ismétlő kezelés válik szükségessé, annak díja az <strong>aktuális kezelés árának 50%-a</strong>.
+        </p>
+        <p class="text-gray-600 text-sm">
+          A pontos kezelési tervet és az árakat ingyenes konzultáció során határozzuk meg, a pigmentfoltok típusának és mélységének figyelembevételével.
+        </p>
+      </div>
+
+      <div class="text-center">
         <a
           href="/ingyenes-konzultacio"
           class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
-          Foglalj időpontot
+          Ingyenes konzultációt kérek
         </a>
       </div>
     </div>
@@ -753,7 +737,7 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <Image
               src={mestersegesIntelligenciaGep}
-              alt="IPL orvosi technológia"
+              alt="Nd:YAG lézeres orvosi technológia"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               format="webp"
               quality={80}
@@ -763,7 +747,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Orvosi háttérrel</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              EU-minősített, orvostechnikai besorolású IPL készülékkel dolgozunk, amely biztonságos és klinikailag bizonyított hatékonyságú.
+              EU-minősített, orvostechnikai besorolású Nd:YAG lézer készülékkel dolgozunk, amely biztonságos és klinikailag bizonyított hatékonyságú.
             </p>
           </div>
         </div>
@@ -843,7 +827,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Bizonyított hatékonyság</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Vendégeink 95%-ánál jelentős halványodást érünk el 3-6 kezelés alatt. Az eredmény hosszú távon is megmarad.
+              Vendégeink többségénél már 1 kezelés elegendő a kívánt eredmény eléréséhez. Az eredmény hosszú távon is megmarad.
             </p>
           </div>
         </div>

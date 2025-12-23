@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* Local fonts - faster than Google Fonts */
+@import "@fontsource/cormorant/400.css";
+@import "@fontsource/cormorant/500.css";
+@import "@fontsource/cormorant/600.css";
+@import "@fontsource/cormorant/700.css";
+@import "@fontsource/open-sans/400.css";
+@import "@fontsource/open-sans/500.css";
+@import "@fontsource/open-sans/600.css";
+@import "@fontsource/open-sans/700.css";
+
 @theme {
   --color-primary: #c53f75;
   --color-primary-dark: #a33460;
@@ -156,5 +166,19 @@
     .section {
       padding: 40px 0;
     }
+  }
+
+  /* Price table scrollable wrapper */
+  .price-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure prices never break to multiple lines */
+  .price-nowrap,
+  td[class*="text-right"],
+  .text-\[\#c53f75\][class*="font-bold"],
+  span[class*="font-bold"][class*="text-"] {
+    white-space: nowrap;
   }
 }

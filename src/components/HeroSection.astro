@@ -30,7 +30,7 @@ const stats = [
       <!-- Google Rating Badge - bottom right corner -->
       <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-4 google-rating-badge">
         <div class="flex items-center gap-3">
-          <Image src={googleLogo} alt="Google" class="w-10 h-10 rounded-full" width={40} height={40} format="webp" />
+          <Image src={googleLogo} alt="Google" class="w-10 h-10 rounded-full object-cover" width={40} height={40} format="webp" />
           <div>
             <div class="flex items-center gap-1 mb-1">
               <span class="text-2xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -67,7 +67,7 @@ const stats = [
           <!-- Mobile Google Rating Badge -->
           <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-2 google-rating-badge">
             <div class="flex items-center gap-2">
-              <Image src={googleLogo} alt="Google" class="w-6 h-6 rounded-full" width={24} height={24} format="webp" />
+              <Image src={googleLogo} alt="Google" class="w-6 h-6 rounded-full object-cover" width={24} height={24} format="webp" />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-lg font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -120,9 +120,9 @@ const stats = [
   </div>
 
   <!-- Stats Row - positioned at the bottom of the hero, always above the fold -->
-  <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] h-[80px] flex-shrink-0 flex items-center justify-center">
+  <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
     <div class="max-w-[1000px] mx-auto px-4 w-full">
-      <div class="grid grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
         {stats.map((stat) => (
           <div class="text-center">
             <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
