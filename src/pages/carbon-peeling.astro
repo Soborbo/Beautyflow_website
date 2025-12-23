@@ -10,10 +10,13 @@ import carbonPeelingLezeres from '../assets/images/carbon-peeling-lezeres.jpg';
 import carbonPeelingMb from '../assets/images/carbon-peeling-mb.jpg';
 import carbonPeelingTetovalas from '../assets/images/carbon-peeling-tetovalas.webp';
 import szemoldokSminktetovalas from '../assets/images/szemoldok-sminktetovalas.jpg';
+import hydrabeautyArckezelesBeautyflow from '../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
 import depositphotosCarbonNanogel from '../assets/images/depositphotos-carbon-nanogel.jpg';
+import carbonPeelingHatter from '../../public/images/carbon-peeling-hatter.webp';
 import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
 import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
 import notinoIkon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
 import higienia from '../assets/images/higienia.jpg';
 import testmeret from '../assets/images/testmeret.jpg';
 import nyitva from '../assets/images/nyitva.jpg';
@@ -237,10 +240,10 @@ const faqs = [
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
-        <!-- Notino Rating Badge -->
+        <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={notinoIkon} alt="Notino" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="eager" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="eager" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -332,13 +335,13 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Benefits Section 1: Dupla hosszúságú kezelés - Image left, Text right -->
+  <!-- Benefits Section 1: Garantált glass skin - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <Image
-          src={carbonPeelingArchamlasztas}
-          alt="60 perces Carbon Peeling kezelés"
+          src={hydrabeautyArckezelesBeautyflow}
+          alt="Garantált glass skin Carbon Peelinggel"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -348,26 +351,26 @@ const faqs = [
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Dupla hosszúságú kezelés
+            Garantált glass skin
           </h2>
           <p class="text-gray-700 mb-6">
-            A carbon peeling kezelés a legtöbb helyen egy sima, 30 perces rutin. A Beautyflownál viszont <strong>német, orvosi tisztaságú krémekkel és 60 perces kozmetikai programmal</strong> kombináljuk a carbon peelinget, így a bőröd nemcsak tisztább és simább lesz, hanem extra ápolást is kap minden alkalommal.
+            Különleges karbonpasztás kezeléssel nemcsak a tetoválás halványítását, hanem a bőr fiatalítását is elérjük. A lézer <strong>szabályozza a faggyútermelést, összehúzza a pórusokat, kisimítja a mikroráncokat</strong>, halványítja a pigmentfoltokat, és garantálja a ragyogó „glass skin" hatást.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 2: Garantált glass skin - Text left, Image right -->
+  <!-- Benefits Section 2: Dupla hosszúságú kezelés - Text left, Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Garantált glass skin
+            Dupla hosszúságú kezelés egy áráért
           </h2>
           <p class="text-gray-700 mb-6">
-            Különleges karbonpasztás kezeléssel nemcsak a tetoválás halványítását, hanem a bőr fiatalítását is elérjük. A lézer <strong>szabályozza a faggyútermelést, összehúzza a pórusokat, kisimítja a mikroráncokat</strong>, halványítja a pigmentfoltokat, és garantálja a ragyogó „glass skin" hatást.
+            A carbon peeling kezelés a legtöbb helyen egy sima, 30 perces rutin. A Beautyflownál viszont <strong>német, orvosi tisztaságú krémekkel és 60 perces kozmetikai programmal</strong> kombináljuk a carbon peelinget, így a bőröd nemcsak tisztább és simább lesz, hanem extra ápolást is kap minden alkalommal.
           </p>
           <div class="text-center">
             <a
@@ -382,7 +385,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <Image
           src={carbonPeelingLezeres}
-          alt="Glass skin Carbon Peeling"
+          alt="60 perces Carbon Peeling kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -392,13 +395,13 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Benefits Section 3: Azonnali hatás - Image left, Text right -->
+  <!-- Benefits Section 3: Vigyázz, rászoksz! - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <Image
-          src={carbonPeelingMb}
-          alt="Azonnali Carbon Peeling eredmény"
+          src={carbonPeelingArchamlasztas}
+          alt="Carbon Peeling eredmények"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -406,22 +409,6 @@ const faqs = [
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-5 lg:px-[10%] text-left">
-          <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Azonnali hatás
-          </h2>
-          <p class="text-gray-700 mb-6">
-            A kezelés után a bőr azonnal látványosan simább, frissebb és élettel telibb lesz, így <strong>akár smink nélkül is magabiztosan indulhatsz el otthonról</strong> – hiszen a természetes szépséged kerül előtérbe.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Benefits Section 4: Vigyázz, rászoksz! - Text left, Image right -->
-  <section class="section-animate bg-gray-50">
-    <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Vigyázz, aki kipróbálja, rászokik!
@@ -431,33 +418,13 @@ const faqs = [
           </p>
         </div>
       </div>
-      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
-          src={carbonPeelingTetovalas}
-          alt="Carbon Peeling eredmények"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
     </div>
   </section>
 
-  <!-- Benefits Section 5: Éleszd újra a sminktetoválást - Image left, Text right -->
-  <section class="section-animate">
+  <!-- Benefits Section 4: Éleszd újra a sminktetoválást - Text left, Image right -->
+  <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
-          src={szemoldokSminktetovalas}
-          alt="Sminktetoválás felfrissítés Carbon Peelinggel"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
+      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
             Éleszd újra a sminktetoválást
@@ -475,6 +442,16 @@ const faqs = [
           </div>
         </div>
       </div>
+      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
+        <Image
+          src={szemoldokSminktetovalas}
+          alt="Sminktetoválás felfrissítés Carbon Peelinggel"
+          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
+      </div>
     </div>
   </section>
 
@@ -488,25 +465,13 @@ const faqs = [
         Válaszd ki a számodra megfelelő területet és kezelési csomagot
       </p>
 
-      <div class="flex flex-col lg:flex-row gap-8">
+      <div class="flex flex-col lg:flex-row gap-8 items-stretch">
         <!-- Single Treatments -->
-        <div class="lg:w-1/2">
+        <div class="lg:w-1/2 flex flex-col">
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
 
-          <!-- Treatment Image -->
-          <div class="mb-6">
-            <Image
-              src={carbonPeelingArchamlasztas}
-              alt="Carbon Peeling kezelési területek"
-              class="w-full h-48 object-cover object-top rounded-2xl shadow-lg"
-              format="webp"
-              quality={80}
-              loading="lazy"
-            />
-          </div>
-
           <!-- Price List -->
-          <div class="space-y-3">
+          <div class="space-y-3 flex-1 flex flex-col justify-center">
             {singlePrices.map((item) => (
               <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
                 <div class="flex justify-between items-center">
@@ -519,12 +484,12 @@ const faqs = [
         </div>
 
         <!-- Packages -->
-        <div class="lg:w-1/2">
+        <div class="lg:w-1/2 flex flex-col">
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
             Bérletek <span class="text-[#c53f75]">(5 alkalom)</span>
           </h3>
 
-          <div class="space-y-3">
+          <div class="space-y-3 flex-1 flex flex-col justify-center">
             {packages.map((pkg) => (
               <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
                 <div class="flex justify-between items-center">
@@ -559,7 +524,7 @@ const faqs = [
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
       <Image
-        src={depositphotosCarbonNanogel}
+        src={carbonPeelingHatter}
         alt="Carbon Peeling kezelés folyamata"
         class="w-full h-64 object-cover object-top"
         format="webp"
@@ -571,7 +536,7 @@ const faqs = [
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
       <Image
-        src={depositphotosCarbonNanogel}
+        src={carbonPeelingHatter}
         alt=""
         class="w-full h-full object-cover object-[center_30%]"
         format="webp"
@@ -716,15 +681,15 @@ const faqs = [
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
+              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
               <Image
-                src={notinoIkon}
-                alt="Notino"
-                class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1 flex-shrink-0"
-                width={48}
-                height={48}
+                src={googleLogo}
+                alt="Google"
+                class="w-7 h-7 object-contain flex-shrink-0"
+                width={28}
+                height={28}
                 loading="lazy"
               />
-              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
             </div>
           </div>
         ))}

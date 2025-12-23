@@ -5,6 +5,7 @@ import LocationsSection from '../components/LocationsSection.astro';
 
 // Image imports
 import notinoIcon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
 import pigmentfoltArckezeles from '../assets/images/pigmentfolt-arckezeles.jpg';
 import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
 import pigmentfoltLezer from '../assets/images/pigmentfolt-lezer.jpg';
@@ -230,10 +231,10 @@ const faqs = [
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
-        <!-- Notino Rating Badge -->
+        <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={notinoIcon} alt="Notino" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} format="webp" quality={80} loading="lazy" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} format="webp" quality={80} loading="lazy" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -699,17 +700,17 @@ const faqs = [
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
+              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
               <Image
-                src={notinoIcon}
-                alt="Notino"
-                class="w-12 h-12 rounded-full object-contain bg-gray-50 p-1 flex-shrink-0"
-                width={48}
-                height={48}
+                src={googleLogo}
+                alt="Google"
+                class="w-7 h-7 object-contain flex-shrink-0"
+                width={28}
+                height={28}
                 format="webp"
                 quality={80}
                 loading="lazy"
               />
-              <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
             </div>
           </div>
         ))}
