@@ -1,3 +1,75 @@
+// 301 Redirects - SEO átirányítások
+const redirects = {
+  // Trailing slash eltávolítás
+  '/arak/': '/arak',
+  '/rolunk/': '/rolunk',
+  '/sminktetovalas/': '/sminktetovalas',
+  '/carbon-peeling/': '/carbon-peeling',
+  '/hydrabeauty/': '/hydrabeauty',
+  '/beautyflow-buda/': '/beautyflow-buda',
+  '/beautyflow-pest/': '/beautyflow-pest',
+  '/dioda-lezeres-szortelenites/': '/dioda-lezeres-szortelenites',
+  '/lezeres-tetovalas-eltavolitas/': '/lezeres-tetovalas-eltavolitas',
+  '/gyakran-ismetelt-kerdesek/': '/gyakran-ismetelt-kerdesek',
+  '/adatvedelmi-tajekoztato/': '/adatvedelmi-tajekoztato',
+  '/ingyenes-konzultacio/': '/ingyenes-konzultacio',
+  '/pigmentfolt-eltavolitas/': '/pigmentfolt-eltavolitas',
+
+  // Személyes/csapat oldalak -> Rólunk
+  '/fanni': '/rolunk',
+  '/fanni/': '/rolunk',
+  '/janka': '/rolunk',
+  '/janka/': '/rolunk',
+  '/piroska': '/rolunk',
+  '/piroska/': '/rolunk',
+  '/Piroska': '/rolunk',
+  '/Piroska/': '/rolunk',
+  '/andi': '/rolunk',
+  '/andi/': '/rolunk',
+  '/inez': '/rolunk',
+  '/inez/': '/rolunk',
+  '/rolam': '/rolunk',
+  '/rolam/': '/rolunk',
+
+  // Szőrtelenítés variációk
+  '/szortelenites': '/dioda-lezeres-szortelenites',
+  '/szortelenites/': '/dioda-lezeres-szortelenites',
+  '/cukorpasztas-intimgyanta': '/dioda-lezeres-szortelenites',
+  '/cukorpasztas-intimgyanta/': '/dioda-lezeres-szortelenites',
+  '/gyantazas': '/dioda-lezeres-szortelenites',
+  '/gyantazas/': '/dioda-lezeres-szortelenites',
+
+  // Tetoválás eltávolítás
+  '/lezeres-test-es-sminktetovalas-eltavolitas': '/lezeres-tetovalas-eltavolitas',
+  '/lezeres-test-es-sminktetovalas-eltavolitas/': '/lezeres-tetovalas-eltavolitas',
+
+  // Sminktetoválás variációk
+  '/szemoldok-styling': '/sminktetovalas',
+  '/szemoldok-styling/': '/sminktetovalas',
+  '/szemoldok': '/sminktetovalas',
+  '/szemoldok/': '/sminktetovalas',
+
+  // Helyszín oldalak
+  '/buda': '/beautyflow-buda',
+  '/buda/': '/beautyflow-buda',
+  '/pest': '/beautyflow-pest',
+  '/pest/': '/beautyflow-pest',
+  '/beautyflowpest': '/beautyflow-pest',
+  '/beautyflowpest/': '/beautyflow-pest',
+
+  // Jogi/info oldalak
+  '/altalanos-szerzodesi-feltetelek': '/adatvedelmi-tajekoztato',
+  '/altalanos-szerzodesi-feltetelek/': '/adatvedelmi-tajekoztato',
+  '/adatvedelem': '/adatvedelmi-tajekoztato',
+  '/adatvedelem/': '/adatvedelmi-tajekoztato',
+  '/adatvedelmi': '/adatvedelmi-tajekoztato',
+  '/adatvedelmi/': '/adatvedelmi-tajekoztato',
+
+  // GYIK
+  '/szalon-etikett': '/gyakran-ismetelt-kerdesek',
+  '/szalon-etikett/': '/gyakran-ismetelt-kerdesek',
+};
+
 // 410 Gone URLs - véglegesen törölt oldalak
 const goneUrls = [
   '/partnereim',
@@ -109,6 +181,11 @@ const goneHtml = `<!DOCTYPE html>
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
+
+  // Check for 301 redirects first
+  if (redirects[pathname]) {
+    return Response.redirect(new URL(redirects[pathname], url.origin), 301);
+  }
 
   // Check if this URL should return 410 Gone
   if (goneUrls.some(goneUrl => pathname === goneUrl || pathname.startsWith(goneUrl.replace(/\/$/, '') + '/'))) {
