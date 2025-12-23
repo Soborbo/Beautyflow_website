@@ -1,5 +1,6 @@
 ---
-import '../styles/global.css';
+// CSS import with URL for async loading
+import cssUrl from '../styles/global.css?url';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
@@ -85,6 +86,10 @@ const { title, description = "A legcsajosabb szépségszalon a környékeden. Ki
         .lg\:pt-\[80px\]{padding-top:80px}
       }
     </style>
+
+    <!-- Non-blocking CSS - loads after critical CSS -->
+    <link rel="preload" href={cssUrl} as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href={cssUrl} /></noscript>
 
     <!-- Open Graph -->
     <meta property="og:locale" content="hu_HU" />
