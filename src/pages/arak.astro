@@ -242,11 +242,11 @@ const categories = [
                     {/* Items in group */}
                     {group.items.map((item) => (
                       <tr class="hover:bg-gray-50 border-b border-gray-100">
-                        <td class="py-3 px-4 font-medium text-gray-900">{item.zone}</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[0]} Ft</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[1]} Ft</td>
-                        <td class="py-3 px-3 text-center text-gray-700">{item.prices[2]} Ft</td>
-                        <td class="py-3 px-3 text-center text-blue-600 font-semibold">{item.prices[3]} Ft</td>
+                        <td class="py-3 px-4 font-medium text-gray-900 whitespace-nowrap">{item.zone}</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[0]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[1]} Ft</td>
+                        <td class="py-3 px-3 text-center text-gray-700 whitespace-nowrap">{item.prices[2]} Ft</td>
+                        <td class="py-3 px-3 text-center text-blue-600 font-semibold whitespace-nowrap">{item.prices[3]} Ft</td>
                       </tr>
                     ))}
                   </>

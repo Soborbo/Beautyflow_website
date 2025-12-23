@@ -399,18 +399,17 @@ const faqSchema = {
   <!-- Category Navigation -->
   <section class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
     <div class="container mx-auto px-4">
-      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide justify-center" id="faq-nav">
+      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:justify-center" id="faq-nav">
         {faqCategories.map((category, index) => {
           const colors = categoryColors[category.id];
           return (
           <button
-            class={`faq-nav-btn flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer ${index === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md'}`}
+            class={`faq-nav-btn flex-shrink-0 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer ${index === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md'}`}
             style={index === 0 ? `background-color: ${colors.primary}; box-shadow: 0 10px 15px -3px ${colors.shadow}` : ''}
             data-target={category.id}
             data-color={colors.primary}
             data-shadow={colors.shadow}
           >
-            <span class="hidden md:inline-block w-5 h-5 transition-transform duration-300 group-hover:rotate-12" set:html={category.icon} />
             {category.title}
           </button>
         )})}
