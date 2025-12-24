@@ -18,7 +18,7 @@ const testimonials = [
 ];
 ---
 
-<section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7] below-fold">
+<section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
   <div class="max-w-[1300px] mx-auto px-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
       {testimonials.map((testimonial) => (
@@ -43,18 +43,12 @@ const testimonials = [
               src={testimonial.image}
               alt={testimonial.author}
               class="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              width="48"
-              height="48"
-              loading="lazy"
             />
             <span class="font-semibold text-gray-900 text-sm flex-1 leading-none">{testimonial.author}</span>
             <img
               src="/images/google-logo.jpg"
               alt="Google"
               class="w-7 h-7 object-contain flex-shrink-0"
-              width="28"
-              height="28"
-              loading="lazy"
             />
           </div>
         </div>
