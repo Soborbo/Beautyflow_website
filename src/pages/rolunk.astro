@@ -223,31 +223,21 @@ const values = [
     </div>
   </section>
 
-  <!-- Timeline Section - Horizontal -->
-  <section class="py-16 lg:py-20 bg-gradient-to-b from-[#fdf8f6] to-white">
-    <div class="max-w-[1100px] mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="font-heading text-3xl lg:text-4xl text-gray-900">
-          Mérföldkövek
-        </h2>
-      </div>
-
-      <!-- Horizontal scrollable timeline -->
-      <div class="relative timeline-container">
-        <!-- Scroll hint arrows -->
-        <div class="scroll-hint-left absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#fdf8f6] to-transparent z-20 pointer-events-none opacity-0 transition-opacity duration-300"></div>
-        <div class="scroll-hint-right absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#fdf8f6] to-transparent z-20 pointer-events-none flex items-center justify-end pr-2">
-          <div class="scroll-arrow animate-bounce-x">
-            <svg class="w-6 h-6 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
+  <!-- Timeline Section - Parallax Horizontal Scroll -->
+  <section class="timeline-section bg-gradient-to-b from-[#fdf8f6] to-white">
+    <div class="timeline-sticky-container">
+      <div class="max-w-[1100px] mx-auto px-4 py-16 lg:py-20">
+        <div class="text-center mb-12">
+          <h2 class="font-heading text-3xl lg:text-4xl text-gray-900">
+            Mérföldkövek
+          </h2>
         </div>
 
-        <div class="timeline-scroll overflow-x-scroll pb-4 -mx-4 px-4 scrollbar-hide" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch; touch-action: pan-x;">
-          <div class="flex gap-4 min-w-max">
+        <!-- Horizontal timeline with parallax -->
+        <div class="overflow-hidden">
+          <div class="timeline-track flex gap-4">
             {milestones.map((milestone, index) => (
-              <div class="flex flex-col items-center min-w-[200px] relative">
+              <div class="timeline-item flex flex-col items-center min-w-[200px] relative flex-shrink-0">
                 <!-- Year circle - gold for awards, pink for regular -->
                 <div class={`w-16 h-16 rounded-full flex items-center justify-center text-white font-heading text-sm shadow-lg z-10 ${milestone.isAward ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-[#c53f75]'}`}>
                   {milestone.isAward && (
@@ -396,71 +386,80 @@ const values = [
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const scrollContainer = document.querySelector('.timeline-scroll');
-    const scrollHintRight = document.querySelector('.scroll-hint-right');
-    const scrollHintLeft = document.querySelector('.scroll-hint-left');
+    const timelineSection = document.querySelector('.timeline-section');
+    const timelineTrack = document.querySelector('.timeline-track');
 
-    if (scrollContainer && scrollHintRight) {
-      scrollContainer.addEventListener('scroll', () => {
-        const scrollLeft = scrollContainer.scrollLeft;
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    if (!timelineSection || !timelineTrack) return;
 
-        // Show/hide left hint
-        if (scrollHintLeft) {
-          scrollHintLeft.style.opacity = scrollLeft > 20 ? '1' : '0';
-        }
+    // Calculate dimensions
+    const updateTimeline = () => {
+      const trackWidth = timelineTrack.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const scrollDistance = trackWidth - viewportWidth + 100; // Extra padding
 
-        // Hide right hint when scrolled
-        if (scrollLeft > 50) {
-          scrollHintRight.style.opacity = '0';
-        } else {
-          scrollHintRight.style.opacity = '1';
-        }
-      });
-    }
+      // Set section height based on scroll distance needed
+      const sectionHeight = Math.max(scrollDistance + window.innerHeight, window.innerHeight);
+      timelineSection.style.height = `${sectionHeight}px`;
+    };
+
+    const handleScroll = () => {
+      const rect = timelineSection.getBoundingClientRect();
+      const stickyContainer = document.querySelector('.timeline-sticky-container');
+
+      if (!stickyContainer) return;
+
+      const sectionTop = rect.top;
+      const sectionHeight = timelineSection.offsetHeight;
+      const viewportHeight = window.innerHeight;
+
+      // Calculate scroll progress within the section
+      const scrollProgress = Math.max(0, Math.min(1, -sectionTop / (sectionHeight - viewportHeight)));
+
+      // Calculate horizontal translation
+      const trackWidth = timelineTrack.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const maxTranslate = trackWidth - viewportWidth + 100;
+      const translateX = scrollProgress * maxTranslate;
+
+      // Apply transform
+      timelineTrack.style.transform = `translateX(-${translateX}px)`;
+    };
+
+    // Initial setup
+    updateTimeline();
+
+    // Event listeners
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', () => {
+      updateTimeline();
+      handleScroll();
+    });
+
+    // Initial call
+    handleScroll();
   });
 </script>
 
 <style>
-  /* Hide scrollbar but keep functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .timeline-section {
+    position: relative;
   }
 
-  /* Horizontal bounce animation for scroll arrow */
-  @keyframes bounce-x {
-    0%, 100% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(6px);
-    }
+  .timeline-sticky-container {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
   }
 
-  .animate-bounce-x {
-    animation: bounce-x 1.5s ease-in-out infinite;
+  .timeline-track {
+    transition: transform 0.1s ease-out;
+    will-change: transform;
   }
 
-  .scroll-hint-right {
-    transition: opacity 0.3s ease;
-  }
-
-  .scroll-hint-left {
-    transition: opacity 0.3s ease;
-  }
-
-  .timeline-scroll {
-    overflow-x: scroll !important;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    cursor: grab;
-  }
-
-  .timeline-scroll:active {
-    cursor: grabbing;
+  .timeline-item {
+    opacity: 1;
   }
 </style>
