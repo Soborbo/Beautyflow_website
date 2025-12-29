@@ -224,7 +224,7 @@ const values = [
   </section>
 
   <!-- Timeline Section - Horizontal -->
-  <section class="py-16 lg:py-20 bg-gradient-to-b from-[#fdf8f6] to-white overflow-hidden">
+  <section class="py-16 lg:py-20 bg-gradient-to-b from-[#fdf8f6] to-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <div class="text-center mb-12">
         <h2 class="font-heading text-3xl lg:text-4xl text-gray-900">
@@ -244,7 +244,7 @@ const values = [
           </div>
         </div>
 
-        <div class="timeline-scroll overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+        <div class="timeline-scroll overflow-x-scroll pb-4 -mx-4 px-4 scrollbar-hide" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch; touch-action: pan-x;">
           <div class="flex gap-4 min-w-max">
             {milestones.map((milestone, index) => (
               <div class="flex flex-col items-center min-w-[200px] relative">
@@ -451,5 +451,16 @@ const values = [
 
   .scroll-hint-left {
     transition: opacity 0.3s ease;
+  }
+
+  .timeline-scroll {
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    cursor: grab;
+  }
+
+  .timeline-scroll:active {
+    cursor: grabbing;
   }
 </style>
