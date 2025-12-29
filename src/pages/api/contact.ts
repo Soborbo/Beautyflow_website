@@ -100,11 +100,15 @@ a Beautyflow alapítója
   });
 }
 
-// Append to Google Sheet
-async function appendToGoogleSheet(data: ContactFormData) {
-  const sheetId = import.meta.env.GOOGLE_SHEETS_ID;
-  const serviceAccountEmail = import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = import.meta.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+// Append to Google Sheet with env parameters
+interface GoogleEnv {
+  sheetId?: string;
+  serviceAccountEmail?: string;
+  privateKey?: string;
+}
+
+async function appendToGoogleSheetWithEnv(data: ContactFormData, googleEnv: GoogleEnv) {
+  const { sheetId, serviceAccountEmail, privateKey } = googleEnv;
 
   if (!sheetId || !serviceAccountEmail || !privateKey) {
     console.warn('Google Sheets credentials not configured');
@@ -147,9 +151,13 @@ async function appendToGoogleSheet(data: ContactFormData) {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const data: ContactFormData = await request.json();
+
+    // Get Cloudflare runtime environment
+    const runtime = (locals as any).runtime;
+    const env = runtime?.env || {};
 
     // Honeypot check - if filled, silently succeed
     if (data.website) {
@@ -202,10 +210,10 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Initialize Resend
-    const resendApiKey = import.meta.env.RESEND_API_KEY;
+    // Initialize Resend - try Cloudflare env first, then fallback to import.meta.env
+    const resendApiKey = env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY;
     if (!resendApiKey) {
-      console.error('RESEND_API_KEY not configured');
+      console.error('RESEND_API_KEY not configured. Cloudflare env:', Object.keys(env));
       return new Response(
         JSON.stringify({ success: false, error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon.' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -214,12 +222,19 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resend = new Resend(resendApiKey);
 
+    // Get Google Sheets credentials from Cloudflare env
+    const googleEnv = {
+      sheetId: env.GOOGLE_SHEETS_ID || import.meta.env.GOOGLE_SHEETS_ID,
+      serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL || import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      privateKey: (env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY)?.replace(/\\n/g, '\n'),
+    };
+
     // Send emails and append to sheet in parallel
     try {
       await Promise.all([
         sendAdminEmail(resend, data),
         sendUserEmail(resend, data),
-        appendToGoogleSheet(data),
+        appendToGoogleSheetWithEnv(data, googleEnv),
       ]);
     } catch (emailError) {
       console.error('Email sending error:', emailError);
