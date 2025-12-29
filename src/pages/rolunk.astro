@@ -25,7 +25,7 @@ const organizationSchema = {
     "@type": "Person",
     "name": "Kónya Fanni"
   },
-  "numberOfEmployees": "6",
+  "numberOfEmployees": "7",
   "address": [
     {
       "@type": "PostalAddress",
@@ -55,11 +55,20 @@ const organizationSchema = {
 };
 
 const milestones = [
-  { year: '2015', event: 'Kónya Fanni elvégzi a kozmetikusképzést' },
-  { year: '2020', event: 'Megnyílik a Beautyflow Buda' },
-  { year: '2023', event: 'Fanni megveszi az első diódalézert' },
-  { year: '2024', event: 'A Hónap Szalonja leszünk a Notinón' },
-  { year: '2025', event: 'Megnyílik a Beautyflow Pest' }
+  { year: '2015 február', event: 'Elkezdődik Fanni útja a szépségiparban' },
+  { year: '2017 október', event: 'Első sminktetováló képzés elvégzése' },
+  { year: '2018 február', event: 'Kitűnő eredménnyel végzett szépségtanácsadó (OKJ)' },
+  { year: '2019 augusztus', event: 'Szemöldök stylist és műszempilla oktató lettem, a megszerzett tudást a sminktetoválások során azóta is aktívan alkalmazom' },
+  { year: '2020 január', event: 'Kozmetikussá váltam kitüntetett 5-ös eredménnyel, 100%-os vizsgával, valamint Gáspár Melindánál tanulhattam sminktetoválás eltávolítást' },
+  { year: '2021', event: 'A covid időszak alatt kizárólag tanulásra fókuszáltam: Méhn Tünde PMU ART School ajak- és szemhéj sminktetoválás képzés, valamint cukorpasztás depiláció' },
+  { year: '2022', event: 'Megvásároltam az első elektrokozmetikai gépemet, a diódalézeres szőrtelenítő készüléket' },
+  { year: '2023', event: 'Második diódalézeres szőrtelenítő gép beszerzése, tudatos elindulás az elektrokozmetika irányába' },
+  { year: '2024', event: 'Megnyílik a Beautyflow Buda' },
+  { year: '2024', event: 'Év Vállalkozója díj', isAward: true },
+  { year: '2024', event: 'Notino Partner lettem', isAward: true },
+  { year: '2025 március', event: 'Hónap Szalonja díj', isAward: true },
+  { year: '2025', event: 'Év Vállalkozója díj', isAward: true },
+  { year: '2025', event: 'Bővülünk Nd:YAG lézerrel és HydraBeauty géppel' }
 ];
 
 const teamMembers = [
@@ -74,8 +83,7 @@ const teamMembers = [
       { name: 'Tetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' },
       { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
@@ -86,8 +94,7 @@ const teamMembers = [
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
@@ -96,8 +103,7 @@ const teamMembers = [
     image: nagyPiroska,
     description: '2016 óta kozmetikus. A precizitás nálam nem opció – alap. Gyöngyösön kezdtem, Budapesten folytattam. Több város, több szalon, több ezer kezelés – és mindegyikből tanultam valamit. Jelenleg a diódalézeres szőrtelenítésre specializálódtam. A kezelés alatt szeretek beszélgetni, nevetni, lazítani. De amikor dolgozom, a kezem nem viccel.',
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' }
     ]
   },
   {
@@ -108,8 +114,7 @@ const teamMembers = [
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
@@ -120,8 +125,7 @@ const teamMembers = [
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
@@ -134,8 +138,7 @@ const teamMembers = [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
-      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' }
     ]
   },
   {
@@ -145,8 +148,7 @@ const teamMembers = [
     description: 'A csapat legújabb tagja vagyok – de a lelkesedésben nem maradok le. Diódalézeres szőrtelenítéssel és carbon peelinggel foglalkozom, és imádok beszélgetni közben. Nálam gyorsan telik az idő, mert nem csak kezelés van, hanem kapcsolat is. Ha kicsit izgulsz az első alkalom előtt, ne tedd. Közvetlen vagyok, figyelek rád.',
     treatments: [
       { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Személyes konzultáció', url: '/ingyenes-konzultacio' }
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   }
 ];
@@ -198,7 +200,7 @@ const values = [
               A Beautyflow-t 2014-ben alapította Kónya Fanni, azzal a céllal, hogy egy olyan szépségszalont hozzon létre, ahol minden vendég valódi törődést és professzionális szolgáltatást kap.
             </p>
             <p>
-              Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 6 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.
+              Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 7 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.
             </p>
             <p>
               Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.
@@ -235,9 +237,14 @@ const values = [
           <div class="flex gap-4 min-w-max">
             {milestones.map((milestone, index) => (
               <div class="flex flex-col items-center min-w-[200px] relative">
-                <!-- Year circle -->
-                <div class="w-16 h-16 rounded-full bg-[#c53f75] flex items-center justify-center text-white font-heading text-xl shadow-lg z-10">
-                  {milestone.year}
+                <!-- Year circle - gold for awards, pink for regular -->
+                <div class={`w-16 h-16 rounded-full flex items-center justify-center text-white font-heading text-sm shadow-lg z-10 ${milestone.isAward ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-[#c53f75]'}`}>
+                  {milestone.isAward && (
+                    <svg class="w-5 h-5 absolute -top-1 -right-1 text-yellow-400 drop-shadow" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  )}
+                  <span class="text-center leading-tight px-1">{milestone.year}</span>
                 </div>
 
                 <!-- Connecting line -->
@@ -246,7 +253,8 @@ const values = [
                 )}
 
                 <!-- Event card -->
-                <div class="mt-4 bg-white p-4 rounded-xl shadow-md text-center max-w-[180px]">
+                <div class={`mt-4 p-4 rounded-xl shadow-md text-center max-w-[180px] ${milestone.isAward ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200' : 'bg-white'}`}>
+                  {milestone.isAward && <span class="text-yellow-500 text-lg">⭐</span>}
                   <p class="text-gray-700 text-sm leading-relaxed">{milestone.event}</p>
                 </div>
               </div>
