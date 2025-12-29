@@ -117,11 +117,17 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
 
 // Convert PEM to CryptoKey
 async function importPrivateKey(pemKey: string): Promise<CryptoKey> {
-  // Remove PEM header/footer and newlines
-  const pemContents = pemKey
+  // Handle various newline formats from environment variables
+  let normalizedKey = pemKey
+    .replace(/\\n/g, '\n')  // Handle escaped newlines
+    .replace(/\\\\n/g, '\n') // Handle double-escaped newlines
+    .trim();
+
+  // Remove PEM header/footer and all whitespace
+  const pemContents = normalizedKey
     .replace(/-----BEGIN PRIVATE KEY-----/, '')
     .replace(/-----END PRIVATE KEY-----/, '')
-    .replace(/\s/g, '');
+    .replace(/[\s\r\n]/g, '');
 
   // Decode base64
   const binaryString = atob(pemContents);
@@ -327,7 +333,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const googleEnv = {
       sheetId: env.GOOGLE_SHEETS_ID || import.meta.env.GOOGLE_SHEETS_ID,
       serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL || import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      privateKey: (env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY)?.replace(/\\n/g, '\n'),
+      privateKey: env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY,
     };
 
     // Send emails and append to sheet in parallel
