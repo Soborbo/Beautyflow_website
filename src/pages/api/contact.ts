@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
-import { google } from 'googleapis';
 
 // Treatment name mapping
 const treatmentNames: Record<string, string> = {
@@ -100,14 +99,114 @@ a Beautyflow alapítója
   });
 }
 
-// Append to Google Sheet with env parameters
+// Base64URL encode
+function base64UrlEncode(str: string): string {
+  const base64 = btoa(str);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Base64URL encode ArrayBuffer
+function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return base64UrlEncode(binary);
+}
+
+// Convert PEM to CryptoKey
+async function importPrivateKey(pemKey: string): Promise<CryptoKey> {
+  // Remove PEM header/footer and newlines
+  const pemContents = pemKey
+    .replace(/-----BEGIN PRIVATE KEY-----/, '')
+    .replace(/-----END PRIVATE KEY-----/, '')
+    .replace(/\s/g, '');
+
+  // Decode base64
+  const binaryString = atob(pemContents);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return await crypto.subtle.importKey(
+    'pkcs8',
+    bytes.buffer,
+    {
+      name: 'RSASSA-PKCS1-v1_5',
+      hash: 'SHA-256',
+    },
+    false,
+    ['sign']
+  );
+}
+
+// Create JWT for Google API
+async function createGoogleJWT(serviceAccountEmail: string, privateKey: string): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+
+  const header = {
+    alg: 'RS256',
+    typ: 'JWT',
+  };
+
+  const payload = {
+    iss: serviceAccountEmail,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  };
+
+  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const signatureInput = `${encodedHeader}.${encodedPayload}`;
+
+  const key = await importPrivateKey(privateKey);
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    key,
+    new TextEncoder().encode(signatureInput)
+  );
+
+  const encodedSignature = arrayBufferToBase64Url(signature);
+
+  return `${signatureInput}.${encodedSignature}`;
+}
+
+// Get Google access token
+async function getGoogleAccessToken(serviceAccountEmail: string, privateKey: string): Promise<string> {
+  const jwt = await createGoogleJWT(serviceAccountEmail, privateKey);
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to get access token: ${error}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+// Append to Google Sheet using REST API
 interface GoogleEnv {
   sheetId?: string;
   serviceAccountEmail?: string;
   privateKey?: string;
 }
 
-async function appendToGoogleSheetWithEnv(data: ContactFormData, googleEnv: GoogleEnv) {
+async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) {
   const { sheetId, serviceAccountEmail, privateKey } = googleEnv;
 
   if (!sheetId || !serviceAccountEmail || !privateKey) {
@@ -116,24 +215,21 @@ async function appendToGoogleSheetWithEnv(data: ContactFormData, googleEnv: Goog
   }
 
   try {
-    const auth = new google.auth.JWT(
-      serviceAccountEmail,
-      undefined,
-      privateKey,
-      ['https://www.googleapis.com/auth/spreadsheets']
-    );
-
-    const sheets = google.sheets({ version: 'v4', auth });
+    const accessToken = await getGoogleAccessToken(serviceAccountEmail, privateKey);
 
     const treatmentList = data.treatments
       .map((t) => treatmentNames[t] || t)
       .join(', ');
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: 'Sheet1!A:F',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         values: [
           [
             formatTimestamp(),
@@ -144,8 +240,13 @@ async function appendToGoogleSheetWithEnv(data: ContactFormData, googleEnv: Goog
             data.email,
           ],
         ],
-      },
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Sheets API error: ${error}`);
+    }
   } catch (error) {
     console.error('Failed to append to Google Sheet:', error);
   }
@@ -234,7 +335,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await Promise.all([
         sendAdminEmail(resend, data),
         sendUserEmail(resend, data),
-        appendToGoogleSheetWithEnv(data, googleEnv),
+        appendToGoogleSheet(data, googleEnv),
       ]);
     } catch (emailError) {
       console.error('Email sending error:', emailError);
