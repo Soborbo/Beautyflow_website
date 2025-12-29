@@ -258,13 +258,27 @@ async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) 
   }
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async (context) => {
+  const { request, locals } = context;
+
   try {
     const data: ContactFormData = await request.json();
 
-    // Get Cloudflare runtime environment
+    // Get Cloudflare runtime environment - try multiple methods
     const runtime = (locals as any).runtime;
-    const env = runtime?.env || {};
+    const cfEnv = runtime?.env || {};
+
+    // Also check context.locals directly and platform
+    const platform = (context as any).platform;
+    const platformEnv = platform?.env || {};
+
+    // Merge all possible env sources
+    const env = { ...platformEnv, ...cfEnv };
+
+    // Debug logging
+    console.log('Cloudflare env keys:', Object.keys(env));
+    console.log('Runtime exists:', !!runtime);
+    console.log('Platform exists:', !!platform);
 
     // Honeypot check - if filled, silently succeed
     if (data.website) {
