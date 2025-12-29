@@ -296,11 +296,12 @@ const faqs = [
     <div class="max-w-[1100px] mx-auto px-4">
       <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="flex flex-col lg:flex-row">
-          <div class="w-full lg:w-2/5 flex-shrink-0">
+          <!-- Image - full width on mobile, stretch to fill height on desktop -->
+          <div class="w-full lg:w-2/5 flex-shrink-0 relative">
             <Image
               src={konnyaFanniKonzultacio}
               alt="Kónya Fanni tetoválás eltávolítás szakértő"
-              class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
               format="webp"
               quality={80}
               loading="lazy"

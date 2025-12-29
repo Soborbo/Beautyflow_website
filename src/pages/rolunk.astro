@@ -233,8 +233,18 @@ const values = [
       </div>
 
       <!-- Horizontal scrollable timeline -->
-      <div class="relative">
-        <div class="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+      <div class="relative timeline-container">
+        <!-- Scroll hint arrows -->
+        <div class="scroll-hint-left absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#fdf8f6] to-transparent z-20 pointer-events-none opacity-0 transition-opacity duration-300"></div>
+        <div class="scroll-hint-right absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#fdf8f6] to-transparent z-20 pointer-events-none flex items-center justify-end pr-2">
+          <div class="scroll-arrow animate-bounce-x">
+            <svg class="w-6 h-6 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="timeline-scroll overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
           <div class="flex gap-4 min-w-max">
             {milestones.map((milestone, index) => (
               <div class="flex flex-col items-center min-w-[200px] relative">
@@ -261,16 +271,6 @@ const values = [
               </div>
             ))}
           </div>
-        </div>
-
-        <!-- Scroll hint for mobile -->
-        <div class="flex justify-center mt-4 lg:hidden">
-          <p class="text-gray-400 text-xs flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-            Húzd oldalra
-          </p>
         </div>
       </div>
     </div>
@@ -394,6 +394,33 @@ const values = [
 
 </Layout>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const scrollContainer = document.querySelector('.timeline-scroll');
+    const scrollHintRight = document.querySelector('.scroll-hint-right');
+    const scrollHintLeft = document.querySelector('.scroll-hint-left');
+
+    if (scrollContainer && scrollHintRight) {
+      scrollContainer.addEventListener('scroll', () => {
+        const scrollLeft = scrollContainer.scrollLeft;
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+        // Show/hide left hint
+        if (scrollHintLeft) {
+          scrollHintLeft.style.opacity = scrollLeft > 20 ? '1' : '0';
+        }
+
+        // Hide right hint when scrolled
+        if (scrollLeft > 50) {
+          scrollHintRight.style.opacity = '0';
+        } else {
+          scrollHintRight.style.opacity = '1';
+        }
+      });
+    }
+  });
+</script>
+
 <style>
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
@@ -402,5 +429,27 @@ const values = [
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Horizontal bounce animation for scroll arrow */
+  @keyframes bounce-x {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(6px);
+    }
+  }
+
+  .animate-bounce-x {
+    animation: bounce-x 1.5s ease-in-out infinite;
+  }
+
+  .scroll-hint-right {
+    transition: opacity 0.3s ease;
+  }
+
+  .scroll-hint-left {
+    transition: opacity 0.3s ease;
   }
 </style>

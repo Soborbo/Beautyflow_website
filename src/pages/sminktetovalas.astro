@@ -343,12 +343,12 @@ const faqs = [
       <!-- White card containing both image and text -->
       <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="flex flex-col lg:flex-row">
-          <!-- Image - full width on mobile, max 400px height on desktop -->
-          <div class="w-full lg:w-2/5 flex-shrink-0">
+          <!-- Image - full width on mobile, stretch to fill height on desktop -->
+          <div class="w-full lg:w-2/5 flex-shrink-0 relative">
             <Image
               src={fanniKonzultacio}
               alt="Kónya Fanni sminktetoválás szakértő"
-              class="w-full h-auto lg:h-full object-cover object-top lg:max-h-[400px]"
+              class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
               loading="lazy"
               format="webp"
               quality={80}
