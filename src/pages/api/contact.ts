@@ -215,11 +215,20 @@ export const POST: APIRoute = async ({ request }) => {
     const resend = new Resend(resendApiKey);
 
     // Send emails and append to sheet in parallel
-    await Promise.all([
-      sendAdminEmail(resend, data),
-      sendUserEmail(resend, data),
-      appendToGoogleSheet(data),
-    ]);
+    try {
+      await Promise.all([
+        sendAdminEmail(resend, data),
+        sendUserEmail(resend, data),
+        appendToGoogleSheet(data),
+      ]);
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown email error';
+      return new Response(
+        JSON.stringify({ success: false, error: `Email küldési hiba: ${errorMessage}` }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -227,8 +236,9 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (error) {
     console.error('Contact form error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ success: false, error: 'Hiba történt a küldés során. Kérjük próbáld újra később.' }),
+      JSON.stringify({ success: false, error: `Hiba történt: ${errorMessage}` }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

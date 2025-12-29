@@ -395,7 +395,9 @@ const values = [
     const updateTimeline = () => {
       const trackWidth = timelineTrack.scrollWidth;
       const viewportWidth = window.innerWidth;
-      const scrollDistance = trackWidth - viewportWidth + 100; // Extra padding
+      // Extra padding to ensure last item is fully visible
+      const extraPadding = 300;
+      const scrollDistance = trackWidth - viewportWidth + extraPadding;
 
       // Set section height based on scroll distance needed
       const sectionHeight = Math.max(scrollDistance + window.innerHeight, window.innerHeight);
@@ -415,10 +417,10 @@ const values = [
       // Calculate scroll progress within the section
       const scrollProgress = Math.max(0, Math.min(1, -sectionTop / (sectionHeight - viewportHeight)));
 
-      // Calculate horizontal translation
+      // Calculate horizontal translation - ensure last item is fully visible
       const trackWidth = timelineTrack.scrollWidth;
       const viewportWidth = window.innerWidth;
-      const maxTranslate = trackWidth - viewportWidth + 100;
+      const maxTranslate = trackWidth - viewportWidth + 250;
       const translateX = scrollProgress * maxTranslate;
 
       // Apply transform
