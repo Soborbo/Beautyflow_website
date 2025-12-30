@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 import { Image } from 'astro:assets';
+import ServiceHero from '../components/ServiceHero.astro';
+import ContentImage from '../components/ContentImage.astro';
 
 // Image imports
 import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
@@ -330,14 +332,11 @@ const serviceSchema = {
 
         <!-- Right column: Hero image - full width, no padding -->
         <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[250px] bg-[#fff9f7]">
-          <Image
-            src={lezeresSzortelenitesBg}
+          <ServiceHero
+            image={lezeresSzortelenitesBg}
             alt="Dióda lézeres szőrtelenítés kezelés"
             class="w-full h-full object-contain animate-zoom-in"
-            format="webp"
-            quality={80}
-            loading="eager"
-            fetchpriority="high"
+            priority={true}
           />
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">

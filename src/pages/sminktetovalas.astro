@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 import { Image } from 'astro:assets';
+import ServiceHero from '../components/ServiceHero.astro';
+import ContentImage from '../components/ContentImage.astro';
 
 // Image imports
 import heroImage from '../assets/images/sminktetovalas-mb-2.jpg';
@@ -310,14 +312,11 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <Image
-          src={heroImage}
+        <ServiceHero
+          image={heroImage}
           alt="Sminktetoválás Budapest"
           class="w-full h-full object-cover"
-          loading="eager"
-          fetchpriority="high"
-          format="webp"
-          quality={80}
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
