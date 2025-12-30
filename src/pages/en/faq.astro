@@ -1,0 +1,792 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// FAQ data organized by categories - General Questions FIRST
+const faqCategories = [
+  {
+    id: 'general',
+    title: 'General Questions',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    questions: [
+      {
+        q: "How can I book an appointment?",
+        a: "You can book an appointment online through the Notino platform, or by phone at +36 1 300 9414. For online booking, select your desired treatment, location, and time slot. We'll send you a confirmation by email."
+      },
+      {
+        q: "Where are the salons located?",
+        a: "We welcome you at two locations: Beautyflow Buda (1116 Budapest, Vegyesz u. 1.) and Beautyflow Pest (1135 Budapest, Reitter Ferenc u. 90.). Both salons are easily accessible by public transport and car."
+      },
+      {
+        q: "What are the opening hours?",
+        a: "Beautyflow Buda: Monday-Friday 08:00-20:00, Saturday 10:00-20:00, Sunday 10:00-19:00. Beautyflow Pest: Monday-Friday 08:00-18:00, Saturday 10:00-20:00, Sunday closed."
+      },
+      {
+        q: "Is there a free consultation?",
+        a: "Yes, we provide a free consultation before every treatment! During the consultation, we assess your needs, answer your questions, and create a personalized treatment plan. You can book an appointment on our free consultation page."
+      },
+      {
+        q: "What payment methods do you accept?",
+        a: "We accept both cash and card payments. For larger treatment packages, we also offer installment payment options. Please inquire about the details at the salon."
+      },
+      {
+        q: "Is there parking available?",
+        a: "There is parking available near both of our salons. At the Buda salon, street parking and a nearby parking garage are available. At the Pest salon, street parking is also possible. You can find detailed directions on the location page."
+      },
+      {
+        q: "Can I cancel or reschedule my appointment?",
+        a: "Yes, you can cancel or reschedule your appointment free of charge up to 24 hours before the treatment. Please notify us by phone or online. Cancellations within 24 hours may incur a cancellation fee."
+      },
+      {
+        q: "Can I purchase gift vouchers?",
+        a: "Yes, we offer gift vouchers for any treatment or any amount. Gift vouchers can be purchased at our salons and make an excellent gift for birthdays, name days, or any occasion."
+      }
+    ]
+  },
+  {
+    id: 'laser-hair-removal',
+    title: 'Laser Hair Removal',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+    questions: [
+      {
+        q: "What is a diode laser and how does it differ from other laser types?",
+        a: "A diode laser is a laser technology that operates at 808 nm wavelength and is excellent for targeted treatment of hair follicles. Compared to other lasers (alexandrite, Nd:YAG), diode laser is more effective at treating melanin-rich hair while being gentler on the skin. The professional diode laser devices used at Beautyflow salons feature the latest cooling technology, making the treatment more comfortable."
+      },
+      {
+        q: "How many treatments are needed for lasting results?",
+        a: "Generally, 6-10 treatments are needed for lasting results, at 4-6 week intervals. The number of sessions depends on the size of the treated area, hair density and color, and individual hormonal status. After completing the treatments, 1-2 maintenance sessions per year are recommended."
+      },
+      {
+        q: "Is laser hair removal painful?",
+        a: "Modern diode laser devices have built-in cooling systems that significantly reduce discomfort. Most patients experience a mild stinging or warm sensation. Sensitivity varies between individuals, but the treatment is generally well-tolerated. Numbing cream can be applied if needed."
+      },
+      {
+        q: "What skin types is the treatment suitable for?",
+        a: "Diode laser hair removal is suitable for almost all skin types, from light to darker skin tones (Fitzpatrick I-V). The most effective results are achieved with dark hair and lighter skin, but modern devices can be safely used on darker skin as well. The treatment is less effective on blonde, red, or gray hair."
+      },
+      {
+        q: "What should I do before and after the treatment?",
+        a: "Before treatment: Avoid sun exposure and self-tanners for 2 weeks, don't epilate or wax for 4 weeks, shave the hair 24 hours before the treatment. After treatment: Avoid sun exposure and use sunscreen, don't use saunas or hot baths for 48 hours, avoid intense exercise for 24 hours, and moisturize the skin regularly."
+      },
+      {
+        q: "Are there any side effects of the treatment?",
+        a: "Laser hair removal is generally a safe procedure. Temporary side effects may include mild redness, swelling, or sensitivity, which usually subside within a few hours. In rare cases, pigmentation changes or blistering may occur, so professional treatment and following aftercare advice are important."
+      },
+      {
+        q: "How often should treatments be repeated?",
+        a: "Treatments are generally performed every 4-6 weeks, following the hair growth cycle. For the face, more frequent intervals (3-4 weeks) are recommended, while for the body, longer intervals (5-6 weeks) are advised. After completing the treatment series, 1-2 maintenance sessions per year are sufficient."
+      },
+      {
+        q: "When will I see results?",
+        a: "Initial results are visible after just 1-2 treatments: hair becomes thinner and sparser. The treated hairs fall out 1-3 weeks after the treatment. Lasting results are achieved after completing the full treatment series (6-10 sessions)."
+      },
+      {
+        q: "Can the treatment be done during pregnancy or breastfeeding?",
+        a: "We do not recommend laser hair removal during pregnancy and breastfeeding. Although there is no evidence that it is harmful, following the principle of caution and due to hormonal changes, it is advisable to postpone the treatment."
+      },
+      {
+        q: "Can the treatment be done on intimate areas?",
+        a: "Yes, treatment of intimate areas (bikini line, Brazilian, full intimate) is popular and safe. The cooling system of modern devices is especially important in these sensitive areas. Our specialists perform the treatment discreetly and professionally."
+      },
+      {
+        q: "Can men also use this service?",
+        a: "Absolutely! Laser hair removal is increasingly popular among men. Common areas include: back, shoulders, chest, abdomen, and face (beard line). Men's hair is generally thicker, so a few extra treatments may be needed."
+      },
+      {
+        q: "How much does laser hair removal cost?",
+        a: "Prices depend on the size of the treated area. Smaller areas (underarms, upper lip) start from a few thousand forints, larger areas (full legs, back) are more expensive. We offer significant discounts with our package deals. For exact prices, visit our Prices page or request a personalized quote."
+      },
+      {
+        q: "Can the treatment be done over a tattoo?",
+        a: "Laser hair removal CANNOT be performed over a tattoo because the laser may target the ink, which can cause burns or discoloration of the tattoo. Tattooed areas must be avoided during the treatment."
+      },
+      {
+        q: "Is it safe around moles and freckles?",
+        a: "Moles and other pigmented skin lesions must be avoided during treatment. Before the laser treatment, our specialist will assess your skin and mark the areas to avoid. For large or suspicious moles, dermatological consultation is recommended."
+      },
+      {
+        q: "What happens if I miss a treatment?",
+        a: "Missing one session does not significantly affect the results, but regular treatment is more effective. If you take a longer break, hair growth may restart, and more follow-up treatments may be needed. Try to maintain the recommended 4-6 week interval."
+      }
+    ]
+  },
+  {
+    id: 'hydrabeauty',
+    title: 'HydraBeauty Facial',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>`,
+    questions: [
+      {
+        q: "What is HydraBeauty treatment?",
+        a: "HydraBeauty is a multi-step, non-invasive facial treatment that provides cleansing, exfoliation, skin tightening, and intense hydration in a single session. The treatment uses special vacuum technology that deeply cleanses pores and delivers active ingredients into the skin."
+      },
+      {
+        q: "What skin problems is HydraBeauty recommended for?",
+        a: "HydraBeauty is excellent for: dehydrated skin, enlarged pores and blackheads, dull and tired skin, fine lines, uneven skin tone, and acne-prone skin. It is recommended for almost all skin types and is also suitable for sensitive skin."
+      },
+      {
+        q: "Is HydraBeauty treatment painful?",
+        a: "No, the treatment is completely painless. Most patients find it pleasant and relaxing. The vacuum cleansing creates a gentle suction effect, but it is not uncomfortable. You can return to your daily activities immediately after the treatment."
+      },
+      {
+        q: "How long does a treatment take?",
+        a: "A complete HydraBeauty treatment takes approximately 45-60 minutes. This includes skin preparation, the multi-step treatment, and the finishing care."
+      },
+      {
+        q: "How often is HydraBeauty recommended?",
+        a: "For optimal results, 1-2 treatments per month are recommended. For intensive skin renewal, 4-6 treatments at 2-week intervals are initially recommended, followed by monthly maintenance treatments. Our specialist will create a personalized treatment plan based on individual needs and skin condition."
+      },
+      {
+        q: "When will I see results?",
+        a: "Results are visible immediately! Your skin will be more radiant, hydrated, and fresher after just the first treatment. Lasting results and improvement of deeper problems are achieved after several treatments."
+      },
+      {
+        q: "Is there any recovery time after the treatment?",
+        a: "There is no recovery time. You can apply makeup and continue your daily routine immediately after the treatment. Mild redness may occur and usually disappears within a few hours. The treatment is also known as a 'lunchtime treatment' because it can be done quickly."
+      },
+      {
+        q: "Can it be combined with other treatments?",
+        a: "Yes, HydraBeauty can be excellently combined with other treatments, such as: LED light therapy, mesotherapy, and wrinkle filling. Our specialist will provide information about combined treatments during the consultation."
+      },
+      {
+        q: "Is it suitable for sensitive skin?",
+        a: "Yes, HydraBeauty is particularly gentle and also suitable for sensitive skin. The intensity of the treatment can be adjusted, and the serums used can also be customized according to individual skin conditions."
+      },
+      {
+        q: "Can the treatment be done during pregnancy?",
+        a: "HydraBeauty is generally safe, but it is advisable to consult with the treating specialist during pregnancy. Some intensive active ingredients (e.g., retinol) should be avoided, but the cleansing and hydrating steps can generally be performed."
+      }
+    ]
+  },
+  {
+    id: 'tattoo-removal',
+    title: 'Tattoo Removal',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`,
+    questions: [
+      {
+        q: "How does laser tattoo removal work?",
+        a: "During laser tattoo removal, the laser uses high-energy light pulses to break down ink particles in the skin into tiny pieces. These particles are then naturally removed by the body's immune system over the following weeks. The treatment is a safe and effective way to remove unwanted tattoos."
+      },
+      {
+        q: "How many treatments are needed to remove a tattoo?",
+        a: "The number of treatments needed depends on the size, color, depth, and age of the tattoo. Generally, 6-12 treatments are required, at 6-8 week intervals. Amateur tattoos fade faster, while professional, colored tattoos require more treatments."
+      },
+      {
+        q: "Is tattoo removal painful?",
+        a: "The treatment involves some discomfort; many compare the sensation to a rubber band snapping against the skin. Modern lasers have cooling systems that reduce pain. For larger areas or more sensitive patients, numbing cream can be applied."
+      },
+      {
+        q: "What color tattoos can be removed?",
+        a: "Black and dark blue tattoos are the easiest to remove. Green, light blue, and purple colors require more treatments. Yellow, orange, and white colors are the most difficult. With modern multiwave lasers, almost all colors can be treated."
+      },
+      {
+        q: "Will there be scarring after the treatment?",
+        a: "With professional treatment and proper aftercare, the risk of scarring is minimal. The laser targets the ink, not the skin. It is important to allow adequate healing time between treatments and follow expert instructions."
+      },
+      {
+        q: "When will I see results?",
+        a: "Tattoo fading occurs gradually, treatment by treatment. The first significant change is usually visible after 2-3 treatments. After each treatment, the body works for 6-8 weeks to remove the ink particles."
+      },
+      {
+        q: "Is there recovery time after the treatment?",
+        a: "Redness, swelling, and blistering may occur in the treated area for 1-2 weeks - this is a normal reaction. The area may be sensitive for 2-4 weeks. Avoid sun exposure, swimming, and intense sports during healing."
+      },
+      {
+        q: "Can permanent makeup be removed?",
+        a: "Yes, permanent makeup (eyebrows, eyelids, lips) can also be removed with laser, but these require special treatment due to the sensitivity of the area. It's important to know that certain permanent makeup pigments may oxidize and darken at the first treatment."
+      },
+      {
+        q: "Can a fresh tattoo be removed?",
+        a: "We recommend starting treatment of a fresh tattoo at least 6-8 weeks after the tattoo was done, so the skin can fully heal. New tattoos are often easier to remove because the ink has not penetrated as deeply."
+      },
+      {
+        q: "How much does tattoo removal cost?",
+        a: "The price depends on the size of the tattoo. Treatment of smaller tattoos (e.g., 5x5 cm) costs approximately 15-25 thousand forints per session, larger areas are proportionally more expensive. We offer better prices with package deals."
+      }
+    ]
+  },
+  {
+    id: 'permanent-makeup',
+    title: 'Permanent Makeup',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>`,
+    questions: [
+      {
+        q: "What is permanent makeup?",
+        a: "Permanent makeup (cosmetic tattooing) is a cosmetic tattooing technique that results in natural-looking, long-lasting makeup. Special pigments applied to the upper layers of the skin can enhance eyebrows, eyes, and lips. The results last 1-3 years and then gradually fade."
+      },
+      {
+        q: "What permanent makeup techniques exist?",
+        a: "Popular techniques include: Microblading (eyebrow hair strokes), Ombre/powder brows, Combination brows, Eyeliner tattooing, and Lip contour and lip tattooing. Each technique has its advantages, and the choice depends on individual needs and facial features."
+      },
+      {
+        q: "Is permanent makeup painful?",
+        a: "We apply numbing cream before the treatment, so pain is minimal. Most people feel a slight scratching or pressure sensation. Sensitivity varies between individuals; the sensation may be more intense for lips and eyelids."
+      },
+      {
+        q: "How long does permanent makeup last?",
+        a: "Duration varies between 1-3 years, depending on skin type, the technique applied, pigment color, and lifestyle. It fades faster on oilier skin. A touch-up treatment is recommended once a year to maintain perfect results."
+      },
+      {
+        q: "What is the healing process like?",
+        a: "Healing takes 7-14 days. In the first few days, the color will be more intense, then scabs form and gradually fall off. The final color and shape are visible after 4-6 weeks. Important: do not scratch or soak the area during healing!"
+      },
+      {
+        q: "Is a touch-up required?",
+        a: "Yes, a touch-up treatment is recommended 4-6 weeks after the first treatment. This is part of the process and is usually included in the price. During the touch-up, we refine the shape, replace any pigment that may have fallen out, and finalize the result."
+      },
+      {
+        q: "Am I suitable for permanent makeup?",
+        a: "Permanent makeup is suitable for most people. Contraindications include: pregnancy, breastfeeding, diabetes, blood clotting disorders, epilepsy, active skin conditions, and tendency to keloid scarring. We assess suitability during the consultation."
+      },
+      {
+        q: "How do I choose the right shape and color?",
+        a: "During the consultation, our specialist considers your face shape, skin tone, eye color, and personal preferences. Before the tattoo, we draw the shape so you can see and approve it. The color fades by 30-40% after healing."
+      },
+      {
+        q: "Can I apply makeup to my eyebrows after the treatment?",
+        a: "Avoid applying makeup to the treated area during healing (7-14 days). After that, you can apply makeup, but the point of permanent makeup is that you'll need little to no makeup. Many people only add to it on special occasions."
+      },
+      {
+        q: "What happens if I don't like the result?",
+        a: "The thorough pre-treatment consultation and preliminary shape drawing minimize this risk. If you are still dissatisfied, we can make adjustments during the touch-up appointment. As a last resort, permanent makeup can be removed with laser, although this is a time-consuming process."
+      }
+    ]
+  },
+  {
+    id: 'carbon-peeling',
+    title: 'Carbon Peeling',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
+    questions: [
+      {
+        q: "What is Carbon Peeling treatment?",
+        a: "Carbon Peeling (also known as Hollywood Peeling or Carbon Laser) is an innovative skin rejuvenating and cleansing treatment. A special mask containing carbon particles is applied to the skin, then treated with an Nd:YAG laser. The laser vaporizes the carbon along with impurities while stimulating collagen production."
+      },
+      {
+        q: "What skin problems is it recommended for?",
+        a: "Carbon Peeling is ideal for: treating enlarged pores, oily and acne-prone skin, removing blackheads, uneven skin tone, fine lines, dull and lifeless skin, and pigmentation spots. It is suitable for almost all skin types."
+      },
+      {
+        q: "Is the treatment painful?",
+        a: "The treatment is painless. The laser causes a mild warmth and tingling sensation that most patients find pleasant. No anesthesia is required."
+      },
+      {
+        q: "How long does a treatment take?",
+        a: "A Carbon Peeling treatment takes approximately 30-45 minutes. The treatment is quick and comfortable, with no recovery time - you can return to your daily activities immediately."
+      },
+      {
+        q: "How often can the treatment be repeated?",
+        a: "For optimal results, 4-6 treatments are recommended at 2-4 week intervals. For maintenance, once a month is sufficient. A single treatment before special events also provides impressive results."
+      },
+      {
+        q: "When will I see results?",
+        a: "Results are visible immediately! Your skin will be more radiant, cleaner, and firmer after just the first treatment. Pores contract and skin becomes more even. Due to collagen production stimulation, results continue to improve for weeks."
+      },
+      {
+        q: "Are there any side effects?",
+        a: "Carbon Peeling is extremely safe. Mild redness may occur, which usually disappears within a few hours. In rare cases, temporary sensitivity may occur. Sun protection is important after the treatment."
+      },
+      {
+        q: "Can it be combined with other treatments?",
+        a: "Yes, it can be excellently combined with other treatments: HydraBeauty (deeper cleansing), LED light therapy, and mesotherapy. Our specialist will provide personalized recommendations for combined treatments."
+      },
+      {
+        q: "Is it suitable for sensitive skin?",
+        a: "Carbon Peeling is generally suitable for sensitive skin, but a preliminary consultation is recommended. The treatment intensity can be adjusted. The treatment is contraindicated in cases of active inflammation or open wounds."
+      },
+      {
+        q: "Can the treatment be done in summer?",
+        a: "Yes, Carbon Peeling can be done year-round. However, proper sun protection (SPF 30+) is important in the days following the treatment, especially in summer."
+      }
+    ]
+  },
+  {
+    id: 'pigmentation-removal',
+    title: 'Pigmentation Removal',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`,
+    questions: [
+      {
+        q: "What types of pigmentation spots can be treated with laser?",
+        a: "Laser can treat: sun spots, age spots, freckles, melasma (certain types), post-inflammatory hyperpigmentation (e.g., post-acne spots), and cafe-au-lait spots. An accurate diagnosis is important before treatment, so consultation is necessary."
+      },
+      {
+        q: "How does laser pigmentation removal work?",
+        a: "The laser specifically targets cells containing pigment (melanin). High-energy light pulses break down the pigment particles, which are then naturally removed by the body's immune system. The surrounding skin remains intact."
+      },
+      {
+        q: "How many treatments are needed?",
+        a: "The number of treatments needed depends on the type, size, and depth of the pigmentation spot. Superficial spots can be removed with 1-3 treatments, deeper pigmentation may require 4-6 treatments. Treatments are performed at 4-6 week intervals."
+      },
+      {
+        q: "Is the treatment painful?",
+        a: "The treatment involves mild stinging that most patients tolerate well. The devices have built-in cooling that increases comfort. Numbing cream can be applied if needed."
+      },
+      {
+        q: "What is the healing process like?",
+        a: "Temporary darkening followed by scab formation is expected in the treated area. The scab naturally falls off within 7-14 days, revealing new, healthy skin underneath. Important: do not pick at the scab and use sunscreen!"
+      },
+      {
+        q: "Can pigmentation spots come back?",
+        a: "Successfully removed pigmentation spots generally do not return, BUT new spots can develop due to sun exposure or hormonal changes. The key to prevention is: regular use of sunscreen (SPF 30+) and avoiding excessive sun exposure."
+      },
+      {
+        q: "Can it be done on any skin type?",
+        a: "The treatment is safest and most effective on lighter skin types (Fitzpatrick I-III). On darker skin, there is a higher risk of hypopigmentation (light spots), so more cautious settings are required. We assess suitability during consultation."
+      },
+      {
+        q: "Can melasma be treated with laser?",
+        a: "Melasma is a complex problem where laser treatment is only one element of comprehensive therapy. It can be effective for some types, but may worsen others. For melasma, expert consultation and a personalized treatment plan are definitely required."
+      },
+      {
+        q: "When is the best time for treatment?",
+        a: "The autumn-winter months are ideal for pigmentation treatment when sun intensity is lower. It can also be done in summer with increased sun protection, but the risk of re-pigmentation is higher."
+      },
+      {
+        q: "What should I do before and after the treatment?",
+        a: "Before treatment: avoid sun exposure and self-tanners for 2-4 weeks. After treatment: use sunscreen (SPF 50), avoid direct sunlight, don't scratch, and moisturize regularly. Our specialist will explain the exact protocol."
+      }
+    ]
+  }
+];
+
+// Color scheme for each category
+const categoryColors: Record<string, { primary: string; light: string; bg: string; shadow: string }> = {
+  'general': { primary: '#c53f75', light: '#e497a2', bg: '#fdf8f6', shadow: 'rgba(197, 63, 117, 0.15)' },
+  'laser-hair-removal': { primary: '#3b82f6', light: '#93c5fd', bg: '#eff6ff', shadow: 'rgba(59, 130, 246, 0.15)' },
+  'hydrabeauty': { primary: '#0d9488', light: '#5eead4', bg: '#f0fdfa', shadow: 'rgba(13, 148, 136, 0.15)' },
+  'tattoo-removal': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2', shadow: 'rgba(239, 68, 68, 0.15)' },
+  'permanent-makeup': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff', shadow: 'rgba(99, 102, 241, 0.15)' },
+  'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff', shadow: 'rgba(139, 92, 246, 0.15)' },
+  'pigmentation-removal': { primary: '#f59e0b', light: '#fcd34d', bg: '#fffbeb', shadow: 'rgba(245, 158, 11, 0.15)' },
+};
+
+// Generate FAQ Schema for SEO
+const allQuestions = faqCategories.flatMap(cat => cat.questions);
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": allQuestions.map(q => ({
+    "@type": "Question",
+    "name": q.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": q.a
+    }
+  }))
+};
+---
+
+<Layout lang="en" title="Frequently Asked Questions (FAQ) - Beautyflow Beauty Salon" description="Answers to the most frequently asked questions about laser hair removal, HydraBeauty facial, permanent makeup, and other cosmetic treatments.">
+  <!-- FAQ Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-8 lg:py-12 bg-gradient-to-br from-[#fdf8f6] via-white to-[#f8f4f9]">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-[#c53f75]/5 rounded-full blur-3xl animate-float"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#e497a2]/10 rounded-full blur-3xl animate-float-delayed"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="font-heading text-4xl lg:text-6xl text-gray-900 mb-6 animate-fade-in">
+          Frequently Asked <span class="text-[#c53f75]">Questions</span>
+        </h1>
+        <p class="text-lg text-gray-600 leading-relaxed animate-fade-in-delayed">
+          We have compiled the most frequently asked questions and answers about our treatments,
+          so you can find all the important information in one place.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Navigation -->
+  <section class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div class="container mx-auto px-4">
+      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:justify-center" id="faq-nav">
+        {faqCategories.map((category, index) => {
+          const colors = categoryColors[category.id];
+          return (
+          <button
+            class={`faq-nav-btn flex-shrink-0 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 transform hover:scale-105 cursor-pointer ${index === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md'}`}
+            style={index === 0 ? `background-color: ${colors.primary}; box-shadow: 0 10px 15px -3px ${colors.shadow}` : ''}
+            data-target={category.id}
+            data-color={colors.primary}
+            data-shadow={colors.shadow}
+          >
+            {category.title}
+          </button>
+        )})}
+      </nav>
+    </div>
+  </section>
+
+  <!-- FAQ Content -->
+  <section class="py-12 lg:py-20 bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc]">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        {faqCategories.map((category, catIndex) => {
+          const colors = categoryColors[category.id];
+          return (
+          <div
+            id={category.id}
+            class={`faq-category mb-16 scroll-mt-32 ${catIndex > 0 ? 'pt-12 border-t border-gray-200' : ''}`}
+            data-color={colors.primary}
+            data-shadow={colors.shadow}
+          >
+            <!-- Category Header -->
+            <div class="flex items-center gap-4 mb-10">
+              <div
+                class="category-icon w-16 h-16 rounded-xl flex items-center justify-center text-white shadow-xl transition-all duration-500 hover:scale-110 hover:rotate-3"
+                style={`background: linear-gradient(135deg, ${colors.primary}, ${colors.light}); box-shadow: 0 10px 25px -5px ${colors.shadow}`}
+              >
+                <span class="w-7 h-7" set:html={category.icon} />
+              </div>
+              <div>
+                <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">
+                  {category.title}
+                </h2>
+                <p class="text-sm text-gray-500 flex items-center gap-2">
+                  <span class="inline-block w-2 h-2 rounded-full animate-pulse" style={`background-color: ${colors.primary}`}></span>
+                  {category.questions.length} questions
+                </p>
+              </div>
+            </div>
+
+            <!-- Questions Accordion - Two Columns -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {category.questions.map((item, index) => (
+                <div
+                  class="faq-item group bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-xl shadow-md"
+                  style={`animation-delay: ${index * 50}ms; --accent-color: ${colors.primary}; --accent-bg: ${colors.bg}; --accent-shadow: ${colors.shadow}`}
+                  data-color={colors.primary}
+                >
+                  <button
+                    class="faq-question w-full text-left px-5 py-4 flex items-start justify-between gap-3 transition-colors duration-300 cursor-pointer"
+                    aria-expanded="false"
+                  >
+                    <span class="faq-question-text font-semibold text-gray-900 pr-2 text-base transition-colors duration-300">{item.q}</span>
+                    <span class="faq-icon flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110" style={`background-color: ${colors.bg}`}>
+                      <svg class="faq-icon-svg w-4 h-4 transition-transform duration-500" style={`color: ${colors.primary}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </span>
+                  </button>
+                  <div class="faq-answer">
+                    <div class="faq-answer-inner px-5 pb-5 text-gray-600 leading-relaxed text-sm">
+                      <p>{item.a}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )})}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-[#1a1a2e] to-[#2d2d44] relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute top-0 left-1/4 w-64 h-64 bg-[#c53f75]/20 rounded-full blur-3xl animate-float"></div>
+      <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-[#e497a2]/10 rounded-full blur-3xl animate-float-delayed"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-[768px] mx-auto text-center">
+        <h2 class="font-heading text-3xl lg:text-4xl text-white mb-4">
+          Didn't find your answer?
+        </h2>
+        <p class="text-gray-300 mb-8">
+          Book a free consultation, and we'll answer all your questions in person!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/en/free-consultation"
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 shadow-lg shadow-[#c53f75]/30 hover:shadow-xl hover:shadow-[#c53f75]/40 hover:-translate-y-1"
+          >
+            <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Request Free Consultation
+          </a>
+          <a
+            href="tel:+3613009414"
+            class="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-semibold uppercase text-sm rounded-full hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
+          >
+            <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            +36 1 300 9414
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Hide scrollbar for category nav */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Floating animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(-3deg); }
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 10s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  /* Fade in animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in-delayed {
+    animation: fadeIn 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  /* FAQ Answer slide animation - hidden by default */
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-answer-inner {
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.4s, opacity 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .faq-item.active .faq-answer-inner {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.3s ease 0.1s;
+  }
+
+  /* FAQ Item active state - uses CSS custom properties */
+  .faq-item.active {
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 40px var(--accent-shadow);
+    transform: translateY(-2px);
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+    background-color: var(--accent-color) !important;
+  }
+
+  .faq-item.active .faq-icon-svg {
+    color: white !important;
+  }
+
+  .faq-item.active .faq-question-text {
+    color: var(--accent-color);
+  }
+
+  /* Hover color change for question text */
+  .faq-item:hover .faq-question-text {
+    color: var(--accent-color);
+  }
+
+  .faq-item:hover .faq-icon {
+    background-color: var(--accent-bg) !important;
+  }
+
+  /* Smooth scroll padding for header */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Ripple effect on nav buttons */
+  .faq-nav-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-nav-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease-out;
+  }
+
+  .faq-nav-btn:active::after {
+    transform: scale(2);
+  }
+
+  /* Stagger animation for FAQ items */
+  .faq-item {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Category icon pulse */
+  .category-icon {
+    position: relative;
+  }
+
+  .category-icon::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(135deg, #c53f75, #e497a2);
+    border-radius: inherit;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+  }
+
+  .category-icon:hover::before {
+    opacity: 0.3;
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.3; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+</style>
+
+<script>
+  function initFAQ() {
+    // Accordion functionality with smooth animation
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach((item, idx) => {
+      // Set stagger animation delay
+      (item as HTMLElement).style.animationDelay = `${idx * 30}ms`;
+
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+
+      question?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+
+        // Close all other items in the same category
+        const parentCategory = item.closest('.faq-category');
+        parentCategory?.querySelectorAll('.faq-item.active').forEach(activeItem => {
+          if (activeItem !== item) {
+            activeItem.classList.remove('active');
+            activeItem.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Toggle current item
+        item.classList.toggle('active');
+        question.setAttribute('aria-expanded', (!isActive).toString());
+      });
+    });
+
+    // Category navigation with smooth scroll
+    const navButtons = document.querySelectorAll('.faq-nav-btn');
+    const categories = document.querySelectorAll('.faq-category');
+
+    // Helper to set nav button active state with dynamic color
+    function setNavButtonActive(btn: Element, isActive: boolean) {
+      const color = btn.getAttribute('data-color');
+      const shadow = btn.getAttribute('data-shadow');
+      const htmlBtn = btn as HTMLElement;
+
+      if (isActive) {
+        htmlBtn.style.backgroundColor = color || '#6366f1';
+        htmlBtn.style.boxShadow = `0 10px 15px -3px ${shadow || 'rgba(99, 102, 241, 0.15)'}`;
+        btn.classList.add('text-white', 'shadow-lg');
+        btn.classList.remove('bg-gray-100', 'text-gray-600');
+      } else {
+        htmlBtn.style.backgroundColor = '';
+        htmlBtn.style.boxShadow = '';
+        btn.classList.remove('text-white', 'shadow-lg');
+        btn.classList.add('bg-gray-100', 'text-gray-600');
+      }
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const targetCategory = document.getElementById(targetId || '');
+
+        if (targetCategory) {
+          targetCategory.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Update active nav button with animation
+        navButtons.forEach(b => setNavButtonActive(b, b === btn));
+      });
+    });
+
+    // Update nav on scroll with Intersection Observer
+    const observerOptions = {
+      rootMargin: '-150px 0px -50% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navButtons.forEach(btn => {
+            const isTarget = btn.getAttribute('data-target') === id;
+            setNavButtonActive(btn, isTarget);
+          });
+        }
+      });
+    }, observerOptions);
+
+    categories.forEach(category => observer.observe(category));
+
+    // Add entrance animation to FAQ items when they come into view
+    const itemObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-visible');
+          itemObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    faqItems.forEach(item => itemObserver.observe(item));
+  }
+
+  document.addEventListener('DOMContentLoaded', initFAQ);
+  document.addEventListener('astro:page-load', initFAQ);
+</script>

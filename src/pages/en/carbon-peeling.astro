@@ -1,83 +1,113 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LocationsSection from '../components/LocationsSection.astro';
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import LocationsSection from '../../components/LocationsSection.astro';
+
+// Import images
+import carbonPeelingFo from '../../assets/images/carbon-peeling-fo.jpg';
+import carbonPeelingArchamlasztas from '../../assets/images/carbon-peeling-archamlasztas.jpg';
+import carbonPeelingLezeres from '../../assets/images/carbon-peeling-lezeres.jpg';
+import carbonPeelingMb from '../../assets/images/carbon-peeling-mb.jpg';
+import carbonPeelingTetovalas from '../../assets/images/carbon-peeling-tetovalas.webp';
+import szemoldokSminktetovalas from '../../assets/images/szemoldok-sminktetovalas.jpg';
+import hydrabeautyArckezelesBeautyflow from '../../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
+import depositphotosCarbonNanogel from '../../assets/images/depositphotos-carbon-nanogel.jpg';
+import carbonPeelingHatter from '../../../public/images/carbon-peeling-hatter.webp';
+import konyaFanniSzepsegszalon from '../../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import konyaFanniSzepsegszalonja from '../../assets/images/konya-fanni-szepsegszalonja.jpg';
+import notinoIkon from '../../assets/images/notino-ikon.png';
+import googleLogo from '../../assets/images/google-logo.jpg';
+import higienia from '../../assets/images/higienia.jpg';
+import testmeret from '../../assets/images/testmeret.jpg';
+import nyitva from '../../assets/images/nyitva.jpg';
+import notinoLogoSm from '../../assets/images/logok/notino-logo-sm.jpg';
+import skinlab from '../../assets/images/logok/skinlab.webp';
+
+const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
+const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
 const stats = [
-  { value: '10+ év', label: 'tapasztalat' },
-  { value: '60-120', label: 'perces kezelés' },
-  { value: '100%', label: 'elégedett vendég' },
-  { value: '0', label: 'fájdalom' },
+  { value: '10+ years', label: 'experience' },
+  { value: '60 min', label: 'treatment duration' },
+  { value: '100%', label: 'satisfied clients' },
+  { value: '1x', label: 'visible results' },
 ];
 
 const testimonials = [
   {
-    text: 'A HydraBeauty kezelés után a bőröm annyira puha és ragyogó lett, hogy smink nélkül mentem el dolgozni másnap. Imádom!',
-    author: 'Eszter',
+    text: 'Very kind, friendly, quality work, the salon is beautiful, clean, comfortably furnished, absolutely positive experience!',
+    author: 'Blanka',
   },
   {
-    text: 'Évek óta küzdöttem a mitesszerekkel. Már az első kezelés után óriási különbséget láttam. Visszajáró vendég lettem!',
-    author: 'Petra',
+    text: 'Beautiful, tasteful, clean salon. The girls are very kind and meticulous about their work. I can only recommend them!',
+    author: 'Barbara Czar',
   },
   {
-    text: 'Nagyon relaxáló volt a kezelés, és az eredmény fantasztikus. A bőröm olyan friss, mint évekkel ezelőtt.',
-    author: 'Anita',
+    text: 'I wholeheartedly recommend Fanni and her team. Everyone is very professional and kind. It was the best decision to visit the salon.',
+    author: 'Anita Lazar',
   }
 ];
 
-// HydroFacial prices
-const hydrofacialAreas = [
-  { id: 'arc', name: 'Arc', duration: '60 perc', price: 20000 },
-  { id: 'hat', name: 'Hát', duration: '90 perc', price: 25000 },
-  { id: 'arc-nyak-dekoltazs', name: 'Arc + nyak + dekoltázs', duration: '100 perc', price: 30000 },
+const singlePrices = [
+  { area: 'Pigment spot removal', price: '10,000 Ft' },
+  { area: 'Back of hands (both)', price: '15,000 Ft' },
+  { area: 'Armpit lightening (both)', price: '15,000 Ft' },
+  { area: 'Eyebrows', price: '15,000 Ft' },
+  { area: 'Full face', price: '25,000 Ft' },
+  { area: 'Decolletage', price: '25,000 Ft' },
+  { area: 'Full back', price: '35,000 Ft' },
 ];
 
-// HydroFacial + Carbon Peeling prices
-const hydrofacialCarbonAreas = [
-  { id: 'arc', name: 'Arc', duration: '100 perc', price: 40000 },
-  { id: 'arc-dekoltazs', name: 'Arc + dekoltázs', duration: '120 perc', price: 45000 },
-  { id: 'hat', name: 'Hát', duration: '120 perc', price: 45000 },
+const packages = [
+  { area: 'Full face', originalPrice: '125,000', price: '100,000 Ft', discount: '-20%' },
+  { area: 'Decolletage', originalPrice: '125,000', price: '100,000 Ft', discount: '-20%' },
+  { area: 'Full face + neck + decolletage', originalPrice: '200,000', price: '160,000 Ft', discount: '-20%' },
+  { area: 'Full back', originalPrice: '175,000', price: '140,000 Ft', discount: '-20%' },
+  { area: 'Back of hands (both)', originalPrice: '75,000', price: '60,000 Ft', discount: '-20%' },
+  { area: 'Armpit lightening (both)', originalPrice: '75,000', price: '60,000 Ft', discount: '-20%' },
 ];
 
 const howItWorks = [
   {
     number: '1.',
-    title: 'Bőranalízis és tisztítás',
-    description: 'A kezelés előtt alaposan megvizsgáljuk a bőröd állapotát és eltávolítjuk a sminket. Ez segít meghatározni, mely területekre kell fokozottan figyelni.'
+    title: 'Free consultation',
+    description: 'First, we discuss your skin\'s needs and plan the most beneficial treatment for you. We\'ll show you how carbon peeling works and what results you can expect.'
   },
   {
     number: '2.',
-    title: 'Mélytisztítás és hámlasztás',
-    description: 'Vákuumos technológiával kíméletesen eltávolítjuk az elhalt hámsejteket és a szennyeződéseket a pórusokból. Ez fájdalommentes, de rendkívül hatékony.'
+    title: 'Preparation',
+    description: 'A special carbon paste is applied to the skin, which penetrates deep into the pores. This serves as a conductor for the laser and helps regulate sebum production.'
   },
   {
     number: '3.',
-    title: 'Hidratálás és hatóanyag-bevitel',
-    description: 'Speciális szérumokat juttatunk a bőr mélyebb rétegeibe: hialuronsav, antioxidánsok és vitaminok töltik fel és táplálják a bőrt.'
+    title: 'Laser treatment',
+    description: 'The laser breaks down the carbon paste with micro-pulses, removing impurities and dead skin cells. The treatment tightens pores, reduces inflammation, and fades pigment spots.'
   },
   {
     number: '4.',
-    title: 'Lezárás és védelem',
-    description: 'A kezelést hidratáló maszkkal és fényvédővel zárjuk, hogy a bőröd védett és ápoltan indulhasson. Az eredmény azonnal látható!'
+    title: 'Immediate results',
+    description: 'After just the first treatment, your skin will be fresher, smoother, and more radiant. Pores shrink, skin texture visibly improves, and sebum production normalizes, quickly achieving the "glass skin" effect.'
   }
 ];
 
 const faqs = [
-  { question: 'Mennyire fájdalmas a HydraBeauty kezelés?', answer: 'A kezelés teljesen fájdalommentes! Sokan kellemes, relaxáló élménynek tartják. A vákuumos tisztítás enyhe szívó érzéssel jár, de ez egyáltalán nem kellemetlen.' },
-  { question: 'Kinek ajánlott a HydraBeauty?', answer: 'Mindenkinek! Zsíros, aknés, száraz, érzékeny vagy érett bőrre egyaránt alkalmas. A kezelést mindig személyre szabjuk a bőrtípusodnak megfelelően.' },
-  { question: 'Milyen gyakran érdemes ismételni?', answer: 'Optimális eredményért havonta 1-2 alkalommal javasolt. Speciális bőrproblémák esetén kezdetben sűrűbben, majd fenntartó kezelésként ritkábban.' },
-  { question: 'Van-e leállási idő a kezelés után?', answer: 'Nincs! A HydraBeauty után azonnal visszatérhetsz a mindennapokhoz. Sőt, a bőröd olyan szép lesz, hogy akár smink nélkül is mehetsz bárhova.' },
-  { question: 'Sminkelhetek a kezelés után?', answer: 'Igen, de javasoljuk, hogy hagyd pihenni a bőröd legalább pár órán át. A tiszta, ragyogó bőrnek amúgy sem lesz szüksége sok sminkre!' },
-  { question: 'Miben különbözik más arckezelésektől?', answer: 'A HydraBeauty egyedülálló módon kombinálja a mélytisztítást, hámlasztást és hidratálást egyetlen kezelésben. Nincs bőrirritáció, nincs pirosság, csak azonnali eredmény.' },
-  { question: 'Terhesség alatt végezhető a kezelés?', answer: 'Igen, a HydraBeauty terhesség alatt is biztonságos, mivel kíméletes és nem tartalmaz agresszív vegyszereket. Természetesen egyeztesd kezelőorvosodddal.' },
-  { question: 'Mennyire tartós az eredmény?', answer: 'Az azonnali ragyogás 1-2 hétig látványos. Rendszeres kezeléssel a bőr állapota folyamatosan javul, és hosszú távon is megőrizheted az eredményt.' },
-  { question: 'Mi történik, ha érzékeny a bőröm?', answer: 'A HydraBeauty kifejezetten kíméletes, érzékeny bőrre is tökéletes! A kezelést mindig a bőrtípusodhoz igazítjuk, és kizárólag prémium, bőrbarát termékeket használunk.' },
-  { question: 'Kombinálható más kezelésekkel?', answer: 'Igen! A HydraBeauty kiválóan kombinálható Carbon Peelinggel a még látványosabb eredményért. Kérdezd meg szakemberünket az optimális kombinációról.' },
+  { question: 'How painful is Carbon Peeling?', answer: 'The treatment is almost completely painless. Most of our clients only feel mild warmth and tingling during the laser application.' },
+  { question: 'Who is Carbon Peeling recommended for?', answer: 'It\'s ideal for those with oily, acne-prone, large-pored, pigmented, or dull skin. It\'s also excellent for skin rejuvenation and improving skin tone.' },
+  { question: 'How many treatments are needed for visible results?', answer: 'Results are visible after just the first treatment! For optimal effects, 4-6 treatments are recommended at 2-4 week intervals.' },
+  { question: 'What about aftercare?', answer: 'No special aftercare is required after the treatment. It\'s recommended to avoid strong sunlight and saunas for 48 hours.' },
+  { question: 'Can I wear makeup after the treatment?', answer: 'Yes, you can apply makeup immediately after the treatment. In fact, makeup looks even better on the smooth, clean skin!' },
+  { question: 'Is there any downtime?', answer: 'None! Carbon Peeling is a "lunchtime treatment" - you can return to your daily activities immediately with no visible redness or peeling.' },
+  { question: 'Can the treatment be done during pregnancy?', answer: 'Carbon Peeling treatment is not recommended during pregnancy and breastfeeding.' },
+  { question: 'How often can it be repeated?', answer: 'The treatment can be repeated every 2-4 weeks. Once a month is sufficient for maintenance treatments.' },
+  { question: 'How does it differ from other exfoliating treatments?', answer: 'Carbon Peeling is gentle, there\'s no peeling period, and results are visible from the very first session. The laser not only cleanses but also stimulates collagen production.' },
+  { question: 'Is it suitable for sensitive skin?', answer: 'Yes, Carbon Peeling is particularly gentle and can be used on sensitive skin. We assess your skin condition during the consultation.' },
 ];
 ---
 
 <Layout
-  title="HydraBeauty Arckezelés Budapest - Mélytisztítás és Hidratálás | Beautyflow"
-  description="Professzionális HydraBeauty arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás egyetlen kezelés során. Azonnali eredmény! Kérj ingyenes konzultációt!"
+  lang="en"
+  title="Carbon Peeling Facial Treatment Budapest - Glass Skin Treatment | Beautyflow"
+  description="Revolutionary Carbon Peeling treatment in Budapest. Laser skin cleansing and rejuvenation with a 60-minute luxury program. Glass skin effect from the very first session. Request a free consultation!"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -97,17 +127,17 @@ const faqs = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": "HydraBeauty Arckezelés",
-    "name": "HydraBeauty Arckezelés Budapest",
-    "description": "Professzionális HydraBeauty arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás.",
+    "serviceType": "Carbon Peeling",
+    "name": "Carbon Peeling Facial Treatment Budapest",
+    "description": "Revolutionary Carbon Peeling treatment in Budapest. Laser skin cleansing and rejuvenation with a 60-minute luxury program.",
     "provider": {
       "@type": "LocalBusiness",
-      "name": "Beautyflow Szépségszalon",
+      "name": "Beautyflow Beauty Salon",
       "image": "https://beautyflow.hu/images/beautyflow-logo.png",
       "address": [
         {
           "@type": "PostalAddress",
-          "streetAddress": "Vegyész u. 1.",
+          "streetAddress": "Vegyesz u. 1.",
           "addressLocality": "Budapest",
           "postalCode": "1116",
           "addressCountry": "HU"
@@ -129,14 +159,14 @@ const faqs = [
     },
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "HydraBeauty szolgáltatások",
-      "itemListElement": hydrofacialAreas.map(item => ({
+      "name": "Carbon Peeling Services",
+      "itemListElement": singlePrices.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": `HydraBeauty - ${item.name}`
+          "name": `Carbon Peeling - ${item.area}`
         },
-        "price": item.price.toString(),
+        "price": item.price.replace(/[^0-9]/g, ''),
         "priceCurrency": "HUF"
       }))
     }
@@ -154,36 +184,36 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} loading="eager" />
                 </div>
               </div>
             </div>
             <div class="text-left">
               <div class="flex items-center gap-1">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Díjnyertes szalon</span>
+                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Award-winning salon</span>
               </div>
-              <span class="text-sm font-bold text-[#c53f75]">Notino "Hónap Szalonja"</span>
+              <span class="text-sm font-bold text-[#c53f75]">Notino "Salon of the Month"</span>
             </div>
           </div>
 
           <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2">
-            HydraBeauty arckezelés Budapesten
+            Carbon Peeling Facial Treatment in Budapest
           </h1>
           <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight">
-            Legyen fiatalos és ragyogó az arcbőröd fájdalom és tűszúrás nélkül
+            Revolutionary skin cleansing and rejuvenation with laser
           </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Unod, hogy a smink csak elrejti a fáradtságot? A HydraBeauty kezelés mélyen tisztít, hidratál és feltölti a bőröd – már az első alkalom után látványos változást hoz.
+            Oily, acne-prone, large-pored, or dull skin? Treat yourself to our brand new gentle yet highly effective exfoliation method
           </p>
 
           <!-- CTA row -->
           <div class="flex flex-col items-center justify-center gap-2">
             <a
-              href="/ingyenes-konzultacio"
+              href="/en/free-consultation"
               class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm lg:text-base"
             >
-              Foglalj időpontot most!
+              Book an appointment now!
             </a>
             <a
               href="tel:+3613009414"
@@ -200,17 +230,21 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <img
-          src="/images/hydrabeauty-arckezeles.jpg"
-          alt="HydraBeauty arckezelés Budapest"
+        <Image
+          src={carbonPeelingFo}
+          alt="Carbon Peeling Budapest"
           class="w-full h-full object-cover"
+          loading="eager"
+          fetchpriority="high"
+          format="webp"
+          quality={80}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="eager" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -220,7 +254,7 @@ const faqs = [
                   ))}
                 </div>
               </div>
-              <p class="text-[9px] lg:text-[11px] text-gray-600">Google értékelés alapján</p>
+              <p class="text-[9px] lg:text-[11px] text-gray-600">Based on Google reviews</p>
             </div>
           </div>
         </div>
@@ -252,10 +286,13 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
-              alt="Kónya Fanni HydraBeauty szakértő"
+            <Image
+              src={konyaFanniSzepsegszalon}
+              alt="Fanni Konya Carbon Peeling expert"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -265,21 +302,21 @@ const faqs = [
                 </svg>
               </div>
               <div class="leading-tight">
-                <p class="text-[#c53f75] font-semibold text-sm mb-0">Kónya Fanni</p>
-                <p class="text-gray-500 text-xs mb-0">ügyvezető</p>
+                <p class="text-[#c53f75] font-semibold text-sm mb-0">Fanni Konya</p>
+                <p class="text-gray-500 text-xs mb-0">CEO</p>
               </div>
             </div>
           </div>
           <!-- Text content -->
           <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              Ha reggelente úgy érzed, hogy hiába kened fel a legjobb krémet vagy alapozót, a bőröd fakónak, fáradtnak tűnik, akkor pontosan tudod, milyen bosszantó, amikor semmi nem hozza meg azt az üdeséget, amit szeretnél. <strong>A mitesszerek, tág pórusok vagy apró ráncok még inkább elvehetik az önbizalmad.</strong>
+              No matter how much you cleanse and care for your skin, do blackheads and stubborn pores keep reappearing? It's not your fault - your skin simply needs a deeper cleanse.
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              A HydraBeauty kezelés pont erre nyújt megoldást: fájdalom nélkül tisztítja ki a pórusokat, hidratálja a bőrt és speciális hatóanyagokkal tölti fel, hogy <strong>azonnal frissebb, ragyogóbb és feszesebb legyen az arcod</strong>. Már az első alkalom után látni és érezni fogod a különbséget – a bőröd simább, puhább, fiatalosabb lesz.
+              Carbon Peeling helps with this: the combination of activated carbon and laser effectively frees your pores from impurities while stimulating collagen production. The result? <strong>Fresh, smooth, and firmer skin</strong> that looks visibly more vibrant from the very first session.
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>Ha zsíros az arcbőröd, folyamatosan harcolsz a mitesszerekkel, a tág pórusokkal, vagy csak szeretnéd megőrizni bőröd fiatalságát és egészségét, a HydraBeauty kezelést neked találták ki!</strong>
+              <strong>If you're tired of dull, problematic skin and want to finally look in the mirror with confidence, Carbon Peeling treatment at Beautyflow salon is your solution.</strong>
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -289,8 +326,8 @@ const faqs = [
                 </svg>
               </div>
               <div class="leading-tight">
-                <p class="text-[#c53f75] font-semibold mb-0">Kónya Fanni</p>
-                <p class="text-gray-500 text-sm mb-0">ügyvezető</p>
+                <p class="text-[#c53f75] font-semibold mb-0">Fanni Konya</p>
+                <p class="text-gray-500 text-sm mb-0">CEO</p>
               </div>
             </div>
           </div>
@@ -299,133 +336,122 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Benefits Section 1: Fiatalabb arcbőr - Image left, Text right -->
+  <!-- Benefits Section 1: Guaranteed glass skin - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
-          alt="Fiatalabb arcbőr HydraBeauty kezeléssel"
+        <Image
+          src={hydrabeautyArckezelesBeautyflow}
+          alt="Guaranteed glass skin with Carbon Peeling"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Fiatalabb arcbőr tűszúrás nélkül
+            Guaranteed glass skin
           </h2>
           <p class="text-gray-700 mb-6">
-            A HydraBeauty kezelés a modern bőrápolás egyik legnépszerűbb arckezelése, amely <strong>mélytisztítást, hidratálást és bőrmegújítást kínál egyetlen, kíméletes kezelés során</strong>. Ez a fájdalommentes, relaxáló eljárás minden bőrtípusra ajánlott, és már az első alkalom után látványos eredményt nyújt.
+            With our special carbon paste treatment, we achieve not only tattoo fading but also skin rejuvenation. The laser <strong>regulates sebum production, tightens pores, smooths fine lines</strong>, fades pigment spots, and guarantees a radiant "glass skin" effect.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 2: Mélytisztítás - Text left, Image right -->
+  <!-- Benefits Section 2: Double-length treatment - Text left, Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Mélytisztítás, amire a bőröd vágyik
+            Double-length treatment for the price of one
           </h2>
           <p class="text-gray-700 mb-6">
-            Vákuumos technológiával kíméletesen, mégis alaposan eltávolítjuk az elhalt hámsejteket és a szennyeződéseket, így <strong>a bőröd fellélegzik, a pórusok kitisztulnak</strong>, és végre nem kell állandóan a mitesszerekkel küzdened.
+            Carbon peeling treatment is a simple 30-minute routine in most places. At Beautyflow, we combine carbon peeling with <strong>German medical-grade creams and a 60-minute cosmetic program</strong>, so your skin not only becomes cleaner and smoother but also receives extra care with every session.
           </p>
           <div class="text-center">
             <a
-              href="/ingyenes-konzultacio"
+              href="/en/free-consultation"
               class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
             >
-              Kérj Ingyenes konzultációt
+              Request a Free Consultation
             </a>
           </div>
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/szemhej-tetovalas-smink.jpg"
-          alt="HydraBeauty mélytisztítás"
+        <Image
+          src={carbonPeelingLezeres}
+          alt="60-minute Carbon Peeling treatment"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 3: Hidratálás - Image left, Text right -->
+  <!-- Benefits Section 3: Addictive - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-ranctalanitas.jpg"
-          alt="HydraBeauty ránctalanítás"
+        <Image
+          src={carbonPeelingArchamlasztas}
+          alt="Carbon Peeling results"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            A bőröd nem öreg – csak szomjazik
+            Warning: once you try it, you'll be hooked!
           </h2>
           <p class="text-gray-700 mb-6">
-            Speciális szérumok segítségével feltöltjük a bőrt nedvességgel, ezáltal rugalmassá és üdévé tesszük, így <strong>a fakó, száraz bőr helyett friss, puha és élettel teli arcbőrt</strong> láthatsz a tükörben.
+            Our experience shows that Carbon Peeling is so visible, effective, and comfortable that those who try it once <strong>wonder how they ever lived without it</strong>.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Benefits Section 4: Vitaminok - Text left, Image right -->
+  <!-- Benefits Section 4: Revive permanent makeup - Text left, Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-5 lg:px-[10%] text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            A bőröd számára fontos "vitaminok"
+            Revive your permanent makeup
           </h2>
           <p class="text-gray-700 mb-6">
-            Ahogyan a testednek vitaminokra van szüksége, úgy a bőrödnek is megvannak azok a célzott hatóanyagai, amelyeket a bőr mélyebb rétegeibe juttatva segítenek a <strong>bőr regenerálásában és feszesítésében</strong>, ezért a finom ráncok halványodnak, a bőr tónusa egyenletesebb lesz, és látványosan fiatalabbnak tűnik.
-          </p>
-        </div>
-      </div>
-      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
-          alt="HydraBeauty vitaminok"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- Benefits Section 5: Azonnali hatás - Image left, Text right -->
-  <section class="section-animate">
-    <div class="flex flex-col lg:flex-row">
-      <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty.jpg"
-          alt="HydraBeauty azonnali eredmény"
-          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-        />
-      </div>
-      <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
-        <div class="px-5 lg:px-[10%] text-left">
-          <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Azonnali hatás
-          </h2>
-          <p class="text-gray-700 mb-6">
-            A kezelés után a bőr azonnal látványosan simább, frissebb és élettel telibb lesz, így <strong>akár smink nélkül is magabiztosan indulhatsz el otthonról</strong> – hiszen a természetes szépséged kerül előtérbe.
+            We can bring faded eyebrows back to life in just one session. <strong>By fading permanent makeup, you get a more natural, fresher appearance</strong> - scar-free and safely.
           </p>
           <div class="text-center">
             <a
-              href="/ingyenes-konzultacio"
+              href="/en/free-consultation"
               class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
             >
-              Kérj Ingyenes konzultációt
+              Request a Free Consultation
             </a>
           </div>
         </div>
+      </div>
+      <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
+        <Image
+          src={szemoldokSminktetovalas}
+          alt="Permanent makeup refresh with Carbon Peeling"
+          class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
       </div>
     </div>
   </section>
@@ -434,47 +460,48 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        HydraBeauty Árak
+        Carbon Peeling Prices
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Válaszd ki a számodra megfelelő kezelést és területet
+        Choose the area and treatment package that suits you best
       </p>
 
       <div class="flex flex-col lg:flex-row gap-8 items-stretch">
-        <!-- HydroFacial -->
+        <!-- Single Treatments -->
         <div class="lg:w-1/2 flex flex-col">
-          <h3 class="font-heading text-xl text-gray-900 mb-2 uppercase text-center">HydroFacial</h3>
-          <p class="text-gray-500 text-sm text-center mb-6">Mélytisztító és hidratáló arckezelés</p>
+          <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Per session</h3>
 
+          <!-- Price List -->
           <div class="space-y-3 flex-1 flex flex-col justify-center">
-            {hydrofacialAreas.map((item) => (
+            {singlePrices.map((item) => (
               <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
                 <div class="flex justify-between items-center">
-                  <div>
-                    <span class="text-gray-800 font-medium block">{item.name}</span>
-                    <span class="text-gray-500 text-sm">{item.duration}</span>
-                  </div>
-                  <span class="text-[#c53f75] font-bold text-lg whitespace-nowrap">{item.price.toLocaleString('hu-HU')} Ft</span>
+                  <span class="text-gray-800 font-medium">{item.area}</span>
+                  <span class="text-[#c53f75] font-bold text-lg">{item.price}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <!-- HydroFacial + Carbon Peeling -->
+        <!-- Packages -->
         <div class="lg:w-1/2 flex flex-col">
-          <h3 class="font-heading text-xl text-gray-900 mb-2 uppercase text-center">HydroFacial + Carbon Peeling</h3>
-          <p class="text-gray-500 text-sm text-center mb-6">Komplex kezelés bőrfiatalítással</p>
+          <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
+            Packages <span class="text-[#c53f75]">(5 sessions)</span>
+          </h3>
 
           <div class="space-y-3 flex-1 flex flex-col justify-center">
-            {hydrofacialCarbonAreas.map((item) => (
+            {packages.map((pkg) => (
               <div class="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
                 <div class="flex justify-between items-center">
                   <div>
-                    <span class="text-white font-medium block">{item.name}</span>
-                    <span class="text-white/70 text-sm">{item.duration}</span>
+                    <span class="text-white font-medium block">{pkg.area}</span>
+                    <span class="text-white/70 text-sm line-through">instead of {pkg.originalPrice} Ft</span>
                   </div>
-                  <span class="text-white font-bold text-lg whitespace-nowrap">{item.price.toLocaleString('hu-HU')} Ft</span>
+                  <div class="text-right">
+                    <span class="text-white font-bold text-lg block">{pkg.price}</span>
+                    <span class="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-0.5 rounded">{pkg.discount}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -484,10 +511,10 @@ const faqs = [
 
       <div class="mt-10 text-center">
         <a
-          href="/ingyenes-konzultacio"
+          href="/en/free-consultation"
           class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
-          Foglalj időpontot
+          Book an appointment
         </a>
       </div>
     </div>
@@ -497,19 +524,25 @@ const faqs = [
   <section class="how-it-works-section relative overflow-hidden">
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
-        alt="HydraBeauty kezelés folyamata"
+      <Image
+        src={carbonPeelingHatter}
+        alt="Carbon Peeling treatment process"
         class="w-full h-64 object-cover object-top"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
     </div>
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
+      <Image
+        src={carbonPeelingHatter}
         alt=""
         class="w-full h-full object-cover object-[center_30%]"
+        format="webp"
+        quality={80}
+        loading="lazy"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
@@ -520,7 +553,7 @@ const faqs = [
     <div class="relative z-10 py-12 lg:py-16">
       <div class="max-w-[1200px] mx-auto px-4">
         <h2 class="font-heading text-3xl lg:text-4xl text-[#1e3a5f] mb-10 text-center uppercase">
-          Hogyan működik?
+          How Does It Work?
         </h2>
 
         <div class="flex flex-col lg:flex-row gap-8">
@@ -567,16 +600,19 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
-              alt="Kónya Fanni konzultáció"
+            <Image
+              src={konyaFanniSzepsegszalon}
+              alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
-                Kónya Fanni<br />
-                <span class="text-sm text-gray-500 font-normal">ügyvezető</span>
+                Fanni Konya<br />
+                <span class="text-sm text-gray-500 font-normal">CEO</span>
               </p>
             </div>
           </div>
@@ -584,26 +620,26 @@ const faqs = [
           <!-- Content Column -->
           <div class="lg:w-1/2 p-6 lg:p-8 flex flex-col justify-center">
             <h2 class="font-heading text-xl lg:text-2xl text-gray-900 mb-4 uppercase leading-tight font-bold text-center">
-              Igényeld az ingyenes<br />konzultációdat!
+              Request your free<br />consultation!
             </h2>
 
             <p class="text-gray-700 mb-2 text-sm">
-              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a HydraBeauty kezelésbe!</span>
+              <span class="font-semibold">Let's talk before you start your Carbon Peeling treatment!</span>
             </p>
             <p class="text-gray-600 mb-3 text-sm">
-              Egy kb. 15 perc hosszú INGYENES alkalom során megbeszéljük, hogy
+              During a FREE 15-minute session, we'll discuss:
             </p>
 
             <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
-              <li>milyen bőrproblémákat szeretnél kezelni</li>
-              <li>melyik HydraBeauty csomag a legjobb neked</li>
-              <li>érdemes-e kombinálni más kezelésekkel</li>
-              <li>milyen azonnali és hosszú távú eredményre számíthatsz</li>
+              <li>what skin problems you want to address</li>
+              <li>how many treatments are recommended for your desired results</li>
+              <li>which areas are worth treating (face, decolletage, back)</li>
+              <li>what immediate and long-term results you can expect</li>
             </ul>
 
             <div class="text-center">
               <p class="text-gray-600 mb-1 text-sm">
-                Kérd az ingyenes konzultációt telefonon az alábbi számon
+                Request a free consultation by phone at
               </p>
               <a
                 href="tel:+3613009414"
@@ -611,12 +647,12 @@ const faqs = [
               >
                 +36 1 300 9414
               </a>
-              <p class="text-gray-500 mb-3 text-sm">vagy</p>
+              <p class="text-gray-500 mb-3 text-sm">or</p>
               <a
-                href="/ingyenes-konzultacio"
+                href="/en/free-consultation"
                 class="inline-block px-6 py-2 bg-[#c53f75] text-white font-semibold uppercase text-xs tracking-wide hover:bg-[#a33460] transition-colors rounded-full"
               >
-                Kérj Ingyenes konzultációt
+                Request a Free Consultation
               </a>
             </div>
           </div>
@@ -629,7 +665,7 @@ const faqs = [
   <section class="py-16 bg-[#f8f8f8]">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
-        Vendégeink mondták
+        What Our Clients Say
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
@@ -647,10 +683,13 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src="/images/google-logo.jpg"
+              <Image
+                src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
+                width={28}
+                height={28}
+                loading="lazy"
               />
             </div>
           </div>
@@ -663,14 +702,14 @@ const faqs = [
   <section class="py-12 bg-gray-50">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl text-gray-900 mb-8 text-center uppercase">
-        Partnereink
+        Our Partners
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
         </div>
       </div>
     </div>
@@ -680,111 +719,129 @@ const faqs = [
   <section class="py-16 bg-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért a Beautyflow HydraBeauty kezelést válaszd?
+        Why Choose Beautyflow Carbon Peeling?
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Több mint egy évtizedes tapasztalattal és prémium technológiával garantáljuk a ragyogó eredményt.
+        With over a decade of experience and premium technology, we guarantee radiant results.
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Prémium technológia -->
+        <!-- 60-minute treatment -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/mesterseges-intelligencia-szortelenito-gep.jpg"
-              alt="HydraBeauty prémium technológia"
+            <Image
+              src={carbonPeelingArchamlasztas}
+              alt="60-minute Carbon Peeling treatment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Prémium technológia</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">60-minute luxury treatment</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              A legújabb generációs HydraBeauty géppel dolgozunk, amely kíméletesen, de hatékonyan tisztítja és hidratálja a bőröd.
+              While Carbon Peeling takes 30 minutes elsewhere, we dedicate double the time to you, supplemented with German medical-grade creams for maximum results.
             </p>
           </div>
         </div>
 
-        <!-- Személyre szabott kezelés -->
+        <!-- Immediate results -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/testmeret.jpg"
-              alt="Személyre szabott HydraBeauty"
+            <Image
+              src={carbonPeelingLezeres}
+              alt="Immediate Carbon Peeling results"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Személyre szabott kezelés</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Immediate, visible results</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Minden HydraBeauty kezelést a te bőrtípusodhoz és igényeidhez igazítunk. Nincs két egyforma kezelés!
+              The difference is noticeable after just the first treatment: smaller pores, smoother skin surface, and more radiant complexion - all without downtime.
             </p>
           </div>
         </div>
 
-        <!-- Relaxáló élmény -->
+        <!-- Friendly atmosphere -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/konya-fanni-szepsegszalonja.jpg"
-              alt="Beautyflow relaxáló légkör"
+            <Image
+              src={konyaFanniSzepsegszalonja}
+              alt="Beautyflow salon friendly atmosphere"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Relaxáló élmény</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Comfortable, relaxing experience</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              A HydraBeauty nálunk nem csak kezelés, hanem igazi wellness élmény. Kávéval és teljes figyelemmel várunk.
+              Carbon Peeling with us is not just a treatment but a true relaxation experience. We welcome you with coffee and pleasant conversation so you can truly unwind.
             </p>
           </div>
         </div>
 
-        <!-- Orvosi tisztaság -->
+        <!-- Medical cleanliness -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/higienia.jpg"
-              alt="Steril HydraBeauty környezet"
+            <Image
+              src={higienia}
+              alt="Sterile Carbon Peeling environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Orvosi szintű tisztaság</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Medical-grade cleanliness</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Prémium, EU-bevizsgált szérumokat használunk, és orvosi tisztaságú környezetet biztosítunk minden kezeléshez.
+              We provide premium quality, EU-certified products and a medical-grade clean environment for every Carbon Peeling treatment.
             </p>
           </div>
         </div>
 
-        <!-- Azonnali eredmény -->
+        <!-- For all skin types -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/hydrabeauty-arckezeles.jpg"
-              alt="HydraBeauty azonnali eredmény"
+            <Image
+              src={testmeret}
+              alt="Personalized Carbon Peeling"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Azonnali, látványos eredmény</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Personalized protocol</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Már az első kezelés után észrevehető a különbség: tisztább pórusok, hidratált bőr és ragyogó arctónus.
+              Whether your skin is oily, dry, acne-prone, or sensitive - we customize the treatment specifically for your skin type and concerns.
             </p>
           </div>
         </div>
 
-        <!-- Heti 7 napos nyitvatartás -->
+        <!-- 7-day opening hours -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/nyitva.jpg"
-              alt="Heti 7 napos nyitvatartás"
+            <Image
+              src={nyitva}
+              alt="Open 7 days a week"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              format="webp"
+              quality={80}
+              loading="lazy"
             />
           </div>
           <div class="p-5">
-            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Heti 7 napos nyitvatartás</h3>
+            <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Open 7 days a week</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Hétvégén is várunk! Tudjuk, hogy a hétköznapok zsúfoltak – ezért HydraBeauty kezelésre hétvégén is foglalhatsz.
+              We're open on weekends too! We know weekdays are busy - that's why you can book Carbon Peeling treatments on Saturdays and Sundays as well.
             </p>
           </div>
         </div>
@@ -796,7 +853,7 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc]">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
-        Gyakran Ismételt Kérdések
+        Frequently Asked Questions
       </h2>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -828,22 +885,22 @@ const faqs = [
   <section class="py-16 bg-gradient-to-r from-[#6366f1] to-[#4f46e5]">
     <div class="max-w-[800px] mx-auto px-4 text-center">
       <h2 class="font-heading text-3xl lg:text-4xl text-white mb-4 uppercase">
-        Készen állsz a ragyogó bőrre?
+        Ready for radiant skin?
       </h2>
       <p class="text-white/90 mb-8 text-lg">
-        Foglalj időpontot ingyenes konzultációra és tapasztald meg a HydraBeauty varázsát!
+        Book an appointment for a free consultation and experience the magic of Carbon Peeling!
       </p>
       <a
-        href="/ingyenes-konzultacio"
+        href="/en/free-consultation"
         class="inline-block px-10 py-4 bg-white text-[#6366f1] font-bold uppercase text-sm tracking-wide rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
       >
-        Ingyenes konzultációt kérek
+        Request a Free Consultation
       </a>
     </div>
   </section>
 
   <!-- Locations Section -->
-  <LocationsSection />
+  <LocationsSection lang="en" />
 </Layout>
 
 <script>

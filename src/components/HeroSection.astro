@@ -3,13 +3,65 @@ import { Image } from 'astro:assets';
 import heroImage from '../assets/images/breautyflow-fokep.jpg';
 import googleLogo from '../assets/images/google-logo.jpg';
 import notinoIcon from '../assets/images/notino-ikon.png';
+import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
-const stats = [
-  { value: '10+ év', label: 'tapasztalat' },
-  { value: '10 000+', label: 'kezelés' },
-  { value: '12', label: 'legmodernebb gép' },
-  { value: '1500+', label: 'elégedett vendég' },
-];
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    stats: [
+      { value: '10+ év', label: 'tapasztalat' },
+      { value: '10 000+', label: 'kezelés' },
+      { value: '12', label: 'legmodernebb gép' },
+      { value: '1500+', label: 'elégedett vendég' },
+    ],
+    googleRating: 'Google értékelés alapján',
+    googleRatingMobile: 'Google értékelés',
+    notinoBadge: 'Notino "Hónap Szalonja"',
+    subtitle: 'Szépségszalon és lézeres szőrtelenítés',
+    title: 'A legcsajosabb szépségszalon',
+    location: 'budán és pesten',
+    description: 'Kapj szakszerű kezelést és teljes, osztatlan figyelmet<br />a díjnyertes budai és pesti központunkban.',
+    cta: 'Kérj ingyenes konzultációt',
+    awards: {
+      entrepreneur: 'Év Vállalkozója-díj',
+      notinoPartner: 'Notino Partner',
+      fairBusiness: 'Tisztességes Vállalkozás',
+      turulGold: 'Turul Szépség Gold',
+    },
+    imageAlt: 'Beautyflow szépségszalon',
+  },
+  en: {
+    stats: [
+      { value: '10+ yrs', label: 'experience' },
+      { value: '10,000+', label: 'treatments' },
+      { value: '12', label: 'modern machines' },
+      { value: '1500+', label: 'happy clients' },
+    ],
+    googleRating: 'Based on Google reviews',
+    googleRatingMobile: 'Google rating',
+    notinoBadge: 'Notino "Salon of the Month"',
+    subtitle: 'Beauty salon and laser hair removal',
+    title: 'The coolest beauty salon',
+    location: 'in Buda and Pest',
+    description: 'Get professional treatments and full, undivided attention<br />at our award-winning Buda and Pest locations.',
+    cta: 'Request Free Consultation',
+    awards: {
+      entrepreneur: 'Entrepreneur of the Year',
+      notinoPartner: 'Notino Partner',
+      fairBusiness: 'Fair Business Award',
+      turulGold: 'Turul Beauty Gold',
+    },
+    imageAlt: 'Beautyflow beauty salon',
+  },
+};
+
+const t = content[lang];
+const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
 ---
 
 <section class="relative flex flex-col lg:-mt-[60px] lg:h-[100dvh]">
@@ -18,7 +70,7 @@ const stats = [
     <div class="hidden lg:flex lg:w-1/2 relative">
       <Image
         src={heroImage}
-        alt="Beautyflow szépségszalon"
+        alt={t.imageAlt}
         class="absolute inset-0 w-full h-full object-cover"
         width={800}
         height={600}
@@ -42,7 +94,7 @@ const stats = [
                 ))}
               </div>
             </div>
-            <p class="text-xs text-gray-600">Google értékelés alapján</p>
+            <p class="text-xs text-gray-600">{t.googleRating}</p>
           </div>
         </div>
       </div>
@@ -55,7 +107,7 @@ const stats = [
         <div class="relative lg:hidden -mx-5 mb-6">
           <Image
             src={heroImage}
-            alt="Beautyflow szépségszalon"
+            alt={t.imageAlt}
             class="w-full h-48 object-cover"
             width={720}
             height={192}
@@ -75,38 +127,48 @@ const stats = [
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </div>
-                <p class="text-[10px] text-gray-600">Google értékelés</p>
+                <p class="text-[10px] text-gray-600">{t.googleRatingMobile}</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Notino Badge - ABOVE H1 -->
-        <div class="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg mb-5">
-          <Image src={notinoIcon} alt="Notino" class="w-10 h-10" width={40} height={40} format="webp" />
-          <span class="text-base font-bold text-gray-800">Notino "Hónap Szalonja"</span>
+        <div class="inline-flex items-center gap-2 mb-5">
+          <div class="relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
+            <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
+              <div class="bg-white rounded-full p-1">
+                <Image src={notinoIcon} alt="Notino" class="w-8 h-8" width={32} height={32} format="webp" quality={80} loading="eager" />
+              </div>
+            </div>
+          </div>
+          <div class="text-left">
+            <div class="flex items-center gap-1">
+              <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+              <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">{lang === 'hu' ? 'Díjnyertes szalon' : 'Award-winning salon'}</span>
+            </div>
+            <span class="text-sm font-bold text-[#c53f75]">{t.notinoBadge}</span>
+          </div>
         </div>
 
         <h1 class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-sans font-normal">
-          Szépségszalon és lézeres szőrtelenítés
+          {t.subtitle}
         </h1>
 
         <h2 class="font-heading text-[1.4rem] sm:text-2xl md:text-3xl lg:text-[2.4rem] text-gray-900 mb-1 leading-tight uppercase font-bold">
-          A legcsajosabb szépségszalon
+          {t.title}
         </h2>
         <p class="font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-900 mb-4 uppercase font-bold">
-          budán és pesten
+          {t.location}
         </p>
 
-        <p class="text-gray-600 mb-4 text-sm">
-          Kapj szakszerű kezelést és teljes, osztatlan figyelmet<br />
-          a díjnyertes budai és pesti központunkban.
-        </p>
+        <p class="text-gray-600 mb-4 text-sm" set:html={t.description} />
 
         <!-- CTA: Button + Phone below -->
         <div class="flex flex-col items-center justify-center gap-2 mb-4">
-          <a href="/ingyenes-konzultacio" class="inline-block px-5 py-3 bg-[#c53f75] text-white font-bold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all transform hover:scale-105">
-            Kérj ingyenes konzultációt
+          <a href={consultationPath} class="inline-block px-5 py-3 bg-[#c53f75] text-white font-bold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all transform hover:scale-105">
+            {t.cta}
           </a>
           <a href="tel:+3613009414" class="inline-flex items-center gap-2 text-base lg:text-lg text-[#c53f75] font-bold hover:text-[#a33460] transition-all duration-300">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,7 +185,7 @@ const stats = [
   <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
     <div class="max-w-[1000px] mx-auto px-4 w-full">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
-        {stats.map((stat) => (
+        {t.stats.map((stat) => (
           <div class="text-center">
             <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">
               {stat.value}
@@ -147,7 +209,7 @@ const stats = [
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           </div>
-          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Év Vállalkozója-díj</span>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">{t.awards.entrepreneur}</span>
         </div>
 
         <div class="hidden sm:block w-px h-6 bg-white/20"></div>
@@ -157,7 +219,7 @@ const stats = [
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
             <Image src={notinoIcon} alt="Notino" class="w-4 h-4 sm:w-5 sm:h-5" width={20} height={20} format="webp" />
           </div>
-          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Notino Partner</span>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">{t.awards.notinoPartner}</span>
         </div>
 
         <div class="hidden sm:block w-px h-6 bg-white/20"></div>
@@ -169,7 +231,7 @@ const stats = [
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Tisztességes Vállalkozás</span>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">{t.awards.fairBusiness}</span>
         </div>
 
         <div class="hidden sm:block w-px h-6 bg-white/20"></div>
@@ -179,7 +241,7 @@ const stats = [
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-300 to-yellow-500 flex items-center justify-center flex-shrink-0">
             <span class="text-[10px] sm:text-xs font-bold text-amber-900">G</span>
           </div>
-          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Turul Szépség Gold</span>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">{t.awards.turulGold}</span>
         </div>
       </div>
     </div>

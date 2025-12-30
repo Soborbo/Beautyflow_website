@@ -1,32 +1,28 @@
 ---
 import { Image } from 'astro:assets';
-import Layout from '../layouts/Layout.astro';
-import LocationsSection from '../components/LocationsSection.astro';
-import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
+import Layout from '../../layouts/Layout.astro';
+import LocationsSection from '../../components/LocationsSection.astro';
+import { type Locale, getLocalizedPath } from '../../i18n';
 
-interface Props {
-  lang?: Locale;
-}
-
-const { lang = defaultLang } = Astro.props;
+const lang: Locale = 'en';
 
 // Image imports
-import beautyflowDijak from '../assets/images/beautyflow-dijak.webp';
-import konyaFanniSq from '../assets/images/Konya-Fanni-sq.jpg';
-import fodorInez from '../assets/images/fodor-inez.jpg';
-import nagyPiroska from '../assets/images/Nagy-Piroska.jpg';
-import desvariLiliRozi from '../assets/images/Desvari-Lili-Rozi.jpg';
-import trexlerJanka from '../assets/images/trexler-janka-kozmetikus.jpg';
-import vargaAndrea from '../assets/images/Varga-Andrea.jpg';
-import barnaNiki from '../assets/images/Barna-niki-beautyflow.jpg';
+import beautyflowDijak from '../../assets/images/beautyflow-dijak.webp';
+import konyaFanniSq from '../../assets/images/Konya-Fanni-sq.jpg';
+import fodorInez from '../../assets/images/fodor-inez.jpg';
+import nagyPiroska from '../../assets/images/Nagy-Piroska.jpg';
+import desvariLiliRozi from '../../assets/images/Desvari-Lili-Rozi.jpg';
+import trexlerJanka from '../../assets/images/trexler-janka-kozmetikus.jpg';
+import vargaAndrea from '../../assets/images/Varga-Andrea.jpg';
+import barnaNiki from '../../assets/images/Barna-niki-beautyflow.jpg';
 
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Beautyflow Szépségszalon",
-  "url": "https://beautyflow.hu",
+  "name": "Beautyflow Beauty Salon",
+  "url": "https://beautyflow.hu/en/",
   "logo": "https://beautyflow.hu/images/Beautyflow-favicon.png",
-  "description": "Többszörösen díjnyertes szépségszalon Budapesten. Lézeres szőrtelenítés, sminktetoválás, arckezelések.",
+  "description": "Award-winning beauty salon in Budapest. Laser hair removal, permanent makeup, facial treatments.",
   "foundingDate": "2014",
   "founder": {
     "@type": "Person",
@@ -53,7 +49,7 @@ const organizationSchema = {
     "@type": "ContactPoint",
     "telephone": "+36 1 300 9414",
     "contactType": "customer service",
-    "availableLanguage": "Hungarian"
+    "availableLanguage": ["Hungarian", "English"]
   },
   "sameAs": [
     "https://www.instagram.com/beautyflow.hu/",
@@ -62,182 +58,142 @@ const organizationSchema = {
 };
 
 const milestones = [
-  { year: '2015 február', event: 'Elkezdődik Fanni útja a szépségiparban' },
-  { year: '2017 október', event: 'Első sminktetováló képzés elvégzése' },
-  { year: '2018 február', event: 'Kitűnő eredménnyel végzett szépségtanácsadó (OKJ)' },
-  { year: '2019 augusztus', event: 'Szemöldök stylist és műszempilla oktató lettem, a megszerzett tudást a sminktetoválások során azóta is aktívan alkalmazom' },
-  { year: '2020 január', event: 'Kozmetikussá váltam kitüntetett 5-ös eredménnyel, 100%-os vizsgával, valamint Gáspár Melindánál tanulhattam sminktetoválás eltávolítást' },
-  { year: '2021', event: 'A covid időszak alatt kizárólag tanulásra fókuszáltam: Méhn Tünde PMU ART School ajak- és szemhéj sminktetoválás képzés, valamint cukorpasztás depiláció' },
-  { year: '2022', event: 'Megvásároltam az első elektrokozmetikai gépemet, a diódalézeres szőrtelenítő készüléket' },
-  { year: '2023', event: 'Második diódalézeres szőrtelenítő gép beszerzése, tudatos elindulás az elektrokozmetika irányába' },
-  { year: '2024', event: 'Megnyílik a Beautyflow Buda' },
-  { year: '2024', event: 'Év Vállalkozója díj', isAward: true },
-  { year: '2024', event: 'Notino Partner lettem', isAward: true },
-  { year: '2025 március', event: 'Hónap Szalonja díj', isAward: true },
-  { year: '2025', event: 'Év Vállalkozója díj', isAward: true },
-  { year: '2025', event: 'Bővülünk Nd:YAG lézerrel és HydraBeauty géppel' },
-  { year: '2026', event: 'Új szolgáltatások: BioPen Q2, tengeri algás hámlasztó eljárás, gyémántfejes bőrcsiszoló dermabráziós kezelés, elektrolízises szőrtelenítés' }
+  { year: 'Feb 2015', event: "Fanni's journey in the beauty industry begins" },
+  { year: 'Oct 2017', event: 'First permanent makeup training completed' },
+  { year: 'Feb 2018', event: 'Certified beauty consultant with excellent results' },
+  { year: 'Aug 2019', event: 'Became an eyebrow stylist and eyelash extension instructor' },
+  { year: 'Jan 2020', event: 'Became a cosmetician with top grades, learned permanent makeup removal' },
+  { year: '2021', event: 'During COVID, focused exclusively on training: PMU ART School lip and eyelid permanent makeup, sugar paste depilation' },
+  { year: '2022', event: 'Purchased first electro-cosmetic device, diode laser hair removal machine' },
+  { year: '2023', event: 'Second diode laser machine acquired, conscious move towards electro-cosmetics' },
+  { year: '2024', event: 'Beautyflow Buda opens' },
+  { year: '2024', event: 'Entrepreneur of the Year Award', isAward: true },
+  { year: '2024', event: 'Became Notino Partner', isAward: true },
+  { year: 'Mar 2025', event: 'Salon of the Month Award', isAward: true },
+  { year: '2025', event: 'Entrepreneur of the Year Award', isAward: true },
+  { year: '2025', event: 'Expanding with Nd:YAG laser and HydraBeauty machine' },
+  { year: '2026', event: 'New services: BioPen Q2, seaweed exfoliation, diamond dermabrasion, electrolysis hair removal' }
 ];
 
 const teamMembers = [
   {
-    name: 'Kónya Fanni',
-    role: 'Tulajdonos, Vezető kozmetikus',
+    name: 'Fanni Kónya',
+    role: 'Owner, Lead Cosmetician',
     image: konyaFanniSq,
-    description: 'A Beautyflow alapítója és lelke. Fanni több mint 10 éves tapasztalattal rendelkezik a szépségiparban, és szinte minden kezelést végez a szalonban. A telefonos konzultációkat is ő intézi – ha kérdésed van, nyugodtan hívj!',
+    description: 'The founder and soul of Beautyflow. Fanni has over 10 years of experience in the beauty industry and performs almost all treatments at the salon. She also handles phone consultations – if you have questions, feel free to call!',
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
-      { name: 'Sminktetoválás', url: '/sminktetovalas' },
-      { name: 'Tetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' },
-      { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Permanent Makeup', url: '/permanent-makeup' },
+      { name: 'Tattoo Removal', url: '/tattoo-removal' },
+      { name: 'Pigment Removal', url: '/pigment-removal' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
-    name: 'Fodor Inez Vivien',
-    role: 'Kozmetikus',
+    name: 'Inez Vivien Fodor',
+    role: 'Cosmetician',
     image: fodorInez,
-    description: 'A részletekre figyelek, nem az órára. Évek óta diódalézeres szőrtelenítéssel foglalkozom, és egy dolgot tanultam meg biztosan: a jó eredményhez idő kell. Nálam nincs kapkodás, nincs "gyorsan letudni" mentalitás. Minden kezelést a te bőrödre szabok – legyen szó lézerről, Hydrabeauty-ról vagy carbon peelingről.',
+    description: "I focus on details, not the clock. I've been doing diode laser hair removal for years, and I've learned one thing for sure: good results take time. With me, there's no rushing. Every treatment is tailored to your skin – whether it's laser, Hydrabeauty, or carbon peeling.",
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
-    name: 'Nagy Piroska',
-    role: 'Kozmetikus',
+    name: 'Piroska Nagy',
+    role: 'Cosmetician',
     image: nagyPiroska,
-    description: '2016 óta kozmetikus. A precizitás nálam nem opció – alap. Gyöngyösön kezdtem, Budapesten folytattam. Több város, több szalon, több ezer kezelés – és mindegyikből tanultam valamit. Jelenleg a diódalézeres szőrtelenítésre specializálódtam. A kezelés alatt szeretek beszélgetni, nevetni, lazítani. De amikor dolgozom, a kezem nem viccel.',
+    description: "Cosmetician since 2016. Precision isn't optional for me – it's fundamental. I started in Gyöngyös, continued in Budapest. Multiple cities, multiple salons, thousands of treatments – and I learned something from each. Currently specializing in diode laser hair removal.",
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' }
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' }
     ]
   },
   {
-    name: 'Désvári Lili Rozi',
-    role: 'Kozmetikus',
+    name: 'Lili Rozi Désvári',
+    role: 'Cosmetician',
     image: desvariLiliRozi,
-    description: 'Vasárnaponként Budán várlak – és folyamatosan fejlődve. A Beautyflow csapat tagjaként rendszeresen képzem magam, mert a szépségipar nem áll meg, és én sem akarok. Diódalézeres szőrtelenítést, Hydrabeauty-t és carbon peelinget kínálok – mindig a legfrissebb tudással.',
+    description: "I'm available on Sundays in Buda – and constantly improving. As a member of the Beautyflow team, I regularly train myself because the beauty industry doesn't stop, and neither do I. I offer diode laser hair removal, Hydrabeauty, and carbon peeling – always with the latest knowledge.",
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
-    name: 'Trexler Janka',
-    role: 'Kozmetikus',
+    name: 'Janka Trexler',
+    role: 'Cosmetician',
     image: trexlerJanka,
-    description: 'A Sisiben tanultam a szakmát. A jó hangulatot magamtól hoztam. Kozmetikusnak lenni számomra azt jelenti, hogy segíthetek. Nem csak a bőrödön, hanem azon is, hogy egy kicsit feltöltődj a mindennapokból. Carbon peeling, Hydrabeauty, diódalézeres szőrtelenítés – bármelyiket választod, egy biztos: mosollyal fogsz távozni.',
+    description: "I learned the profession at Sisi. The good mood I brought from myself. Being a cosmetician means I can help. Not just with your skin, but also to help you recharge from everyday life. Carbon peeling, Hydrabeauty, diode laser – whichever you choose, one thing's certain: you'll leave with a smile.",
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   },
   {
-    name: 'Varga Andrea',
-    role: 'Kozmetikus, Sminktetováló',
+    name: 'Andrea Varga',
+    role: 'Cosmetician, Permanent Makeup Artist',
     image: vargaAndrea,
-    description: 'Kozmetikus és sminktetováló – a részletekben hiszek. Évek óta dolgozom a szépségiparban, és egy dolog nem változott: minden vendéget egyénileg kezelek. Szó szerint. Carbon peeling, lézer, Hydrabeauty, pigmentfolt eltávolítás vagy éppen sminktetoválás eltávolítás – mindig az adott bőrhöz és igényhez igazítom a kezelést.',
+    description: "Cosmetician and permanent makeup artist – I believe in details. I've been working in the beauty industry for years, and one thing hasn't changed: I treat every guest individually. Literally. Carbon peeling, laser, Hydrabeauty, pigment removal, or permanent makeup removal – I always tailor the treatment to the specific skin and needs.",
     treatments: [
       { name: 'Carbon Peeling', url: '/carbon-peeling' },
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
       { name: 'Hydrabeauty', url: '/hydrabeauty' },
-      { name: 'Pigmentfolt eltávolítás', url: '/pigmentfolt-eltavolitas' },
-      { name: 'Sminktetoválás eltávolítás', url: '/lezeres-tetovalas-eltavolitas' }
+      { name: 'Pigment Removal', url: '/pigment-removal' },
+      { name: 'Permanent Makeup Removal', url: '/tattoo-removal' }
     ]
   },
   {
     name: 'Niki',
-    role: 'Kozmetikus',
+    role: 'Cosmetician',
     image: barnaNiki,
-    description: 'A csapat legújabb tagja vagyok – de a lelkesedésben nem maradok le. Diódalézeres szőrtelenítéssel és carbon peelinggel foglalkozom, és imádok beszélgetni közben. Nálam gyorsan telik az idő, mert nem csak kezelés van, hanem kapcsolat is. Ha kicsit izgulsz az első alkalom előtt, ne tedd. Közvetlen vagyok, figyelek rád.',
+    description: "I'm the newest member of the team – but I don't fall behind in enthusiasm. I do diode laser hair removal and carbon peeling, and I love chatting during treatments. Time flies with me because it's not just treatment, it's connection. If you're a bit nervous before your first visit, don't be. I'm direct and I pay attention to you.",
     treatments: [
-      { name: 'Diódalézeres szőrtelenítés', url: '/dioda-lezeres-szortelenites' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
       { name: 'Carbon Peeling', url: '/carbon-peeling' }
     ]
   }
 ];
 
-const values = {
-  hu: [
-    {
-      icon: 'heart',
-      title: 'Törődés',
-      description: 'Minden vendégünket egyedi figyelemmel és törődéssel kezeljük. Nálunk nem csak egy szám vagy egy időpont vagy.'
-    },
-    {
-      icon: 'star',
-      title: 'Minőség',
-      description: 'Csak a legjobb eszközökkel és termékekkel dolgozunk. Folyamatosan képezzük magunkat, hogy a legmodernebb technikákat alkalmazhassuk.'
-    },
-    {
-      icon: 'shield',
-      title: 'Biztonság',
-      description: 'Minden higiéniai elvárásnak megfelelünk, és mindent megteszünk azért, hogy biztonságban érezd magad.'
-    }
-  ],
-  en: [
-    {
-      icon: 'heart',
-      title: 'Care',
-      description: "We treat every guest with individual attention and care. You're not just a number or an appointment here."
-    },
-    {
-      icon: 'star',
-      title: 'Quality',
-      description: 'We only work with the best equipment and products. We continuously train ourselves to apply the most modern techniques.'
-    },
-    {
-      icon: 'shield',
-      title: 'Safety',
-      description: 'We meet all hygiene standards and do everything to make you feel safe.'
-    }
-  ]
-};
-
-const content = {
-  hu: {
-    pageTitle: 'Rólunk - Beautyflow Szépségszalon Budapest',
-    pageDescription: 'Ismerd meg a Beautyflow történetét, csapatát és értékeit. Többszörösen díjnyertes szépségszalon Budapesten, ahol a vendég mindig az első.',
-    heroTitle: 'A Beautyflow csapata',
-    heroSubtitle: 'Ismerd meg a szakembereket, akik gondoskodnak rólad! Csapatunk elkötelezett a minőség és a személyre szabott szolgáltatás iránt.',
-    storyTitle: 'A történetünk',
-    storyP1: 'A Beautyflow-t 2014-ben alapította Kónya Fanni, azzal a céllal, hogy egy olyan szépségszalont hozzon létre, ahol minden vendég valódi törődést és professzionális szolgáltatást kap.',
-    storyP2: 'Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 7 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.',
-    storyP3: 'Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.',
-    storyImageAlt: 'Beautyflow - Notino Hónap Szalonja díj',
-    milestonesTitle: 'Mérföldkövek',
-    teamTitle: 'Ismerd meg csapatunkat',
-    valuesTitle: 'Értékeink',
-    ctaTitle: 'Ismerjük meg egymást személyesen!',
-    ctaSubtitle: 'Gyere el egy ingyenes konzultációra és ismerd meg csapatunkat, mielőtt döntesz!',
-    ctaButton: 'Ingyenes konzultációt kérek',
+const values = [
+  {
+    icon: 'heart',
+    title: 'Care',
+    description: "We treat every guest with individual attention and care. You're not just a number or an appointment here."
   },
-  en: {
-    pageTitle: 'About Us - Beautyflow Beauty Salon Budapest',
-    pageDescription: 'Meet the Beautyflow team, our story and values. Award-winning beauty salon in Budapest where the guest always comes first.',
-    heroTitle: 'The Beautyflow Team',
-    heroSubtitle: 'Meet the professionals who take care of you! Our team is committed to quality and personalized service.',
-    storyTitle: 'Our Story',
-    storyP1: 'Beautyflow was founded in 2014 by Fanni Kónya, with the goal of creating a beauty salon where every guest receives genuine care and professional service.',
-    storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
-    storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
-    storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
-    milestonesTitle: 'Milestones',
-    teamTitle: 'Meet Our Team',
-    valuesTitle: 'Our Values',
-    ctaTitle: "Let's meet in person!",
-    ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
-    ctaButton: 'Request Free Consultation',
+  {
+    icon: 'star',
+    title: 'Quality',
+    description: 'We only work with the best equipment and products. We continuously train ourselves to apply the most modern techniques.'
+  },
+  {
+    icon: 'shield',
+    title: 'Safety',
+    description: 'We meet all hygiene standards and do everything to make you feel safe.'
   }
+];
+
+const t = {
+  pageTitle: 'About Us - Beautyflow Beauty Salon Budapest',
+  pageDescription: 'Meet the Beautyflow team, our story and values. Award-winning beauty salon in Budapest where the guest always comes first.',
+  heroTitle: 'The Beautyflow Team',
+  heroSubtitle: 'Meet the professionals who take care of you! Our team is committed to quality and personalized service.',
+  storyTitle: 'Our Story',
+  storyP1: 'Beautyflow was founded in 2014 by Fanni Kónya, with the goal of creating a beauty salon where every guest receives genuine care and professional service.',
+  storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
+  storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
+  storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
+  milestonesTitle: 'Milestones',
+  teamTitle: 'Meet Our Team',
+  valuesTitle: 'Our Values',
+  ctaTitle: "Let's meet in person!",
+  ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
+  ctaButton: 'Request Free Consultation',
 };
 
-const t = content[lang];
-const currentValues = values[lang];
-const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
+const consultationPath = getLocalizedPath('/free-consultation', lang);
 ---
 
 <Layout title={t.pageTitle} description={t.pageDescription} lang={lang}>
@@ -354,7 +310,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
                 />
               ) : (
                 <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">
-                  <span class="font-heading text-3xl text-[#c53f75]">{member.initials}</span>
+                  <span class="font-heading text-3xl text-[#c53f75]">{member.name.split(' ').map(n => n[0]).join('')}</span>
                 </div>
               )}
             </div>
@@ -369,7 +325,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
               <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-auto">
                 {member.treatments.map((treatment) => (
                   <a
-                    href={treatment.url}
+                    href={getLocalizedPath(treatment.url, lang)}
                     class="inline-block px-4 py-2 text-xs text-[#c53f75] bg-[#c53f75]/10 rounded-full hover:bg-[#c53f75]/20 transition-colors"
                   >
                     {treatment.name}
@@ -393,7 +349,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       </div>
 
       <div class="grid gap-8 md:grid-cols-3">
-        {currentValues.map((value) => (
+        {values.map((value) => (
           <div class="text-center">
             <div class="w-16 h-16 mx-auto mb-4 bg-[#c53f75]/10 rounded-full flex items-center justify-center text-[#c53f75]">
               {value.icon === 'heart' && (
@@ -462,7 +418,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
 
       // Set section height based on scroll distance needed
       const sectionHeight = Math.max(scrollDistance + window.innerHeight, window.innerHeight);
-      timelineSection.style.height = `${sectionHeight}px`;
+      (timelineSection as HTMLElement).style.height = `${sectionHeight}px`;
     };
 
     const handleScroll = () => {
@@ -472,7 +428,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       if (!stickyContainer) return;
 
       const sectionTop = rect.top;
-      const sectionHeight = timelineSection.offsetHeight;
+      const sectionHeight = (timelineSection as HTMLElement).offsetHeight;
       const viewportHeight = window.innerHeight;
 
       // Calculate scroll progress within the section
@@ -485,7 +441,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       const translateX = scrollProgress * maxTranslate;
 
       // Apply transform
-      timelineTrack.style.transform = `translateX(-${translateX}px)`;
+      (timelineTrack as HTMLElement).style.transform = `translateX(-${translateX}px)`;
     };
 
     // Initial setup

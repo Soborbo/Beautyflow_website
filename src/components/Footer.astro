@@ -1,4 +1,18 @@
 ---
+import { type Locale, defaultLang, getLocalizedPath, routeMappings } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+// Get localized paths for privacy and terms
+const privacyMapping = routeMappings.find(m => m.hu === '/adatvedelmi-tajekoztato');
+const termsMapping = routeMappings.find(m => m.hu === '/aszf');
+const privacyPath = privacyMapping ? getLocalizedPath(privacyMapping[lang], lang) : '/adatvedelmi-tajekoztato';
+const termsPath = termsMapping ? getLocalizedPath(termsMapping[lang], lang) : '/aszf';
+
 const contactInfo = {
   phone: '+36 (1) 300 9414',
   email: 'hello@beautyflow.pro',
@@ -7,6 +21,33 @@ const contactInfo = {
   regNumber: '01-09-439280',
   address: '1116 Budapest, Fegyvernek utca 121.',
 };
+
+const labels = {
+  hu: {
+    phone: 'Telefonszám',
+    owner: 'Ügyvezető',
+    email: 'E-mail',
+    taxNumber: 'Adószám',
+    address: 'Székhely',
+    regNumber: 'Cégjegyzékszám',
+    copyright: 'Beautyflow Szépségszalon. Minden jog fenntartva.',
+    privacy: 'Adatvédelmi tájékoztató',
+    terms: 'Általános szerződési feltételek',
+  },
+  en: {
+    phone: 'Phone',
+    owner: 'CEO',
+    email: 'Email',
+    taxNumber: 'Tax Number',
+    address: 'Address',
+    regNumber: 'Registration Number',
+    copyright: 'Beautyflow Beauty Salon. All rights reserved.',
+    privacy: 'Privacy Policy',
+    terms: 'Terms and Conditions',
+  },
+};
+
+const t = labels[lang];
 ---
 
 <footer class="relative text-white py-16" style="background-image: url('/images/beautyflow-hatter.jpg'); background-size: cover; background-position: center;">
@@ -14,54 +55,57 @@ const contactInfo = {
   <div class="container mx-auto px-4 relative z-10">
     <!-- Logo -->
     <div class="flex justify-center mb-12">
-      <img
-        src="/images/beautyflow-logo-vilagos.png"
-        alt="Beautyflow"
-        class="h-20 w-auto"
-        width="240"
-        height="80"
-      />
+      <picture>
+        <source srcset="/images/beautyflow-logo.webp" type="image/webp" />
+        <img
+          src="/images/beautyflow-logo.png"
+          alt="Beautyflow"
+          class="h-20 w-auto"
+          width="240"
+          height="80"
+        />
+      </picture>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12 text-center">
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">Telefonszám</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.phone}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.phone}</p>
       </div>
 
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">Ügyvezető</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.owner}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.owner}</p>
       </div>
 
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">E-mail</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.email}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.email}</p>
       </div>
 
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">Adószám</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.taxNumber}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.taxNumber}</p>
       </div>
 
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">Székhely</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.address}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.address}</p>
       </div>
 
       <div>
-        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">Cégjegyzékszám</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white uppercase tracking-wide">{t.regNumber}</h4>
         <p class="text-gray-300 text-sm">{contactInfo.regNumber}</p>
       </div>
     </div>
 
     <!-- Copyright -->
     <div class="text-center text-gray-400 text-sm border-t border-gray-600 pt-8">
-      <p>&copy; {new Date().getFullYear()} Beautyflow Szépségszalon. Minden jog fenntartva.</p>
+      <p>&copy; {new Date().getFullYear()} {t.copyright}</p>
       <p class="mt-2">
-        <a href="/adatvedelmi-tajekoztato" class="text-gray-400 hover:text-[#c53f75] transition-colors underline">Adatvédelmi tájékoztató</a>
+        <a href={privacyPath} class="text-gray-400 hover:text-[#c53f75] transition-colors underline">{t.privacy}</a>
         {' | '}
-        <a href="/aszf" class="text-gray-400 hover:text-[#c53f75] transition-colors underline">Általános szerződési feltételek</a>
+        <a href={termsPath} class="text-gray-400 hover:text-[#c53f75] transition-colors underline">{t.terms}</a>
       </p>
     </div>
   </div>

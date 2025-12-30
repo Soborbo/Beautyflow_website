@@ -1,0 +1,207 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+
+// Image imports
+import konyaFanniKozmetikus from '../../assets/images/konya-fanni-kozmetikus.webp';
+import lezeresSzortelenitesBg from '../../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+
+// Blog posts data
+const posts = [
+  {
+    title: "Dióda Lézeres Szőrtelenítés: Teljes Útmutató 2025",
+    description: "A dióda lézeres szőrtelenítés 80-90%-ban végleges eredményt ad 6-12 kezelés után. Megmutatjuk, hogyan működik, mennyibe kerül, és kinek ajánlott.",
+    href: "/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell",
+    category: "Szőrtelenítés",
+    date: "2025. január 15.",
+    readTime: "12 perc",
+    image: lezeresSzortelenitesBg,
+    featured: true,
+    author: {
+      name: "Kónya Fanni",
+      avatar: konyaFanniKozmetikus
+    }
+  }
+];
+
+const meta = {
+  title: "Tudástár - Szépségápolási Útmutatók és Tippek",
+  description: "Szakértői útmutatók a lézeres szőrtelenítésről, bőrápolásról és szépségkezelésekről. Mindent megtudhatsz a kezelésekről, árakról és felkészülésről."
+};
+
+// Schema.org
+const pageSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": meta.title,
+  "description": meta.description,
+  "url": "https://beautyflow.pro/tudastar",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": posts.map((post, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `https://beautyflow.pro${post.href}`,
+      "name": post.title
+    }))
+  }
+};
+---
+
+<Layout
+  title={meta.title + " | Beautyflow"}
+  description={meta.description}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(pageSchema)} />
+
+  <main class="bg-white">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-[#fff9f7] to-white py-16 lg:py-24">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <!-- Breadcrumb -->
+        <nav class="mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
+          <ol class="flex items-center justify-center gap-2">
+            <li><a href="/" class="hover:text-[#c53f75]">Főoldal</a></li>
+            <li>/</li>
+            <li class="text-gray-700">Tudástár</li>
+          </ol>
+        </nav>
+
+        <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          Tudástár
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Szakértői útmutatók és tippek a szépségápolásról.
+          Mindent megtudhatsz a kezelésekről, felkészülésről és utógondozásról.
+        </p>
+      </div>
+    </section>
+
+    <!-- Featured Post -->
+    {posts.filter(p => p.featured).map(post => (
+      <section class="py-12 bg-white border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <a href={post.href} class="group block">
+            <div class="grid lg:grid-cols-2 gap-8 items-center">
+              <div class="relative overflow-hidden rounded-2xl aspect-[16/10]">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="eager"
+                />
+                <span class="absolute top-4 left-4 bg-[#c53f75] text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Kiemelt cikk
+                </span>
+              </div>
+              <div class="py-4">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="bg-[#c53f75]/10 text-[#c53f75] px-3 py-1 rounded-full text-sm font-medium">
+                    {post.category}
+                  </span>
+                  <span class="text-sm text-gray-500">{post.readTime} olvasás</span>
+                </div>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 group-hover:text-[#c53f75] transition-colors">
+                  {post.title}
+                </h2>
+                <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+                  {post.description}
+                </p>
+                <div class="flex items-center gap-4">
+                  <Image
+                    src={post.author.avatar}
+                    alt={post.author.name}
+                    class="w-12 h-12 rounded-full object-cover border-2 border-[#c53f75]/20"
+                    width={48}
+                    height={48}
+                  />
+                  <div>
+                    <p class="font-semibold text-gray-900">{post.author.name}</p>
+                    <p class="text-sm text-gray-500">{post.date}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+    ))}
+
+    <!-- All Posts Grid -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Minden cikk</h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map(post => (
+            <a href={post.href} class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+              <div class="relative overflow-hidden aspect-[16/10]">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="bg-[#c53f75]/10 text-[#c53f75] px-2 py-0.5 rounded text-xs font-medium">
+                    {post.category}
+                  </span>
+                  <span class="text-xs text-gray-500">{post.readTime}</span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2 group-hover:text-[#c53f75] transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p class="text-sm text-gray-600 line-clamp-2 mb-4">
+                  {post.description}
+                </p>
+                <div class="flex items-center gap-3">
+                  <Image
+                    src={post.author.avatar}
+                    alt={post.author.name}
+                    class="w-8 h-8 rounded-full object-cover"
+                    width={32}
+                    height={32}
+                  />
+                  <div class="text-xs">
+                    <p class="font-medium text-gray-900">{post.author.name}</p>
+                    <p class="text-gray-500">{post.date}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-br from-[#c53f75] to-[#a33460] text-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <h2 class="text-2xl lg:text-3xl font-bold mb-4">
+          Kérdésed van? Segítünk!
+        </h2>
+        <p class="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
+          Ha szeretnéd személyesen megbeszélni a kezelési lehetőségeidet,
+          foglalj egy ingyenes konzultációt szakértőinkkel.
+        </p>
+        <a
+          href="/ingyenes-konzultacio"
+          class="inline-block bg-white text-[#c53f75] font-semibold px-8 py-4 rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+        >
+          Kérek Ingyenes Konzultációt
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

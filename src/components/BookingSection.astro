@@ -2,6 +2,32 @@
 import { Image } from 'astro:assets';
 import bookingImage from '../assets/images/notino-beautyflow.jpg';
 import notinoIcon from '../assets/images/notino-ikon.png';
+import { type Locale, defaultLang } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    imageAlt: 'Notino foglalás applikáció',
+    title: 'Foglalj időpontot gyorsan és egyszerűen',
+    description: 'Gyors, kényelmes, egyszerű és biztonságos foglalás hivatalos partnerünk, a közkedvelt Notino oldalán.',
+    budaBtn: 'Időpontok Budára',
+    pestBtn: 'Időpontok Pestre',
+  },
+  en: {
+    imageAlt: 'Notino booking app',
+    title: 'Book an appointment quickly and easily',
+    description: 'Fast, convenient, simple and secure booking through our official partner, the popular Notino platform.',
+    budaBtn: 'Appointments in Buda',
+    pestBtn: 'Appointments in Pest',
+  },
+};
+
+const t = content[lang];
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -13,7 +39,7 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
     <div class="w-full lg:w-1/2">
       <Image
         src={bookingImage}
-        alt="Notino foglalás applikáció"
+        alt={t.imageAlt}
         class="w-full h-full object-cover"
         width={600}
         height={400}
@@ -27,36 +53,33 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
     <div class="w-full lg:w-1/2 flex items-center justify-center py-12 lg:py-16">
       <div class="w-full px-5 text-center">
         <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 uppercase">
-          Foglalj időpontot gyorsan és egyszerűen
+          {t.title}
         </h2>
 
         <p class="text-gray-600 mb-6">
-          Gyors, kényelmes, egyszerű és biztonságos foglalás hivatalos partnerünk, a közkedvelt Notino oldalán.
+          {t.description}
         </p>
 
-        <!-- Connected buttons with centered Notino logo -->
-        <div class="inline-flex flex-col sm:flex-row items-stretch justify-center rounded-full overflow-hidden border-2 border-[#c53f75]">
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={notinoUrlBuda}
             target="_blank"
             rel="noopener"
-            class="px-6 py-3 bg-[#fdf8f6] text-gray-800 font-semibold uppercase text-sm tracking-wide hover:bg-[#f5ebe6] transition-colors flex items-center gap-2"
+            class="inline-flex items-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a83363] transition-colors"
           >
             <Image src={notinoIcon} alt="Notino" width={20} height={20} class="w-5 h-5" />
-            Időpontok Budára
+            {t.budaBtn}
           </a>
-
-          <div class="w-px bg-[#c53f75] hidden sm:block"></div>
-          <div class="h-px bg-[#c53f75] sm:hidden"></div>
 
           <a
             href={notinoUrlPest}
             target="_blank"
             rel="noopener"
-            class="px-6 py-3 bg-[#fdf8f6] text-gray-800 font-semibold uppercase text-sm tracking-wide hover:bg-[#f5ebe6] transition-colors flex items-center gap-2"
+            class="inline-flex items-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a83363] transition-colors"
           >
             <Image src={notinoIcon} alt="Notino" width={20} height={20} class="w-5 h-5" />
-            Időpontok Pestre
+            {t.pestBtn}
           </a>
         </div>
       </div>

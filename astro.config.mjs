@@ -6,6 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  i18n: {
+    defaultLocale: 'hu',
+    locales: ['hu', 'en'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  },
   adapter: cloudflare({
     imageService: 'compile',
     routes: {

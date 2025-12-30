@@ -6,51 +6,55 @@ import carbonPeelingImg from '../assets/images/carbon-peeling-mb.jpg';
 import diodaImg from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
 import tetovalasImg from '../assets/images/sminktetovalas-mb.jpg';
 import pigmentfoltImg from '../assets/images/pigmentfolt-eltavoitas.webp';
+import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
-const treatments = [
-  {
-    image: hydrabeautyImg,
-    title: 'HydraBeauty arckezelés',
-    description: 'Ragyogó bőr azonnal - tisztítsd, hidratáld, frissítsd fel az arcod. Azonnali hatás!',
-    link: '/hydrabeauty',
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    title: 'Kezeléseink',
+    cta: 'Tovább a kezelésre',
+    treatments: [
+      { title: 'HydraBeauty arckezelés', description: 'Ragyogó bőr azonnal - tisztítsd, hidratáld, frissítsd fel az arcod. Azonnali hatás!', link: '/hydrabeauty' },
+      { title: 'Sminktetoválás', description: 'Nézz ki mindig tökéletesen rögtön az ágyból felkelve is.', link: '/sminktetovalas' },
+      { title: 'Carbon Peeling', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.', link: '/carbon-peeling' },
+      { title: 'Dióda lézeres szőrtelenítés', description: 'Legyen mindig tökéletesen sima és vonzó a bőrőd és mondj búcsút a szőrtüszőgyulladásnak', link: '/dioda-lezeres-szortelenites' },
+      { title: 'Tetoválás-eltávolítás', description: 'Megbántad egy tetoválásodat? Semmi gond, segítünk, hogy ne zavarjon többé.', link: '/lezeres-tetovalas-eltavolitas' },
+      { title: 'Pigmentfolt-eltávolítás', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.', link: '/pigmentfolt-eltavolitas' },
+    ],
   },
-  {
-    image: sminktetovalasImg,
-    title: 'Sminktetoválás',
-    description: 'Nézz ki mindig tökéletesen rögtön az ágyból felkelve is.',
-    link: '/sminktetovalas',
+  en: {
+    title: 'Our Treatments',
+    cta: 'Learn More',
+    treatments: [
+      { title: 'HydraBeauty Facial', description: 'Radiant skin instantly - cleanse, hydrate, refresh your face. Immediate results!', link: '/hydrabeauty' },
+      { title: 'Permanent Makeup', description: 'Look perfect right out of bed, every single day.', link: '/permanent-makeup' },
+      { title: 'Carbon Peeling', description: 'Achieve perfectly clean and healthy facial skin painlessly.', link: '/carbon-peeling' },
+      { title: 'Diode Laser Hair Removal', description: 'Keep your skin perfectly smooth and attractive, say goodbye to ingrown hairs.', link: '/laser-hair-removal' },
+      { title: 'Tattoo Removal', description: 'Regret a tattoo? No problem, we help you make it disappear.', link: '/tattoo-removal' },
+      { title: 'Pigment Spot Removal', description: 'Achieve perfectly clean and healthy facial skin painlessly.', link: '/pigment-removal' },
+    ],
   },
-  {
-    image: carbonPeelingImg,
-    title: 'Carbon Peeling',
-    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
-    link: '/carbon-peeling',
-  },
-  {
-    image: diodaImg,
-    title: 'Dióda lézeres szőrtelenítés',
-    description: 'Legyen mindig tökéletesen sima és vonzó a bőrőd és mondj búcsút a szőrtüszőgyulladásnak',
-    link: '/dioda-lezeres-szortelenites',
-  },
-  {
-    image: tetovalasImg,
-    title: 'Tetoválás-eltávolítás',
-    description: 'Megbántad egy tetoválásodat? Semmi gond, segítünk, hogy ne zavarjon többé.',
-    link: '/lezeres-tetovalas-eltavolitas',
-  },
-  {
-    image: pigmentfoltImg,
-    title: 'Pigmentfolt-eltávolítás',
-    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.',
-    link: '/pigmentfolt-eltavolitas',
-  }
-];
+};
+
+const t = content[lang];
+const images = [hydrabeautyImg, sminktetovalasImg, carbonPeelingImg, diodaImg, tetovalasImg, pigmentfoltImg];
+
+const treatments = t.treatments.map((treatment, index) => ({
+  ...treatment,
+  image: images[index],
+  link: getLocalizedPath(treatment.link, lang),
+}));
 ---
 
 <section class="py-16">
   <div class="max-w-[1060px] mx-auto px-4">
     <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase font-bold">
-      Kezeléseink
+      {t.title}
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -81,7 +85,7 @@ const treatments = [
               href={treatment.link}
               class="block w-full text-center py-3 font-semibold uppercase text-sm tracking-wide border-2 transition-colors mt-auto text-white bg-[#c53f75] border-[#c53f75] hover:bg-transparent hover:text-[#c53f75]"
             >
-              Tovább a kezelésre
+              {t.cta}
             </a>
           </div>
         </div>

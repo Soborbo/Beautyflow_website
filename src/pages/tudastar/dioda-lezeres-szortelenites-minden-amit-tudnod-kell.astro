@@ -1,0 +1,803 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+
+// Image imports
+import konyaFanniKozmetikus from '../../assets/images/konya-fanni-kozmetikus.jpg';
+import lezeresLabEredmeny from '../../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+
+// Blog metadata
+const meta = {
+  title: "Minden, amit tudnod kell a végleges, dióda lézeres szőrtelenítés kapcsán",
+  description: "A dióda lézeres szőrtelenítés 80-90%-ban végleges eredményt ad 6-12 kezelés után. Megmutatjuk, hogyan működik, mennyibe kerül, és kinek ajánlott.",
+  pubDate: "2025-01-15",
+  category: "Szőrtelenítés",
+  readTime: "8\u00A0perc"
+};
+
+// Schema.org data
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://beautyflow.pro/#organization",
+      "name": "Beautyflow Szépségszalon",
+      "url": "https://beautyflow.pro"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://beautyflow.pro/#author-konya-fanni",
+      "name": "Kónya Fanni",
+      "jobTitle": "kozmetikus, a Beautyflow alapítója"
+    },
+    {
+      "@type": "Article",
+      "headline": meta.title,
+      "description": meta.description,
+      "datePublished": meta.pubDate,
+      "author": { "@id": "https://beautyflow.pro/#author-konya-fanni" },
+      "publisher": { "@id": "https://beautyflow.pro/#organization" }
+    }
+  ]
+};
+---
+
+<Layout
+  title={meta.title + " | Beautyflow"}
+  description={meta.description}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+
+  <!-- Mobile Progress Bar -->
+  <div id="progress-container" class="fixed top-0 left-0 right-0 z-50 lg:hidden h-1 bg-gray-200">
+    <div id="progress-bar" class="h-full bg-[#c53f75] w-0 transition-all duration-150"></div>
+  </div>
+
+  <article class="bg-white">
+    <!-- Header with Title and Author -->
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-6 border-b border-gray-100">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+        Minden, amit tudnod kell a végleges, dióda lézeres szőrtelenítés kapcsán
+      </h1>
+
+      <div class="flex items-center gap-4">
+        <Image
+          src={konyaFanniKozmetikus}
+          alt="Kónya Fanni"
+          class="w-[70px] h-[70px] rounded-full object-cover"
+          width={140}
+          height={140}
+        />
+        <div>
+          <div class="font-semibold text-gray-900">Kónya Fanni</div>
+          <div class="text-sm text-gray-500">kozmetikus, a Beautyflow alapítója</div>
+        </div>
+        <div class="ml-auto text-sm text-gray-400">
+          Olvasási idő: <span class="text-gray-600">{meta.readTime}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content with Sidebar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-12">
+      <div class="lg:flex lg:gap-12">
+        <!-- Sticky Sidebar TOC (Desktop only) -->
+        <aside class="hidden lg:block lg:w-72 xl:w-80 flex-shrink-0">
+          <nav id="sticky-toc" class="sticky top-24 bg-white border border-gray-100 rounded-xl p-5 shadow-sm" aria-label="Tartalomjegyzék">
+            <h2 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Tartalomjegyzék</h2>
+            <ol class="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#hogyan-mukodik" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Hogyan működik?</a>
+              </li>
+              <li>
+                <a href="#harom-hullamhossz" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Három hullámhossz</a>
+              </li>
+              <li>
+                <a href="#mennyire-tartos" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Mennyire tartós?</a>
+              </li>
+              <li>
+                <a href="#szoke-szor" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Szőke szőr</a>
+              </li>
+              <li>
+                <a href="#ipl-vs-dioda" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">IPL vs Dióda</a>
+              </li>
+              <li>
+                <a href="#ellenjavallatok" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Ellenjavallatok</a>
+              </li>
+              <li>
+                <a href="#felkeszules" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Felkészülés</a>
+              </li>
+              <li>
+                <a href="#kezeles-utan" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Kezelés után</a>
+              </li>
+            </ol>
+            <div class="mt-6 pt-4 border-t border-gray-100">
+              <a
+                href="/ingyenes-konzultacio"
+                class="block w-full text-center bg-[#c53f75] text-white font-semibold py-3 rounded-full hover:bg-[#a83363] transition-colors text-sm"
+              >
+                Ingyenes konzultáció
+              </a>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Main Article Content -->
+        <div class="lg:flex-1 max-w-4xl">
+          <!-- Intro -->
+          <p class="text-lg text-gray-700 leading-relaxed mb-8">
+            A dióda lézeres szőrtelenítés az utóbbi időben nagyon népszerűvé vált, sorra nyílnak a szalonok Budapesten.
+            Ebben a cikkben mindent összefoglalok a számodra, amit tudnod érdemes a végleges lézeres szőrtelenítés leghatékonyabb módszeréről.
+          </p>
+
+          <!-- CTA Button -->
+          <div class="mb-8 text-center">
+            <a
+              href="/ingyenes-konzultacio"
+              class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+            >
+              Kérj Ingyenes konzultációt
+            </a>
+          </div>
+
+          <!-- Table of Contents (Mobile/Tablet) -->
+          <nav id="main-toc" class="lg:hidden bg-gray-50 rounded-xl p-6 mb-12" aria-label="Tartalomjegyzék">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">Tartalomjegyzék</h2>
+            <ol class="space-y-2 text-gray-700">
+              <li>
+                <a href="#hogyan-mukodik" class="hover:text-[#c53f75] transition-colors">1. Hogyan működik a dióda lézeres szőrtelenítés?</a>
+              </li>
+              <li>
+                <a href="#harom-hullamhossz" class="hover:text-[#c53f75] transition-colors">2. Miért fontos, hogy három hullámhosszos géppel kezeljenek?</a>
+              </li>
+              <li>
+                <a href="#mennyire-tartos" class="hover:text-[#c53f75] transition-colors">3. Mennyire tartós a lézeres szőrtelenítés?</a>
+              </li>
+              <li>
+                <a href="#szoke-szor" class="hover:text-[#c53f75] transition-colors">4. Kezelhető a szőke szőr dióda lézerrel?</a>
+              </li>
+              <li>
+                <a href="#ipl-vs-dioda" class="hover:text-[#c53f75] transition-colors">5. Mi a különbség az IPL és a dióda lézeres szőrtelenítés között?</a>
+              </li>
+              <li>
+                <a href="#ellenjavallatok" class="hover:text-[#c53f75] transition-colors">6. Mik a lézeres szőrtelenítés ellenjavallatai?</a>
+              </li>
+              <li>
+                <a href="#felkeszules" class="hover:text-[#c53f75] transition-colors">7. Hogyan készülj fel a lézeres szőrtelenítés előtt?</a>
+              </li>
+              <li>
+                <a href="#kezeles-utan" class="hover:text-[#c53f75] transition-colors">8. Mit tegyél a lézeres szőrtelenítő kezelés után?</a>
+              </li>
+            </ol>
+          </nav>
+
+          <!-- Hero Image -->
+          <div class="mb-12">
+        <img
+          src="/images/lezeres-szortelenites-beautyflow.jpg"
+          alt="Dióda lézeres szőrtelenítés kezelés a Beautyflow szalonban"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Hogyan működik -->
+      <section id="hogyan-mukodik" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Hogyan működik a dióda lézeres szőrtelenítés?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A lézeres szőrtelenítés alapelve nagyon egyszerű: a gép egy speciális fényt bocsát ki, amit a szőrszálakban lévő festékanyag,
+          a melanin elnyel. Ez a fény hővé alakul, és kiégeti a szőrtüszőt, ami ezután nem fog többé új szőrszálat termelni,
+          vagy csak sokkal vékonyabbat és gyengébbet.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Fontos tudni, hogy a lézer csak azokra a szőrszálakra tud hatni, amelyek éppen aktívan növekedési szakaszban vannak,
+          mert maga a szőrszál az, ami felveszi és a szőrtüsző felé továbbítja a hőt.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          Ezért kell többször is kezelni ugyanazt a területet, hogy az idő múltával azokat a szőrszálakat is elérje a lézer,
+          amelyek éppen nem látszanak.
+        </p>
+
+        <!-- How it works image -->
+        <div class="mb-8">
+          <img
+            src="/images/lezeres-szortelenites-hogyan-mukodik.jpg"
+            alt="Hogyan működik a lézeres szőrtelenítés - 4 lépés illusztráció"
+            class="w-full rounded-xl"
+          />
+        </div>
+
+        <!-- 4 steps explanation -->
+        <div class="bg-gray-50 rounded-xl p-6 mb-8">
+          <p class="text-gray-700 mb-4">
+            <strong>1. kép:</strong> Az első kezeléskor a szőrszálaknak láthatónak kell lenniük a bőr felszínén.
+          </p>
+          <p class="text-gray-700 mb-4">
+            <strong>2. kép:</strong> Amikor a lézersugarat a szőrszálra lőjük, a hőenergia a melaninba szívódik fel, ami felmelegíti a szőrszál többi részét is.
+          </p>
+          <p class="text-gray-700 mb-4">
+            <strong>3. kép:</strong> A hő vagy meggyengíti, vagy teljesen elpusztítja a szőrtüszőt. Ennek következtében a szőrtüsző leválik a szőrszálról.
+          </p>
+          <p class="text-gray-700">
+            <strong>4. kép:</strong> A szőr kihullik, és mivel a szőrtüsző már nincs jelen, azon a területen nem tud újra kinőni.
+          </p>
+        </div>
+
+        <!-- Booking buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <a href="/idopontfoglalas?helyszin=buda" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Időpontok Budára
+          </a>
+          <a href="/idopontfoglalas?helyszin=pest" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Időpontok Pestre
+          </a>
+        </div>
+      </section>
+
+      <!-- Diode treatment image -->
+      <div class="mb-12">
+        <img
+          src="/images/lezeres-szortelenites-dioda.jpg"
+          alt="Dióda lézeres szőrtelenítés hónalj kezelés"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Három hullámhossz -->
+      <section id="harom-hullamhossz" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Miért fontos, hogy három hullámhosszos géppel kezeljenek?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Ez valószínűleg egy olyan kérdés, amit a legtöbben nem is értenek elsőre - de a kezelés sikere múlhat a válaszon!
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A diódalézeres szőrtelenítő kezelések esetében a hullámhossz a kezelési mélységet jelöli, tehát azt,
+          hogy a bőrfelszín alatt meddig éri el a szőrtüszőket a készülék.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Mivel a szőrtüszők alkati adottságtól és a testterületeidtől függően 650-1060nm-ig több mélységben is megtalálhatóak,
+          az egyhullámhosszos gépek gyakran nem adnak teljesen kielégítő eredményt. Ezeket 808 nanométerre kalibrálják,
+          így sok, a felszínhez közelebbi vagy mélyebbről eredő szőrszálat egyszerűen nem érnek el.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A Lumino 1200 lézeres szőrtelenítő technológiát azért fejlesztették ki, hogy minden mélységben tudjuk kezelni a szőrtüszőket
+          és ne maradjanak meg szőrszálak itt-ott amiatt, hogy magasabban vagy mélyebben találhatóak, mint 808nm.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A másik ok, amiért feltétlenül többhullámhosszos gépet javaslok, az a bőrszín kérdése.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Igaz, hogy a 808 nanométeres lézerrel papíron minden bőrtípus kezelhető, de valójában nem ugyanolyan megbízható a hatékonysága.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Világos bőrre például a tapasztalatunk szerint a 755 nanométeres hullámhossz a legmegfelelőbb,
+          sötétebb bőrtípusokon az 1064 nanométer hozza a legjobb eredményt. Az egyhullámhosszos gépek a kettő közé vannak beállítva,
+          ami sajnos nem a gyakorlatban nem azt jelenti, hogy mindkettőre jók, hanem hogy egyikre sem igazán tökéletesek.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          A mi gépeinkben egyetlen kezelőfejbe van beépítve mind a három hullámhossz, így minden bőrszín és szőrtípus egyaránt tökéletes hatékonysággal kezelhető.
+        </p>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/ingyenes-konzultacio"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Kérj Ingyenes konzultációt
+          </a>
+        </div>
+      </section>
+
+      <!-- Face treatment image -->
+      <div class="mb-12">
+        <img
+          src="/images/lezeres-dioda-szortelenites-budapest.jpg"
+          alt="Dióda lézeres szőrtelenítés arc kezelés Budapesten"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Mennyire tartós -->
+      <section id="mennyire-tartos" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Mennyire tartós a lézeres szőrtelenítés?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Érthető módon ez az egyik leggyakoribb kérdés, hiszen a lézeres szőrtelenítés nem olcsó és senki sem akar feleslegesen időt és pénzt áldozni egy félmegoldásra.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A jó hír az, hogy a dióda lézer hatása tényleg hosszú távon megmarad - még ha nem is örökre.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A kezeléssorozat végére (alkati adottságoktól függően 6–12 alkalom) a szőrszálaid nagyjából 80–90%-a valóban el fog tűnni,
+          és ami megmarad, az is sokkal vékonyabb és világosabb lesz, ráadásul sokkal lassabban nő vissza. Ez már önmagában óriási dolog.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Főleg, mert a legtöbb embernél a hatás utána évekig megmarad és a nem kell komolyan foglalkoznod a szőrtelenítéssel.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          Az emberi test természetesen folyamatosan változik és regenerálódik, ezért előfordulhat, hogy néhány szőrszál visszatér,
+          de az első sorozat után évente 1–3 fenntartó kezelés már bőven elégséges ahhoz, hogy a bőröd folyamatosan teljesen sima és gyulladásmentes legyen.
+        </p>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/ingyenes-konzultacio"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Kérj Ingyenes konzultációt
+          </a>
+        </div>
+      </section>
+
+      <!-- Before/After image -->
+      <div class="mb-12">
+        <Image
+          src={lezeresLabEredmeny}
+          alt="Lézeres szőrtelenítés előtte-utána eredmény lábon"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Szőke szőr -->
+      <section id="szoke-szor" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Kezelhető a szőke szőr dióda lézerrel?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Sajnos a válasz röviden: nem igazán.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A dióda lézer ugyanis - ahogy korábban írtam - a szőrszálban lévő festékanyagot, a melanint célozza meg.
+          Minél több melanin van egy szőrszálban, minél sötétebb, annál jobban elnyeli a fényt, és annál hatékonyabban tudja a lézer károsítani a szőrtüszőt.
+          Ezért működik a módszer annyira jól sötét szőrszálaknál világos bőrön.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A szőke, vörös vagy ősz szőrszálaknál viszont teljesen más a helyzet: ezek nagyon kevés melanint tartalmaznak,
+          ezért a lézer nem igazán tud eljutni a szőrtüszőkig, ami drasztikusan rontja a hatékonyságot.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          Szőke szőrszálak esetében jobb módszer lehet az elektrolízis, ami nem a pigmentet, hanem közvetlenül a szőrtüszőt célozza.
+          Ez persze lassabb és aprólékosabb, de szőke szőrnél sokszor ez az egyetlen tartós megoldás.
+        </p>
+      </section>
+
+      <!-- Section: IPL vs Dióda -->
+      <section id="ipl-vs-dioda" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Mi a különbség az IPL szőrtelenítés és a dióda lézeres szőrtelenítés között?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Első ránézésre az IPL és a dióda lézeres szőrtelenítés nagyon hasonlónak tűnhet, hiszen mindkettő fényenergiát használ a szőrtüsző roncsolására - a különbség a fény típusában és a kezelés eredményében rejlik.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Az IPL (Intense Pulsed Light) magyarul villanófényes szőrtelenítést jelent. Ilyenkor egy széles spektrumú, szórt fény éri a bőrt,
+          a szőrszál melaninja ezt a fényt hővé alakítja, amelynek egy része eljut a szőrtüszőbe.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          De az IPL sokkal kevésbé koncentrált, mint a dióda lézeres szőrtelenítés, a szőrtüszőt károsítja ugyan, de nem iktatja ki,
+          ezért az eredménye is kevésbé látványos: inkább csak ritkítani és lassítani tudja a szőr növekedését, mint teljesen megszüntetni.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A dióda lézer ezzel szemben célzott, és sokkal mélyebbre hatol a bőrben. A lézer egyesével és pontosan célozza meg a szőrszálakat,
+          amik az energiáját hő formájában a szőrtüszőbe vezetik.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A dióda lézeres szőrtelenítés sokkal pontosabb, ezért sokkal erőteljesebb, tartósabb, és nagyobb hatékonyságú is.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A kezeléssorozat végére a szőrszálak 80–90%-a teljesen eltűnik és a maradék is vékonyabb és világosabb lesz.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          A különbséget a mindennapokban is érzed: IPL esetén több kezelésre lesz szükséged és gyakrabban kell majd fenntartó kezelésekre is járnod,
+          míg a dióda lézerrel elég egy intenzív kúra és ezt követően évente 1-3 emlékeztető kezelés.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          Az IPL tehát a dióda lézeres szőrtelenítéshez képest olcsóbb, de kevésbé hatékony, csak átmeneti eredménnyel kecsegtető megoldás.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed font-semibold mb-8">
+          Ha hosszú távú eredményt szeretnél, a dióda lézer egyértelműen a hatékonyabb és tartósabb technológia.
+        </p>
+
+        <!-- Comparison Table -->
+        <div class="overflow-x-auto mb-8">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">Szempont</th>
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">Dióda lézer</th>
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">IPL (villanófény)</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700">
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Fény típusa</td><td class="py-2 px-4">Célzott lézerfény</td><td class="py-2 px-4">Szórt fény</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Energia fókuszáltsága</td><td class="py-2 px-4">Pontos célzás</td><td class="py-2 px-4">Kevésbé pontos</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Hatásmechanizmus</td><td class="py-2 px-4">Teljes hatás</td><td class="py-2 px-4">Részleges hatás</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Kezelési mélység</td><td class="py-2 px-4">Teljes</td><td class="py-2 px-4">Sekélyebb</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Precizitás</td><td class="py-2 px-4">Magas</td><td class="py-2 px-4">Közepes</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Hatásosság</td><td class="py-2 px-4">80–90%</td><td class="py-2 px-4">kb. 50–70%</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Első látható eredmény</td><td class="py-2 px-4">2–3. alkalom körül</td><td class="py-2 px-4">3–4. alkalom körül</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Fenntartó kezelések</td><td class="py-2 px-4">Évente 1–3 alkalom</td><td class="py-2 px-4">Gyakran / gyakoribb</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Bőrtípus alkalmasság</td><td class="py-2 px-4">Minden bőrtípusra</td><td class="py-2 px-4">Világos bőrön a legjobb</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Sötét bőr biztonsága</td><td class="py-2 px-4">Biztonságos</td><td class="py-2 px-4">Korlátozott</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Fájdalom</td><td class="py-2 px-4">Csípés/meleg; jó hűtéssel kíméletesebb</td><td class="py-2 px-4">Csípő/forró villanások</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Mellékhatás kockázata</td><td class="py-2 px-4">Alacsony</td><td class="py-2 px-4">Közepes</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Benőtt szőr hajlam</td><td class="py-2 px-4">Jelentősen csökkenti</td><td class="py-2 px-4">Korlátozott hatékonyság</td></tr>
+              <tr class="bg-gray-50"><td class="py-2 px-4 font-semibold">PCOS</td><td class="py-2 px-4">Teljes hatékonyság</td><td class="py-2 px-4">Korlátozott hatékonyság</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Salon image -->
+      <div class="mb-12">
+        <img
+          src="/images/beautyflow-kapcsolat-sm-1.jpg"
+          alt="Beautyflow szalon recepció"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Ellenjavallatok -->
+      <section id="ellenjavallatok" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Mik a lézeres szőrtelenítés ellenjavallatai?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Amennyiben bármilyen, a páciens egészségét, biztonságát veszélyeztető körülményt észlelünk, fenntartjuk a jogot a kezelés megtagadására!
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">
+          A lézeres szőrtelenítést az alábbi esetekben szükséges kerülni:
+        </p>
+
+        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-8">
+          <li>terhesség és szoptatás idején</li>
+          <li>lázas állapotban</li>
+          <li>cukorbetegség, epilepszia, kemoterápiás kezelés alatt</li>
+          <li>autoimmun betegségek</li>
+          <li>daganatos betegségek</li>
+          <li>aktív bőrbetegség (pl. ekcéma, psoriasis az adott területen)</li>
+          <li>aktív herpesz az adott területen</li>
+          <li>nyílt sebek, friss sérülések</li>
+          <li>keloidos vagy hypertrophiás sebgyógyulási hajlam</li>
+          <li>tetoválás-eltávolítás helyszínén</li>
+          <li>fokozott fényérzékenység vagy fényallergia</li>
+          <li>fényérzékenyítő gyógyszerek szedése (pl. retinoidok, barbiturátok, béta-blokkolók, bizonyos gyulladáscsökkentők)</li>
+          <li>barnított bőr (napozás, szolárium, önbarnító használata a kezelés előtt)</li>
+          <li>az elmúlt 21 napban gyantázott területen</li>
+          <li>fehér vagy ősz szőrszálakon</li>
+        </ul>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/ingyenes-konzultacio"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Kérj Ingyenes konzultációt
+          </a>
+        </div>
+      </section>
+
+      <!-- Section: Felkészülés -->
+      <section id="felkeszules" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Hogyan készülj fel a lézeres szőrtelenítés előtt?
+        </h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Card 1 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/ne-gyantazz.jpg" alt="Ne gyantázz" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne gyantázz és ne epilálj</h3>
+              <p class="text-gray-600 text-sm">
+                Minimum 21 nappal a kezelés előtt már csak borotvát használj! Ez azért fontos, mert így a szőrtüsző és a szőrszál kapcsolata nem sérül,
+                tehát a lézer is könnyebben célba talál.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/nenapozz.jpg" alt="Ne napozz" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne akarj barnulni előtte</h3>
+              <p class="text-gray-600 text-sm">
+                A napozás, szoláriumozás, de még a barnítókrém használata során is melanin termelődik, ami növeli az égésveszélyt.
+                14 nappal a kezelés előtt már kerüld a barnulást!
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/ne-hamlassz.jpg" alt="Ne hámlaszd" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne szőkítsd és ne hámlaszd</h3>
+              <p class="text-gray-600 text-sm">
+                A szőkítés és mélyhámlasztás érzékennyé teszi a bőrt, ami értelemszerűen nem szerencsés egy lézeres szőrtelenítő kezelés előtt.
+                Körülbelül 14 nappal a kezelés előtt hagyd abba ezeket.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/smink.jpg" alt="Ne sminkelj" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne sminkelj vagy krémezz</h3>
+              <p class="text-gray-600 text-sm">
+                A kezelés napján már ne használj krémeket, főleg ne használj fényvédő krémet illetve sminket.
+                Ezek megnehezíthetik, sőt, akár el is lehetetleníthetik a sikeres kezelést.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/gyogyser.jpg" alt="Gyógyszerek" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Szólj, ha gyógyszert szedsz</h3>
+              <p class="text-gray-600 text-sm">
+                Bizonyos gyógyszerek (pl. fényérzékenyítő antibiotikumok) ellenjavaltak, tilos a hatásuk alatt lézeres szőrtelenítést végezni,
+                ezért mindig tájékoztass minket előre, ha szedsz valamit.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/borotvalkozas.jpg" alt="Borotválkozás" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Borotválkozz 2 nappal előtte</h3>
+              <p class="text-gray-600 text-sm">
+                A kezelés előtti estén borotválkozz, ne a kezelés napján reggel. Így a bőrnek van ideje megnyugodni,
+                és a minimális szőrhossz (1-2mm) is pont ideális lesz.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking buttons -->
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/idopontfoglalas?helyszin=buda" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Időpontok Budára
+          </a>
+          <a href="/idopontfoglalas?helyszin=pest" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Időpontok Pestre
+          </a>
+        </div>
+      </section>
+
+      <!-- Section: Kezelés után -->
+      <section id="kezeles-utan" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Mit tegyél a lézeres szőrtelenítő kezelés után?
+        </h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Card 1 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/napozas.jpg" alt="Óvd a naptól" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Óvd a naptól</h3>
+              <p class="text-gray-600 text-sm">
+                Az UV-sugárzás ilyenkor nagyon káros lehet. Egy hétig kerüld a napozást és a szoláriumot,
+                és utána is használj magas faktorszámú naptejet, hogy megelőzd a pigmentfoltok kialakulását.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/onbarnito.jpg" alt="Ne használj önbarnítót" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne használj önbarnítót</h3>
+              <p class="text-gray-600 text-sm">
+                A kezelést követő körülbelül 2 hétben ne használj önbarnító krémeket, mert irritálhatják a bőrt és befolyásolhatják a bőr gyógyulását.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/krem.jpg" alt="Ne használj illatosított krémet" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne használj illatosított krémet</h3>
+              <p class="text-gray-600 text-sm">
+                A kezelés után 24–48 óráig ne használj erős illatú, színezett vagy fehérítő krémeket, parfümöt a kezelt területen, mert irritálhatja a bőröd.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/borruha.jpg" alt="Kerüld a szoros ruhát" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Kerüld a szoros ruhát</h3>
+              <p class="text-gray-600 text-sm">
+                Hagyd szabadon lélegezni a bőrt, és ne viselj olyan ruhát, ami kidörzsölheti, irritálhatja vagy szoríthatja a kezelt részt.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/szauna.jpg" alt="Kerüld az extrém hőt" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Kerüld az extrém hőt</h3>
+              <p class="text-gray-600 text-sm">
+                Legalább 48 óráig mellőzd a forró fürdőt, a gőzfürdőt, a szaunát, és ne menj erősen klórozott vízbe, például uszodába.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/borradir.jpg" alt="Ne használj bőrradírt" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Ne használj bőrradírt</h3>
+              <p class="text-gray-600 text-sm">
+                A lézeres szőrtelenítést követően körülbelül egy hétig kerüld a bőrhámlasztó kezeléseket és a bőrradír használatát.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/borotvalkozas.jpg" alt="Csak borotvát használj" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Csak borotvát használj</h3>
+              <p class="text-gray-600 text-sm">
+                Ne epilálj, ne gyantázz és ne használj szőrtelenítő krémet legalább 2 hétig, vagy a következő kezelésig. Egyedül a borotva megengedett.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 8 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/tiszta-szaraz.jpg" alt="Tartsd tisztán és szárazon" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Tartsd tisztán és szárazon</h3>
+              <p class="text-gray-600 text-sm">
+                A kezelt felületet kezeld óvatosan, óvd a vegyi anyagoktól, az irritációtól, ne dörzsöld, és ügyelj rá, hogy mindig tiszta és száraz maradjon.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 9 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <img src="/images/vizivaas.jpg" alt="Hidratálj kívül-belül" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Hidratálj kívül-belül</h3>
+              <p class="text-gray-600 text-sm">
+                Nyugtasd a bőrödet illatmentes hidratálóval vagy aloe vera géllel, és igyál sok vizet, hogy a tested belülről is támogassa a regenerációt.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+        </div><!-- End Main Article Content -->
+      </div><!-- End flex container -->
+    </div><!-- End max-w-7xl -->
+  </article>
+</Layout>
+
+<script>
+  function initArticleFeatures() {
+    // Mobile Progress Bar
+    const progressBar = document.getElementById('progress-bar');
+    const article = document.querySelector('article');
+
+    if (progressBar && article) {
+      function updateProgress() {
+        const articleRect = article.getBoundingClientRect();
+        const articleTop = articleRect.top + window.scrollY;
+        const articleHeight = article.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrolled = window.scrollY - articleTop + windowHeight;
+        const progress = Math.min(Math.max((scrolled / articleHeight) * 100, 0), 100);
+        progressBar.style.width = progress + '%';
+      }
+
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    // Active TOC Link Highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('section[id]');
+
+    if (tocLinks.length && sections.length) {
+      function updateActiveLink() {
+        let currentSection = '';
+
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 150;
+          if (window.scrollY >= sectionTop) {
+            currentSection = section.getAttribute('id');
+          }
+        });
+
+        tocLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === '#' + currentSection) {
+            link.classList.add('text-[#c53f75]', 'border-[#c53f75]', 'font-semibold');
+            link.classList.remove('border-transparent');
+          } else {
+            link.classList.remove('text-[#c53f75]', 'border-[#c53f75]', 'font-semibold');
+            link.classList.add('border-transparent');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', updateActiveLink, { passive: true });
+      updateActiveLink();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initArticleFeatures);
+  document.addEventListener('astro:page-load', initArticleFeatures);
+</script>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  article p {
+    hyphens: auto;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    table {
+      font-size: 0.75rem;
+    }
+
+    th, td {
+      padding: 0.5rem 0.25rem !important;
+    }
+  }
+</style>

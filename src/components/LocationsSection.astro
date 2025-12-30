@@ -2,6 +2,36 @@
 import { Image } from 'astro:assets';
 import budaImage from '../assets/images/Beautyflow-buda.jpg';
 import pestImage from '../assets/images/Beautyflow-Pest.jpg';
+import { type Locale, defaultLang } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    bookNow: 'Időpontfoglalás',
+    openingHours: 'Nyitvatartás',
+    hours: [
+      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
+      { days: 'Szombat', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: '10:00 – 20:00' },
+    ],
+  },
+  en: {
+    bookNow: 'Book Appointment',
+    openingHours: 'Opening Hours',
+    hours: [
+      { days: 'Monday – Friday', time: '08:00 – 20:00' },
+      { days: 'Saturday', time: '10:00 – 20:00' },
+      { days: 'Sunday', time: '10:00 – 20:00' },
+    ],
+  },
+};
+
+const t = content[lang];
 
 const locations = [
   {
@@ -10,11 +40,7 @@ const locations = [
     addressMobile: '1116 Budapest,\nVegyész utca 1.',
     image: budaImage,
     bookingUrl: 'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
-    hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
-    ],
+    hours: t.hours,
     slideFrom: 'left'
   },
   {
@@ -23,11 +49,7 @@ const locations = [
     addressMobile: '1135 Budapest,\nReitter Ferenc utca 90.',
     image: pestImage,
     bookingUrl: 'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
-    hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
-    ],
+    hours: t.hours,
     slideFrom: 'right'
   }
 ];
@@ -74,7 +96,7 @@ const locations = [
               rel="noopener"
               class="inline-block bg-[#c53f75] text-white font-semibold uppercase text-sm px-8 py-3 rounded-full hover:bg-[#a33460] transition-colors"
             >
-              Időpontfoglalás
+              {t.bookNow}
             </a>
           </div>
 
@@ -83,7 +105,7 @@ const locations = [
             <thead>
               <tr>
                 <th colspan="2" class="font-semibold py-3 text-center border-b border-gray-300">
-                  Nyitvatartás
+                  {t.openingHours}
                 </th>
               </tr>
             </thead>

@@ -1,27 +1,32 @@
 ---
-const testimonials = [
-  {
-    text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!',
-    author: 'Szilágyi Sára',
-    image: '/images/sara.png'
-  },
-  {
-    text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!',
-    author: 'Imregi Blanka',
-    image: '/images/blanka-1.png'
-  },
-  {
-    text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!',
-    author: 'Bátor Blanka',
-    image: '/images/Blanka-bat.png'
-  }
-];
+import { type Locale, defaultLang } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const testimonials = {
+  hu: [
+    { text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!', author: 'Szilágyi Sára', image: '/images/sara.png' },
+    { text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
+    { text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+  ],
+  en: [
+    { text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied, already booking my next appointment!', author: 'Szilágyi Sára', image: '/images/sara.png' },
+    { text: 'After a long time I finally got to the salon, which I wish I could have done sooner. I can\'t wait for the next time and I highly recommend it to everyone!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
+    { text: 'I wholeheartedly recommend them, professional work, lovely staff!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+  ],
+};
+
+const currentTestimonials = testimonials[lang];
 ---
 
 <section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
   <div class="max-w-[1300px] mx-auto px-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-      {testimonials.map((testimonial) => (
+      {currentTestimonials.map((testimonial) => (
         <div class="bg-white p-5 shadow-sm rounded-lg flex flex-col">
           <!-- Stars -->
           <div class="flex gap-0.5 mb-3">

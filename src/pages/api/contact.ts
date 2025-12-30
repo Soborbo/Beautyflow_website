@@ -275,11 +275,6 @@ export const POST: APIRoute = async (context) => {
     // Merge all possible env sources
     const env = { ...platformEnv, ...cfEnv };
 
-    // Debug logging
-    console.log('Cloudflare env keys:', Object.keys(env));
-    console.log('Runtime exists:', !!runtime);
-    console.log('Platform exists:', !!platform);
-
     // Honeypot check - if filled, silently succeed
     if (data.website) {
       return new Response(JSON.stringify({ success: true }), {

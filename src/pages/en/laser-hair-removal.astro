@@ -1,41 +1,41 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LocationsSection from '../components/LocationsSection.astro';
+import Layout from '../../layouts/Layout.astro';
+import LocationsSection from '../../components/LocationsSection.astro';
 import { Image } from 'astro:assets';
 
 // Image imports
-import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
-import beautyflowPest from '../assets/images/Beautyflow-Pest.jpg';
-import notinoIkon from '../assets/images/notino-ikon.png';
-import googleLogo from '../assets/images/google-logo.jpg';
-import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
-import konyaFanniKonzultacio from '../assets/images/konya-fanni-konzultacio.webp';
-import lezeresSzortelenitesBg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
-import lezeresLabSzortelenites from '../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
-import lezeresSzortelenites from '../assets/images/lezeres-szortelenites-eredmenye.jpg';
-import intimSzortelenites from '../assets/images/intim-szortelenites-lezerrel.jpg';
-import lezeresHonaljSzortelenites from '../assets/images/lezeres-honalj-szortelenites.jpg';
-import borotvalas from '../assets/images/borotvalas.jpg';
-import lezeresArModell from '../assets/images/lezeres-szortelenites-ar-modell.jpg';
-import hajdu from '../assets/images/hajdu.png';
-import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
-import skinlab from '../assets/images/logok/skinlab.webp';
-import beautyflowDijak from '../assets/images/beautyflow-dijak.webp';
-import diodaLezeresMob from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
-import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
-import higienia from '../assets/images/higienia.jpg';
-import testmeret from '../assets/images/testmeret.jpg';
-import nyitva from '../assets/images/nyitva.jpg';
-import szegyenlos from '../assets/images/szegyenlos.jpg';
-import mestIntSzortelenito from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
-import pcosSzortelenites from '../assets/images/pcos-szortelenites.jpg';
-import laszloEszter from '../assets/images/laszlo-eszter.png';
-import kitti from '../assets/images/kitti.png';
-import dora from '../assets/images/dora.png';
-import szepsegszalonVirag from '../assets/images/szepsegszalon-virag.jpg';
-import szepsegszalonRuzs from '../assets/images/szepsegszalon-ruzs.jpg';
-import szepsegszalonTrofea from '../assets/images/szepsegszalon-trofea.jpg';
-import szepsegszalonUgyfel from '../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
+import beautyflowBuda from '../../assets/images/Beautyflow-buda.jpg';
+import beautyflowPest from '../../assets/images/Beautyflow-Pest.jpg';
+import notinoIkon from '../../assets/images/notino-ikon.png';
+import googleLogo from '../../assets/images/google-logo.jpg';
+import konyaFanniSzepsegszalon from '../../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import konyaFanniKonzultacio from '../../assets/images/konya-fanni-konzultacio.webp';
+import lezeresSzortelenitesBg from '../../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+import lezeresLabSzortelenites from '../../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+import lezeresSzortelenites from '../../assets/images/lezeres-szortelenites-eredmenye.jpg';
+import intimSzortelenites from '../../assets/images/intim-szortelenites-lezerrel.jpg';
+import lezeresHonaljSzortelenites from '../../assets/images/lezeres-honalj-szortelenites.jpg';
+import borotvalas from '../../assets/images/borotvalas.jpg';
+import lezeresArModell from '../../assets/images/lezeres-szortelenites-ar-modell.jpg';
+import hajdu from '../../assets/images/hajdu.png';
+import notinoLogoSm from '../../assets/images/logok/notino-logo-sm.jpg';
+import skinlab from '../../assets/images/logok/skinlab.webp';
+import beautyflowDijak from '../../assets/images/beautyflow-dijak.webp';
+import diodaLezeresMob from '../../assets/images/dioda-lezeres-szortelenites-mob.jpg';
+import konyaFanniSzepsegszalonja from '../../assets/images/konya-fanni-szepsegszalonja.jpg';
+import higienia from '../../assets/images/higienia.jpg';
+import testmeret from '../../assets/images/testmeret.jpg';
+import nyitva from '../../assets/images/nyitva.jpg';
+import szegyenlos from '../../assets/images/szegyenlos.jpg';
+import mestIntSzortelenito from '../../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import pcosSzortelenites from '../../assets/images/pcos-szortelenites.jpg';
+import laszloEszter from '../../assets/images/laszlo-eszter.png';
+import kitti from '../../assets/images/kitti.png';
+import dora from '../../assets/images/dora.png';
+import szepsegszalonVirag from '../../assets/images/szepsegszalon-virag.jpg';
+import szepsegszalonRuzs from '../../assets/images/szepsegszalon-ruzs.jpg';
+import szepsegszalonTrofea from '../../assets/images/szepsegszalon-trofea.jpg';
+import szepsegszalonUgyfel from '../../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -47,9 +47,9 @@ const locations = [
     image: beautyflowBuda,
     bookingUrl: notinoUrlBuda,
     hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
+      { days: 'Monday – Friday', time: '08:00 – 20:00' },
+      { days: 'Saturday', time: '10:00 – 20:00' },
+      { days: 'Sunday', time: '10:00 – 20:00' },
     ]
   },
   {
@@ -58,34 +58,34 @@ const locations = [
     image: beautyflowPest,
     bookingUrl: notinoUrlPest,
     hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
-      { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
+      { days: 'Monday – Friday', time: '08:00 – 20:00' },
+      { days: 'Saturday', time: '10:00 – 20:00' },
+      { days: 'Sunday', time: '10:00 – 20:00' },
     ]
   }
 ];
 
 const stats = [
-  { icon: szepsegszalonVirag, value: '10+ év', label: 'tapasztalat' },
-  { icon: szepsegszalonRuzs, value: '10 000+', label: 'elvégzett kezelés' },
-  { icon: szepsegszalonTrofea, value: '12', label: 'legmodernebb gép' },
-  { icon: szepsegszalonUgyfel, value: '1500+', label: 'elégedett vendég' },
+  { icon: szepsegszalonVirag, value: '10+ years', label: 'experience' },
+  { icon: szepsegszalonRuzs, value: '10,000+', label: 'completed treatments' },
+  { icon: szepsegszalonTrofea, value: '12', label: 'cutting-edge devices' },
+  { icon: szepsegszalonUgyfel, value: '1,500+', label: 'satisfied clients' },
 ];
 
 const testimonials = [
   {
-    text: 'A szalon hangulata nagyon jó, csodás a berendezés is. A lézerezés elkezdése pedig életem egyik legjobb döntése volt! Ajánlom mindenkinek!',
-    author: 'László Eszter',
+    text: 'The salon atmosphere is amazing, and the decor is wonderful. Starting laser treatments was one of the best decisions of my life! I recommend it to everyone!',
+    author: 'Eszter Laszlo',
     image: laszloEszter
   },
   {
-    text: 'Fannihoz járok szőrtelenítésre, és nagyon elégedett vagyok Vele. Kedvességével, profizmusával, mindig hamar elrepül az ott töltött idő. Csak ajánlani tudom.',
-    author: 'Keul Kitti',
+    text: 'I go to Fanni for hair removal, and I am very satisfied with her. With her kindness and professionalism, time flies by. I can only recommend her.',
+    author: 'Kitti Keul',
     image: kitti
   },
   {
-    text: 'Lézeres szőrtelenítésre járok hozzá és nagyon örülök, hogy őt választottam. Amit eddig kezelt nekem, az baromi látványos.. Figyelmes és a szalonja is tip-top.',
-    author: 'Erdei Dóra',
+    text: 'I go to her for laser hair removal and I am so glad I chose her. What she has treated so far is incredibly impressive. She is attentive and her salon is spotless.',
+    author: 'Dora Erdei',
     image: dora
   }
 ];
@@ -93,120 +93,120 @@ const testimonials = [
 const howItWorks = [
   {
     number: '1.',
-    title: 'Ingyenes tanácsadás',
-    description: 'Az első, ingyenes konzultáció során felmérjük a bőröd és a szőr típusát és állapotát. Elmondjuk, mire figyelj oda és minden kérdésedre választ adunk'
+    title: 'Free consultation',
+    description: 'During the first free consultation, we assess your skin and hair type and condition. We tell you what to pay attention to and answer all your questions.'
   },
   {
     number: '2.',
-    title: 'Minden kezelés előtt',
-    description: 'Teljes kozmetikai váltóruhát kapsz tőlünk minden kezelés előtt. Lefertőtlenítjük a kezelendő területet letakarjuk a tetoválásokat, anyajegyeket, és az egyedi bőr- és szőrtípusodnak megfelelően beállítjuk a gépet.'
+    title: 'Before each treatment',
+    description: 'You receive complete cosmetic change clothes from us before each treatment. We disinfect the area to be treated, cover tattoos and moles, and adjust the machine according to your individual skin and hair type.'
   },
   {
     number: '3.',
-    title: 'A kezelés menete',
-    description: 'A kezelés időtartama a kezelt felület nagyságától függően 10 és 120 perc közötti hosszúságú lesz. Mindig annyi időt szánunk rád, amennyi az optimális eredmény eléréséhez kell!'
+    title: 'Treatment process',
+    description: 'The duration of the treatment will be between 10 and 120 minutes depending on the size of the treated area. We always take as much time as needed to achieve optimal results!'
   },
   {
     number: '4.',
-    title: 'Hány kezelésre kell?',
-    description: 'A kezeléseket 10-12 alkalommal (havonta egyszer) kell elvégezni, hogy az eredmény tartós és végleges legyen. Később évente egy, maximum két alkalommal szoktunk utókezelést végezni a tökéletes és végleges szőrtelenítés érdekében.'
+    title: 'How many treatments?',
+    description: 'Treatments need to be performed 10-12 times (once a month) for lasting and permanent results. Later, we usually perform one or maximum two follow-up treatments per year for perfect and permanent hair removal.'
   }
 ];
 
 const packages = [
-  { name: 'Diamond', content: 'Teljes intim + Popsi belső + Teljes kar + Hónalj + Teljes láb', price: '55 000', popular: false },
-  { name: 'Gold', content: 'Teljes intim + Popsi belső + Hónalj + Teljes láb', price: '45 000', popular: true },
-  { name: 'Silver', content: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '35 000', popular: false },
-  { name: 'White', content: 'Teljes intim + Popsi belső + Hónalj', price: '23 000', popular: false },
-  { name: 'Pearl', content: 'Hónalj + Lábszár térdig', price: '21 000', popular: false },
-  { name: 'Shine', content: 'Hónalj + Bikinivonal', price: '16 000', popular: false },
+  { name: 'Diamond', content: 'Full bikini + Inner buttocks + Full arms + Underarms + Full legs', price: '55 000', popular: false },
+  { name: 'Gold', content: 'Full bikini + Inner buttocks + Underarms + Full legs', price: '45 000', popular: true },
+  { name: 'Silver', content: 'Full bikini + Inner buttocks + Underarms + Lower legs', price: '35 000', popular: false },
+  { name: 'White', content: 'Full bikini + Inner buttocks + Underarms', price: '23 000', popular: false },
+  { name: 'Pearl', content: 'Underarms + Lower legs', price: '21 000', popular: false },
+  { name: 'Shine', content: 'Underarms + Bikini line', price: '16 000', popular: false },
 ];
 
 const priceList = [
-  { area: 'Alkar', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
-  { area: 'Áll', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
-  { area: 'Bajusz', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
-  { area: 'Bajusz + Áll', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
-  { area: 'Bikinivonal', p1: '9 000', p3: '22 500', p6: '45 000', p10: '76 500' },
-  { area: 'Comb', p1: '17 000', p3: '42 500', p6: '85 000', p10: '144 500' },
-  { area: 'Farpofák', p1: '12 000', p3: '30 000', p6: '60 000', p10: '102 000' },
-  { area: 'Has', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
-  { area: 'Hascsík', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
-  { area: 'Hát', p1: '20 000', p3: '50 000', p6: '100 000', p10: '170 000' },
-  { area: 'Hónalj', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
-  { area: 'Lábszár térdig', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
-  { area: 'Mellbimbó', p1: '5 000', p3: '12 500', p6: '25 000', p10: '42 500' },
-  { area: 'Mellek közt', p1: '5 000', p3: '12 500', p6: '25 000', p10: '42 500' },
-  { area: 'Popsi belső ív', p1: '8 000', p3: '20 000', p6: '40 000', p10: '68 000' },
-  { area: 'Teljes arc', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
-  { area: 'Teljes far + popsi belső', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
-  { area: 'Teljes intim', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
-  { area: 'Teljes intim + popsi belső', p1: '17 000', p3: '42 500', p6: '85 000', p10: '144 500' },
-  { area: 'Teljes kar', p1: '16 000', p3: '40 000', p6: '80 000', p10: '136 000' },
-  { area: 'Teljes láb', p1: '28 000', p3: '70 000', p6: '140 000', p10: '238 000' },
+  { area: 'Forearm', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
+  { area: 'Chin', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
+  { area: 'Mustache', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
+  { area: 'Mustache + Chin', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
+  { area: 'Bikini line', p1: '9 000', p3: '22 500', p6: '45 000', p10: '76 500' },
+  { area: 'Thighs', p1: '17 000', p3: '42 500', p6: '85 000', p10: '144 500' },
+  { area: 'Buttocks', p1: '12 000', p3: '30 000', p6: '60 000', p10: '102 000' },
+  { area: 'Abdomen', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
+  { area: 'Happy trail', p1: '6 000', p3: '15 000', p6: '30 000', p10: '51 000' },
+  { area: 'Back', p1: '20 000', p3: '50 000', p6: '100 000', p10: '170 000' },
+  { area: 'Underarms', p1: '10 000', p3: '25 000', p6: '50 000', p10: '85 000' },
+  { area: 'Lower legs', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
+  { area: 'Nipples', p1: '5 000', p3: '12 500', p6: '25 000', p10: '42 500' },
+  { area: 'Between breasts', p1: '5 000', p3: '12 500', p6: '25 000', p10: '42 500' },
+  { area: 'Inner buttocks', p1: '8 000', p3: '20 000', p6: '40 000', p10: '68 000' },
+  { area: 'Full face', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
+  { area: 'Full buttocks + inner', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
+  { area: 'Full bikini', p1: '15 000', p3: '37 500', p6: '75 000', p10: '127 500' },
+  { area: 'Full bikini + inner buttocks', p1: '17 000', p3: '42 500', p6: '85 000', p10: '144 500' },
+  { area: 'Full arms', p1: '16 000', p3: '40 000', p6: '80 000', p10: '136 000' },
+  { area: 'Full legs', p1: '28 000', p3: '70 000', p6: '140 000', p10: '238 000' },
 ];
 
 const whyChooseUs = [
   {
     image: mestIntSzortelenito,
-    title: 'AI-vezérelt gépek\ncsúcstechnológiával',
-    description: 'A legmodernebb dióda lézeres szőrtelenítő géppel dolgozunk, amelyet mesterséges intelligencia segít a bőr- és szőrtípushoz igazítani – minden alkalommal tökéletes precizitással.'
+    title: 'AI-powered devices\nwith cutting-edge technology',
+    description: 'We work with the most modern diode laser hair removal machine, which is assisted by artificial intelligence to adapt to skin and hair type - with perfect precision every time.'
   },
   {
     image: szegyenlos,
-    title: 'Szégyenlős vagy?\nSemmi gond, segítünk!',
-    description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.'
+    title: 'Feeling shy?\nNo problem, we help!',
+    description: 'Having trouble undressing in front of others? Completely understandable. With us, you can freely request that your most preferred colleague be your personal specialist, and from then on they will always treat you. Maximum trust and discretion are standard with us.'
   },
   {
     image: konyaFanniSzepsegszalonja,
-    title: 'Barátságos, „csajos",\nfelszabadító légkör',
-    description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.'
+    title: 'Friendly, "girly",\nliberating atmosphere',
+    description: 'For us, the beauty salon is about both external and internal beauty, we care for body and soul simultaneously. We welcome you with coffee, conversation, and sincere attention.'
   },
   {
     image: higienia,
-    title: 'Orvosi szintű tisztaság\nés higiénia',
-    description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
+    title: 'Medical-grade cleanliness\nand hygiene',
+    description: 'Safety and health are more important to us than anything else. We provide disposable tools and a sterile environment for you during every treatment.'
   },
   {
     image: testmeret,
-    title: 'Minden testalkat\nugyanannyi fizet',
-    description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.'
+    title: 'Every body type\npays the same',
+    description: 'We treat people, not bodies. We do not differentiate between slim and larger girls, everyone pays the same with us, because that is fair.'
   },
   {
     image: nyitva,
-    title: 'Heti 7 napos\nnyitvatartás',
-    description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.'
+    title: 'Open 7 days\na week',
+    description: 'Have perfectly clean and healthy facial skin painlessly.'
   },
   {
     image: diodaLezeresMob,
-    title: 'Nem futószalagon\ndolgozunk',
-    description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.'
+    title: 'We do not work\non an assembly line',
+    description: 'Safety and health are more important to us than anything else. We provide disposable tools and a sterile environment for you during every treatment.'
   },
   {
     image: pcosSzortelenites,
-    title: 'Akkor is számíthatsz ránk,\nha más nem járt sikerrel',
-    description: 'Főleg PCOS-es vendégeink szoktak számos korábbi sikertelen próbálkozásról beszámolni, amit a hormonális okok miatt kialakult különösen erős szőrzet okoz. Mi rászánjuk az időt és az energiát, hogy minden'
+    title: 'You can count on us\neven when others failed',
+    description: 'Especially our PCOS clients often report numerous previous unsuccessful attempts caused by particularly strong hair growth due to hormonal reasons. We take the time and energy to help everyone.'
   },
   {
     image: beautyflowDijak,
-    title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás',
-    description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.'
+    title: 'Multiple award-winning,\nreliable business',
+    description: 'Over the years, we have won numerous awards, from the "Fair Business" award to the "Notino Salon of the Month" recognition.'
   }
 ];
 
 const faqs = [
-  { question: 'Mennyire fájdalmas a lézeres szőrtelenítés?', answer: 'A modern dióda lézerek beépített hűtőrendszerrel rendelkeznek, ami minimalizálja a kellemetlenséget. A legtöbb vendégünk csak enyhe melegséget és enyhe csípést érez.' },
-  { question: 'Hány alkalommal számoljak?', answer: 'Általában 10-12 kezelés szükséges a tartós eredményhez, havonta egyszer. A pontos szám egyénenként változik.' },
-  { question: 'Végleges az eredmény?', answer: 'Igen, a lézeres szőrtelenítés tartós eredményt biztosít. Évente 1-2 karbantartó kezelés javasolt.' },
-  { question: 'Mit csinálj a kezelés előtt és után?', answer: 'A kezelés előtt 24-48 órával borotváld le a területet. Kerüld a napozást és az önbarnítót 2 hétig a kezelés előtt és után.' },
-  { question: 'Mikortól látszik majd az eredmény?', answer: 'Az első kezelés után 1-2 héten belül a kezelt szőrszálak kihullanak. A teljes eredmény a kezeléssorozat után látható.' },
-  { question: 'Minden bőrtípuson működik?', answer: 'A modern dióda lézerek minden bőrtípusra alkalmazhatók biztonságosan.' },
-  { question: 'Borotválkozhatok-e két kezelés között?', answer: 'Igen, borotválkozni szabad. Gyantázni, szőrtelenítő krémet használni viszont nem ajánlott.' },
-  { question: 'Lehet-e mellékhatás vagy szövődmény?', answer: 'Enyhe bőrpír jelentkezhet, ami általában néhány órán belül elmúlik. Komolyabb mellékhatás rendkívül ritka.' },
-  { question: 'Jöhetek-e menstruáció alatt?', answer: 'Igen, a menstruáció nem akadálya a kezelésnek, csak az intim terület kezelését javasolt elhalasztani.' },
-  { question: 'Férfiak is jöhetnek?', answer: 'Természetesen, férfi vendégeinket is szívesen látjuk.' },
-  { question: 'Mi a helyzet terhesség és szoptatás alatt?', answer: 'Terhesség és szoptatás alatt nem javasolt a kezelés.' },
-  { question: 'Mikor nem javasolt a lézeres szőrtelenítés?', answer: 'Terhesség, szoptatás, aktív bőrfertőzés, friss barnulás, bizonyos gyógyszerszedés esetén nem javasolt.' },
+  { question: 'How painful is laser hair removal?', answer: 'Modern diode lasers have built-in cooling systems that minimize discomfort. Most of our clients only feel mild warmth and a slight tingling.' },
+  { question: 'How many sessions should I expect?', answer: 'Generally 10-12 treatments are needed for lasting results, once a month. The exact number varies individually.' },
+  { question: 'Is the result permanent?', answer: 'Yes, laser hair removal provides lasting results. 1-2 maintenance treatments per year are recommended.' },
+  { question: 'What should I do before and after treatment?', answer: 'Shave the area 24-48 hours before treatment. Avoid sunbathing and self-tanner for 2 weeks before and after treatment.' },
+  { question: 'When will I see results?', answer: 'Within 1-2 weeks after the first treatment, the treated hairs will fall out. Full results are visible after the treatment series.' },
+  { question: 'Does it work on all skin types?', answer: 'Modern diode lasers can be safely used on all skin types.' },
+  { question: 'Can I shave between treatments?', answer: 'Yes, shaving is allowed. However, waxing or using depilatory cream is not recommended.' },
+  { question: 'Can there be side effects or complications?', answer: 'Mild skin redness may occur, which usually disappears within a few hours. Serious side effects are extremely rare.' },
+  { question: 'Can I come during menstruation?', answer: 'Yes, menstruation is not an obstacle to treatment, only intimate area treatment is recommended to be postponed.' },
+  { question: 'Can men also come?', answer: 'Of course, we welcome our male clients as well.' },
+  { question: 'What about during pregnancy and breastfeeding?', answer: 'Treatment is not recommended during pregnancy and breastfeeding.' },
+  { question: 'When is laser hair removal not recommended?', answer: 'Not recommended during pregnancy, breastfeeding, active skin infection, fresh tan, or while taking certain medications.' },
 ];
 
 const faqSchema = {
@@ -225,15 +225,15 @@ const faqSchema = {
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  "name": "Dióda Lézeres Szőrtelenítés",
-  "description": "Végleges dióda lézeres szőrtelenítés AI-vezérelt technológiával. Fájdalommentes kezelés, garantált eredmény.",
+  "name": "Diode Laser Hair Removal",
+  "description": "Permanent diode laser hair removal with AI-powered technology. Painless treatment, guaranteed results.",
   "provider": {
     "@type": "BeautySalon",
-    "name": "Beautyflow Szépségszalon",
+    "name": "Beautyflow Beauty Salon",
     "url": "https://beautyflow.hu"
   },
   "areaServed": "Budapest",
-  "serviceType": "Lézeres szőrtelenítés",
+  "serviceType": "Laser hair removal",
   "offers": {
     "@type": "AggregateOffer",
     "priceCurrency": "HUF",
@@ -245,13 +245,13 @@ const serviceSchema = {
 ---
 
 <Layout
-  title="Dióda Lézeres Szőrtelenítés Budapest - Végleges Szőrtelenítés | Beautyflow"
-  description="Végleges dióda lézeres szőrtelenítés Budapesten. AI-vezérelt technológia, fájdalommentes kezelés, garantált eredmény. Kérj ingyenes konzultációt!"
+  lang="en"
+  title="Diode Laser Hair Removal Budapest - Permanent Hair Removal | Beautyflow"
+  description="Permanent diode laser hair removal in Budapest. AI-powered technology, painless treatment, guaranteed results. Request a free consultation!"
 >
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
 
-  <div class="overflow-x-hidden">
   <!-- Hero Section - Full viewport height minus header (60px) and stats (80px) -->
   <section class="hero-section relative lg:h-[calc(100dvh-60px)] flex flex-col">
     <!-- Top row: Text + Image - takes remaining space -->
@@ -272,29 +272,29 @@ const serviceSchema = {
               <div class="text-left">
                 <div class="flex items-center gap-1">
                   <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                  <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Díjnyertes szalon</span>
+                  <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Award-winning salon</span>
                 </div>
-                <span class="text-sm font-bold text-[#c53f75]">Notino "Hónap Szalonja"</span>
+                <span class="text-sm font-bold text-[#c53f75]">Notino "Salon of the Month"</span>
               </div>
             </div>
 
             <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2 animate-fade-in">
-              Dióda lézeres szőrtelenítés Budapest
+              Diode Laser Hair Removal Budapest
             </h1>
             <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight animate-slide-up">
-              Szabadulj meg a szőrproblémádtól egyszer és mindenkorra
+              Get rid of your hair problems once and for all
             </h2>
             <p class="text-gray-600 mb-5 text-base lg:text-lg animate-fade-in-delay max-w-lg mx-auto">
-              A legmodernebb, mesterséges intelligenciával vezérelt gépekkel Budán és Pesten
+              With the most modern AI-powered devices in Buda and Pest
             </p>
 
             <!-- Centered CTA row -->
             <div class="flex flex-col items-center justify-center gap-2 animate-fade-in-delay-2">
               <a
-                href="/ingyenes-konzultacio"
+                href="/en/free-consultation"
                 class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm lg:text-base"
               >
-                Kérj Ingyenes konzultációt
+                Request Free Consultation
               </a>
               <a
                 href="tel:+3613009414"
@@ -313,7 +313,7 @@ const serviceSchema = {
         <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[250px] bg-[#fff9f7]">
           <Image
             src={lezeresSzortelenitesBg}
-            alt="Dióda lézeres szőrtelenítés kezelés"
+            alt="Diode laser hair removal treatment"
             class="w-full h-full object-contain animate-zoom-in"
             format="webp"
             quality={80}
@@ -333,7 +333,7 @@ const serviceSchema = {
                     ))}
                   </div>
                 </div>
-                <p class="text-[9px] lg:text-[11px] text-gray-600">Google értékelés alapján</p>
+                <p class="text-[9px] lg:text-[11px] text-gray-600">Based on Google reviews</p>
               </div>
             </div>
           </div>
@@ -367,7 +367,7 @@ const serviceSchema = {
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
             <Image
               src={konyaFanniSzepsegszalon}
-              alt="Kónya Fanni lézeres szőrtelenítés szakértő"
+              alt="Fanni Konya laser hair removal expert"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
               format="webp"
               quality={80}
@@ -381,21 +381,21 @@ const serviceSchema = {
                 </svg>
               </div>
               <div class="leading-tight">
-                <p class="text-[#c53f75] font-semibold text-sm mb-0">Kónya Fanni</p>
-                <p class="text-gray-500 text-xs mb-0">ügyvezető</p>
+                <p class="text-[#c53f75] font-semibold text-sm mb-0">Fanni Konya</p>
+                <p class="text-gray-500 text-xs mb-0">CEO</p>
               </div>
             </div>
           </div>
           <!-- Text content -->
           <div class="w-full lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
             <p class="text-gray-700 mb-5 leading-relaxed" style="font-size: 18px;">
-              Ha volt már olyan, hogy visszatetted a szoknyát reggel, mert nem volt időd szőrteleníteni, vagy kényelmetlenül érezted magad egy rövid ujjú felsőben, mert borostás vagy piros pöttyös volt a bőröd – nem vagy egyedül.
+              Have you ever put the skirt back in the morning because you did not have time to remove hair, or felt uncomfortable in a short-sleeved top because your skin was stubbly or had red dots? You are not alone.
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              A dióda lézeres szőrtelenítés nemcsak tartósan eltávolítja a szőrszálakat, de véget vet a gyulladt, benőtt szőrszálaknak és a borotválás okozta irritációnak is. <strong>Már az első kezelés után érezhető a különbség</strong>: a bőr simább, puhább lesz, és minden alkalom után egyre ritkábban kell borotválkoznod. Igen, még PCOS esetén is!
+              Diode laser hair removal not only permanently removes hair, but also ends ingrown hairs and irritation caused by shaving. <strong>You can feel the difference after the first treatment</strong>: the skin becomes smoother, softer, and you will need to shave less and less after each session. Yes, even with PCOS!
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>A dióda lézeres szőrtelenítés fájdalommentes, hatékony, és ma már mindenki számára elérhető, mindennapi luxus</strong>: egy kihagyhatatlan esély, hogy végre felszabadultan, magabiztosan élvezheted a nőiességedet.
+              <strong>Diode laser hair removal is painless, effective, and now an accessible everyday luxury for everyone</strong>: an unmissable opportunity to finally enjoy your femininity freely and confidently.
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -405,8 +405,8 @@ const serviceSchema = {
                 </svg>
               </div>
               <div class="leading-tight">
-                <p class="text-[#c53f75] font-semibold mb-0">Kónya Fanni</p>
-                <p class="text-gray-500 text-sm mb-0">ügyvezető</p>
+                <p class="text-[#c53f75] font-semibold mb-0">Fanni Konya</p>
+                <p class="text-gray-500 text-sm mb-0">CEO</p>
               </div>
             </div>
           </div>
@@ -416,49 +416,36 @@ const serviceSchema = {
   </section>
 
   <!-- Intro Text Section with YouTube Video -->
-  <section class="section-animate overflow-hidden">
-    <div class="flex flex-col lg:flex-row lg:min-h-[500px]">
-      <!-- YouTube Shorts Video - Left side (Lite YouTube for performance) -->
+  <section class="section-animate">
+    <div class="flex flex-col lg:flex-row min-h-[500px]">
+      <!-- YouTube Shorts Video - Left side -->
       <div class="w-full lg:w-1/2 relative overflow-hidden flex items-center justify-center bg-black">
-        <div
-          id="lite-youtube"
-          data-videoid="NU5avBZmB58"
-          class="w-full h-full relative cursor-pointer group min-h-[300px] lg:min-h-[500px]"
-        >
-          <!-- Placeholder image -->
-          <img
-            src="https://i.ytimg.com/vi/NU5avBZmB58/maxresdefault.jpg"
-            alt="Lézeres szőrtelenítés videó"
-            class="w-full h-full object-cover absolute inset-0"
-            loading="lazy"
-          />
-          <!-- Play button overlay -->
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-16 h-16 lg:w-20 lg:h-20 bg-red-600 rounded-full flex items-center justify-center group-hover:bg-red-700 transition-colors shadow-lg">
-              <svg class="w-8 h-8 lg:w-10 lg:h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <iframe
+          src="https://www.youtube.com/embed/NU5avBZmB58"
+          class="w-full h-full"
+          style="min-height: 500px; border: none;"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
       <!-- Text - Right side -->
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-20 bg-white">
         <div class="px-[8%] lg:px-[10%]">
           <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-6 uppercase">
-            Miben más a lézeres szőrtelenítés nálunk?
+            What makes laser hair removal different with us?
           </h2>
           <p class="text-gray-700 mb-5" style="font-size: 16px;">
-            Tudjuk, hogy sokan szkeptikusak a lézeres szőrtelenítéssel kapcsolatban, mert nem minden szalon és nem minden kezelés hozza ugyanazt az eredményt. Éppen ezért mi mindig egy ingyenes, őszinte konzultációval kezdünk.
+            We know that many people are skeptical about laser hair removal because not every salon and not every treatment delivers the same results. That is why we always start with a free, honest consultation.
           </p>
           <p class="text-gray-700 mb-5" style="font-size: 16px;">
-            Felmérjük a bőr- és szőrtípusodat, és csak akkor kezdünk bele egyáltalán a kezelésbe, ha garantálni tudjuk a sikert. A <strong>mesterséges intelligenciával vezérelt</strong>, 4 hullámhosszon működő dióda lézereink még akár PCOS esetén is hatékonyan működnek, és a gépeket mindig a te egyedi adottságaidhoz állítjuk be. <strong>A kezelésnek nincs időkorlátja</strong>: addig fogunk dolgozni, amíg a legjobb eredményt el nem érjük.
+            We assess your skin and hair type, and only start treatment if we can guarantee success. Our <strong>AI-powered</strong> diode lasers operating on 4 wavelengths work effectively even in PCOS cases, and we always adjust the machines to your individual characteristics. <strong>There is no time limit on treatments</strong>: we will work until we achieve the best results.
           </p>
           <p class="text-gray-700 mb-5" style="font-size: 16px;">
-            Nálunk <strong>mindig ugyanaz a kezelő fog foglalkozni veled</strong>, aki ismeri a bőrödet, tudja, mi működik nálad, és aki előtt nem leszel szégyenlős, mert ki tud alakulni a bizalom.
+            With us, <strong>the same specialist will always take care of you</strong>, someone who knows your skin, knows what works for you, and in front of whom you will not feel shy because trust can develop.
           </p>
           <p class="text-gray-700" style="font-size: 16px;">
-            Ami pedig a fájdalmat illeti: a mi eljárásunkkal egy <strong>enyhe csipkelődést és melegséget fogsz csak érezni</strong> – a legtöbb vendégünk meglepődik, mennyivel elviselhetőbb, mint amire számított.
+            As for the pain: with our procedure, you will only feel a <strong>mild tingling and warmth</strong> - most of our clients are surprised how much more bearable it is than they expected.
           </p>
         </div>
       </div>
@@ -474,7 +461,7 @@ const serviceSchema = {
           <div class="lg:w-1/2 relative">
             <Image
               src={konyaFanniKonzultacio}
-              alt="Kónya Fanni konzultáció"
+              alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
               format="webp"
@@ -483,8 +470,8 @@ const serviceSchema = {
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
-                Kónya Fanni<br />
-                <span class="text-sm text-gray-500 font-normal">ügyvezető</span>
+                Fanni Konya<br />
+                <span class="text-sm text-gray-500 font-normal">CEO</span>
               </p>
             </div>
           </div>
@@ -492,26 +479,26 @@ const serviceSchema = {
           <!-- Content Column -->
           <div class="lg:w-1/2 p-6 lg:p-8 flex flex-col justify-center">
             <h2 class="font-heading text-xl lg:text-2xl text-gray-900 mb-4 uppercase leading-tight font-bold text-center">
-              Igényeld az ingyenes<br />konzultációdat!
+              Request your free<br />consultation!
             </h2>
 
             <p class="text-gray-700 mb-2 text-sm">
-              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a kezelésbe!</span>
+              <span class="font-semibold">Let's talk before you start treatment!</span>
             </p>
             <p class="text-gray-600 mb-3 text-sm">
-              Egy kb. 15 perc hosszú INGYENES alkalom során megbeszéljük, hogy
+              During a FREE session of about 15 minutes, we will discuss:
             </p>
 
             <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
-              <li>van-e bármilyen egészségügyi ellenjavallata a kezelésnek</li>
-              <li>hány alkalomra lesz szükséged</li>
-              <li>ki lenne a számodra legmegfelelőbb munkatársunk</li>
-              <li>milyen eredményekre és esetleges mellékhatásokra számíthatsz.</li>
+              <li>whether there are any health contraindications to the treatment</li>
+              <li>how many sessions you will need</li>
+              <li>which of our colleagues would be most suitable for you</li>
+              <li>what results and possible side effects you can expect.</li>
             </ul>
 
             <div class="text-center">
               <p class="text-gray-600 mb-1 text-sm">
-                Kérd az ingyenes konzultációt telefonon az alábbi számon
+                Request a free consultation by phone at the number below
               </p>
               <a
                 href="tel:+3613009414"
@@ -519,12 +506,12 @@ const serviceSchema = {
               >
                 +36 1 300 9414
               </a>
-              <p class="text-gray-500 mb-3 text-sm">vagy</p>
+              <p class="text-gray-500 mb-3 text-sm">or</p>
               <a
-                href="/ingyenes-konzultacio"
+                href="/en/free-consultation"
                 class="inline-block px-6 py-2 bg-[#c53f75] text-white font-semibold uppercase text-xs tracking-wide hover:bg-[#a33460] transition-colors rounded-full"
               >
-                Kérj Ingyenes konzultációt
+                Request Free Consultation
               </a>
             </div>
           </div>
@@ -574,14 +561,14 @@ const serviceSchema = {
     </div>
   </section>
 
-  <!-- Section 1: Merj újra rövidujjút - Before/After Image left, Text right -->
+  <!-- Section 1: Dare to wear short sleeves - Before/After Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <Image
           src={lezeresLabSzortelenites}
-          alt="Lézeres lábszőrtelenítés előtte utána"
+          alt="Laser leg hair removal before and after"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -592,17 +579,17 @@ const serviceSchema = {
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16">
         <div class="px-[10%] text-center lg:text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Merj újra rövidujjút, szoknyát és nyitott cipőt felvenni
+            Dare to wear short sleeves, skirts and open shoes again
           </h2>
           <p class="text-gray-700 mb-6">
-            A sima, irritációmentes bőr nemcsak egészségesebb, de magabiztossá is tesz. Többé nem kell azon aggódnod, hogy látható-e a borosta, van-e egy-két benőtt szőrszál, vagy pöttyös-e a bőröd borotválás után. A dióda lézeres szőrtelenítéssel <strong>újra élvezheted az öltözködés szabadságát</strong> – és nem azért takarod el magad, mert kell, hanem mert épp úgy érzed.
+            Smooth, irritation-free skin is not only healthier but also makes you confident. You no longer have to worry about visible stubble, ingrown hairs, or dotted skin after shaving. With diode laser hair removal, <strong>you can enjoy the freedom of dressing again</strong> - and you cover up not because you have to, but because you feel like it.
           </p>
           <div class="text-center">
             <a
-              href="/ingyenes-konzultacio"
+              href="/en/free-consultation"
               class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
             >
-              Kérj Ingyenes konzultációt
+              Request Free Consultation
             </a>
           </div>
         </div>
@@ -610,17 +597,17 @@ const serviceSchema = {
     </div>
   </section>
 
-  <!-- Section 2: Szőrtüszőgyulladás - Text left, Before/After Image right -->
+  <!-- Section 2: Folliculitis - Text left, Before/After Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <!-- Text -->
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-[10%] text-center lg:text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Felejtsd el a szőrtüszőgyulladást!
+            Forget about folliculitis!
           </h2>
           <p class="text-gray-700 mb-6">
-            Garanciát adunk rá, hogy a lézeres szőrtelenítéssel kezelt területekről 3 napon belül eltűnik az összes benőtt szőrszál és elmúlik az összes szőrtüszőgyulladás - és ha rendszeresen végezzük a kezeléseket, nem is térnek vissza többé!
+            We guarantee that all ingrown hairs will disappear from the laser-treated areas within 3 days and all folliculitis will clear up - and if we perform treatments regularly, they will not come back!
           </p>
         </div>
       </div>
@@ -628,7 +615,7 @@ const serviceSchema = {
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <Image
           src={lezeresSzortelenites}
-          alt="Szőrtüszőgyulladás előtte utána"
+          alt="Folliculitis before and after"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -638,14 +625,14 @@ const serviceSchema = {
     </div>
   </section>
 
-  <!-- Section 3: Látható eredmény - Before/After Image left, Text right -->
+  <!-- Section 3: Visible results - Before/After Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <Image
           src={intimSzortelenites}
-          alt="Lézeres szőrtelenítés előtte utána"
+          alt="Laser hair removal before and after"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -656,30 +643,30 @@ const serviceSchema = {
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16">
         <div class="px-[10%] text-center lg:text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Látható eredmény már az első alkalmak után
+            Visible results after the first sessions
           </h2>
           <p class="text-gray-700 mb-4">
-            Tény, hogy nem minden szalon és nem minden kezelés biztosítja ugyanazokat az eredményeket - de nálunk már az első lézeres szőrtelenítő kezelés után is látni fogod a változást. És az igazi örömhír, hogy innentől csak egyre jobb és jobb lesz.
+            It is true that not every salon and not every treatment provides the same results - but with us, you will see the difference even after the first laser hair removal treatment. And the real good news is that it only gets better and better from here.
           </p>
           <p class="text-gray-500 text-sm italic">
-            (A képen öt kezelés eredménye látható)
+            (The picture shows results after five treatments)
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 4: Izzadság - Text left, Before/After Image right -->
+  <!-- Section 4: Sweat - Text left, Before/After Image right -->
   <section class="section-animate bg-gray-50">
     <div class="flex flex-col lg:flex-row">
       <!-- Text -->
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
         <div class="px-[10%] text-center lg:text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Enyhítsd az izzadságod szagát
+            Reduce your sweat odor
           </h2>
           <p class="text-gray-700 mb-6">
-            A lézeres szőrtelenítéssel kezelt területek nem csak szebbek, de higiénikusabbak is lesznek. A szőrtelenített testrészeken természetesen, magától megváltozik a baktériumok összetétele és mennyisége is, így az izzadságod szaga is enyhébb lesz.
+            Areas treated with laser hair removal not only look better but are also more hygienic. On hair-free body parts, the composition and amount of bacteria naturally changes on its own, so your sweat odor will also be milder.
           </p>
         </div>
       </div>
@@ -687,7 +674,7 @@ const serviceSchema = {
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <Image
           src={lezeresHonaljSzortelenites}
-          alt="Hónalj szőrtelenítés előtte utána"
+          alt="Underarm hair removal before and after"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -697,14 +684,14 @@ const serviceSchema = {
     </div>
   </section>
 
-  <!-- Section 5: Felejtsd otthon a borotvát - Image left, Text right -->
+  <!-- Section 5: Leave the razor at home - Image left, Text right -->
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <!-- Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <Image
           src={borotvalas}
-          alt="Borotva"
+          alt="Razor"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
           format="webp"
           quality={80}
@@ -715,27 +702,27 @@ const serviceSchema = {
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16">
         <div class="px-[10%] text-center lg:text-left">
           <h2 class="font-heading text-[2rem] text-gray-900 mb-4 uppercase">
-            Nyugodtan felejtsd otthon a borotvát
+            Feel free to leave your razor at home
           </h2>
           <p class="text-gray-700 mb-6">
-            Biztosan te is kerültél már abba a kellemetlen helyzetbe, amikor valahol hirtelen kellett volna megjelenned vagy csak egy sima nyaraláson elfelejtettél magaddal borotvát vinni, és szégyellted a frissen kinőtt szőrszálaidat. Mostantól nyugodtan felejtsd otthon a borotvát és érezd magad magabiztosnak minden helyzetben.
+            Surely you have been in that awkward situation when you suddenly had to appear somewhere or on a simple vacation you forgot to bring a razor and were embarrassed by your freshly grown hair. From now on, feel free to leave your razor at home and feel confident in every situation.
           </p>
 
           <!-- CTA -->
           <div class="text-center">
-            <p class="text-gray-600 mb-2 text-sm">Hívj minket most!</p>
+            <p class="text-gray-600 mb-2 text-sm">Call us now!</p>
             <a
               href="tel:+3613009414"
               class="text-xl text-[#c53f75] font-bold hover:underline block mb-2"
             >
               +36 1 300 9414
             </a>
-            <p class="text-gray-500 mb-4 text-sm">vagy</p>
+            <p class="text-gray-500 mb-4 text-sm">or</p>
             <a
-              href="/ingyenes-konzultacio"
+              href="/en/free-consultation"
               class="inline-block px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg"
             >
-              Kérj Ingyenes konzultációt
+              Request Free Consultation
             </a>
           </div>
         </div>
@@ -744,17 +731,17 @@ const serviceSchema = {
   </section>
 
   <!-- Locations Section -->
-  <LocationsSection />
+  <LocationsSection lang="en" />
 
-  <!-- 6. HOGYAN MŰKÖDIK? - Interactive Journey -->
-  <section class="py-20 bg-gradient-to-b from-white via-[#fdf8f6] to-white overflow-hidden" id="kezelesi-menet">
+  <!-- 6. HOW IT WORKS? - Interactive Journey -->
+  <section class="py-20 bg-gradient-to-b from-white via-[#fdf8f6] to-white overflow-hidden" id="treatment-process">
     <div class="max-w-[1100px] mx-auto px-4">
       <div class="text-center mb-8">
         <span class="inline-block px-4 py-2 bg-[#fbe5ec] text-[#c53f75] text-sm font-semibold rounded-full mb-4">
-          Fedezd fel a folyamatot
+          Discover the process
         </span>
         <h2 class="font-heading text-2xl lg:text-4xl text-gray-900 mb-4 uppercase">
-          A lézeres szőrtelenítés menete
+          The laser hair removal process
         </h2>
       </div>
 
@@ -817,9 +804,9 @@ const serviceSchema = {
           </div>
         </div>
         <div class="text-center lg:text-left">
-          <h3 class="font-heading text-xl lg:text-2xl text-gray-900 mb-2">Nem fáj!</h3>
+          <h3 class="font-heading text-xl lg:text-2xl text-gray-900 mb-2">It does not hurt!</h3>
           <p class="text-gray-600 text-base lg:text-lg">
-            A mi eljárásunkkal egy <strong class="text-green-600">enyhe csipkelődést és melegséget</strong> fogsz csak érezni – a legtöbb vendégünk meglepődik, mennyivel elviselhetőbb, mint amire számított. A gép beépített hűtőrendszere minimalizálja a kellemetlenséget.
+            With our procedure, you will only feel a <strong class="text-green-600">mild tingling and warmth</strong> - most of our clients are surprised how much more bearable it is than they expected. The machine's built-in cooling system minimizes discomfort.
           </p>
         </div>
       </div>
@@ -830,29 +817,29 @@ const serviceSchema = {
   <section class="py-16 bg-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért minket válassz?
+        Why choose us?
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Nézd meg, miben különbözünk a többi szalontól. A Beautyflow-nál a minőség és a személyes odafigyelés az első.
+        See how we differ from other salons. At Beautyflow, quality and personal attention come first.
       </p>
 
       <div class="overflow-x-auto">
         <table class="w-full bg-white rounded-2xl shadow-lg overflow-hidden">
           <thead>
             <tr class="bg-gradient-to-r from-[#c53f75] to-[#a33460] text-white">
-              <th class="py-4 px-6 text-left font-semibold">Szempont</th>
+              <th class="py-4 px-6 text-left font-semibold">Aspect</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
                   <Image src={notinoIkon} alt="Beautyflow" class="w-6 h-6" format="webp" quality={80} loading="lazy" />
                   Beautyflow
                 </div>
               </th>
-              <th class="py-4 px-6 text-center font-semibold text-white/80">Átlagos szalon</th>
+              <th class="py-4 px-6 text-center font-semibold text-white/80">Average salon</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">AI-vezérelt, 4 hullámhosszú gép</td>
+              <td class="py-4 px-6 font-medium text-gray-900">AI-powered, 4-wavelength device</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -865,7 +852,7 @@ const serviceSchema = {
               </td>
             </tr>
             <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Mindig ugyanaz a kezelő</td>
+              <td class="py-4 px-6 font-medium text-gray-900">Always the same specialist</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -878,7 +865,7 @@ const serviceSchema = {
               </td>
             </tr>
             <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Nincs időkorlát a kezelésekre</td>
+              <td class="py-4 px-6 font-medium text-gray-900">No time limit on treatments</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -891,47 +878,47 @@ const serviceSchema = {
               </td>
             </tr>
             <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Ingyenes konzultáció</td>
+              <td class="py-4 px-6 font-medium text-gray-900">Free consultation</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
               </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Fizetős vagy nincs</td>
+              <td class="py-4 px-6 text-center text-gray-500 text-sm">Paid or none</td>
             </tr>
             <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Minden testalkat ugyanannyit fizet</td>
+              <td class="py-4 px-6 font-medium text-gray-900">Every body type pays the same</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
               </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Pótdíj felszámítás</td>
+              <td class="py-4 px-6 text-center text-gray-500 text-sm">Surcharge applies</td>
             </tr>
             <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">PCOS-es vendégek kezelése</td>
+              <td class="py-4 px-6 font-medium text-gray-900">PCOS client treatment</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
               </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Alacsony hatékonyság</td>
+              <td class="py-4 px-6 text-center text-gray-500 text-sm">Low effectiveness</td>
             </tr>
             <tr class="hover:bg-gray-50">
-              <td class="py-4 px-6 font-medium text-gray-900">Heti 7 napos nyitvatartás</td>
+              <td class="py-4 px-6 font-medium text-gray-900">Open 7 days a week</td>
               <td class="py-4 px-6 text-center">
                 <svg class="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
               </td>
-              <td class="py-4 px-6 text-center text-gray-500 text-sm">Hétköznap csak</td>
+              <td class="py-4 px-6 text-center text-gray-500 text-sm">Weekdays only</td>
             </tr>
             <tr class="hover:bg-gray-50 bg-gray-50/50">
-              <td class="py-4 px-6 font-medium text-gray-900">Díjnyertes szalon</td>
+              <td class="py-4 px-6 font-medium text-gray-900">Award-winning salon</td>
               <td class="py-4 px-6 text-center">
                 <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded-full">
                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                  Notino Hónap Szalonja
+                  Notino Salon of the Month
                 </span>
               </td>
               <td class="py-4 px-6 text-center">
@@ -945,21 +932,21 @@ const serviceSchema = {
       </div>
 
       <div class="text-center mt-8">
-        <a href="/ingyenes-konzultacio" class="inline-block px-8 py-4 bg-[#c53f75] text-white font-bold uppercase text-sm rounded-full hover:bg-[#a33460] transition-colors">
-          Kérj ingyenes konzultációt
+        <a href="/en/free-consultation" class="inline-block px-8 py-4 bg-[#c53f75] text-white font-bold uppercase text-sm rounded-full hover:bg-[#a33460] transition-colors">
+          Request free consultation
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Csomagok és Bérletek Section -->
-  <section id="arlista" class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
+  <!-- Packages and Passes Section -->
+  <section id="price-list" class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[960px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        Lézeres szőrtelenítés árak 2025
+        Laser hair removal prices 2025
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Kattints a testtájakra az árak megtekintéséhez, vagy görgess lejjebb a teljes árlistáért.
+        Click on body areas to view prices, or scroll down for the full price list.
       </p>
 
       <!-- Interactive Body Map -->
@@ -970,7 +957,7 @@ const serviceSchema = {
             <!-- Body model image -->
             <Image
               src={lezeresArModell}
-              alt="Lézeres szőrtelenítés testtájak"
+              alt="Laser hair removal body areas"
               class="w-full h-auto rounded-2xl"
               format="webp"
               quality={80}
@@ -978,41 +965,41 @@ const serviceSchema = {
             />
 
             <!-- Clickable Hotspots - positioned for the new image -->
-            <button class="body-hotspot" style="top: 24%; left: 49%; transform: translate(-50%, -50%);" data-area="arc" aria-label="Arc">
+            <button class="body-hotspot" style="top: 24%; left: 49%; transform: translate(-50%, -50%);" data-area="arc" aria-label="Face">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Arc</span>
+              <span class="hotspot-label">Face</span>
             </button>
-            <button class="body-hotspot" style="top: 32%; left: 35%; transform: translate(-50%, -50%);" data-area="honalj" aria-label="Hónalj">
+            <button class="body-hotspot" style="top: 32%; left: 35%; transform: translate(-50%, -50%);" data-area="honalj" aria-label="Underarms">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Hónalj</span>
+              <span class="hotspot-label">Underarms</span>
             </button>
-            <button class="body-hotspot" style="top: 23%; left: 58%; transform: translate(-50%, -50%);" data-area="kar" aria-label="Kar">
+            <button class="body-hotspot" style="top: 23%; left: 58%; transform: translate(-50%, -50%);" data-area="kar" aria-label="Arms">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Kar</span>
+              <span class="hotspot-label">Arms</span>
             </button>
-            <button class="body-hotspot" style="top: 40%; left: 44%; transform: translate(-50%, -50%);" data-area="dekoltazs" aria-label="Dekoltázs">
+            <button class="body-hotspot" style="top: 40%; left: 44%; transform: translate(-50%, -50%);" data-area="dekoltazs" aria-label="Decollete">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Dekoltázs</span>
+              <span class="hotspot-label">Decollete</span>
             </button>
-            <button class="body-hotspot" style="top: 50%; left: 47%; transform: translate(-50%, -50%);" data-area="has" aria-label="Has">
+            <button class="body-hotspot" style="top: 50%; left: 47%; transform: translate(-50%, -50%);" data-area="has" aria-label="Abdomen">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Has</span>
+              <span class="hotspot-label">Abdomen</span>
             </button>
-            <button class="body-hotspot" style="top: 58%; left: 51%; transform: translate(-50%, -50%);" data-area="intim" aria-label="Intim">
+            <button class="body-hotspot" style="top: 58%; left: 51%; transform: translate(-50%, -50%);" data-area="intim" aria-label="Bikini">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Intim</span>
+              <span class="hotspot-label">Bikini</span>
             </button>
-            <button class="body-hotspot" style="top: 58%; left: 80%; transform: translate(-50%, -50%);" data-area="fenek" aria-label="Fenék">
+            <button class="body-hotspot" style="top: 58%; left: 80%; transform: translate(-50%, -50%);" data-area="fenek" aria-label="Buttocks">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Fenék</span>
+              <span class="hotspot-label">Buttocks</span>
             </button>
-            <button class="body-hotspot" style="top: 41%; left: 80%; transform: translate(-50%, -50%);" data-area="hat" aria-label="Hát">
+            <button class="body-hotspot" style="top: 41%; left: 80%; transform: translate(-50%, -50%);" data-area="hat" aria-label="Back">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Hát</span>
+              <span class="hotspot-label">Back</span>
             </button>
-            <button class="body-hotspot" style="top: 70%; left: 52%; transform: translate(-50%, -50%);" data-area="lab" aria-label="Láb">
+            <button class="body-hotspot" style="top: 70%; left: 52%; transform: translate(-50%, -50%);" data-area="lab" aria-label="Legs">
               <span class="hotspot-dot"></span>
-              <span class="hotspot-label">Láb</span>
+              <span class="hotspot-label">Legs</span>
             </button>
           </div>
         </div>
@@ -1026,7 +1013,7 @@ const serviceSchema = {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                 </svg>
               </div>
-              <p class="text-gray-700 font-medium">Kattints egy testtájra a bal oldalon az árak megtekintéséhez!</p>
+              <p class="text-gray-700 font-medium">Click on a body area on the left to view prices!</p>
             </div>
 
             <div id="price-content" class="hidden">
@@ -1039,36 +1026,36 @@ const serviceSchema = {
 
               <div class="space-y-4">
                 <div class="bg-gray-50 rounded-xl p-4">
-                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Egyedi kezelés</p>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Single treatment</p>
                   <p class="text-2xl font-bold text-gray-900 whitespace-nowrap"><span id="price-single"></span> Ft</p>
                 </div>
 
                 <div class="bg-gradient-to-r from-[#c53f75]/10 to-[#e497a2]/10 rounded-xl p-4 relative overflow-hidden">
                   <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                    -17% KEDVEZMÉNY
+                    -17% DISCOUNT
                   </div>
-                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">10 alkalmas bérlet</p>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">10-session package</p>
                   <p class="text-2xl font-bold text-[#c53f75] whitespace-nowrap"><span id="price-package"></span> Ft</p>
                 </div>
               </div>
 
-              <a href="/ingyenes-konzultacio" class="mt-6 block w-full py-3 bg-[#c53f75] text-white text-center font-semibold rounded-full hover:bg-[#a33460] transition-colors">
-                Foglalj konzultációt
+              <a href="/en/free-consultation" class="mt-6 block w-full py-3 bg-[#c53f75] text-white text-center font-semibold rounded-full hover:bg-[#a33460] transition-colors">
+                Book consultation
               </a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Csomagok - Card Layout -->
+      <!-- Packages - Card Layout -->
       <div class="bg-[#fdf8f6] rounded-2xl p-6 lg:p-8 mb-12">
-        <h3 class="font-heading text-xl text-gray-900 mb-6">Csomagok</h3>
+        <h3 class="font-heading text-xl text-gray-900 mb-6">Packages</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {packages.map((pkg) => (
             <div class={`relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${pkg.popular ? 'ring-2 ring-[#c53f75]' : 'border border-gray-200'}`}>
               {pkg.popular && (
                 <div class="absolute top-0 right-0 bg-[#c53f75] text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                  Legnépszerűbb
+                  Most popular
                 </div>
               )}
               <div class={`p-5 ${pkg.popular ? 'bg-gradient-to-br from-[#fbe5ec] to-white' : ''}`}>
@@ -1080,7 +1067,7 @@ const serviceSchema = {
                 </div>
                 <div class="flex items-baseline gap-1">
                   <span class="text-2xl font-bold text-[#c53f75]">{pkg.price}</span>
-                  <span class="text-gray-500 text-sm">Ft / alkalom</span>
+                  <span class="text-gray-500 text-sm">Ft / session</span>
                 </div>
               </div>
             </div>
@@ -1088,8 +1075,8 @@ const serviceSchema = {
         </div>
         <!-- Button to price table -->
         <div class="text-center mt-6">
-          <a href="#arlista" class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            Tovább az ártáblázathoz
+          <a href="#price-list" class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            Go to price table
           </a>
         </div>
       </div>
@@ -1109,18 +1096,18 @@ const serviceSchema = {
           ))}
         </div>
         <p class="text-gray-700 mb-4 leading-relaxed">
-          A legjobb hely a dióda lézeres szőrtelenítéshez. Fanni és Piroska elképesztő, alapos munkát végeznek, és mindig gondoskodnak arról, hogy a lehető legkényelmesebb legyen. Az eljáráshoz használt gép fenomenális, és az első kezelés után lenyűgöző eredményeket fog látni.
+          The best place for diode laser hair removal. Fanni and Piroska do amazing, thorough work, and always make sure to be as comfortable as possible. The machine used for the procedure is phenomenal, and you will see impressive results after the first treatment.
         </p>
         <div class="flex items-center justify-center gap-3">
           <Image
             src={hajdu}
-            alt="László Eszter"
+            alt="Eszter Laszlo"
             class="w-12 h-12 rounded-full object-cover"
             format="webp"
             quality={80}
             loading="lazy"
           />
-          <p class="font-semibold text-gray-900">László Eszter</p>
+          <p class="font-semibold text-gray-900">Eszter Laszlo</p>
         </div>
       </div>
     </div>
@@ -1130,10 +1117,10 @@ const serviceSchema = {
   <section class="py-16 bg-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért a
+        Why choose
       </h2>
       <h2 class="font-heading text-3xl lg:text-4xl text-[#c53f75] mb-12 text-center uppercase">
-        Beautyflow szépségszalont válaszd?
+        Beautyflow beauty salon?
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1162,8 +1149,8 @@ const serviceSchema = {
       </div>
 
       <div class="text-center mt-12">
-        <a href="/ingyenes-konzultacio" class="inline-block px-8 py-4 bg-[#c53f75] text-white font-bold uppercase text-base rounded hover:bg-[#a33460] transition-colors">
-          Kérj Ingyenes konzultációt
+        <a href="/en/free-consultation" class="inline-block px-8 py-4 bg-[#c53f75] text-white font-bold uppercase text-base rounded hover:bg-[#a33460] transition-colors">
+          Request Free Consultation
         </a>
       </div>
     </div>
@@ -1173,7 +1160,7 @@ const serviceSchema = {
   <section class="py-12 bg-gray-50">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl text-gray-900 mb-8 text-center uppercase">
-        Partnereink
+        Our Partners
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
@@ -1190,7 +1177,7 @@ const serviceSchema = {
   <section class="py-16 bg-[#fff9f7]">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-12 text-center uppercase">
-        Gyakran Ismételt Kérdések
+        Frequently Asked Questions
       </h2>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -1223,7 +1210,7 @@ const serviceSchema = {
         <div>
           <Image
             src={beautyflowDijak}
-            alt="Beautyflow csapat és díjak"
+            alt="Beautyflow team and awards"
             class="w-full rounded-2xl shadow-lg"
             format="webp"
             quality={80}
@@ -1232,16 +1219,16 @@ const serviceSchema = {
         </div>
         <div>
           <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-6 uppercase">
-            Rólunk
+            About Us
           </h2>
           <p class="text-gray-700 mb-4">
-            A Beautyflow-t 2014-ben alapította <strong>Kónya Fanni</strong>, azzal a céllal, hogy egy olyan szépségszalont hozzon létre, ahol minden vendég valódi törődést és professzionális szolgáltatást kap.
+            Beautyflow was founded in 2014 by <strong>Fanni Konya</strong>, with the goal of creating a beauty salon where every guest receives genuine care and professional service.
           </p>
           <p class="text-gray-700 mb-4">
-            Az évek során két modern szalonná bővültünk – egyet Budán, egyet Pesten – és ma már <strong>6 fős csapattal</strong> dolgozunk. A <strong>Notino "Hónap Szépségszalonja"</strong> díjat is elnyertük.
+            Over the years, we have expanded to two modern salons - one in Buda, one in Pest - and now work with a <strong>team of 6</strong>. We have also won the <strong>Notino "Beauty Salon of the Month"</strong> award.
           </p>
           <p class="text-gray-700 mb-6">
-            Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.
+            Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.
           </p>
 
           <div class="flex flex-wrap gap-4 mb-6">
@@ -1249,25 +1236,25 @@ const serviceSchema = {
               <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span class="text-sm font-semibold text-gray-700">10+ év tapasztalat</span>
+              <span class="text-sm font-semibold text-gray-700">10+ years experience</span>
             </div>
             <div class="flex items-center gap-2 bg-[#fbe5ec] px-4 py-2 rounded-full">
               <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span class="text-sm font-semibold text-gray-700">6 fős szakértő csapat</span>
+              <span class="text-sm font-semibold text-gray-700">Team of 6 experts</span>
             </div>
             <div class="flex items-center gap-2 bg-[#fbe5ec] px-4 py-2 rounded-full">
               <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span class="text-sm font-semibold text-gray-700">2 helyszín: Buda és Pest</span>
+              <span class="text-sm font-semibold text-gray-700">2 locations: Buda and Pest</span>
             </div>
           </div>
 
-          <a href="/rolunk" class="inline-flex items-center gap-2 text-[#c53f75] font-semibold hover:underline">
-            Ismerj meg minket közelebbről
+          <a href="/en/about" class="inline-flex items-center gap-2 text-[#c53f75] font-semibold hover:underline">
+            Get to know us better
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -1281,10 +1268,10 @@ const serviceSchema = {
   <section class="py-16 lg:py-20 bg-gradient-to-br from-[#c53f75] to-[#a33460]">
     <div class="max-w-[900px] mx-auto px-4 text-center">
       <h2 class="font-heading text-3xl lg:text-4xl text-white mb-6 uppercase">
-        Készen állsz megszabadulni a szőrproblémáidtól?
+        Ready to get rid of your hair problems?
       </h2>
       <p class="text-white/90 mb-8 max-w-2xl mx-auto text-lg">
-        Csatlakozz a több mint 1500 elégedett vendégünkhöz, akik már élvezik a tartósan sima bőr szabadságát!
+        Join our more than 1,500 satisfied clients who already enjoy the freedom of permanently smooth skin!
       </p>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
@@ -1292,34 +1279,34 @@ const serviceSchema = {
           <svg class="w-8 h-8 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p class="text-white font-semibold text-sm">Fájdalommentes kezelés</p>
+          <p class="text-white font-semibold text-sm">Painless treatment</p>
         </div>
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
           <svg class="w-8 h-8 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <p class="text-white font-semibold text-sm">AI-vezérelt technológia</p>
+          <p class="text-white font-semibold text-sm">AI-powered technology</p>
         </div>
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
           <svg class="w-8 h-8 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p class="text-white font-semibold text-sm">Ingyenes konzultáció</p>
+          <p class="text-white font-semibold text-sm">Free consultation</p>
         </div>
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
           <svg class="w-8 h-8 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
           </svg>
-          <p class="text-white font-semibold text-sm">Díjnyertes szalon</p>
+          <p class="text-white font-semibold text-sm">Award-winning salon</p>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row justify-center gap-4">
         <a
-          href="/ingyenes-konzultacio"
+          href="/en/free-consultation"
           class="inline-block px-10 py-4 bg-white text-[#c53f75] font-bold uppercase text-sm rounded-full hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
         >
-          Kérj ingyenes konzultációt
+          Request free consultation
         </a>
         <a
           href="tel:+3613009414"
@@ -1328,12 +1315,11 @@ const serviceSchema = {
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>
-          Hívj minket: +36 1 300 9414
+          Call us: +36 1 300 9414
         </a>
       </div>
     </div>
   </section>
-  </div>
 </Layout>
 
 <style>
@@ -1619,28 +1605,6 @@ const serviceSchema = {
 </style>
 
 <script>
-  // Lite YouTube - lazy load iframe on click
-  function initLiteYouTube() {
-    const liteYoutube = document.getElementById('lite-youtube');
-    if (!liteYoutube) return;
-
-    liteYoutube.addEventListener('click', function() {
-      const videoId = this.getAttribute('data-videoid');
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-      iframe.className = 'w-full h-full absolute inset-0';
-      iframe.style.border = 'none';
-      iframe.setAttribute('frameborder', '0');
-      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-      iframe.setAttribute('allowfullscreen', '');
-
-      // Clear content and add iframe
-      this.innerHTML = '';
-      this.appendChild(iframe);
-      this.classList.remove('cursor-pointer', 'group');
-    });
-  }
-
   function initRatingAnimation() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ratingElements = document.querySelectorAll('.rating-number');
@@ -1722,10 +1686,6 @@ const serviceSchema = {
   document.addEventListener('DOMContentLoaded', initPageAnimations);
   document.addEventListener('astro:page-load', initPageAnimations);
 
-  // Initialize Lite YouTube
-  document.addEventListener('DOMContentLoaded', initLiteYouTube);
-  document.addEventListener('astro:page-load', initLiteYouTube);
-
   // Body Map Price Interaction with Tabs
   function initBodyMapPricing() {
     interface SubArea {
@@ -1741,67 +1701,67 @@ const serviceSchema = {
 
     const priceData: Record<string, AreaData> = {
       arc: {
-        title: 'Arc',
+        title: 'Face',
         subAreas: [
-          { label: 'Teljes arc', single: '15 000', package: '127 500' },
-          { label: 'Áll', single: '6 000', package: '51 000' },
-          { label: 'Bajusz + Áll', single: '10 000', package: '85 000' }
+          { label: 'Full face', single: '15 000', package: '127 500' },
+          { label: 'Chin', single: '6 000', package: '51 000' },
+          { label: 'Mustache + Chin', single: '10 000', package: '85 000' }
         ]
       },
       honalj: {
-        title: 'Hónalj',
+        title: 'Underarms',
         subAreas: [
-          { label: 'Hónalj', single: '10 000', package: '85 000' }
+          { label: 'Underarms', single: '10 000', package: '85 000' }
         ]
       },
       kar: {
-        title: 'Kar',
+        title: 'Arms',
         subAreas: [
-          { label: 'Teljes kar', single: '16 000', package: '136 000' },
-          { label: 'Alkar', single: '10 000', package: '85 000' }
+          { label: 'Full arms', single: '16 000', package: '136 000' },
+          { label: 'Forearm', single: '10 000', package: '85 000' }
         ]
       },
       dekoltazs: {
-        title: 'Dekoltázs',
+        title: 'Decollete',
         subAreas: [
-          { label: 'Mellek közt', single: '5 000', package: '42 500' }
+          { label: 'Between breasts', single: '5 000', package: '42 500' }
         ]
       },
       has: {
-        title: 'Has',
+        title: 'Abdomen',
         subAreas: [
-          { label: 'Has', single: '15 000', package: '127 500' },
-          { label: 'Hascsík', single: '6 000', package: '51 000' }
+          { label: 'Abdomen', single: '15 000', package: '127 500' },
+          { label: 'Happy trail', single: '6 000', package: '51 000' }
         ]
       },
       intim: {
-        title: 'Intim',
+        title: 'Bikini',
         subAreas: [
-          { label: 'Teljes intim', single: '15 000', package: '127 500' },
-          { label: 'Bikinivonal', single: '9 000', package: '76 500' },
-          { label: 'Teljes intim + popsi belső', single: '17 000', package: '144 500' },
-          { label: 'Popsi belső ív', single: '8 000', package: '68 000' }
+          { label: 'Full bikini', single: '15 000', package: '127 500' },
+          { label: 'Bikini line', single: '9 000', package: '76 500' },
+          { label: 'Full bikini + inner buttocks', single: '17 000', package: '144 500' },
+          { label: 'Inner buttocks', single: '8 000', package: '68 000' }
         ]
       },
       fenek: {
-        title: 'Fenék',
+        title: 'Buttocks',
         subAreas: [
-          { label: 'Teljes far + popsi belső', single: '15 000', package: '127 500' },
-          { label: 'Farpofák', single: '12 000', package: '102 000' }
+          { label: 'Full buttocks + inner', single: '15 000', package: '127 500' },
+          { label: 'Buttocks', single: '12 000', package: '102 000' }
         ]
       },
       hat: {
-        title: 'Hát',
+        title: 'Back',
         subAreas: [
-          { label: 'Hát', single: '20 000', package: '170 000' }
+          { label: 'Back', single: '20 000', package: '170 000' }
         ]
       },
       lab: {
-        title: 'Láb',
+        title: 'Legs',
         subAreas: [
-          { label: 'Teljes láb', single: '28 000', package: '238 000' },
-          { label: 'Comb', single: '17 000', package: '144 500' },
-          { label: 'Lábszár térdig', single: '15 000', package: '127 500' }
+          { label: 'Full legs', single: '28 000', package: '238 000' },
+          { label: 'Thighs', single: '17 000', package: '144 500' },
+          { label: 'Lower legs', single: '15 000', package: '127 500' }
         ]
       }
     };

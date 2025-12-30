@@ -1,0 +1,134 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const lastUpdated = '2024. január 1.';
+---
+
+<Layout
+  title="Adatvédelmi Tájékoztató | Beautyflow Szépségszalon"
+  description="A Beautyflow Szépségszalon adatvédelmi tájékoztatója. Ismerje meg, hogyan kezeljük személyes adatait."
+  lang="hu"
+>
+  <section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-white to-[#f8f4f9]">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="font-heading text-3xl md:text-4xl text-gray-900 mb-4 uppercase text-center font-bold">
+        Adatvédelmi Tájékoztató
+      </h1>
+      <p class="text-center text-gray-500 mb-12">Utolsó frissítés: {lastUpdated}</p>
+
+      <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">1. Adatkezelő</h2>
+          <p class="text-gray-600 leading-relaxed">
+            <strong>Név:</strong> Beautyflow Kft.<br />
+            <strong>Székhely:</strong> 1116 Budapest, Fegyvernek utca 121.<br />
+            <strong>Adószám:</strong> 32724316-1-43<br />
+            <strong>Cégjegyzékszám:</strong> 01-09-439280<br />
+            <strong>E-mail:</strong> hello@beautyflow.pro<br />
+            <strong>Telefon:</strong> +36 1 300 9414
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">2. A kezelt adatok köre</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            Az alábbi személyes adatokat gyűjtjük és kezeljük:
+          </p>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li>Név (vezetéknév, keresztnév)</li>
+            <li>E-mail cím</li>
+            <li>Telefonszám</li>
+            <li>Az érdeklődés tárgya (kezelés típusa)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">3. Az adatkezelés célja</h2>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li>Kapcsolatfelvétel és visszahívás biztosítása</li>
+            <li>Konzultációs időpont egyeztetése</li>
+            <li>Ügyfélszolgálati kérdések megválaszolása</li>
+            <li>Szolgáltatásainkról történő tájékoztatás</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">4. Az adatkezelés jogalapja</h2>
+          <p class="text-gray-600 leading-relaxed">
+            Az adatkezelés jogalapja az Ön hozzájárulása (GDPR 6. cikk (1) bekezdés a) pont),
+            amelyet a konzultációs űrlap kitöltésével és elküldésével ad meg.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">5. Az adatkezelés időtartama</h2>
+          <p class="text-gray-600 leading-relaxed">
+            A személyes adatokat az érdeklődés feldolgozásáig, de legfeljebb 2 évig tároljuk,
+            kivéve, ha Ön korábban kéri azok törlését.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">6. Adattovábbítás</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            Az Ön adatait harmadik félnek nem adjuk ki, kivéve az alábbi szolgáltatókat,
+            amelyek az adatkezeléshez technikai segítséget nyújtanak:
+          </p>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li><strong>Resend</strong> - E-mail küldés szolgáltatás</li>
+            <li><strong>Google Sheets</strong> - Adatok tárolása (EU-n belüli szervereken)</li>
+            <li><strong>Cloudflare</strong> - Weboldal üzemeltetés</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">7. Az Ön jogai</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            A GDPR alapján Önt az alábbi jogok illetik meg:
+          </p>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li><strong>Hozzáférési jog:</strong> Tájékoztatást kérhet az Önről tárolt adatokról</li>
+            <li><strong>Helyesbítési jog:</strong> Kérheti adatai helyesbítését</li>
+            <li><strong>Törlési jog:</strong> Kérheti adatai törlését</li>
+            <li><strong>Adathordozhatóság:</strong> Kérheti adatai kiadását géppel olvasható formátumban</li>
+            <li><strong>Tiltakozási jog:</strong> Tiltakozhat az adatkezelés ellen</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">8. Kapcsolat és panasz</h2>
+          <p class="text-gray-600 leading-relaxed">
+            Adatvédelmi kérdéseivel, panaszaival forduljon hozzánk a
+            <a href="mailto:hello@beautyflow.pro" class="text-[#c53f75] underline">hello@beautyflow.pro</a>
+            e-mail címen.
+          </p>
+          <p class="text-gray-600 leading-relaxed mt-4">
+            Ha úgy érzi, hogy jogai sérültek, panaszt tehet a Nemzeti Adatvédelmi és
+            Információszabadság Hatóságnál (NAIH):<br />
+            <strong>Cím:</strong> 1055 Budapest, Falk Miksa utca 9-11.<br />
+            <strong>Weboldal:</strong> <a href="https://naih.hu" target="_blank" rel="noopener" class="text-[#c53f75] underline">naih.hu</a>
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">9. Cookie-k (sütik)</h2>
+          <p class="text-gray-600 leading-relaxed">
+            Weboldalunk alapvető működési sütiket használ. Ezek elengedhetetlenek az oldal
+            működéséhez, és nem gyűjtenek személyes adatokat marketing célokra.
+          </p>
+        </section>
+
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+        >
+          Vissza a főoldalra
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

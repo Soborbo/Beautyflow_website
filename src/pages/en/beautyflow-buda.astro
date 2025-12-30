@@ -1,0 +1,829 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Location data
+const location = {
+  name: 'Beautyflow Buda',
+  fullName: 'Beautyflow Buda Beauty Salon',
+  address: {
+    street: 'Vegyész utca 1.',
+    postalCode: '1116',
+    city: 'Budapest',
+    district: 'District XI (Újbuda)',
+    country: 'Hungary',
+    full: '1116 Budapest, Vegyész utca 1.',
+  },
+  geo: {
+    lat: '47.4644',
+    lng: '19.0436',
+  },
+  phone: '+36 1 300 9414',
+  phoneDisplay: '+36 1 300 9414',
+  email: 'info@beautyflow.pro',
+  website: 'https://beautyflow.pro/en/beautyflow-buda',
+  bookingUrl: 'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
+  googleMapsUrl: 'https://maps.google.com/?q=Beautyflow+Buda,+1116+Budapest,+Vegyész+utca+1.',
+  googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2697.1234567890!2d19.0436!3d47.4644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDI3JzUyLjAiTiAxOcKwMDInMzciRQ!5e0!3m2!1shu!2shu!4v1234567890',
+  image: '/images/Beautyflow-buda.jpg',
+  hours: [
+    { day: 'Monday', open: '08:00', close: '20:00', dayOfWeek: 'Monday' },
+    { day: 'Tuesday', open: '08:00', close: '20:00', dayOfWeek: 'Tuesday' },
+    { day: 'Wednesday', open: '08:00', close: '20:00', dayOfWeek: 'Wednesday' },
+    { day: 'Thursday', open: '08:00', close: '20:00', dayOfWeek: 'Thursday' },
+    { day: 'Friday', open: '08:00', close: '20:00', dayOfWeek: 'Friday' },
+    { day: 'Saturday', open: '10:00', close: '20:00', dayOfWeek: 'Saturday' },
+    { day: 'Sunday', open: '10:00', close: '19:00', dayOfWeek: 'Sunday' },
+  ],
+  services: [
+    'Diode laser hair removal',
+    'HydraBeauty facial treatment',
+    'Permanent makeup',
+    'Laser tattoo removal',
+    'Carbon peeling',
+    'Pigmentation removal',
+  ],
+  parking: 'Street parking and nearby parking garage (Allee Shopping Center) available.',
+  publicTransport: 'The salon is easily accessible by metro line 4 (Újbuda-központ station, 5 min walk), as well as tram lines 41 and 47.',
+  accessibility: 'Wheelchair accessible entrance and restroom.',
+};
+
+// Services with unique descriptions for Buda
+const services = [
+  {
+    name: 'Diode Laser Hair Removal',
+    description: 'At our Buda salon, we perform permanent hair removal using the most advanced 808nm diode laser technology. Painless, fast and effective treatment for all skin types.',
+    link: '/en/diode-laser-hair-removal',
+    image: '/images/lezeres-szortelenites-beautyflow.jpg',
+  },
+  {
+    name: 'HydraBeauty Facial Treatment',
+    description: 'Deep cleansing and hydrating facial treatment that delivers immediately visible results. In our Buda salon, you can relax in a quiet, peaceful environment during the treatment.',
+    link: '/en/hydrabeauty',
+    image: '/images/hydrabeauty-arckezeles.jpg',
+  },
+  {
+    name: 'Permanent Makeup',
+    description: 'Professional eyebrow, eyeliner and lip tattooing by our experienced specialists. Natural effect, customized shape and color.',
+    link: '/en/permanent-makeup',
+    image: '/images/sminktetovalas-budapest.jpg',
+  },
+  {
+    name: 'Carbon Peeling',
+    description: 'The favorite skin rejuvenation treatment of Hollywood stars. Pore-tightening, skin cleansing and collagen-stimulating effects in a single treatment.',
+    link: '/en/carbon-peeling',
+    image: '/images/carbon-peeling-lezeres.jpg',
+  },
+];
+
+// Testimonials specific to Buda location
+const testimonials = [
+  {
+    name: 'Anna K.',
+    rating: 5,
+    text: 'The Beautyflow Buda salon is my favorite! Always professional service, clean environment and impressive results. I had my laser hair removal done here, and after 6 sessions I was completely hair-free!',
+    service: 'Laser hair removal',
+  },
+  {
+    name: 'Petra N.',
+    rating: 5,
+    text: 'After the HydraBeauty treatment, I felt like I had new skin. The atmosphere of the Buda salon is wonderful, I really relaxed.',
+    service: 'HydraBeauty facial',
+  },
+  {
+    name: 'Eszter S.',
+    rating: 5,
+    text: 'My eyebrow tattoo turned out perfect! Very natural effect, exactly what I wanted. Thank you for the expert work!',
+    service: 'Permanent makeup',
+  },
+];
+
+// LocalBusiness Schema
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "@id": "https://beautyflow.pro/en/beautyflow-buda#beautysalon",
+  "name": location.fullName,
+  "alternateName": "Beautyflow Buda",
+  "description": "Premium beauty salon in Újbuda, Budapest. Laser hair removal, HydraBeauty facial treatment, permanent makeup and carbon peeling services. Professional specialists, modern technology.",
+  "url": location.website,
+  "telephone": location.phone,
+  "email": location.email,
+  "image": [
+    "https://beautyflow.pro/images/Beautyflow-buda.jpg",
+    "https://beautyflow.pro/images/beautyflow-interior-1.jpg"
+  ],
+  "logo": "https://beautyflow.pro/images/Beautyflow-logo.png",
+  "priceRange": "$$",
+  "currenciesAccepted": "HUF",
+  "paymentAccepted": "Cash, Credit Card",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": location.address.street,
+    "addressLocality": location.address.city,
+    "addressRegion": location.address.district,
+    "postalCode": location.address.postalCode,
+    "addressCountry": "HU"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": location.geo.lat,
+    "longitude": location.geo.lng
+  },
+  "hasMap": location.googleMapsUrl,
+  "openingHoursSpecification": location.hours.map(h => ({
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": h.dayOfWeek,
+    "opens": h.open,
+    "closes": h.close
+  })),
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "reviewCount": "127",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "areaServed": [
+    {
+      "@type": "City",
+      "name": "Budapest"
+    },
+    {
+      "@type": "AdministrativeArea",
+      "name": "District XI"
+    },
+    {
+      "@type": "AdministrativeArea",
+      "name": "Újbuda"
+    }
+  ],
+  "sameAs": [
+    "https://www.facebook.com/beautyflowbuda",
+    "https://www.instagram.com/beautyflow.hu"
+  ],
+  "makesOffer": location.services.map(service => ({
+    "@type": "Offer",
+    "itemOffered": {
+      "@type": "Service",
+      "name": service
+    }
+  }))
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://beautyflow.pro/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Beautyflow Buda",
+      "item": "https://beautyflow.pro/en/beautyflow-buda"
+    }
+  ]
+};
+
+const notinoUrl = location.bookingUrl;
+---
+
+<Layout
+  title="Beautyflow Buda Beauty Salon | Laser Hair Removal Budapest | District XI"
+  description="Beautyflow Buda beauty salon in Újbuda, Budapest. Diode laser hair removal, HydraBeauty facial, permanent makeup. Address: 1116 Budapest, Vegyész u. 1. Tel: +36 1 300 9414. Book online!"
+  lang="en"
+>
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section - Kapcsolat style with image -->
+  <section class="hero-section relative lg:h-[calc(100dvh-60px)] flex flex-col">
+    <!-- Top row: Text + Image -->
+    <div class="flex flex-col lg:flex-row flex-1 min-h-0">
+      <!-- Left column: Text content -->
+      <div class="w-full lg:w-1/2 flex flex-col justify-center py-8 lg:py-12 order-2 lg:order-1 bg-[#fff9f7]">
+        <div class="w-full px-[6%] text-center">
+          <!-- Notino Award Badge -->
+          <div class="inline-flex items-center gap-2 mb-4">
+            <div class="relative">
+              <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
+              <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
+                <div class="bg-white rounded-full p-1">
+                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                </div>
+              </div>
+            </div>
+            <div class="text-left">
+              <div class="flex items-center gap-1">
+                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Award-winning salon</span>
+              </div>
+              <span class="text-sm font-bold text-[#c53f75]">Notino "Salon of the Month"</span>
+            </div>
+          </div>
+
+          <h1 class="font-heading text-4xl lg:text-5xl text-gray-900 mb-4 uppercase leading-tight">
+            Beautyflow Buda
+          </h1>
+          <p class="text-gray-600 mb-2 text-base lg:text-lg max-w-lg mx-auto">
+            Premium beauty salon in the heart of Újbuda
+          </p>
+          <p class="text-gray-500 mb-6 text-sm flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {location.address.full}
+          </p>
+
+          <!-- CTA row -->
+          <div class="flex flex-col items-center justify-center gap-2">
+            <a
+              href={notinoUrl}
+              target="_blank"
+              rel="noopener"
+              class="inline-block px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm lg:text-base"
+            >
+              Book Appointment
+            </a>
+            <a
+              href={`tel:${location.phone}`}
+              class="inline-flex items-center gap-2 text-base lg:text-lg text-[#c53f75] font-bold hover:text-[#a33460] transition-all duration-300"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              {location.phoneDisplay}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Buda image -->
+      <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden bg-[#c53f75]">
+        <img
+          src="/images/Beautyflow-buda.jpg"
+          alt="Beautyflow Buda beauty salon"
+          class="w-full h-full object-cover min-h-[250px] lg:min-h-0"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
+
+        <!-- Google Rating Badge -->
+        <div class="absolute bottom-3 right-3 lg:bottom-5 lg:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
+          <div class="flex items-center gap-2">
+            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
+                <div class="flex">
+                  {[1,2,3,4,5].map(() => (
+                    <svg class="w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                  ))}
+                </div>
+              </div>
+              <p class="text-[9px] lg:text-[11px] text-gray-600">Based on Google reviews</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
+      <div class="max-w-[1000px] mx-auto px-4 w-full">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+          <div class="text-center">
+            <p class="text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">10+ yrs</p>
+            <p class="text-white/80 text-[16px] leading-[0.9]">experience</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">10,000+</p>
+            <p class="text-white/80 text-[16px] leading-[0.9]">treatments</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">12</p>
+            <p class="text-white/80 text-[16px] leading-[0.9]">state-of-the-art devices</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">1,500+</p>
+            <p class="text-white/80 text-[16px] leading-[0.9]">satisfied clients</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="py-12 lg:py-20 bg-gradient-to-b from-white to-[#fdf8f6]">
+    <div class="container mx-auto px-4">
+      <div class="grid lg:grid-cols-3 gap-8 lg:gap-12">
+
+        <!-- Left Column: Location Details -->
+        <div class="lg:col-span-2 space-y-12">
+
+          <!-- About Section -->
+          <div>
+            <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4">
+              Welcome to Beautyflow Buda Beauty Salon
+            </h2>
+            <div class="prose prose-lg text-gray-600 max-w-none">
+              <p>
+                <strong>Beautyflow Buda</strong> beauty salon is one of the most sought-after cosmetic centers in Újbuda.
+                Located near the Allee Shopping Center in <strong>District XI</strong>, our salon welcomes guests
+                with the most modern technology and years of professional experience.
+              </p>
+              <p>
+                Our salon specializes in <strong>diode laser hair removal</strong>, which is safe and effective
+                for all skin types thanks to its 808nm wavelength.
+                We also offer <strong>HydraBeauty facial treatments</strong>, <strong>permanent makeup</strong>,
+                and <strong>carbon peeling</strong> treatments.
+              </p>
+              <p>
+                Our qualified cosmeticians and permanent makeup artists provide personalized consultations
+                to help you find the most suitable treatment for you. We offer a
+                <strong>free consultation</strong> for all new clients.
+              </p>
+            </div>
+          </div>
+
+          <!-- Services Section -->
+          <div>
+            <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-6">
+              Our Services in Buda
+            </h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+              {services.map((service) => (
+                <a
+                  href={service.link}
+                  class="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:border-[#c53f75]/20 transition-all"
+                >
+                  <div class="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div class="p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 group-hover:text-[#c53f75] transition-colors">
+                      {service.name}
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                      {service.description}
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div class="mt-6 text-center">
+              <a href="/en/prices" class="inline-flex items-center gap-2 text-[#c53f75] font-semibold hover:underline">
+                View full price list
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Testimonials Section -->
+          <div>
+            <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-6">
+              Client Reviews
+            </h2>
+            <div class="grid gap-4">
+              {testimonials.map((testimonial) => (
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div class="flex items-center gap-1 mb-3">
+                    {[...Array(testimonial.rating)].map(() => (
+                      <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p class="text-gray-700 mb-3 italic">"{testimonial.text}"</p>
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold text-gray-900">{testimonial.name}</span>
+                    <span class="text-sm text-[#c53f75]">{testimonial.service}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- How to Get There -->
+          <div>
+            <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-6">
+              How to Get Here
+            </h2>
+            <div class="grid sm:grid-cols-2 gap-6">
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-gray-900">Public Transport</h3>
+                </div>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                  {location.publicTransport}
+                </p>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-gray-900">Parking</h3>
+                </div>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                  {location.parking}
+                </p>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+              <p class="text-sm text-blue-800 flex items-center gap-2">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><strong>Accessibility:</strong> {location.accessibility}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="sticky top-24 space-y-6">
+
+            <!-- Contact Card -->
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div class="bg-white p-8">
+                <h3 class="font-heading text-2xl text-gray-900 mb-2">Contact</h3>
+                <p class="text-gray-600">Call us or book online!</p>
+              </div>
+              <div class="p-8 pt-0 space-y-5">
+                <!-- Address -->
+                <div class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-[#c53f75] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <div>
+                    <p class="font-semibold text-gray-900">Address</p>
+                    <a href={location.googleMapsUrl} target="_blank" rel="noopener" class="text-gray-600 hover:text-[#c53f75] transition-colors text-sm">
+                      {location.address.full}
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-[#c53f75] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <div>
+                    <p class="font-semibold text-gray-900">Phone</p>
+                    <a href={`tel:${location.phone}`} class="text-gray-600 hover:text-[#c53f75] transition-colors text-sm">
+                      {location.phoneDisplay}
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-[#c53f75] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <div>
+                    <p class="font-semibold text-gray-900">Email</p>
+                    <a href={`mailto:${location.email}`} class="text-gray-600 hover:text-[#c53f75] transition-colors text-sm">
+                      {location.email}
+                    </a>
+                  </div>
+                </div>
+
+                <a
+                  href={notinoUrl}
+                  target="_blank"
+                  rel="noopener"
+                  class="block w-full bg-[#c53f75] text-white text-center font-semibold py-3 rounded-full hover:bg-[#a33460] transition-colors"
+                >
+                  Book Appointment
+                </a>
+              </div>
+            </div>
+
+            <!-- Opening Hours Card -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div class="p-6 border-b border-gray-100">
+                <h3 class="font-heading text-xl text-gray-900 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Opening Hours
+                </h3>
+              </div>
+              <div class="p-6">
+                <table class="w-full text-sm">
+                  <tbody>
+                    {location.hours.map((hour) => (
+                      <tr class="border-b border-gray-100 last:border-0">
+                        <td class="py-2 font-medium text-gray-700">{hour.day}</td>
+                        <td class="py-2 text-right text-gray-600">{hour.open} - {hour.close}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Map Preview -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div class="aspect-video bg-gray-100 relative">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2697.5!2d19.0436!3d47.4644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4741dc44d2ea0001%3A0x1234567890!2sVegy%C3%A9sz%20u.%201%2C%20Budapest%2C%201116!5e0!3m2!1shu!2shu!4v1234567890"
+                  width="100%"
+                  height="100%"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  title="Beautyflow Buda map"
+                  class="absolute inset-0"
+                ></iframe>
+              </div>
+              <a
+                href={location.googleMapsUrl}
+                target="_blank"
+                rel="noopener"
+                class="block p-4 text-center text-[#c53f75] font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Open larger map
+              </a>
+            </div>
+
+            <!-- Other Location CTA -->
+            <div class="bg-gradient-to-br from-[#fdf8f6] to-white rounded-xl p-6 border border-gray-100">
+              <p class="text-sm text-gray-600 mb-3">More convenient on the Pest side?</p>
+              <a
+                href="/en/beautyflow-pest"
+                class="inline-flex items-center gap-2 text-[#c53f75] font-semibold hover:underline"
+              >
+                Beautyflow Pest salon
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section specific to location -->
+  <section class="py-12 lg:py-16 bg-[#fdf8f6]">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 text-center mb-8">
+          Frequently Asked Questions About the Buda Salon
+        </h2>
+
+        <div class="space-y-4">
+          <div class="faq-item bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+            <button class="faq-question w-full flex items-center justify-between p-6 cursor-pointer text-left" aria-expanded="false">
+              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">How can I book an appointment?</span>
+              <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner px-6 pb-6 text-gray-600">
+                <p>You can book an appointment online anytime through the Notino platform, or by phone at {location.phoneDisplay} during opening hours. For online booking, select the Beautyflow Buda location, choose your desired treatment and pick a convenient time slot.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+            <button class="faq-question w-full flex items-center justify-between p-6 cursor-pointer text-left" aria-expanded="false">
+              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">Is there parking available near the salon?</span>
+              <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner px-6 pb-6 text-gray-600">
+                <p>{location.parking}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+            <button class="faq-question w-full flex items-center justify-between p-6 cursor-pointer text-left" aria-expanded="false">
+              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">Is the salon wheelchair accessible?</span>
+              <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner px-6 pb-6 text-gray-600">
+                <p>Yes, our salon is fully wheelchair accessible. {location.accessibility}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
+            <button class="faq-question w-full flex items-center justify-between p-6 cursor-pointer text-left" aria-expanded="false">
+              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">What payment methods do you accept?</span>
+              <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner px-6 pb-6 text-gray-600">
+                <p>We accept both cash and credit card payments. For larger treatment packages, please inquire about installment payment options at the salon.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <a href="/en/faq" class="inline-flex items-center gap-2 text-[#c53f75] font-semibold hover:underline">
+            More questions and answers
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-gradient-to-br from-[#1a1a2e] to-[#2d2d44] relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute top-0 left-1/4 w-64 h-64 bg-[#c53f75]/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-[#e497a2]/10 rounded-full blur-3xl"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-2xl mx-auto text-center text-white">
+        <h2 class="font-heading text-3xl lg:text-4xl mb-4">
+          Visit Us in Buda!
+        </h2>
+        <p class="text-white/80 mb-8">
+          Book an appointment online and experience the Beautyflow quality!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href={notinoUrl}
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center justify-center gap-2 bg-[#c53f75] text-white font-semibold uppercase text-sm px-8 py-4 rounded-full hover:bg-[#a33460] transition-all shadow-lg"
+          >
+            Book Appointment
+          </a>
+          <a
+            href={`tel:${location.phone}`}
+            class="inline-flex items-center justify-center gap-2 bg-white/10 text-white font-semibold uppercase text-sm px-8 py-4 rounded-full hover:bg-white/20 transition-all border border-white/30"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            {location.phoneDisplay}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* FAQ Animated Accordion */
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-answer-inner {
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.4s, opacity 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .faq-item.active .faq-answer-inner {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.3s ease 0.1s;
+  }
+
+  .faq-item.active {
+    border-color: #c53f75;
+    box-shadow: 0 10px 25px rgba(197, 63, 117, 0.15);
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .faq-item.active .faq-question-text {
+    color: #c53f75;
+  }
+
+  .faq-item:hover .faq-question-text {
+    color: #c53f75;
+  }
+</style>
+
+<script>
+  function initFAQAccordion() {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+
+      question?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+
+        // Close all other items
+        faqItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('active');
+            otherItem.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Toggle current item
+        item.classList.toggle('active');
+        question.setAttribute('aria-expanded', (!isActive).toString());
+      });
+    });
+  }
+
+  function initRatingAnimation() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ratingElements = document.querySelectorAll('.rating-number');
+
+    if (prefersReducedMotion) {
+      ratingElements.forEach(el => {
+        el.textContent = el.getAttribute('data-target') || '5.0';
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          const target = parseFloat(el.getAttribute('data-target') || '5.0');
+          animateRating(el, target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    ratingElements.forEach(el => observer.observe(el));
+  }
+
+  function animateRating(element: HTMLElement, target: number) {
+    const duration = 1500;
+    const start = 1;
+    const startTime = performance.now();
+
+    function update(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const current = start + (target - start) * easeOut;
+      element.textContent = current.toFixed(1);
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initFAQAccordion();
+    initRatingAnimation();
+  });
+  document.addEventListener('astro:page-load', () => {
+    initFAQAccordion();
+    initRatingAnimation();
+  });
+</script>

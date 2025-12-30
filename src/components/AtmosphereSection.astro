@@ -1,6 +1,30 @@
 ---
 import { Image } from 'astro:assets';
 import atmosphereImage from '../assets/images/hangulat-beautyflow-scaled.webp';
+import { type Locale, defaultLang } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    imageAlt: 'Beautyflow szépségszalon hangulat',
+    title: 'A légkörre vagyunk a legbüszkébbek',
+    paragraph1: '<span class="text-xl">Egy szépségszalon mindig a bizalomról szól.</span> Amellett, hogy a lézeres szőrtelenítés, a tetoválás eltávolítás és az összes többi szépészeti kezelés a legmagasabb színvonalú gépekkel és anyagokkal érhető el nálunk, igazából a légkörre vagyunk a legbüszkébbek.',
+    paragraph2: 'Jöhetsz akárhonnan, lehetnek akármilyen testi adottságaid, <strong>nálunk mindig elfogadásra fogsz találni</strong>. A nálunk töltött idő nem csak megszépít, de fel is tölt: akár egy csajos beszélgetésre, akár csendes pihenésre vágysz, nálunk meg fogod találni.',
+  },
+  en: {
+    imageAlt: 'Beautyflow beauty salon atmosphere',
+    title: "We're most proud of the atmosphere",
+    paragraph1: '<span class="text-xl">A beauty salon is always about trust.</span> While laser hair removal, tattoo removal, and all other beauty treatments are available with top-quality equipment and materials, we are actually most proud of our atmosphere.',
+    paragraph2: "No matter where you come from or what your physical attributes are, <strong>you'll always find acceptance here</strong>. The time spent with us not only beautifies but also recharges you: whether you're looking for a friendly chat or quiet relaxation, you'll find it here.",
+  },
+};
+
+const t = content[lang];
 ---
 
 <section class="py-16">
@@ -10,7 +34,7 @@ import atmosphereImage from '../assets/images/hangulat-beautyflow-scaled.webp';
       <div>
         <Image
           src={atmosphereImage}
-          alt="Beautyflow szépségszalon hangulat"
+          alt={t.imageAlt}
           class="w-full h-auto"
           width={600}
           height={400}
@@ -23,16 +47,12 @@ import atmosphereImage from '../assets/images/hangulat-beautyflow-scaled.webp';
       <!-- Content -->
       <div>
         <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-6 uppercase">
-          A légkörre vagyunk a legbüszkébbek
+          {t.title}
         </h2>
 
-        <p class="text-gray-600 mb-4">
-          <span class="text-xl">Egy szépségszalon mindig a bizalomról szól.</span> Amellett, hogy a lézeres szőrtelenítés, a tetoválás eltávolítás és az összes többi szépészeti kezelés a legmagasabb színvonalú gépekkel és anyagokkal érhető el nálunk, igazából a légkörre vagyunk a legbüszkébbek.
-        </p>
+        <p class="text-gray-600 mb-4" set:html={t.paragraph1} />
 
-        <p class="text-gray-600">
-          Jöhetsz akárhonnan, lehetnek akármilyen testi adottságaid, <strong>nálunk mindig elfogadásra fogsz találni</strong>. A nálunk töltött idő nem csak megszépít, de fel is tölt: akár egy csajos beszélgetésre, akár csendes pihenésre vágysz, nálunk meg fogod találni.
-        </p>
+        <p class="text-gray-600" set:html={t.paragraph2} />
       </div>
     </div>
   </div>
