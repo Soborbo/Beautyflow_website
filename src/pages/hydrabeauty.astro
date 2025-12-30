@@ -5,6 +5,23 @@ import { Image } from 'astro:assets';
 import ServiceHero from '../components/ServiceHero.astro';
 import ContentImage from '../components/ContentImage.astro';
 
+// Import all images from assets
+import heroImage from '../assets/images/hydrabeauty-arckezeles.jpg';
+import notinoIcon from '../assets/images/notino-ikon.png';
+import googleLogo from '../assets/images/google-logo.jpg';
+import fanniImage from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import hydrabeautyArcImage from '../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
+import szemhejImage from '../assets/images/szemhej-tetovalas-smink.jpg';
+import ranctalInitasImage from '../assets/images/hydrabeauty-ranctalanitas.jpg';
+import hydrabeautyImage from '../assets/images/hydrabeauty.jpg';
+import aiMachineImage from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import testmeretImage from '../assets/images/testmeret.jpg';
+import salonImage from '../assets/images/konya-fanni-szepsegszalonja.jpg';
+import higieniaImage from '../assets/images/higienia.jpg';
+import nyitvaImage from '../assets/images/nyitva.jpg';
+import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
+import skinlabLogo from '../assets/images/logok/skinlab.webp';
+
 const stats = [
   { value: '10+ év', label: 'tapasztalat' },
   { value: '60-120', label: 'perces kezelés' },
@@ -178,7 +195,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <Image src={notinoIcon} alt="Notino" width={32} height={32} formats={['avif', 'webp']} quality={90} loading="eager" decoding="async" class="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -224,17 +241,18 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <img
-          src="/images/hydrabeauty-arckezeles.jpg"
+        <ServiceHero
+          image={heroImage}
           alt="HydraBeauty arckezelés Budapest"
           class="w-full h-full object-cover"
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <Image src={googleLogo} alt="Google" width={36} height={36} formats={['avif', 'webp']} quality={85} loading="eager" decoding="async" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -276,9 +294,15 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={fanniImage}
               alt="Kónya Fanni HydraBeauty szakértő"
+              width={400}
+              height={600}
+              formats={['avif', 'webp']}
+              quality={80}
+              loading="lazy"
+              decoding="async"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
             />
             <!-- Mobile signature - right below image -->
@@ -327,9 +351,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        <ContentImage
+          image={hydrabeautyArcImage}
           alt="Fiatalabb arcbőr HydraBeauty kezeléssel"
+          maxWidth={1000}
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -368,9 +393,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/szemhej-tetovalas-smink.jpg"
+        <ContentImage
+          image={szemhejImage}
           alt="HydraBeauty mélytisztítás"
+          maxWidth={1000}
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -381,9 +407,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-ranctalanitas.jpg"
+        <ContentImage
+          image={ranctalInitasImage}
           alt="HydraBeauty ránctalanítás"
+          maxWidth={1000}
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -414,9 +441,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        <ContentImage
+          image={hydrabeautyArcImage}
           alt="HydraBeauty vitaminok"
+          maxWidth={1000}
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -427,9 +455,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty.jpg"
+        <ContentImage
+          image={hydrabeautyImage}
           alt="HydraBeauty azonnali eredmény"
+          maxWidth={1000}
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -521,18 +550,30 @@ const faqs = [
   <section class="how-it-works-section relative overflow-hidden">
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
+      <Image
+        src={heroImage}
         alt="HydraBeauty kezelés folyamata"
+        width={800}
+        height={400}
+        formats={['avif', 'webp']}
+        quality={75}
+        loading="lazy"
+        decoding="async"
         class="w-full h-64 object-cover object-top"
       />
     </div>
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
+      <Image
+        src={heroImage}
         alt=""
+        width={1920}
+        height={1080}
+        formats={['avif', 'webp']}
+        quality={70}
+        loading="lazy"
+        decoding="async"
         class="w-full h-full object-cover object-[center_30%]"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
@@ -591,9 +632,15 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={fanniImage}
               alt="Kónya Fanni konzultáció"
+              width={400}
+              height={500}
+              formats={['avif', 'webp']}
+              quality={80}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
             />
@@ -671,9 +718,15 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src="/images/google-logo.jpg"
+              <Image
+                src={googleLogo}
                 alt="Google"
+                width={28}
+                height={28}
+                formats={['avif', 'webp']}
+                quality={85}
+                loading="lazy"
+                decoding="async"
                 class="w-7 h-7 object-contain flex-shrink-0"
               />
             </div>
@@ -691,10 +744,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={notinoLogoSm} alt="Notino Partner" width={120} height={48} formats={['avif', 'webp']} quality={85} loading="lazy" decoding="async" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <Image src={skinlabLogo} alt="Skinlab Partner" width={120} height={48} formats={['avif', 'webp']} quality={85} loading="lazy" decoding="async" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
       </div>
     </div>
@@ -714,9 +767,15 @@ const faqs = [
         <!-- Prémium technológia -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/mesterseges-intelligencia-szortelenito-gep.jpg"
+            <Image
+              src={aiMachineImage}
               alt="HydraBeauty prémium technológia"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -731,9 +790,15 @@ const faqs = [
         <!-- Személyre szabott kezelés -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/testmeret.jpg"
+            <Image
+              src={testmeretImage}
               alt="Személyre szabott HydraBeauty"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -748,9 +813,15 @@ const faqs = [
         <!-- Relaxáló élmény -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/konya-fanni-szepsegszalonja.jpg"
+            <Image
+              src={salonImage}
               alt="Beautyflow relaxáló légkör"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -765,9 +836,15 @@ const faqs = [
         <!-- Orvosi tisztaság -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/higienia.jpg"
+            <Image
+              src={higieniaImage}
               alt="Steril HydraBeauty környezet"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -782,9 +859,15 @@ const faqs = [
         <!-- Azonnali eredmény -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/hydrabeauty-arckezeles.jpg"
+            <Image
+              src={heroImage}
               alt="HydraBeauty azonnali eredmény"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -799,9 +882,15 @@ const faqs = [
         <!-- Heti 7 napos nyitvatartás -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/nyitva.jpg"
+            <Image
+              src={nyitvaImage}
               alt="Heti 7 napos nyitvatartás"
+              width={400}
+              height={300}
+              formats={['avif', 'webp']}
+              quality={75}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
