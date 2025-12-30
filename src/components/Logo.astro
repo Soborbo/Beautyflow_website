@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets';
+import logoImage from '../assets/images/beautyflow-logo.png';
+
+interface Props {
+  class?: string;
+  variant?: 'default' | 'light';
+}
+
+const { class: className, variant = 'default' } = Astro.props;
+---
+
+<Image
+  src={logoImage}
+  width={200}
+  height={67}
+  formats={['avif', 'webp']}
+  quality={90}
+  alt="Beautyflow Szépségszalon"
+  class={className}
+  loading="eager"
+  decoding="async"
+/>

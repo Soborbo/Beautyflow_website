@@ -1,0 +1,78 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image: ImageMetadata;
+  class?: string;
+  overlayOpacity?: number;
+  overlayColor?: string;
+}
+
+const {
+  image,
+  class: className,
+  overlayOpacity = 0.5,
+  overlayColor = '0, 0, 0'
+} = Astro.props;
+
+// Generate different sizes for responsive backgrounds
+const bgSmall = await getImage({ src: image, width: 640, format: 'webp', quality: 70 });
+const bgMedium = await getImage({ src: image, width: 1024, format: 'webp', quality: 75 });
+const bgLarge = await getImage({ src: image, width: 1920, format: 'avif', quality: 70 });
+const bgLargeFallback = await getImage({ src: image, width: 1920, format: 'webp', quality: 75 });
+---
+
+<section
+  class:list={['bg-section', className]}
+  data-bg-small={bgSmall.src}
+  data-bg-medium={bgMedium.src}
+  data-bg-large={bgLarge.src}
+  data-bg-large-fallback={bgLargeFallback.src}
+  style={`
+    --bg-small: url(${bgSmall.src});
+    --bg-medium: url(${bgMedium.src});
+    --bg-large: url(${bgLarge.src});
+    --overlay-opacity: ${overlayOpacity};
+    --overlay-color: ${overlayColor};
+  `}
+>
+  <div class="bg-overlay"></div>
+  <div class="bg-content">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .bg-section {
+    position: relative;
+    background-image: var(--bg-small);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  @media (min-width: 641px) {
+    .bg-section {
+      background-image: var(--bg-medium);
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .bg-section {
+      background-image: var(--bg-large);
+    }
+  }
+
+  .bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--overlay-color), var(--overlay-opacity));
+    pointer-events: none;
+  }
+
+  .bg-content {
+    position: relative;
+    z-index: 1;
+  }
+</style>
