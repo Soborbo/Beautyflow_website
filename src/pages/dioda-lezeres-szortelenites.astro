@@ -444,11 +444,16 @@ const serviceSchema = {
           class="w-full h-full relative cursor-pointer group min-h-[300px] lg:min-h-[500px]"
         >
           <!-- Placeholder image -->
-          <img
-            src="https://i.ytimg.com/vi/NU5avBZmB58/maxresdefault.jpg"
+          <Image
+            src={diodaLezeresMob}
             alt="Lézeres szőrtelenítés videó"
-            class="w-full h-full object-cover absolute inset-0"
+            width={800}
+            height={600}
+            formats={['avif', 'webp']}
+            quality={75}
             loading="lazy"
+            decoding="async"
+            class="w-full h-full object-cover absolute inset-0"
           />
           <!-- Play button overlay -->
           <div class="absolute inset-0 flex items-center justify-center">

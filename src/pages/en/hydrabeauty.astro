@@ -1,6 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
+import { Image } from 'astro:assets';
+import fanniImage from '../../assets/images/Konya-Fanni-szepsegszalon.jpg';
+import googleLogo from '../../assets/images/google-logo.jpg';
 
 const stats = [
   { value: '10+ years', label: 'experience' },
@@ -273,9 +276,15 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={fanniImage}
               alt="Fanni Konya HydraBeauty specialist"
+              width={400}
+              height={600}
+              formats={['avif', 'webp']}
+              quality={80}
+              loading="lazy"
+              decoding="async"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
             />
             <!-- Mobile signature - right below image -->
@@ -588,9 +597,15 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <Image
+              src={fanniImage}
               alt="Fanni Konya consultation"
+              width={400}
+              height={500}
+              formats={['avif', 'webp']}
+              quality={80}
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
             />
