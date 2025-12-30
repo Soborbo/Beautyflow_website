@@ -28,6 +28,8 @@ const redirects = {
   '/andi/': '/rolunk',
   '/inez': '/rolunk',
   '/inez/': '/rolunk',
+  '/lili': '/rolunk',
+  '/lili/': '/rolunk',
   '/rolam': '/rolunk',
   '/rolam/': '/rolunk',
 
@@ -58,8 +60,9 @@ const redirects = {
   '/beautyflowpest/': '/beautyflow-pest',
 
   // Jogi/info oldalak
-  '/altalanos-szerzodesi-feltetelek': '/adatvedelmi-tajekoztato',
-  '/altalanos-szerzodesi-feltetelek/': '/adatvedelmi-tajekoztato',
+  '/altalanos-szerzodesi-feltetelek': '/aszf',
+  '/altalanos-szerzodesi-feltetelek/': '/aszf',
+  '/aszf/': '/aszf',
   '/adatvedelem': '/adatvedelmi-tajekoztato',
   '/adatvedelem/': '/adatvedelmi-tajekoztato',
   '/adatvedelmi': '/adatvedelmi-tajekoztato',
@@ -89,6 +92,15 @@ const goneUrls = [
   '/wp-content/uploads/2024/07/Dioda-lezer-2024.docx',
 ];
 
+// WordPress fájlok pattern - ezek 410-et kapnak
+const wpPatterns = [
+  /^\/wp-.*\.php/,
+  /^\/wp-admin/,
+  /^\/wp-includes/,
+  /^\/wp-content\/uploads\/.*\.docx$/,
+  /^\/xmlrpc\.php/,
+];
+
 // 410 Gone HTML oldal
 const goneHtml = `<!DOCTYPE html>
 <html lang="hu">
@@ -96,13 +108,10 @@ const goneHtml = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>410 - Az oldal véglegesen törlésre került | Beautyflow</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Open Sans', sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -115,7 +124,7 @@ const goneHtml = `<!DOCTYPE html>
       max-width: 600px;
     }
     .error-code {
-      font-family: 'Cormorant', serif;
+      font-family: Georgia, 'Times New Roman', serif;
       font-size: 120px;
       font-weight: 700;
       background: linear-gradient(90deg, #c53f75, #6366f1);
@@ -126,7 +135,7 @@ const goneHtml = `<!DOCTYPE html>
       margin-bottom: 20px;
     }
     h1 {
-      font-family: 'Cormorant', serif;
+      font-family: Georgia, 'Times New Roman', serif;
       font-size: 28px;
       color: #1f2937;
       text-transform: uppercase;
@@ -188,7 +197,10 @@ export async function onRequest(context) {
   }
 
   // Check if this URL should return 410 Gone
-  if (goneUrls.some(goneUrl => pathname === goneUrl || pathname.startsWith(goneUrl.replace(/\/$/, '') + '/'))) {
+  const isGoneUrl = goneUrls.some(goneUrl => pathname === goneUrl || pathname.startsWith(goneUrl.replace(/\/$/, '') + '/'));
+  const isWpPattern = wpPatterns.some(pattern => pattern.test(pathname));
+
+  if (isGoneUrl || isWpPattern) {
     return new Response(goneHtml, {
       status: 410,
       headers: {
