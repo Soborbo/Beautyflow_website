@@ -2,6 +2,7 @@
 
 /* Local fonts - faster than Google Fonts */
 /* Only import the font weights actually used in the project */
+/* Note: Fontsource already includes font-display: swap by default */
 @import "@fontsource/cormorant/400.css";
 @import "@fontsource/cormorant/700.css";
 @import "@fontsource/open-sans/400.css";

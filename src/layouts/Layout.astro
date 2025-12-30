@@ -47,6 +47,16 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
     <title>{title}</title>
 
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.notino.hu" crossorigin />
+    <link rel="dns-prefetch" href="https://www.notino.hu" />
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/node_modules/@fontsource/open-sans/files/open-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/node_modules/@fontsource/cormorant/files/cormorant-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Alternate language links for SEO -->

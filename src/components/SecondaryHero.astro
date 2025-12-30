@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
+import contactImage from '../assets/images/beautyflow-kapcsolat-sm.jpg';
 
 interface Props {
   lang?: Locale;
@@ -88,11 +89,12 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       <!-- Right side - Image -->
       <div class="w-full lg:w-1/2">
         <Image
-          src="/images/beautyflow-kapcsolat-sm.jpg"
+          src={contactImage}
           alt={t.imageAlt}
           width={600}
           height={400}
-          format="webp"
+          formats={['avif', 'webp']}
+          quality={80}
           class="w-full h-auto rounded-lg shadow-2xl aspect-[3/2]"
           loading="lazy"
           decoding="async"

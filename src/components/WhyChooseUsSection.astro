@@ -2,6 +2,18 @@
 import { Image } from 'astro:assets';
 import { type Locale, defaultLang } from '../i18n';
 
+// Import all feature images from assets
+import aiMachinesImg from '../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import shyImg from '../assets/images/szegyenlos.jpg';
+import salonAtmosphereImg from '../assets/images/konya-fanni-szepsegszalonja-1.jpg';
+import hygieneImg from '../assets/images/higienia.jpg';
+import bodySizeImg from '../assets/images/testmeret.jpg';
+import openingHoursImg from '../assets/images/nyitva.jpg';
+import permanentMakeupImg from '../assets/images/sminktetovalas-budapest-beautyflow.jpg';
+import pcosImg from '../assets/images/pcos-szortelenites.jpg';
+import awardsImg from '../assets/images/beautyflow-dijak.webp';
+import notinoIcon from '../assets/images/notino-ikon.png';
+
 interface Props {
   lang?: Locale;
 }
@@ -17,15 +29,15 @@ const content = {
     budaBtn: 'Időpontok Budára',
     pestBtn: 'Időpontok Pestre',
     features: [
-      { image: '/images/mesterseges-intelligencia-szortelenito-gep.jpg', title: 'AI-vezérelt gépek\ncsúcstechnológiával', description: 'Folyamatosan bővülő gépparkkal, a legmodernebb eszközökkel dolgozunk. A kezeléseink teljes precizitásáról a munkatársaink szakértelme mellett a mesterséges intelligencia gondoskodik.' },
-      { image: '/images/szegyenlos.jpg', title: 'Szégyenlős vagy?\nSemmi gond, segítünk!', description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.' },
-      { image: '/images/konya-fanni-szepsegszalonja-1.jpg', title: 'Barátságos, „csajos",\nfelszabadító légkör', description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.' },
-      { image: '/images/higienia.jpg', title: 'Orvosi szintű tisztaság\nés higiénia', description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.' },
-      { image: '/images/testmeret.jpg', title: 'Minden testalkat\nugyanannyit fizet', description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.' },
-      { image: '/images/nyitva.jpg', title: 'Heti 7 napos\nnyitvatartás', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.' },
-      { image: '/images/sminktetovalas-budapest-beautyflow.jpg', title: 'Mi rád fogjuk szánni\naz időt', description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.' },
-      { image: '/images/pcos-szortelenites.jpg', title: 'Sokéves gyakorlat\nPCOS-es vendégekkel', description: 'A policisztás ovárium szindróma rengeteg nőnek keseríti meg az életét. Különleges odafigyeléssel és a megszokottnál jelentősen jobb eredményekkel várunk!' },
-      { image: '/images/beautyflow-dijak.webp', title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás', description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.' },
+      { image: aiMachinesImg, title: 'AI-vezérelt gépek\ncsúcstechnológiával', description: 'Folyamatosan bővülő gépparkkal, a legmodernebb eszközökkel dolgozunk. A kezeléseink teljes precizitásáról a munkatársaink szakértelme mellett a mesterséges intelligencia gondoskodik.' },
+      { image: shyImg, title: 'Szégyenlős vagy?\nSemmi gond, segítünk!', description: 'Nehezen vetkőzöl le más előtt? Teljesen érthető. Nálunk szabadon kérheted, hogy a számodra legszimpatikusabb munkatársunk legyen a te egyéni szakembered és onnantól mindig ő kezel majd. Nálunk alapértelmezett a maximális bizalom és diszkréció.' },
+      { image: salonAtmosphereImg, title: 'Barátságos, „csajos",\nfelszabadító légkör', description: 'Számunkra a szépségszalon a külső-belső szépülésről egyaránt szól, egyszerre törődünk a testtel és a lélekkel. Kávéval, beszélgetéssel, őszinte figyelemmel várunk.' },
+      { image: hygieneImg, title: 'Orvosi szintű tisztaság\nés higiénia', description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.' },
+      { image: bodySizeImg, title: 'Minden testalkat\nugyanannyit fizet', description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.' },
+      { image: openingHoursImg, title: 'Heti 7 napos\nnyitvatartás', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.' },
+      { image: permanentMakeupImg, title: 'Mi rád fogjuk szánni\naz időt', description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.' },
+      { image: pcosImg, title: 'Sokéves gyakorlat\nPCOS-es vendégekkel', description: 'A policisztás ovárium szindróma rengeteg nőnek keseríti meg az életét. Különleges odafigyeléssel és a megszokottnál jelentősen jobb eredményekkel várunk!' },
+      { image: awardsImg, title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás', description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.' },
     ],
   },
   en: {
@@ -33,15 +45,15 @@ const content = {
     budaBtn: 'Appointments in Buda',
     pestBtn: 'Appointments in Pest',
     features: [
-      { image: '/images/mesterseges-intelligencia-szortelenito-gep.jpg', title: 'AI-powered machines\nwith cutting-edge technology', description: 'We work with a continuously expanding fleet of the most modern equipment. The full precision of our treatments is ensured by both our staff expertise and artificial intelligence.' },
-      { image: '/images/szegyenlos.jpg', title: 'Feeling shy?\nNo problem, we help!', description: "Find it hard to undress in front of others? Completely understandable. You can freely request that your favorite staff member becomes your personal specialist and they'll always be the one treating you. Maximum trust and discretion is our default." },
-      { image: '/images/konya-fanni-szepsegszalonja-1.jpg', title: 'Friendly, "girly",\nliberating atmosphere', description: "For us, a beauty salon is about both external and internal beauty, we care for both body and soul. We welcome you with coffee, conversation, and sincere attention." },
-      { image: '/images/higienia.jpg', title: 'Medical-grade cleanliness\nand hygiene', description: 'Safety and health are more important to us than anything. During every treatment, we provide disposable tools and a sterile environment for you.' },
-      { image: '/images/testmeret.jpg', title: 'Every body type\npays the same', description: "We treat people, not bodies. We don't differentiate between slim and curvier clients, everyone pays the same because that's fair." },
-      { image: '/images/nyitva.jpg', title: 'Open 7 days\na week', description: 'Achieve perfectly clean and healthy facial skin painlessly.' },
-      { image: '/images/sminktetovalas-budapest-beautyflow.jpg', title: "We'll dedicate our\ntime to you", description: 'We only work with one client at a time to ensure you receive our full and undivided attention.' },
-      { image: '/images/pcos-szortelenites.jpg', title: 'Years of experience\nwith PCOS clients', description: "Polycystic ovary syndrome affects many women's lives. We welcome you with special care and significantly better results than usual!" },
-      { image: '/images/beautyflow-dijak.webp', title: 'Multiple award-winning,\nreliable business', description: 'Over the years, we have won numerous awards from the "Fair Business" award to the "Notino Salon of the Month" recognition.' },
+      { image: aiMachinesImg, title: 'AI-powered machines\nwith cutting-edge technology', description: 'We work with a continuously expanding fleet of the most modern equipment. The full precision of our treatments is ensured by both our staff expertise and artificial intelligence.' },
+      { image: shyImg, title: 'Feeling shy?\nNo problem, we help!', description: "Find it hard to undress in front of others? Completely understandable. You can freely request that your favorite staff member becomes your personal specialist and they'll always be the one treating you. Maximum trust and discretion is our default." },
+      { image: salonAtmosphereImg, title: 'Friendly, "girly",\nliberating atmosphere', description: "For us, a beauty salon is about both external and internal beauty, we care for both body and soul. We welcome you with coffee, conversation, and sincere attention." },
+      { image: hygieneImg, title: 'Medical-grade cleanliness\nand hygiene', description: 'Safety and health are more important to us than anything. During every treatment, we provide disposable tools and a sterile environment for you.' },
+      { image: bodySizeImg, title: 'Every body type\npays the same', description: "We treat people, not bodies. We don't differentiate between slim and curvier clients, everyone pays the same because that's fair." },
+      { image: openingHoursImg, title: 'Open 7 days\na week', description: 'Achieve perfectly clean and healthy facial skin painlessly.' },
+      { image: permanentMakeupImg, title: "We'll dedicate our\ntime to you", description: 'We only work with one client at a time to ensure you receive our full and undivided attention.' },
+      { image: pcosImg, title: 'Years of experience\nwith PCOS clients', description: "Polycystic ovary syndrome affects many women's lives. We welcome you with special care and significantly better results than usual!" },
+      { image: awardsImg, title: 'Multiple award-winning,\nreliable business', description: 'Over the years, we have won numerous awards from the "Fair Business" award to the "Notino Salon of the Month" recognition.' },
     ],
   },
 };
@@ -62,7 +74,8 @@ const t = content[lang];
               alt={feature.title.replace('\n', ' ')}
               width={400}
               height={300}
-              format="webp"
+              formats={['avif', 'webp']}
+              quality={75}
               class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
               decoding="async"
@@ -92,7 +105,7 @@ const t = content[lang];
       </a>
 
       <Image
-        src="/images/notino-ikon.png"
+        src={notinoIcon}
         alt="Notino"
         width={48}
         height={48}

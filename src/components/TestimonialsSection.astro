@@ -2,6 +2,12 @@
 import { Image } from 'astro:assets';
 import { type Locale, defaultLang } from '../i18n';
 
+// Import testimonial images
+import saraImg from '../assets/images/sara.png';
+import blankaImg from '../assets/images/blanka-1.png';
+import blankaBatImg from '../assets/images/Blanka-bat.png';
+import googleLogo from '../assets/images/google-logo.jpg';
+
 interface Props {
   lang?: Locale;
 }
@@ -10,14 +16,14 @@ const { lang = defaultLang } = Astro.props;
 
 const testimonials = {
   hu: [
-    { text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!', author: 'Szilágyi Sára', image: '/images/sara.png' },
-    { text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
-    { text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+    { text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!', author: 'Szilágyi Sára', image: saraImg },
+    { text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!', author: 'Imregi Blanka', image: blankaImg },
+    { text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!', author: 'Bátor Blanka', image: blankaBatImg },
   ],
   en: [
-    { text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied, already booking my next appointment!', author: 'Szilágyi Sára', image: '/images/sara.png' },
-    { text: 'After a long time I finally got to the salon, which I wish I could have done sooner. I can\'t wait for the next time and I highly recommend it to everyone!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
-    { text: 'I wholeheartedly recommend them, professional work, lovely staff!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+    { text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied, already booking my next appointment!', author: 'Szilágyi Sára', image: saraImg },
+    { text: 'After a long time I finally got to the salon, which I wish I could have done sooner. I can\'t wait for the next time and I highly recommend it to everyone!', author: 'Imregi Blanka', image: blankaImg },
+    { text: 'I wholeheartedly recommend them, professional work, lovely staff!', author: 'Bátor Blanka', image: blankaBatImg },
   ],
 };
 
@@ -50,14 +56,15 @@ const currentTestimonials = testimonials[lang];
               alt={testimonial.author}
               width={48}
               height={48}
-              format="webp"
+              formats={['avif', 'webp']}
+              quality={85}
               class="w-12 h-12 rounded-full object-cover flex-shrink-0 aspect-square"
               loading="lazy"
               decoding="async"
             />
             <span class="font-semibold text-gray-900 text-sm flex-1 leading-none">{testimonial.author}</span>
             <Image
-              src="/images/google-logo.jpg"
+              src={googleLogo}
               alt="Google"
               width={28}
               height={28}
