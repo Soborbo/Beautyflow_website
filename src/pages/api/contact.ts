@@ -262,7 +262,15 @@ export const POST: APIRoute = async (context) => {
   const { request, locals } = context;
 
   try {
-    const data: ContactFormData = await request.json();
+    let data: ContactFormData;
+    try {
+      data = await request.json();
+    } catch (parseError) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Érvénytelen kérés formátum.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Get Cloudflare runtime environment - try multiple methods
     const runtime = (locals as any).runtime;

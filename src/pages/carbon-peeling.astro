@@ -107,6 +107,7 @@ const faqs = [
 <Layout
   title="Carbon Peeling Archámlasztás Budapest - Glass Skin Kezelés | Beautyflow"
   description="Forradalmi Carbon Peeling kezelés Budapesten. Lézeres bőrtisztítás és fiatalítás 60 perces luxus programmal. Glass skin hatás már az első alkalomtól. Kérj ingyenes konzultációt!"
+  ogImage="/images/carbon-peeling-fo.jpg"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -122,6 +123,26 @@ const faqs = [
     }))
   })} />
 
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Főoldal",
+        "item": "https://beautyflow.pro/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Carbon Peeling Archámlasztás",
+        "item": "https://beautyflow.pro/carbon-peeling"
+      }
+    ]
+  })} />
+
   <!-- Service Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -132,7 +153,7 @@ const faqs = [
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
-      "image": "https://beautyflow.hu/images/beautyflow-logo.png",
+      "image": "https://beautyflow.pro/images/beautyflow-logo.png",
       "address": [
         {
           "@type": "PostalAddress",

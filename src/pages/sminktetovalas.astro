@@ -167,6 +167,7 @@ const faqs = [
 <Layout
   title="Tartós Sminktetoválás Budapest - Szemöldök, Ajak, Szempilla | Beautyflow"
   description="Professzionális sminktetoválás Budapesten. Szemöldök, szempillaalap és ajak tetoválás természetes hatással. 10+ év tapasztalat. Kérj ingyenes konzultációt!"
+  ogImage="/images/sminktetovalas-mb-2.jpg"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -182,6 +183,26 @@ const faqs = [
     }))
   })} />
 
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Főoldal",
+        "item": "https://beautyflow.pro/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Sminktetoválás",
+        "item": "https://beautyflow.pro/sminktetovalas"
+      }
+    ]
+  })} />
+
   <!-- Service Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -192,7 +213,7 @@ const faqs = [
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
-      "image": "https://beautyflow.hu/images/beautyflow-logo.png",
+      "image": "https://beautyflow.pro/images/beautyflow-logo.png",
       "address": [
         {
           "@type": "PostalAddress",

@@ -21,6 +21,59 @@ const socialProofs = [
   { name: 'Sara S.', text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied!' },
   { name: 'Timea H.', text: 'The best place for diode laser hair removal. Fanni and Piroska do amazingly thorough work.' },
 ];
+
+// Schema.org - ContactPoint for consultation
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "name": "Beautyflow Beauty Salon",
+  "url": "https://beautyflow.pro/en/free-consultation",
+  "telephone": "+36 1 300 9414",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+36 1 300 9414",
+    "contactType": "Customer Service",
+    "areaServed": "HU",
+    "availableLanguage": ["Hungarian", "English"],
+    "contactOption": "TollFree"
+  },
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ]
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://beautyflow.pro/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Free Consultation",
+      "item": "https://beautyflow.pro/en/free-consultation"
+    }
+  ]
+};
 ---
 
 <!DOCTYPE html>
@@ -30,16 +83,24 @@ const socialProofs = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Request a free consultation at Beautyflow beauty salon. Personalized advice on laser hair removal, facial treatments, and permanent makeup." />
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>Free Consultation | Beautyflow Beauty Salon</title>
     <link rel="canonical" href={canonicalUrl} />
     <link rel="alternate" hreflang="hu" href={`https://beautyflow.pro${huUrl}`} />
     <link rel="alternate" hreflang="en" href={`https://beautyflow.pro${enUrl}`} />
     <link rel="alternate" hreflang="x-default" href={`https://beautyflow.pro${huUrl}`} />
+    <script type="application/ld+json" set:html={JSON.stringify(contactSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+    <!-- Google Tag Manager -->
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-W8V3BVGD');</script>
   </head>
   <body class="bg-[#fdf8f6] min-h-[100dvh] md:h-screen md:overflow-hidden">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W8V3BVGD"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main class="min-h-[100dvh] md:h-full py-4 md:py-0">
       <!-- Form Container -->
       <div id="form-container" class="min-h-[100dvh] md:h-full flex items-center justify-center px-4">

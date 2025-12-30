@@ -15,8 +15,8 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "BeautySalon",
   "name": "Beautyflow Szépségszalon",
-  "image": "https://beautyflow.hu/images/Beautyflow-buda.jpg",
-  "url": "https://beautyflow.hu",
+  "image": "https://beautyflow.pro/images/Beautyflow-buda.jpg",
+  "url": "https://beautyflow.pro",
   "telephone": "+36 1 300 9414",
   "priceRange": "$$",
   "aggregateRating": {
@@ -55,14 +55,23 @@ const localBusinessSchema = {
     }
   ],
   "sameAs": [
-    "https://www.instagram.com/beautyflow.hu/",
-    "https://www.facebook.com/beautyflow.hu/"
+    "https://www.instagram.com/beautyflow.pro/",
+    "https://www.facebook.com/beautyflow.pro/"
   ]
+};
+
+// WebSite Schema (required for homepage per SEO skill)
+const webSiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Beautyflow Szépségszalon",
+  "url": "https://beautyflow.pro"
 };
 ---
 
 <Layout title="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Buda és Pest">
   <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(webSiteSchema)} />
   <HeroSection />
   <ConsultationSection />
   <AtmosphereSection />

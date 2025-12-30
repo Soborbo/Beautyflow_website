@@ -1,0 +1,28 @@
+---
+import { Picture } from 'astro:assets';
+
+interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  priority?: boolean;
+  class?: string;
+}
+
+const { src, alt, width, height, priority = false, class: className } = Astro.props;
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  formats={['webp']}
+  fallbackFormat="png"
+  widths={[width, width * 2]}
+  sizes={`${width}px`}
+  loading={priority ? 'eager' : 'lazy'}
+  decoding={priority ? 'sync' : 'async'}
+  class={className}
+/>

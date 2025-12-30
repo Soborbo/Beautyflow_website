@@ -141,9 +141,116 @@ const categories = [
   { id: 'tattoo-removal', label: 'Tattoo Removal', color: categoryColors['tetovalas-eltavolitas'] },
   { id: 'carbon-peeling', label: 'Carbon Peeling', color: categoryColors['carbon-peeling'] },
 ];
+
+// Schema.org - Service Catalog with Offers (all services + both locations)
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "name": "Beautyflow Beauty Salon",
+  "url": "https://beautyflow.pro/en/prices",
+  "telephone": "+36 1 300 9414",
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Beautyflow Services",
+    "itemListElement": [
+      {
+        "@type": "OfferCatalog",
+        "name": "Laser Hair Removal Packages",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Diamond Package", "description": "Full bikini + Inner buttocks + Full arms + Underarms + Full legs" }, "price": "55000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gold Package", "description": "Full bikini + Inner buttocks + Underarms + Full legs" }, "price": "45000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Silver Package", "description": "Full bikini + Inner buttocks + Underarms + Lower legs" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "White Package", "description": "Full bikini + Inner buttocks + Underarms" }, "price": "23000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pearl Package", "description": "Underarms + Lower legs" }, "price": "21000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Shine Package", "description": "Underarms + Bikini line" }, "price": "16000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "HydraBeauty Facial Treatments",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (face)", "description": "60-minute professional facial" }, "price": "20000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (back)", "description": "90-minute back treatment" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (face + neck + decolletage)", "description": "100-minute comprehensive treatment" }, "price": "30000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial + Carbon peeling (face)", "description": "100-minute combined treatment" }, "price": "40000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Permanent Makeup",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyebrow tattoo (powder/ombre)", "description": "Long-lasting eyebrow permanent makeup" }, "price": "75000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Botched eyebrow tattoo correction", "description": "Corrective permanent makeup" }, "price": "80000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyeliner tattoo (lash enhancement)", "description": "Long-lasting eyeliner permanent makeup" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Half lip contour", "description": "Partial lip permanent makeup" }, "price": "55000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Full lip contour", "description": "Complete lip permanent makeup" }, "price": "65000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Tattoo Removal",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyebrow tattoo removal", "description": "Laser removal" }, "price": "20000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Lip contour removal", "description": "Laser removal" }, "price": "15000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tattoo removal (2x2 cm)", "description": "Small area laser removal" }, "price": "10000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tattoo removal (5x5 cm)", "description": "Medium area laser removal" }, "price": "20000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Carbon Peeling",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pigment spot removal", "description": "Targeted pigmentation treatment" }, "price": "10000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (full face)", "description": "Skin rejuvenation treatment" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (decolletage)", "description": "Decolletage treatment" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (full back)", "description": "Back treatment" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (face + neck + decolletage)", "description": "Comprehensive treatment" }, "price": "40000", "priceCurrency": "HUF" }
+        ]
+      }
+    ]
+  }
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://beautyflow.pro/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Prices",
+      "item": "https://beautyflow.pro/en/prices"
+    }
+  ]
+};
 ---
 
 <Layout title="Prices - Beautyflow Beauty Salon Budapest" lang="en">
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <!-- Hero Section -->
   <section class="bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc] py-8 lg:py-12">
     <div class="container mx-auto px-4 text-center">

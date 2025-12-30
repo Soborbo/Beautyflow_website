@@ -126,6 +126,26 @@ const faqs = [
     }))
   })} />
 
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://beautyflow.pro/en/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Laser Tattoo Removal",
+        "item": "https://beautyflow.pro/en/tattoo-removal"
+      }
+    ]
+  })} />
+
   <!-- Service Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -136,7 +156,7 @@ const faqs = [
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Beauty Salon",
-      "image": "https://beautyflow.hu/images/beautyflow-logo.png",
+      "image": "https://beautyflow.pro/images/beautyflow-logo.png",
       "address": [
         {
           "@type": "PostalAddress",

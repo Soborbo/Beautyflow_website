@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { type Locale, defaultLang } from '../i18n';
 
 interface Props {
@@ -22,7 +23,7 @@ const content = {
       { image: '/images/higienia.jpg', title: 'Orvosi szintű tisztaság\nés higiénia', description: 'Számunkra a biztonság és az egészség mindennél fontosabb. Minden kezelés során egyszerhasználatos eszközöket és steril környezetet biztosítunk számodra.' },
       { image: '/images/testmeret.jpg', title: 'Minden testalkat\nugyanannyit fizet', description: 'Mi embereket kezelünk, nem testeket. Nem teszünk különbséget a vékony és a termetesebb lányok között, nálunk mindenki ugyannyit fizet, mert így tisztességes.' },
       { image: '/images/nyitva.jpg', title: 'Heti 7 napos\nnyitvatartás', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.' },
-      { image: '/images/dioda-lezeres-szortelenites-mob.jpg', title: 'Mi rád fogjuk szánni\naz időt', description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.' },
+      { image: '/images/sminktetovalas-budapest-beautyflow.jpg', title: 'Mi rád fogjuk szánni\naz időt', description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.' },
       { image: '/images/pcos-szortelenites.jpg', title: 'Sokéves gyakorlat\nPCOS-es vendégekkel', description: 'A policisztás ovárium szindróma rengeteg nőnek keseríti meg az életét. Különleges odafigyeléssel és a megszokottnál jelentősen jobb eredményekkel várunk!' },
       { image: '/images/beautyflow-dijak.webp', title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás', description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.' },
     ],
@@ -38,7 +39,7 @@ const content = {
       { image: '/images/higienia.jpg', title: 'Medical-grade cleanliness\nand hygiene', description: 'Safety and health are more important to us than anything. During every treatment, we provide disposable tools and a sterile environment for you.' },
       { image: '/images/testmeret.jpg', title: 'Every body type\npays the same', description: "We treat people, not bodies. We don't differentiate between slim and curvier clients, everyone pays the same because that's fair." },
       { image: '/images/nyitva.jpg', title: 'Open 7 days\na week', description: 'Achieve perfectly clean and healthy facial skin painlessly.' },
-      { image: '/images/dioda-lezeres-szortelenites-mob.jpg', title: "We'll dedicate our\ntime to you", description: 'We only work with one client at a time to ensure you receive our full and undivided attention.' },
+      { image: '/images/sminktetovalas-budapest-beautyflow.jpg', title: "We'll dedicate our\ntime to you", description: 'We only work with one client at a time to ensure you receive our full and undivided attention.' },
       { image: '/images/pcos-szortelenites.jpg', title: 'Years of experience\nwith PCOS clients', description: "Polycystic ovary syndrome affects many women's lives. We welcome you with special care and significantly better results than usual!" },
       { image: '/images/beautyflow-dijak.webp', title: 'Multiple award-winning,\nreliable business', description: 'Over the years, we have won numerous awards from the "Fair Business" award to the "Notino Salon of the Month" recognition.' },
     ],
@@ -55,18 +56,23 @@ const t = content[lang];
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {t.features.map((feature) => (
         <div class="text-center group cursor-pointer bg-white border border-gray-100 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <div class="overflow-hidden">
-            <img
+          <div class="overflow-hidden aspect-[4/3]">
+            <Image
               src={feature.image}
               alt={feature.title.replace('\n', ' ')}
-              class="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105"
+              width={400}
+              height={300}
+              format="webp"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-xl text-gray-900 mb-3 whitespace-pre-line leading-tight transition-colors duration-300 group-hover:text-[#c53f75]">
               {feature.title}
             </h3>
-            <p class="text-gray-600 text-sm leading-relaxed">
+            <p class="text-gray-600 text-sm leading-relaxed text-left">
               {feature.description}
             </p>
           </div>
@@ -85,10 +91,15 @@ const t = content[lang];
         {t.budaBtn}
       </a>
 
-      <img
+      <Image
         src="/images/notino-ikon.png"
         alt="Notino"
+        width={48}
+        height={48}
+        format="webp"
         class="w-12 h-12 hidden sm:block"
+        loading="lazy"
+        decoding="async"
       />
 
       <a

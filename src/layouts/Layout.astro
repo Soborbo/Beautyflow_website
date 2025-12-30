@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import GTMTracking from '../components/GTMTracking.astro';
 import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
 
 interface Props {
@@ -10,6 +12,8 @@ interface Props {
   description?: string;
   lang?: Locale;
   translationOf?: string;
+  noindex?: boolean;
+  ogImage?: string;
 }
 
 const currentLang = Astro.props.lang || getLangFromUrl(Astro.url);
@@ -18,7 +22,9 @@ const t = useTranslations(currentLang);
 const defaultDescription = t('meta.defaultDescription');
 const siteName = t('meta.siteName');
 
-const { title, description = defaultDescription, translationOf } = Astro.props;
+const { title, description = defaultDescription, translationOf, noindex = false, ogImage } = Astro.props;
+const defaultOgImage = 'https://beautyflow.pro/images/beautyflow-fb.jpg';
+const finalOgImage = ogImage ? `https://beautyflow.pro${ogImage}` : defaultOgImage;
 
 const ogLocale = currentLang === 'hu' ? 'hu_HU' : 'en_US';
 const currentUrl = Astro.url.pathname;
@@ -37,6 +43,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
     <title>{title}</title>
 
@@ -55,17 +62,32 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:image" content="https://beautyflow.pro/images/beautyflow-fb.jpg" />
+    <meta property="og:image" content={finalOgImage} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={finalOgImage} />
+
+    <!-- Google Tag Manager -->
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-W8V3BVGD');</script>
+    <!-- End Google Tag Manager -->
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W8V3BVGD"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <Header lang={currentLang} />
     <main class="flex-grow">
       <slot />
     </main>
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
+    <WhatsAppButton />
+    <GTMTracking />
   </body>
 </html>
