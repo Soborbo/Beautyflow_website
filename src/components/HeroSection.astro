@@ -49,7 +49,7 @@ const stats = [
     </div>
 
     <!-- Right side - Content -->
-    <div class="lg:w-1/2 bg-[#fff9f7] flex items-center justify-center py-8 lg:pt-[80px] lg:pb-6">
+    <div class="lg:w-1/2 bg-[#fff9f7] flex items-center justify-center pt-0 pb-8 lg:pt-[80px] lg:pb-6">
       <div class="w-full px-5 text-center">
         <!-- Mobile image with Google rating -->
         <div class="relative lg:hidden -mx-5 mb-6">
@@ -131,6 +131,56 @@ const stats = [
             <p class="text-white/80 text-[12px] lg:text-[16px] leading-[0.9]">{stat.label}</p>
           </div>
         ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust Badges / Awards Row - Elegant Design -->
+  <div class="w-full bg-[#1a1a1a] py-5">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <!-- Mobile: 2x2 grid, Desktop: flex row -->
+      <div class="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:items-center sm:gap-6 lg:gap-12">
+        <!-- Év Vállalkozója díj -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Év Vállalkozója-díj</span>
+        </div>
+
+        <div class="hidden sm:block w-px h-6 bg-white/20"></div>
+
+        <!-- Notino Partner -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+            <Image src={notinoIcon} alt="Notino" class="w-4 h-4 sm:w-5 sm:h-5" width={20} height={20} format="webp" />
+          </div>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Notino Partner</span>
+        </div>
+
+        <div class="hidden sm:block w-px h-6 bg-white/20"></div>
+
+        <!-- Tisztességes Vállalkozás -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Tisztességes Vállalkozás</span>
+        </div>
+
+        <div class="hidden sm:block w-px h-6 bg-white/20"></div>
+
+        <!-- Turul Szépség Gold -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-300 to-yellow-500 flex items-center justify-center flex-shrink-0">
+            <span class="text-[10px] sm:text-xs font-bold text-amber-900">G</span>
+          </div>
+          <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">Turul Szépség Gold</span>
+        </div>
       </div>
     </div>
   </div>
