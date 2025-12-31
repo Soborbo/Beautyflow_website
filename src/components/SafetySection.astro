@@ -1,6 +1,8 @@
 ---
-import { Image } from 'astro:assets';
+import ContentImage from './images/ContentImage.astro';
 import { type Locale, defaultLang } from '../i18n';
+import beautyflowKezeles from '../assets/images/beautyflow-kezeles.jpg';
+import beautyflowCsapat from '../assets/images/beautyflow-csapat.jpg';
 
 interface Props {
   lang?: Locale;
@@ -56,15 +58,10 @@ const t = content[lang];
 
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2 order-1 lg:order-2">
-      <Image
-        src="/images/beautyflow-kezeles.jpg"
+      <ContentImage
+        src={beautyflowKezeles}
         alt={t.safety.imageAlt}
-        width={800}
-        height={600}
-        format="webp"
         class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
-        loading="lazy"
-        decoding="async"
       />
     </div>
   </div>
@@ -75,15 +72,10 @@ const t = content[lang];
   <div class="flex flex-col lg:flex-row">
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2">
-      <Image
-        src="/images/beautyflow-csapat.jpg"
+      <ContentImage
+        src={beautyflowCsapat}
         alt={t.friends.imageAlt}
-        width={800}
-        height={600}
-        format="webp"
         class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
-        loading="lazy"
-        decoding="async"
       />
     </div>
 

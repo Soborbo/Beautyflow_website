@@ -1,5 +1,8 @@
 ---
 import { type Locale, defaultLang, getLocalizedPath, routeMappings } from '../i18n';
+import { Picture } from 'astro:assets';
+import Logo from './Logo.astro';
+import footerBg from '../assets/images/beautyflow-hatter.jpg';
 
 interface Props {
   lang?: Locale;
@@ -50,24 +53,23 @@ const labels = {
 const t = labels[lang];
 ---
 
-<footer class="relative text-white py-16" style="background-image: url('/images/beautyflow-hatter.jpg'); background-size: cover; background-position: center;">
+<footer class="relative text-white py-16 overflow-hidden">
+  <!-- Optimalizált háttérkép -->
+  <Picture
+    src={footerBg}
+    alt=""
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    widths={[640, 1024, 1280, 1920]}
+    sizes="100vw"
+    class="absolute inset-0 w-full h-full object-cover object-center"
+    loading="lazy"
+  />
   <div class="absolute inset-0 bg-black/80"></div>
   <div class="container mx-auto px-4 relative z-10">
     <!-- Logo -->
     <div class="flex justify-center mb-12">
-      <picture>
-        <source srcset="/images/beautyflow-logo.webp 1x, /images/beautyflow-logo.webp 2x" type="image/webp" />
-        <img
-          src="/images/beautyflow-logo.png"
-          srcset="/images/beautyflow-logo.png 1x, /images/beautyflow-logo.png 2x"
-          alt="Beautyflow"
-          class="h-20 w-auto"
-          width="240"
-          height="80"
-          loading="lazy"
-          decoding="async"
-        />
-      </picture>
+      <Logo class="h-20 w-auto" />
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12 text-center">

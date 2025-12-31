@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 
 // Image imports
 import heroImage from '../assets/images/sminktetovalas-mb-2.jpg';
@@ -621,29 +621,20 @@ const faqs = [
 
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
-    <!-- Mobile: Image above everything like benefit sections -->
-    <div class="lg:hidden">
-      <Image
+    <!-- Egyetlen optimalizált háttérkép - mobile-on felül, desktop-on teljes szekció -->
+    <div class="how-it-works-bg">
+      <Picture
         src={sminktetovalasBg}
         alt="Sminktetoválás kezelés"
-        class="w-full h-64 object-cover object-[center_20%]"
+        formats={['avif', 'webp']}
+        fallbackFormat="jpg"
+        widths={[640, 828, 1200, 1600]}
+        sizes="100vw"
+        class="w-full h-full object-cover object-[center_20%] lg:object-right"
         loading="lazy"
-        format="webp"
-        quality={80}
       />
-    </div>
-
-    <!-- Background image for desktop -->
-    <div class="hidden lg:block absolute inset-0">
-      <Image
-        src={sminktetovalasBg}
-        alt=""
-        class="w-full h-full object-cover object-right"
-        loading="lazy"
-        format="webp"
-        quality={80}
-      />
-      <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
+      <!-- Desktop gradient overlay -->
+      <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
     <!-- Mobile background for content area -->
@@ -1082,6 +1073,19 @@ const faqs = [
 </script>
 
 <style>
+  /* How It Works háttérkép - egyszer betöltve, responsive pozicionálás */
+  .how-it-works-bg {
+    height: 16rem; /* h-64 mobile-on */
+    position: relative;
+  }
+  @media (min-width: 1024px) {
+    .how-it-works-bg {
+      position: absolute;
+      inset: 0;
+      height: auto;
+    }
+  }
+
   .stat-item {
     opacity: 1;
   }

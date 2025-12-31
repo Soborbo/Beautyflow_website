@@ -1,5 +1,6 @@
 ---
 import { type Locale, defaultLang, getLocalizedPath, getAlternateRoute } from '../i18n';
+import Logo from './Logo.astro';
 
 interface Props {
   lang?: Locale;
@@ -111,19 +112,7 @@ const flags = {
   <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
     <!-- Logo -->
     <a href="/" class="flex-shrink-0">
-      <picture>
-        <source srcset="/images/beautyflow-logo.webp 1x, /images/beautyflow-logo.webp 2x" type="image/webp" />
-        <img
-          src="/images/beautyflow-logo.png"
-          srcset="/images/beautyflow-logo.png 1x, /images/beautyflow-logo.png 2x"
-          alt="Beautyflow"
-          class="h-8 w-auto"
-          width="96"
-          height="32"
-          loading="eager"
-          decoding="async"
-        />
-      </picture>
+      <Logo class="h-8 w-auto" />
     </a>
 
     <!-- Addresses -->
@@ -175,19 +164,7 @@ const flags = {
   <div class="flex items-center h-full px-4 lg:px-6">
     <!-- Logo - pushed to left edge on lg -->
     <a href="/" class="flex-shrink-0">
-      <picture>
-        <source srcset="/images/beautyflow-logo.webp 1x, /images/beautyflow-logo.webp 2x" type="image/webp" />
-        <img
-          src="/images/beautyflow-logo.png"
-          srcset="/images/beautyflow-logo.png 1x, /images/beautyflow-logo.png 2x"
-          alt="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest"
-          class="h-10 md:h-10 lg:h-12 w-auto"
-          width="168"
-          height="56"
-          loading="eager"
-          decoding="async"
-        />
-      </picture>
+      <Logo class="h-10 md:h-10 lg:h-12 w-auto" alt="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest" />
     </a>
 
     <!-- Spacer to push nav to the right -->
@@ -286,19 +263,7 @@ const flags = {
   <div class="flex flex-col h-full">
     <!-- Header with close button -->
     <div class="flex items-center justify-between p-4 border-b border-gray-100">
-      <picture>
-        <source srcset="/images/beautyflow-logo.webp 1x, /images/beautyflow-logo.webp 2x" type="image/webp" />
-        <img
-          src="/images/beautyflow-logo.png"
-          srcset="/images/beautyflow-logo.png 1x, /images/beautyflow-logo.png 2x"
-          alt="Beautyflow"
-          class="h-10 w-auto"
-          width="120"
-          height="40"
-          loading="lazy"
-          decoding="async"
-        />
-      </picture>
+      <Logo class="h-10 w-auto" />
       <button id="mobile-close-btn" class="p-2 text-gray-700 hover:text-[#c53f75] transition-colors" aria-label={closeMenuLabel}>
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
