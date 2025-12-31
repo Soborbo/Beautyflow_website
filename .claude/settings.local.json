@@ -34,7 +34,9 @@
       "Bash(unzip:*)",
       "Bash(git push:*)",
       "Bash(gh auth:*)",
-      "Bash(brew install:*)"
+      "Bash(brew install:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(ssh-keygen:*)"
     ]
   }
 }
