@@ -1,5 +1,6 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import ContentImage from '../components/images/ContentImage.astro';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
@@ -24,8 +25,8 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Beautyflow Szépségszalon",
-  "url": "https://beautyflow.hu",
-  "logo": "https://beautyflow.hu/images/Beautyflow-favicon.png",
+  "url": "https://beautyflow.pro",
+  "logo": "https://beautyflow.pro/images/Beautyflow-favicon.png",
   "description": "Többszörösen díjnyertes szépségszalon Budapesten. Lézeres szőrtelenítés, sminktetoválás, arckezelések.",
   "foundingDate": "2014",
   "founder": {
@@ -56,8 +57,28 @@ const organizationSchema = {
     "availableLanguage": "Hungarian"
   },
   "sameAs": [
-    "https://www.instagram.com/beautyflow.hu/",
-    "https://www.facebook.com/beautyflow.hu/"
+    "https://www.instagram.com/beautyflow.pro/",
+    "https://www.facebook.com/beautyflow.pro/"
+  ]
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Főoldal",
+      "item": "https://beautyflow.pro"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Rólunk",
+      "item": "https://beautyflow.pro/rolunk"
+    }
   ]
 };
 
@@ -238,10 +259,23 @@ const content = {
 const t = content[lang];
 const currentValues = values[lang];
 const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
+
+// Pre-generate team member images with 1x and 2x versions
+const teamMemberImages = await Promise.all(
+  teamMembers.map(async (member) => {
+    if (member.image) {
+      const img1x = await getImage({ src: member.image, width: 128, height: 128, format: 'webp', quality: 60 });
+      const img2x = await getImage({ src: member.image, width: 256, height: 256, format: 'webp', quality: 60 });
+      return { name: member.name, img1x, img2x };
+    }
+    return { name: member.name, img1x: null, img2x: null };
+  })
+);
 ---
 
 <Layout title={t.pageTitle} description={t.pageDescription} lang={lang}>
   <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
   <!-- Hero Section -->
   <section class="py-16 lg:py-20 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
@@ -270,14 +304,11 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
           </div>
         </div>
         <div class="order-1 lg:order-2">
-          <Image
+          <ContentImage
             src={beautyflowDijak}
             alt={t.storyImageAlt}
             class="w-full rounded-2xl shadow-lg"
-            format="webp"
-            quality={80}
-            loading="eager"
-            fetchpriority="high"
+            priority
           />
         </div>
       </div>
@@ -337,20 +368,22 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       </div>
 
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {teamMembers.map((member) => (
+        {teamMembers.map((member, index) => {
+          const memberImg = teamMemberImages[index];
+          return (
           <div class="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow flex flex-col">
             <!-- Image or Initials -->
             <div class="flex justify-center pt-6">
-              {member.image ? (
-                <Image
-                  src={member.image}
+              {memberImg.img1x && memberImg.img2x ? (
+                <img
+                  src={memberImg.img1x.src}
+                  srcset={`${memberImg.img1x.src} 1x, ${memberImg.img2x.src} 2x`}
                   alt={member.name}
                   class="w-32 h-32 rounded-full object-cover shadow-md"
-                  format="webp"
-                  quality={80}
+                  width="128"
+                  height="128"
                   loading="lazy"
-                  width={128}
-                  height={128}
+                  decoding="async"
                 />
               ) : (
                 <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">
@@ -378,7 +411,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   </section>

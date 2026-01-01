@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  build: {
+    inlineStylesheets: 'auto', // Inline small CSS files for better performance
+  },
   i18n: {
     defaultLocale: 'hu',
     locales: ['hu', 'en'],
@@ -24,10 +27,14 @@ export default defineConfig({
   image: {
     // Enable image optimization
     service: {
-      entrypoint: 'astro/assets/services/sharp'
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        avif: { quality: 65 },
+        webp: { quality: 75 },
+        jpeg: { quality: 80 },
+        png: { quality: 90 },
+      }
     },
-    // Default quality for optimized images
-    quality: 80,
     // Domains that are allowed for remote images
     domains: [],
   },

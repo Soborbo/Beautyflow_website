@@ -1,0 +1,33 @@
+---
+/**
+ * CardImage - THIRD pattern for card grids
+ * Use: 3-column grids, treatment cards, feature cards
+ * Pattern: 33vw desktop, 50vw tablet, 100vw mobile
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+}
+
+const { src, alt, class: className } = Astro.props;
+
+// THIRD pattern from astro-images skill
+const widths = [256, 512, 640, 853, 1280];
+const sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={['avif', 'webp', 'jpg']}
+  quality={60}
+  class={className}
+  loading="lazy"
+  decoding="async"
+/>

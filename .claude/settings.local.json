@@ -17,7 +17,25 @@
       "Bash(npx sharp-cli:*)",
       "Bash(findstr:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(for file in /Users/laszlo/Documents/GitHub/beautyflow/src/pages/404.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/adatvedelmi-tajekoztato.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/arak.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/aszf.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/ingyenes-konzultacio.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/rolunk.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/404.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/free-consultation.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/prices.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/privacy-policy.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/terms-and-conditions.astro)",
+      "Bash(do grep -l \"application/ld+json\" \"$file\")",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(grep:*)",
+      "Bash(for f in /Users/laszlo/Documents/GitHub/beautyflow/src/pages/*.astro /Users/laszlo/Documents/GitHub/beautyflow/src/pages/en/*.astro)",
+      "Bash(do grep -q \"application/ld+json\" \"$f\")",
+      "Bash(while read f)",
+      "Bash(do if ! grep -q \"application/ld+json\" \"$f\")",
+      "Bash(fi)",
+      "Bash(then basename \"$f\")",
+      "Bash(xargs ls:*)",
+      "Bash(unzip:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(brew install:*)",
+      "Bash(mkdir:*)"
     ]
   }
 }

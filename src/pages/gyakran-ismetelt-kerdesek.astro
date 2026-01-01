@@ -371,11 +371,32 @@ const faqSchema = {
     }
   }))
 };
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Főoldal",
+      "item": "https://beautyflow.pro"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Gyakran Ismételt Kérdések",
+      "item": "https://beautyflow.pro/gyakran-ismetelt-kerdesek"
+    }
+  ]
+};
 ---
 
 <Layout title="Gyakran Ismételt Kérdések (GYIK) - Beautyflow Szépségszalon" description="Válaszok a lézeres szőrtelenítéssel, HydraBeauty kezeléssel, sminktetoválással és egyéb kozmetikai kezelésekkel kapcsolatos leggyakoribb kérdésekre.">
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
   <!-- Hero Section -->
   <section class="relative py-8 lg:py-12 bg-gradient-to-br from-[#fdf8f6] via-white to-[#f8f4f9]">

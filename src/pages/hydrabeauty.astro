@@ -78,6 +78,7 @@ const faqs = [
 <Layout
   title="HydraBeauty Arckezelés Budapest - Mélytisztítás és Hidratálás | Beautyflow"
   description="Professzionális HydraBeauty arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás egyetlen kezelés során. Azonnali eredmény! Kérj ingyenes konzultációt!"
+  ogImage="/images/hydrabeauty-arckezeles.jpg"
 >
   <!-- FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -93,6 +94,26 @@ const faqs = [
     }))
   })} />
 
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Főoldal",
+        "item": "https://beautyflow.pro/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "HydraBeauty Arckezelés",
+        "item": "https://beautyflow.pro/hydrabeauty"
+      }
+    ]
+  })} />
+
   <!-- Service Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -103,7 +124,7 @@ const faqs = [
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
-      "image": "https://beautyflow.hu/images/beautyflow-logo.png",
+      "image": "https://beautyflow.pro/images/beautyflow-logo.png",
       "address": [
         {
           "@type": "PostalAddress",

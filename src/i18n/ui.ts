@@ -50,7 +50,7 @@ export const ui = {
     '404.backHome': 'Vissza a főoldalra',
 
     // Meta
-    'meta.defaultDescription': 'A legcsajosabb szépségszalon a környékeden. Kiváló értékelések, a legmodernebb gépek, nagyszerű hangulat és sokéves szakmai tapasztalat vár.',
+    'meta.defaultDescription': 'A legcsajosabb szépségszalon a környékeden. Kiváló értékelések, csúcstechnológiájú gépek, nagyszerű hangulat és sokéves szakmai tapasztalat vár.',
     'meta.siteName': 'Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest',
   },
   en: {

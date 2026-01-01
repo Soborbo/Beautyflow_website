@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { ContentImage } from './images';
 import consultationImage from '../assets/images/konya-fanni-konzultacio.webp';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
@@ -54,16 +54,10 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       <div class="flex flex-col lg:flex-row">
         <!-- Image Column - 50% width -->
         <div class="lg:w-1/2 relative">
-          <Image
+          <ContentImage
             src={consultationImage}
             alt={t.imageAlt}
             class="w-full h-full object-cover object-top"
-            style="min-height: 350px;"
-            width={400}
-            height={500}
-            format="webp"
-            quality={80}
-            loading="lazy"
           />
           <!-- Name overlay on image -->
           <div class="absolute bottom-6 left-0 right-0 text-center">

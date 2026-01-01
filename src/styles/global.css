@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
 /* Local fonts - faster than Google Fonts */
+/* Only import the font weights actually used in the project */
 @import "@fontsource/cormorant/400.css";
-@import "@fontsource/cormorant/500.css";
-@import "@fontsource/cormorant/600.css";
 @import "@fontsource/cormorant/700.css";
 @import "@fontsource/open-sans/400.css";
-@import "@fontsource/open-sans/500.css";
 @import "@fontsource/open-sans/600.css";
 @import "@fontsource/open-sans/700.css";
 

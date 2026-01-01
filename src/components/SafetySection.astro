@@ -1,4 +1,7 @@
 ---
+import { ContentImage } from './images';
+import safetyImage from '../assets/images/beautyflow-kezeles.jpg';
+import friendsImage from '../assets/images/beautyflow-csapat.jpg';
 import { type Locale, defaultLang } from '../i18n';
 
 interface Props {
@@ -55,24 +58,24 @@ const t = content[lang];
 
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2 order-1 lg:order-2">
-      <img
-        src="/images/beautyflow-kezeles.jpg"
+      <ContentImage
+        src={safetyImage}
         alt={t.safety.imageAlt}
-        class="w-full h-64 lg:h-full object-cover"
+        class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
       />
     </div>
   </div>
 </section>
 
 <!-- Friends Section - Image Left, Content Right -->
-<section class="border-b-4 border-[#c53f75]">
+<section>
   <div class="flex flex-col lg:flex-row">
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2">
-      <img
-        src="/images/beautyflow-csapat.jpg"
+      <ContentImage
+        src={friendsImage}
         alt={t.friends.imageAlt}
-        class="w-full h-64 lg:h-full object-cover"
+        class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
       />
     </div>
 

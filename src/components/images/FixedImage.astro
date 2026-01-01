@@ -1,0 +1,53 @@
+---
+/**
+ * FixedImage - FIXED pattern for logos, avatars, icons
+ * Use: Small fixed-size images that don't scale with viewport
+ * Pattern: 1x + 2x density srcset using getImage()
+ *
+ * Note: For very small icons (< 24px), consider inline SVG instead
+ */
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  width: number;
+  height?: number;
+  class?: string;
+}
+
+const { src, alt, width, height, class: className } = Astro.props;
+
+// FIXED pattern: 1x at quality 80, 2x at quality 60
+// Generate avif, webp, and jpg for browser choice with fallback
+const avif1x = await getImage({ src, width, height, quality: 80, format: 'avif' });
+const avif2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'avif' });
+const webp1x = await getImage({ src, width, height, quality: 80, format: 'webp' });
+const webp2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'webp' });
+const jpg1x = await getImage({ src, width, height, quality: 80, format: 'jpg' });
+const jpg2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'jpg' });
+
+const finalHeight = height || width;
+---
+
+<picture>
+  <source
+    type="image/avif"
+    srcset={`${avif1x.src} 1x, ${avif2x.src} 2x`}
+  />
+  <source
+    type="image/webp"
+    srcset={`${webp1x.src} 1x, ${webp2x.src} 2x`}
+  />
+  <img
+    src={jpg1x.src}
+    srcset={`${jpg1x.src} 1x, ${jpg2x.src} 2x`}
+    alt={alt}
+    width={width}
+    height={finalHeight}
+    class={className}
+    loading="lazy"
+    decoding="async"
+  />
+</picture>

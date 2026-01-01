@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import HeroImage from '../../components/images/HeroImage.astro';
 
 // Image imports
 import konyaFanniKozmetikus from '../../assets/images/konya-fanni-kozmetikus.jpg';
@@ -41,6 +42,10 @@ const articleSchema = {
     }
   ]
 };
+
+// Pre-generate author avatar with 1x and 2x versions (70x70 display size)
+const authorAvatar1x = await getImage({ src: konyaFanniKozmetikus, width: 70, height: 70, format: 'webp', quality: 60 });
+const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, height: 140, format: 'webp', quality: 60 });
 ---
 
 <Layout
@@ -62,12 +67,16 @@ const articleSchema = {
       </h1>
 
       <div class="flex items-center gap-4">
-        <Image
-          src={konyaFanniKozmetikus}
+        <img
+          src={authorAvatar1x.src}
+          srcset={`${authorAvatar1x.src} 1x, ${authorAvatar2x.src} 2x`}
           alt="Kónya Fanni"
           class="w-[70px] h-[70px] rounded-full object-cover"
-          width={140}
-          height={140}
+          width="70"
+          height="70"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
         />
         <div>
           <div class="font-semibold text-gray-900">Kónya Fanni</div>
@@ -353,7 +362,7 @@ const articleSchema = {
 
       <!-- Before/After image -->
       <div class="mb-12">
-        <Image
+        <HeroImage
           src={lezeresLabEredmeny}
           alt="Lézeres szőrtelenítés előtte-utána eredmény lábon"
           class="w-full rounded-xl"

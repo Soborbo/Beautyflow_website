@@ -1,11 +1,11 @@
 ---
-import { Image } from 'astro:assets';
+import { CardImage } from './images';
 import hydrabeautyImg from '../assets/images/hydrabeauty.jpg';
 import sminktetovalasImg from '../assets/images/sminktetovalas-mb-2.jpg';
 import carbonPeelingImg from '../assets/images/carbon-peeling-mb.jpg';
 import diodaImg from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
 import tetovalasImg from '../assets/images/sminktetovalas-mb.jpg';
-import pigmentfoltImg from '../assets/images/pigmentfolt-eltavoitas.webp';
+import pigmentfoltImg from '../assets/images/pigmentfolt-arckezeles.jpg';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
 interface Props {
@@ -63,15 +63,10 @@ const treatments = t.treatments.map((treatment, index) => ({
           class="bg-white rounded-lg overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.08)]"
         >
           <div class="relative overflow-hidden">
-            <Image
+            <CardImage
               src={treatment.image}
               alt={treatment.title}
               class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
-              width={400}
-              height={224}
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-6 flex flex-col flex-1">

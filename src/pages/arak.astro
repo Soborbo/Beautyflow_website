@@ -141,9 +141,116 @@ const categories = [
   { id: 'tetovalas-eltavolitas', label: 'Tetoválás eltávolítás', color: categoryColors['tetovalas-eltavolitas'] },
   { id: 'carbon-peeling', label: 'Carbon Peeling', color: categoryColors['carbon-peeling'] },
 ];
+
+// Schema.org - Service Catalog with Offers (all services + both locations)
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "BeautySalon",
+  "name": "Beautyflow Szépségszalon",
+  "url": "https://beautyflow.pro/arak",
+  "telephone": "+36 1 300 9414",
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Beautyflow Szolgáltatások",
+    "itemListElement": [
+      {
+        "@type": "OfferCatalog",
+        "name": "Lézeres Szőrtelenítés Csomagok",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Diamond Csomag", "description": "Teljes intim + Popsi belső + Teljes kar + Hónalj + Teljes láb" }, "price": "55000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gold Csomag", "description": "Teljes intim + Popsi belső + Hónalj + Teljes láb" }, "price": "45000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Silver Csomag", "description": "Teljes intim + Popsi belső + Hónalj + Lábszár térdig" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "White Csomag", "description": "Teljes intim + Popsi belső + Hónalj" }, "price": "23000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pearl Csomag", "description": "Hónalj + Lábszár térdig" }, "price": "21000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Shine Csomag", "description": "Hónalj + Bikinivonal" }, "price": "16000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "HydraBeauty Arckezelések",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (arc)", "description": "60 perces professzionális arckezelés" }, "price": "20000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (hát)", "description": "90 perces hátkezelés" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (arc + nyak + dekoltázs)", "description": "100 perces komplex kezelés" }, "price": "30000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial + Carbon peeling (arc)", "description": "100 perces kombinált kezelés" }, "price": "40000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Sminktetoválás",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemöldök tetoválás (púderes/ombre)", "description": "Tartós szemöldök sminktetoválás" }, "price": "75000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Rontott szemöldök tetoválás javítása", "description": "Korrekciós sminktetoválás" }, "price": "80000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemhéj tetoválás (pillató sűrítő)", "description": "Tartós szemhéj sminktetoválás" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fél ajaksatír", "description": "Részleges ajak sminktetoválás" }, "price": "55000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Teljes ajaksatír", "description": "Tartós ajak sminktetoválás" }, "price": "65000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Tetoválás eltávolítás",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemöldök tetoválás eltávolítás", "description": "Lézeres eltávolítás" }, "price": "20000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Ajakkontúr eltávolítás", "description": "Lézeres eltávolítás" }, "price": "15000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tetoválás eltávolítás (2x2 cm)", "description": "Kis terület lézeres eltávolítása" }, "price": "10000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tetoválás eltávolítás (5x5 cm)", "description": "Közepes terület lézeres eltávolítása" }, "price": "20000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Carbon Peeling",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pigmentfolt eltávolítás", "description": "Célzott pigmentfolt kezelés" }, "price": "10000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (teljes arc)", "description": "Bőrfiatalító kezelés" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (dekoltázs)", "description": "Dekoltázs kezelés" }, "price": "25000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (teljes hát)", "description": "Hát kezelés" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (arc + nyak + dekoltázs)", "description": "Komplex kezelés" }, "price": "40000", "priceCurrency": "HUF" }
+        ]
+      }
+    ]
+  }
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Főoldal",
+      "item": "https://beautyflow.pro"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Árak",
+      "item": "https://beautyflow.pro/arak"
+    }
+  ]
+};
 ---
 
 <Layout title="Árak - Beautyflow Szépségszalon Budapest">
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <!-- Hero Section -->
   <section class="bg-gradient-to-b from-[#f0ebe8] to-[#e8e0dc] py-8 lg:py-12">
     <div class="container mx-auto px-4 text-center">

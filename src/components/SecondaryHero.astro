@@ -1,4 +1,6 @@
 ---
+import { ContentImage } from './images';
+import heroImage from '../assets/images/beautyflow-kapcsolat-sm.jpg';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
 interface Props {
@@ -86,13 +88,10 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
 
       <!-- Right side - Image -->
       <div class="w-full lg:w-1/2">
-        <img
-          src="/images/beautyflow-kapcsolat-sm.jpg"
+        <ContentImage
+          src={heroImage}
           alt={t.imageAlt}
-          class="w-full h-auto rounded-lg shadow-2xl"
-          width="600"
-          height="400"
-          loading="lazy"
+          class="w-full h-auto rounded-lg shadow-2xl aspect-[3/2]"
         />
       </div>
     </div>

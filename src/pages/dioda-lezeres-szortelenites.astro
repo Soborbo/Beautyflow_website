@@ -1,7 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import ContentImage from '../components/images/ContentImage.astro';
+import CardImage from '../components/images/CardImage.astro';
+import FixedImage from '../components/images/FixedImage.astro';
 
 // Image imports
 import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
@@ -37,6 +40,22 @@ import szepsegszalonRuzs from '../assets/images/szepsegszalon-ruzs.jpg';
 import szepsegszalonTrofea from '../assets/images/szepsegszalon-trofea.jpg';
 import szepsegszalonUgyfel from '../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
 
+// Small fixed-size images - using getImage for 1x + 2x srcset
+const notinoIkonOptimized = await getImage({ src: notinoIkon, width: 32, height: 32, format: 'webp', quality: 60 });
+const notinoIkon2x = await getImage({ src: notinoIkon, width: 64, height: 64, format: 'webp', quality: 60 });
+
+const googleLogoOptimized = await getImage({ src: googleLogo, width: 36, height: 36, format: 'webp', quality: 60 });
+const googleLogo2x = await getImage({ src: googleLogo, width: 72, height: 72, format: 'webp', quality: 60 });
+
+const notinoLogoSmOptimized = await getImage({ src: notinoLogoSm, width: 48, height: 48, format: 'webp', quality: 60 });
+const notinoLogoSm2x = await getImage({ src: notinoLogoSm, width: 96, height: 96, format: 'webp', quality: 60 });
+
+const skinlabOptimized = await getImage({ src: skinlab, width: 48, height: 48, format: 'webp', quality: 60 });
+const skinlab2x = await getImage({ src: skinlab, width: 96, height: 96, format: 'webp', quality: 60 });
+
+const hajduOptimized = await getImage({ src: hajdu, width: 48, height: 48, format: 'webp', quality: 60 });
+const hajdu2x = await getImage({ src: hajdu, width: 96, height: 96, format: 'webp', quality: 60 });
+
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
@@ -68,7 +87,7 @@ const locations = [
 const stats = [
   { icon: szepsegszalonVirag, value: '10+ év', label: 'tapasztalat' },
   { icon: szepsegszalonRuzs, value: '10 000+', label: 'elvégzett kezelés' },
-  { icon: szepsegszalonTrofea, value: '12', label: 'legmodernebb gép' },
+  { icon: szepsegszalonTrofea, value: '12', label: 'csúcstechnológiájú gép' },
   { icon: szepsegszalonUgyfel, value: '1500+', label: 'elégedett vendég' },
 ];
 
@@ -230,7 +249,7 @@ const serviceSchema = {
   "provider": {
     "@type": "BeautySalon",
     "name": "Beautyflow Szépségszalon",
-    "url": "https://beautyflow.hu"
+    "url": "https://beautyflow.pro"
   },
   "areaServed": "Budapest",
   "serviceType": "Lézeres szőrtelenítés",
@@ -247,9 +266,28 @@ const serviceSchema = {
 <Layout
   title="Dióda Lézeres Szőrtelenítés Budapest - Végleges Szőrtelenítés | Beautyflow"
   description="Végleges dióda lézeres szőrtelenítés Budapesten. AI-vezérelt technológia, fájdalommentes kezelés, garantált eredmény. Kérj ingyenes konzultációt!"
+  ogImage="/images/lezeres-szortelenites-beautyflow-bg.jpg"
 >
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Főoldal",
+        "item": "https://beautyflow.pro/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Dióda Lézeres Szőrtelenítés",
+        "item": "https://beautyflow.pro/dioda-lezeres-szortelenites"
+      }
+    ]
+  })} />
 
   <div class="overflow-x-hidden">
   <!-- Hero Section - Full viewport height minus header (60px) and stats (80px) -->
@@ -265,7 +303,15 @@ const serviceSchema = {
                 <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
                 <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                   <div class="bg-white rounded-full p-1">
-                    <Image src={notinoIkon} alt="Notino" class="w-8 h-8" format="webp" quality={80} loading="eager" fetchpriority="high" />
+                    <img
+                      src={notinoIkonOptimized.src}
+                      srcset={`${notinoIkonOptimized.src} 1x, ${notinoIkon2x.src} 2x`}
+                      alt="Notino"
+                      class="w-8 h-8"
+                      width="32"
+                      height="32"
+                      loading="eager"
+                    />
                   </div>
                 </div>
               </div>
@@ -311,19 +357,24 @@ const serviceSchema = {
 
         <!-- Right column: Hero image - full width, no padding -->
         <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[250px] bg-[#fff9f7]">
-          <Image
+          <ContentImage
             src={lezeresSzortelenitesBg}
             alt="Dióda lézeres szőrtelenítés kezelés"
             class="w-full h-full object-contain animate-zoom-in"
-            format="webp"
-            quality={80}
-            loading="eager"
-            fetchpriority="high"
+            priority
           />
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">
             <div class="flex items-center gap-2">
-              <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" format="webp" quality={80} loading="eager" />
+              <img
+                src={googleLogoOptimized.src}
+                srcset={`${googleLogoOptimized.src} 1x, ${googleLogo2x.src} 2x`}
+                alt="Google"
+                class="w-7 h-7 lg:w-9 lg:h-9 rounded-full"
+                width="36"
+                height="36"
+                loading="lazy"
+              />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -365,13 +416,10 @@ const serviceSchema = {
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <Image
+            <ContentImage
               src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni lézeres szőrtelenítés szakértő"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -472,14 +520,10 @@ const serviceSchema = {
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <Image
+            <ContentImage
               src={konyaFanniKonzultacio}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -550,21 +594,20 @@ const serviceSchema = {
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <Image
+              <FixedImage
                 src={testimonial.image}
                 alt={testimonial.author}
+                width={48}
                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                format="webp"
-                quality={80}
-                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <Image
-                src={googleLogo}
+              <img
+                src={googleLogoOptimized.src}
+                srcset={`${googleLogoOptimized.src} 1x, ${googleLogo2x.src} 2x`}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
-                format="webp"
-                quality={80}
+                width="28"
+                height="28"
                 loading="lazy"
               />
             </div>
@@ -579,13 +622,10 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={lezeresLabSzortelenites}
           alt="Lézeres lábszőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -626,13 +666,10 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={lezeresSzortelenites}
           alt="Szőrtüszőgyulladás előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -643,13 +680,10 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={intimSzortelenites}
           alt="Lézeres szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -685,13 +719,10 @@ const serviceSchema = {
       </div>
       <!-- Before/After Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={lezeresHonaljSzortelenites}
           alt="Hónalj szőrtelenítés előtte utána"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -702,13 +733,10 @@ const serviceSchema = {
     <div class="flex flex-col lg:flex-row">
       <!-- Image -->
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={borotvalas}
           alt="Borotva"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <!-- Text -->
@@ -843,7 +871,15 @@ const serviceSchema = {
               <th class="py-4 px-6 text-left font-semibold">Szempont</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
-                  <Image src={notinoIkon} alt="Beautyflow" class="w-6 h-6" format="webp" quality={80} loading="lazy" />
+                  <img
+                    src={notinoIkonOptimized.src}
+                    srcset={`${notinoIkonOptimized.src} 1x, ${notinoIkon2x.src} 2x`}
+                    alt="Beautyflow"
+                    class="w-6 h-6"
+                    width="24"
+                    height="24"
+                    loading="lazy"
+                  />
                   Beautyflow
                 </div>
               </th>
@@ -968,13 +1004,10 @@ const serviceSchema = {
         <div class="w-full lg:w-1/2 relative flex justify-center">
           <div class="relative body-map-container">
             <!-- Body model image -->
-            <Image
+            <ContentImage
               src={lezeresArModell}
               alt="Lézeres szőrtelenítés testtájak"
               class="w-full h-auto rounded-2xl"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
 
             <!-- Clickable Hotspots - positioned for the new image -->
@@ -1112,12 +1145,13 @@ const serviceSchema = {
           A legjobb hely a dióda lézeres szőrtelenítéshez. Fanni és Piroska elképesztő, alapos munkát végeznek, és mindig gondoskodnak arról, hogy a lehető legkényelmesebb legyen. Az eljáráshoz használt gép fenomenális, és az első kezelés után lenyűgöző eredményeket fog látni.
         </p>
         <div class="flex items-center justify-center gap-3">
-          <Image
-            src={hajdu}
+          <img
+            src={hajduOptimized.src}
+            srcset={`${hajduOptimized.src} 1x, ${hajdu2x.src} 2x`}
             alt="László Eszter"
             class="w-12 h-12 rounded-full object-cover"
-            format="webp"
-            quality={80}
+            width="48"
+            height="48"
             loading="lazy"
           />
           <p class="font-semibold text-gray-900">László Eszter</p>
@@ -1140,13 +1174,10 @@ const serviceSchema = {
         {whyChooseUs.map((feature) => (
           <div class="bg-white border-2 border-[#d9baaf] rounded-lg overflow-hidden shadow-[10px_10px_5px_5px_#cccccc] hover:shadow-[12px_12px_8px_5px_#bbbbbb] transition-shadow duration-300">
             <div class="overflow-hidden">
-              <Image
+              <CardImage
                 src={feature.image}
                 alt={feature.title.replace('\n', ' ')}
                 class="w-full h-48 object-cover"
-                format="webp"
-                quality={80}
-                loading="lazy"
               />
             </div>
             <div class="p-5 text-center">
@@ -1177,10 +1208,24 @@ const serviceSchema = {
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <img
+            src={notinoLogoSmOptimized.src}
+            srcset={`${notinoLogoSmOptimized.src} 1x, ${notinoLogoSm2x.src} 2x`}
+            alt="Notino Partner"
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+            height="48"
+            loading="lazy"
+          />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <img
+            src={skinlabOptimized.src}
+            srcset={`${skinlabOptimized.src} 1x, ${skinlab2x.src} 2x`}
+            alt="Skinlab Partner"
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+            height="48"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
@@ -1221,13 +1266,10 @@ const serviceSchema = {
     <div class="max-w-[1000px] mx-auto px-4">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <Image
+          <ContentImage
             src={beautyflowDijak}
             alt="Beautyflow csapat és díjak"
             class="w-full rounded-2xl shadow-lg"
-            format="webp"
-            quality={80}
-            loading="lazy"
           />
         </div>
         <div>

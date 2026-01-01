@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { ContentImage } from './images';
 import atmosphereImage from '../assets/images/hangulat-beautyflow-scaled.webp';
 import { type Locale, defaultLang } from '../i18n';
 
@@ -32,15 +32,10 @@ const t = content[lang];
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       <!-- Image -->
       <div>
-        <Image
+        <ContentImage
           src={atmosphereImage}
           alt={t.imageAlt}
           class="w-full h-auto"
-          width={600}
-          height={400}
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
 
