@@ -25,17 +25,8 @@ export default defineConfig({
     }
   }),
   image: {
-    // Enable image optimization
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
-      config: {
-        avif: { quality: 65 },
-        webp: { quality: 75 },
-        jpeg: { quality: 80 },
-        png: { quality: 90 },
-      }
-    },
-    // Domains that are allowed for remote images
+    // With imageService: 'compile', images are processed at build time
+    // No need for sharp service - Cloudflare adapter handles it
     domains: [],
   },
   vite: {
