@@ -479,7 +479,65 @@ const breadcrumbSchema = {
     </style>
 
     <script>
+      import {
+        persistTrackingParams,
+        trackFullConversion,
+        getAllTrackingData,
+        hasMarketingConsent,
+        onConsentChange,
+        pushStepEvent,
+      } from '../../lib/tracking';
+
+      // Initialize tracking on page load
+      function initTracking() {
+        onConsentChange((consent) => {
+          if (consent.marketing) {
+            persistTrackingParams();
+          }
+        });
+
+        if (hasMarketingConsent()) {
+          persistTrackingParams();
+        }
+      }
+
+      // Send tracking beacon (guaranteed delivery)
+      function sendTrackingBeacon(data: Record<string, unknown>): void {
+        const endpoint = '/api/tracking-beacon';
+
+        try {
+          const payload = JSON.stringify({
+            ...data,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          });
+
+          if (navigator.sendBeacon) {
+            const blob = new Blob([payload], { type: 'application/json' });
+            navigator.sendBeacon(endpoint, blob);
+          } else {
+            fetch(endpoint, {
+              method: 'POST',
+              body: payload,
+              headers: { 'Content-Type': 'application/json' },
+              keepalive: true,
+            }).catch(() => {});
+          }
+        } catch {}
+      }
+
+      // Generate transaction ID
+      function generateTransactionId(): string {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).slice(2, 7);
+        return `LEAD-${timestamp}-${random}`.toUpperCase();
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
+        // Initialize tracking
+        initTracking();
+
         let currentStep = 1;
 
         // Form data
@@ -556,6 +614,7 @@ const breadcrumbSchema = {
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
+            pushStepEvent('treatments', 1);
             showStep(2);
           }
         });
@@ -579,6 +638,7 @@ const breadcrumbSchema = {
 
         btnStep2.addEventListener('click', () => {
           if (formData.firstName.length >= 2 && formData.lastName.length >= 2) {
+            pushStepEvent('name', 2);
             showStep(3);
           }
         });
@@ -602,6 +662,7 @@ const breadcrumbSchema = {
 
         btnStep3.addEventListener('click', () => {
           if (validatePhone(formData.phone)) {
+            pushStepEvent('phone', 3);
             showStep(4);
           }
         });
@@ -672,6 +733,34 @@ const breadcrumbSchema = {
 
           loadingOverlay?.classList.remove('hidden');
           errorMessage?.classList.add('hidden');
+
+          // Generate transaction ID for tracking
+          const transactionId = generateTransactionId();
+
+          // Track conversion (GTM + Zaraz) - consent-aware
+          const trackingResult = trackFullConversion({
+            email: formData.email,
+            phone: formData.phone,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            value: 5000, // Lead value in HUF
+            currency: 'HUF',
+            transactionId,
+            contentName: 'Free Consultation',
+          });
+
+          // Get all tracking data for beacon
+          const trackingData = getAllTrackingData();
+
+          // Send beacon (guaranteed delivery even on page unload)
+          sendTrackingBeacon({
+            email: formData.email,
+            phone: formData.phone,
+            transactionId,
+            gclid: trackingResult.gclid,
+            fbclid: trackingResult.fbclid,
+            ...trackingData,
+          });
 
           try {
             const response = await fetch('/api/contact', {
