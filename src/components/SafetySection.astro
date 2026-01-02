@@ -1,8 +1,8 @@
 ---
-import ContentImage from './images/ContentImage.astro';
+import { ContentImage } from './images';
+import safetyImage from '../assets/images/beautyflow-kezeles.jpg';
+import friendsImage from '../assets/images/beautyflow-csapat.jpg';
 import { type Locale, defaultLang } from '../i18n';
-import beautyflowKezeles from '../assets/images/beautyflow-kezeles.jpg';
-import beautyflowCsapat from '../assets/images/beautyflow-csapat.jpg';
 
 interface Props {
   lang?: Locale;
@@ -59,7 +59,7 @@ const t = content[lang];
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2 order-1 lg:order-2">
       <ContentImage
-        src={beautyflowKezeles}
+        src={safetyImage}
         alt={t.safety.imageAlt}
         class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
       />
@@ -73,7 +73,7 @@ const t = content[lang];
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2">
       <ContentImage
-        src={beautyflowCsapat}
+        src={friendsImage}
         alt={t.friends.imageAlt}
         class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
       />

@@ -1,0 +1,839 @@
+---
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import { getImage } from 'astro:assets';
+import { ContentImage, CardImage } from '../../../components/images';
+
+// Image imports
+import konyaFanniKozmetikus from '../../../assets/images/konya-fanni-kozmetikus.jpg';
+import lezeresLabEredmeny from '../../../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+
+// Hero and content images from originals folder
+import lezeresBeautyflow from '../../../assets/images/originals/lezeres-szortelenites-beautyflow.jpg';
+import lezeresHogyanMukodik from '../../../assets/images/originals/lezeres-szortelenites-hogyan-mukodik.jpg';
+import lezerDioda from '../../../assets/images/originals/lezeres-szortelenites-dioda.jpg';
+import lezerDiodaBudapest from '../../../assets/images/originals/lezeres-dioda-szortelenites-budapest.jpg';
+import beautyflowKapcsolat from '../../../assets/images/originals/beautyflow-kapcsolat-sm-1.jpg';
+
+// Preparation card images
+import neGyantazz from '../../../assets/images/originals/ne-gyantazz.jpg';
+import neNapozz from '../../../assets/images/originals/nenapozz.jpg';
+import neHamlassz from '../../../assets/images/originals/ne-hamlassz.jpg';
+import smink from '../../../assets/images/originals/smink.jpg';
+import gyogyszer from '../../../assets/images/originals/gyogyser.jpg';
+import borotvalkozas from '../../../assets/images/originals/borotvalkozas.jpg';
+
+// Aftercare card images
+import napozas from '../../../assets/images/originals/napozas.jpg';
+import onbarnito from '../../../assets/images/originals/onbarnito.jpg';
+import krem from '../../../assets/images/originals/krem.jpg';
+import borruha from '../../../assets/images/originals/borruha.jpg';
+import szauna from '../../../assets/images/originals/szauna.jpg';
+import borradir from '../../../assets/images/originals/borradir.jpg';
+import tisztaSzaraz from '../../../assets/images/originals/tiszta-szaraz.jpg';
+import vizivaas from '../../../assets/images/originals/vizivaas.jpg';
+
+// Blog metadata
+const meta = {
+  title: "Everything You Need to Know About Permanent Diode Laser Hair Removal",
+  description: "Diode laser hair removal provides 80-90% permanent results after 6-12 treatments. Learn how it works, what it costs, and who it's suitable for.",
+  pubDate: "2025-01-15",
+  category: "Hair Removal",
+  readTime: "8\u00A0min"
+};
+
+// Schema.org data
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://beautyflow.pro/#organization",
+      "name": "Beautyflow Beauty Salon",
+      "url": "https://beautyflow.pro"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://beautyflow.pro/#author-konya-fanni",
+      "name": "Fanni Kónya",
+      "jobTitle": "Aesthetician, Founder of Beautyflow"
+    },
+    {
+      "@type": "Article",
+      "headline": meta.title,
+      "description": meta.description,
+      "datePublished": meta.pubDate,
+      "author": { "@id": "https://beautyflow.pro/#author-konya-fanni" },
+      "publisher": { "@id": "https://beautyflow.pro/#organization" }
+    }
+  ]
+};
+
+// Pre-generate author avatar with 1x and 2x versions (70x70 display size)
+const authorAvatar1x = await getImage({ src: konyaFanniKozmetikus, width: 70, height: 70, format: 'webp', quality: 60 });
+const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, height: 140, format: 'webp', quality: 60 });
+---
+
+<Layout
+  title={meta.title + " | Beautyflow"}
+  description={meta.description}
+  lang="en"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+
+  <!-- Mobile Progress Bar -->
+  <div id="progress-container" class="fixed top-0 left-0 right-0 z-50 lg:hidden h-1 bg-gray-200">
+    <div id="progress-bar" class="h-full bg-[#c53f75] w-0 transition-all duration-150"></div>
+  </div>
+
+  <article class="bg-white">
+    <!-- Header with Title and Author -->
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-6 border-b border-gray-100">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight text-center">
+        Everything You Need to Know About Permanent Diode Laser Hair Removal
+      </h1>
+
+      <div class="flex items-center gap-4">
+        <img
+          src={authorAvatar1x.src}
+          srcset={`${authorAvatar1x.src} 1x, ${authorAvatar2x.src} 2x`}
+          alt="Fanni Kónya"
+          class="w-[70px] h-[70px] rounded-full object-cover"
+          width="70"
+          height="70"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        <div>
+          <div class="font-semibold text-gray-900">Fanni Kónya</div>
+          <div class="text-sm text-gray-500">Aesthetician, Founder of Beautyflow</div>
+        </div>
+        <div class="ml-auto text-sm text-gray-400">
+          Reading time: <span class="text-gray-600">{meta.readTime}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content with Sidebar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-12">
+      <div class="lg:flex lg:gap-12">
+        <!-- Sticky Sidebar TOC (Desktop only) -->
+        <aside class="hidden lg:block lg:w-72 xl:w-80 flex-shrink-0">
+          <nav id="sticky-toc" class="sticky top-24 bg-white border border-gray-100 rounded-xl p-5 shadow-sm" aria-label="Table of Contents">
+            <h2 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Table of Contents</h2>
+            <ol class="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#how-it-works" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">How does it work?</a>
+              </li>
+              <li>
+                <a href="#three-wavelengths" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Three wavelengths</a>
+              </li>
+              <li>
+                <a href="#how-long-lasting" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">How long-lasting?</a>
+              </li>
+              <li>
+                <a href="#blonde-hair" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Blonde hair</a>
+              </li>
+              <li>
+                <a href="#ipl-vs-diode" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">IPL vs Diode</a>
+              </li>
+              <li>
+                <a href="#contraindications" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Contraindications</a>
+              </li>
+              <li>
+                <a href="#preparation" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Preparation</a>
+              </li>
+              <li>
+                <a href="#aftercare" class="toc-link block py-1 hover:text-[#c53f75] transition-colors border-l-2 border-transparent pl-3 -ml-px">Aftercare</a>
+              </li>
+            </ol>
+            <div class="mt-6 pt-4 border-t border-gray-100">
+              <a
+                href="/en/free-consultation"
+                class="block w-full text-center bg-[#c53f75] text-white font-semibold py-3 rounded-full hover:bg-[#a83363] transition-colors text-sm"
+              >
+                Free Consultation
+              </a>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Main Article Content -->
+        <div class="lg:flex-1 max-w-4xl">
+          <!-- Intro -->
+          <p class="text-lg text-gray-700 leading-relaxed mb-8">
+            Diode laser hair removal has become incredibly popular lately, with salons opening up all over Budapest.
+            In this article, I'll summarize everything you need to know about the most effective method for permanent laser hair removal.
+          </p>
+
+          <!-- CTA Button -->
+          <div class="mb-8 text-center">
+            <a
+              href="/en/free-consultation"
+              class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+            >
+              Request a Free Consultation
+            </a>
+          </div>
+
+          <!-- Table of Contents (Mobile/Tablet) -->
+          <nav id="main-toc" class="lg:hidden bg-gray-50 rounded-xl p-6 mb-12" aria-label="Table of Contents">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">Table of Contents</h2>
+            <ol class="space-y-2 text-gray-700">
+              <li>
+                <a href="#how-it-works" class="hover:text-[#c53f75] transition-colors">1. How does diode laser hair removal work?</a>
+              </li>
+              <li>
+                <a href="#three-wavelengths" class="hover:text-[#c53f75] transition-colors">2. Why is it important to use a three-wavelength device?</a>
+              </li>
+              <li>
+                <a href="#how-long-lasting" class="hover:text-[#c53f75] transition-colors">3. How long-lasting is laser hair removal?</a>
+              </li>
+              <li>
+                <a href="#blonde-hair" class="hover:text-[#c53f75] transition-colors">4. Can blonde hair be treated with diode laser?</a>
+              </li>
+              <li>
+                <a href="#ipl-vs-diode" class="hover:text-[#c53f75] transition-colors">5. What's the difference between IPL and diode laser hair removal?</a>
+              </li>
+              <li>
+                <a href="#contraindications" class="hover:text-[#c53f75] transition-colors">6. What are the contraindications for laser hair removal?</a>
+              </li>
+              <li>
+                <a href="#preparation" class="hover:text-[#c53f75] transition-colors">7. How should you prepare before laser hair removal?</a>
+              </li>
+              <li>
+                <a href="#aftercare" class="hover:text-[#c53f75] transition-colors">8. What should you do after laser hair removal treatment?</a>
+              </li>
+            </ol>
+          </nav>
+
+          <!-- Hero Image -->
+          <div class="mb-12">
+            <ContentImage
+              src={lezeresBeautyflow}
+              alt="Diode laser hair removal treatment at Beautyflow salon"
+              class="w-full rounded-xl"
+              priority={true}
+            />
+          </div>
+
+      <!-- Section: How it works -->
+      <section id="how-it-works" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          How does diode laser hair removal work?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The principle behind laser hair removal is quite simple: the device emits a special light that is absorbed by the pigment (melanin) in the hair shaft.
+          This light converts to heat and burns the hair follicle, which then either stops producing new hair entirely or produces much thinner, weaker hair.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          It's important to understand that the laser can only affect hairs that are in an active growth phase,
+          because it's the hair shaft itself that absorbs and transfers heat to the hair follicle.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          This is why multiple treatments on the same area are necessary—so that the laser can eventually reach hairs
+          that weren't visible during earlier sessions.
+        </p>
+
+        <!-- How it works image -->
+        <div class="mb-8">
+          <ContentImage
+            src={lezeresHogyanMukodik}
+            alt="How laser hair removal works - 4 step illustration"
+            class="w-full rounded-xl"
+          />
+        </div>
+
+        <!-- 4 steps explanation -->
+        <div class="bg-gray-50 rounded-xl p-6 mb-8">
+          <p class="text-gray-700 mb-4">
+            <strong>Image 1:</strong> During the first treatment, hair must be visible at the skin's surface.
+          </p>
+          <p class="text-gray-700 mb-4">
+            <strong>Image 2:</strong> When we direct the laser beam at the hair, the heat energy is absorbed by the melanin, which heats up the rest of the hair shaft as well.
+          </p>
+          <p class="text-gray-700 mb-4">
+            <strong>Image 3:</strong> The heat either weakens or completely destroys the hair follicle. As a result, the follicle separates from the hair shaft.
+          </p>
+          <p class="text-gray-700">
+            <strong>Image 4:</strong> The hair falls out, and since the follicle is no longer present, hair cannot regrow in that area.
+          </p>
+        </div>
+
+        <!-- Booking buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <a href="/en/beautyflow-buda" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Book Buda Location
+          </a>
+          <a href="/en/beautyflow-pest" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Book Pest Location
+          </a>
+        </div>
+      </section>
+
+      <!-- Diode treatment image -->
+      <div class="mb-12">
+        <ContentImage
+          src={lezerDioda}
+          alt="Diode laser hair removal underarm treatment"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Three wavelengths -->
+      <section id="three-wavelengths" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Why is it important to use a three-wavelength device?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          This is probably a question most people don't understand at first—but your treatment's success may depend on the answer!
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          In diode laser hair removal treatments, wavelength refers to treatment depth—how far beneath the skin's surface the device can reach the hair follicles.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Since hair follicles can be found at various depths (650-1060nm) depending on your body type and the treatment area,
+          single-wavelength devices often don't provide fully satisfactory results. These are calibrated to 808 nanometers,
+          meaning they simply cannot reach many hair follicles that are closer to the surface or deeper.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The Lumino 1200 laser hair removal technology was developed to treat hair follicles at every depth,
+          so no hairs remain simply because they're located higher or deeper than 808nm.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The other reason I definitely recommend multi-wavelength devices is the skin tone factor.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          While the 808 nanometer laser can technically treat all skin types, its effectiveness isn't the same across the board.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          For light skin, for example, our experience shows that the 755 nanometer wavelength works best,
+          while for darker skin tones, 1064 nanometers produces the best results. Single-wavelength devices are set between these two,
+          which in practice doesn't mean they work well for both—rather, they're not truly optimal for either.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          Our devices have all three wavelengths built into a single handpiece, so every skin color and hair type can be treated with perfect efficiency.
+        </p>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/en/free-consultation"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Request a Free Consultation
+          </a>
+        </div>
+      </section>
+
+      <!-- Face treatment image -->
+      <div class="mb-12">
+        <ContentImage
+          src={lezerDiodaBudapest}
+          alt="Diode laser hair removal face treatment in Budapest"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: How long-lasting -->
+      <section id="how-long-lasting" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          How long-lasting is laser hair removal?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Understandably, this is one of the most common questions, since laser hair removal isn't cheap and no one wants to waste time and money on a half-solution.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The good news is that diode laser effects really do last long-term—even if not forever.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          By the end of the treatment series (6–12 sessions depending on individual factors), approximately 80–90% of your hair will actually disappear,
+          and what remains will be much thinner and lighter, plus it grows back much slower. This alone is a huge achievement.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Especially since for most people, the effects last for years and you don't have to seriously deal with hair removal.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          The human body naturally changes and regenerates continuously, so some hair may return,
+          but after the initial series, 1–3 maintenance treatments per year are more than enough to keep your skin continuously smooth and inflammation-free.
+        </p>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/en/free-consultation"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Request a Free Consultation
+          </a>
+        </div>
+      </section>
+
+      <!-- Before/After image -->
+      <div class="mb-12">
+        <ContentImage
+          src={lezeresLabEredmeny}
+          alt="Laser hair removal before and after results on legs"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Blonde hair -->
+      <section id="blonde-hair" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          Can blonde hair be treated with diode laser?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Unfortunately, the short answer is: not really.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          As I mentioned earlier, the diode laser targets the pigment (melanin) in the hair shaft.
+          The more melanin in a hair shaft, the darker it is, the better it absorbs light, and the more effectively the laser can damage the hair follicle.
+          This is why the method works so well on dark hair with light skin.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          However, the situation is completely different with blonde, red, or gray hair: these contain very little melanin,
+          so the laser can't really reach the hair follicles, which drastically reduces effectiveness.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          For blonde hair, electrolysis may be a better method, as it targets the hair follicle directly rather than the pigment.
+          This is slower and more meticulous, but for blonde hair, it's often the only lasting solution.
+        </p>
+      </section>
+
+      <!-- Section: IPL vs Diode -->
+      <section id="ipl-vs-diode" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          What's the difference between IPL hair removal and diode laser hair removal?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          At first glance, IPL and diode laser hair removal may seem very similar, since both use light energy to damage hair follicles—the difference lies in the type of light and the treatment results.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          IPL (Intense Pulsed Light) means flash light hair removal. In this case, a broad-spectrum, scattered light reaches the skin,
+          the hair's melanin converts this light into heat, and some of that heat reaches the hair follicle.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          But IPL is much less concentrated than diode laser hair removal—it damages the hair follicle but doesn't eliminate it,
+          so the results are less dramatic: it can only thin and slow hair growth, not completely stop it.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          The diode laser, on the other hand, is targeted and penetrates much deeper into the skin. The laser precisely targets individual hairs,
+          which conduct its energy as heat into the hair follicle.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Diode laser hair removal is much more precise, therefore much more powerful, longer-lasting, and more effective.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          By the end of the treatment series, 80–90% of hairs completely disappear and the remainder becomes thinner and lighter.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          You'll feel the difference in your daily life too: with IPL, you'll need more treatments and more frequent maintenance sessions,
+          while with diode laser, one intensive course is enough followed by 1-3 reminder treatments per year.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-8">
+          So compared to diode laser hair removal, IPL is cheaper but less effective, promising only temporary results.
+        </p>
+
+        <p class="text-gray-700 leading-relaxed font-semibold mb-8">
+          If you want long-term results, the diode laser is clearly the more effective and longer-lasting technology.
+        </p>
+
+        <!-- Comparison Table -->
+        <div class="overflow-x-auto mb-8">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">Aspect</th>
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">Diode Laser</th>
+                <th class="py-3 px-4 text-left font-semibold text-gray-900 border-b">IPL (Flash Light)</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700">
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Light Type</td><td class="py-2 px-4">Targeted laser light</td><td class="py-2 px-4">Scattered light</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Energy Focus</td><td class="py-2 px-4">Precise targeting</td><td class="py-2 px-4">Less precise</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Mechanism</td><td class="py-2 px-4">Full effect</td><td class="py-2 px-4">Partial effect</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Treatment Depth</td><td class="py-2 px-4">Complete</td><td class="py-2 px-4">Shallower</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Precision</td><td class="py-2 px-4">High</td><td class="py-2 px-4">Medium</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Effectiveness</td><td class="py-2 px-4">80–90%</td><td class="py-2 px-4">~50–70%</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">First Visible Results</td><td class="py-2 px-4">Around 2–3rd session</td><td class="py-2 px-4">Around 3–4th session</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Maintenance Treatments</td><td class="py-2 px-4">1–3 sessions/year</td><td class="py-2 px-4">More frequent</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Skin Type Suitability</td><td class="py-2 px-4">All skin types</td><td class="py-2 px-4">Best on light skin</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Dark Skin Safety</td><td class="py-2 px-4">Safe</td><td class="py-2 px-4">Limited</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Discomfort</td><td class="py-2 px-4">Pinching/warm; gentler with cooling</td><td class="py-2 px-4">Pinching/hot flashes</td></tr>
+              <tr class="border-b bg-gray-50"><td class="py-2 px-4 font-semibold">Side Effect Risk</td><td class="py-2 px-4">Low</td><td class="py-2 px-4">Medium</td></tr>
+              <tr class="border-b"><td class="py-2 px-4 font-semibold">Ingrown Hair Tendency</td><td class="py-2 px-4">Significantly reduces</td><td class="py-2 px-4">Limited effectiveness</td></tr>
+              <tr class="bg-gray-50"><td class="py-2 px-4 font-semibold">PCOS</td><td class="py-2 px-4">Full effectiveness</td><td class="py-2 px-4">Limited effectiveness</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Salon image -->
+      <div class="mb-12">
+        <ContentImage
+          src={beautyflowKapcsolat}
+          alt="Beautyflow salon reception"
+          class="w-full rounded-xl"
+        />
+      </div>
+
+      <!-- Section: Contraindications -->
+      <section id="contraindications" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          What are the contraindications for laser hair removal?
+        </h2>
+
+        <p class="text-gray-700 leading-relaxed mb-6">
+          If we notice any circumstances that could endanger the patient's health or safety, we reserve the right to refuse treatment!
+        </p>
+
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Laser hair removal should be avoided in the following cases:
+        </p>
+
+        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-8">
+          <li>During pregnancy and breastfeeding</li>
+          <li>When having a fever</li>
+          <li>Diabetes, epilepsy, during chemotherapy treatment</li>
+          <li>Autoimmune diseases</li>
+          <li>Cancer</li>
+          <li>Active skin conditions (e.g., eczema, psoriasis in the treatment area)</li>
+          <li>Active herpes in the treatment area</li>
+          <li>Open wounds, fresh injuries</li>
+          <li>Tendency for keloid or hypertrophic scarring</li>
+          <li>At tattoo removal sites</li>
+          <li>Increased photosensitivity or light allergy</li>
+          <li>When taking photosensitizing medications (e.g., retinoids, barbiturates, beta-blockers, certain anti-inflammatory drugs)</li>
+          <li>Tanned skin (sunbathing, solarium, self-tanner use before treatment)</li>
+          <li>In areas waxed within the last 21 days</li>
+          <li>On white or gray hairs</li>
+        </ul>
+
+        <!-- CTA -->
+        <div class="text-center">
+          <a
+            href="/en/free-consultation"
+            class="inline-block bg-[#c53f75] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#a83363] transition-colors"
+          >
+            Request a Free Consultation
+          </a>
+        </div>
+      </section>
+
+      <!-- Section: Preparation -->
+      <section id="preparation" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          How should you prepare before laser hair removal?
+        </h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Card 1 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={neGyantazz} alt="No waxing" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Don't wax or epilate</h3>
+              <p class="text-gray-600 text-sm">
+                Use only a razor at least 21 days before treatment! This is important because the connection between hair follicle and hair shaft remains intact,
+                allowing the laser to target more effectively.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={neNapozz} alt="No tanning" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Don't try to tan beforehand</h3>
+              <p class="text-gray-600 text-sm">
+                Melanin is produced during sunbathing, solarium use, and even when using self-tanner, which increases the risk of burns.
+                Avoid tanning 14 days before treatment!
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={neHamlassz} alt="No bleaching" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Don't bleach or exfoliate</h3>
+              <p class="text-gray-600 text-sm">
+                Bleaching and deep exfoliation make the skin sensitive, which is obviously not ideal before laser hair removal treatment.
+                Stop these about 14 days before treatment.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={smink} alt="No makeup" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">No makeup or creams</h3>
+              <p class="text-gray-600 text-sm">
+                On the day of treatment, don't use creams, especially sunscreen or makeup.
+                These can make treatment difficult or even impossible.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={gyogyszer} alt="Medications" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Tell us about medications</h3>
+              <p class="text-gray-600 text-sm">
+                Certain medications (e.g., photosensitizing antibiotics) are contraindicated—it's forbidden to perform laser hair removal while taking them,
+                so always inform us in advance if you're taking anything.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={borotvalkozas} alt="Shaving" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Shave 2 days before</h3>
+              <p class="text-gray-600 text-sm">
+                Shave the evening before treatment, not the morning of. This gives your skin time to calm down,
+                and the minimal hair length (1-2mm) will be just right.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking buttons -->
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/en/beautyflow-buda" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Book Buda Location
+          </a>
+          <a href="/en/beautyflow-pest" class="inline-flex items-center gap-2 bg-[#c53f75] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#a83363] transition-colors">
+            Book Pest Location
+          </a>
+        </div>
+      </section>
+
+      <!-- Section: Aftercare -->
+      <section id="aftercare" class="mb-16 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          What should you do after laser hair removal treatment?
+        </h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Card 1 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={napozas} alt="Protect from sun" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Protect from sun</h3>
+              <p class="text-gray-600 text-sm">
+                UV radiation can be very harmful at this time. Avoid sunbathing and solarium for a week,
+                and continue using high SPF sunscreen to prevent pigmentation spots.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={onbarnito} alt="No self-tanner" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">No self-tanner</h3>
+              <p class="text-gray-600 text-sm">
+                Don't use self-tanning products for about 2 weeks after treatment, as they can irritate the skin and affect healing.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={krem} alt="No scented creams" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">No scented creams</h3>
+              <p class="text-gray-600 text-sm">
+                For 24–48 hours after treatment, don't use strongly scented, colored, or whitening creams, or perfume on the treated area, as they can irritate your skin.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={borruha} alt="Avoid tight clothing" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Avoid tight clothing</h3>
+              <p class="text-gray-600 text-sm">
+                Let your skin breathe freely, and don't wear clothing that might rub, irritate, or compress the treated area.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={szauna} alt="Avoid extreme heat" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Avoid extreme heat</h3>
+              <p class="text-gray-600 text-sm">
+                For at least 48 hours, avoid hot baths, steam rooms, saunas, and heavily chlorinated water like swimming pools.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={borradir} alt="No exfoliation" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">No exfoliation</h3>
+              <p class="text-gray-600 text-sm">
+                Avoid exfoliating treatments and scrubs for about a week after laser hair removal.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={borotvalkozas} alt="Only shaving allowed" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Only shaving allowed</h3>
+              <p class="text-gray-600 text-sm">
+                Don't epilate, wax, or use hair removal cream for at least 2 weeks, or until your next treatment. Only shaving is permitted.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 8 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={tisztaSzaraz} alt="Keep clean and dry" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Keep clean and dry</h3>
+              <p class="text-gray-600 text-sm">
+                Treat the treated area gently, protect it from chemicals and irritation, don't rub it, and make sure it stays clean and dry.
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 9 -->
+          <div class="bg-gray-50 rounded-xl overflow-hidden">
+            <CardImage src={vizivaas} alt="Hydrate inside and out" class="w-full aspect-[4/3] object-contain bg-white" />
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-2">Hydrate inside and out</h3>
+              <p class="text-gray-600 text-sm">
+                Soothe your skin with fragrance-free moisturizer or aloe vera gel, and drink plenty of water so your body supports regeneration from within.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+        </div><!-- End Main Article Content -->
+      </div><!-- End flex container -->
+    </div><!-- End max-w-7xl -->
+  </article>
+</Layout>
+
+<script>
+  function initArticleFeatures() {
+    // Mobile Progress Bar
+    const progressBar = document.getElementById('progress-bar');
+    const article = document.querySelector('article');
+
+    if (progressBar && article) {
+      function updateProgress() {
+        const articleRect = article.getBoundingClientRect();
+        const articleTop = articleRect.top + window.scrollY;
+        const articleHeight = article.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrolled = window.scrollY - articleTop + windowHeight;
+        const progress = Math.min(Math.max((scrolled / articleHeight) * 100, 0), 100);
+        progressBar.style.width = progress + '%';
+      }
+
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    // Active TOC Link Highlighting
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = document.querySelectorAll('section[id]');
+
+    if (tocLinks.length && sections.length) {
+      function updateActiveLink() {
+        let currentSection = '';
+
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 150;
+          if (window.scrollY >= sectionTop) {
+            currentSection = section.getAttribute('id');
+          }
+        });
+
+        tocLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === '#' + currentSection) {
+            link.classList.add('text-[#c53f75]', 'border-[#c53f75]', 'font-semibold');
+            link.classList.remove('border-transparent');
+          } else {
+            link.classList.remove('text-[#c53f75]', 'border-[#c53f75]', 'font-semibold');
+            link.classList.add('border-transparent');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', updateActiveLink, { passive: true });
+      updateActiveLink();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initArticleFeatures);
+  document.addEventListener('astro:page-load', initArticleFeatures);
+</script>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  article p {
+    hyphens: auto;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    table {
+      font-size: 0.75rem;
+    }
+
+    th, td {
+      padding: 0.5rem 0.25rem !important;
+    }
+  }
+</style>

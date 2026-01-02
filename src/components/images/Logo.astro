@@ -1,28 +1,52 @@
 ---
-import { Picture } from 'astro:assets';
+/**
+ * Logo - FIXED pattern for logos (header, footer, partner logos)
+ * Use: Brand logos, partner logos, any fixed-size logo
+ * Pattern: 1x + 2x density srcset using getImage()
+ */
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 
 interface Props {
-  src: string;
+  src: ImageMetadata;
   alt: string;
   width: number;
-  height: number;
-  priority?: boolean;
+  height?: number;
   class?: string;
+  priority?: boolean;
 }
 
-const { src, alt, width, height, priority = false, class: className } = Astro.props;
+const { src, alt, width, height, class: className, priority = false } = Astro.props;
+
+// FIXED pattern: 1x at quality 80, 2x at quality 60
+// Generate avif, webp, and jpg for browser choice with fallback
+const avif1x = await getImage({ src, width, height, quality: 80, format: 'avif' });
+const avif2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'avif' });
+const webp1x = await getImage({ src, width, height, quality: 80, format: 'webp' });
+const webp2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'webp' });
+const jpg1x = await getImage({ src, width, height, quality: 80, format: 'jpg' });
+const jpg2x = await getImage({ src, width: width * 2, height: height ? height * 2 : undefined, quality: 60, format: 'jpg' });
+
+const finalHeight = height || width;
 ---
 
-<Picture
-  src={src}
-  alt={alt}
-  width={width}
-  height={height}
-  formats={['webp']}
-  fallbackFormat="png"
-  widths={[width, width * 2]}
-  sizes={`${width}px`}
-  loading={priority ? 'eager' : 'lazy'}
-  decoding={priority ? 'sync' : 'async'}
-  class={className}
-/>
+<picture>
+  <source
+    type="image/avif"
+    srcset={`${avif1x.src} 1x, ${avif2x.src} 2x`}
+  />
+  <source
+    type="image/webp"
+    srcset={`${webp1x.src} 1x, ${webp2x.src} 2x`}
+  />
+  <img
+    src={jpg1x.src}
+    srcset={`${jpg1x.src} 1x, ${jpg2x.src} 2x`}
+    alt={alt}
+    width={width}
+    height={finalHeight}
+    class={className}
+    loading={priority ? 'eager' : 'lazy'}
+    decoding={priority ? undefined : 'async'}
+  />
+</picture>

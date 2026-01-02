@@ -1,0 +1,35 @@
+---
+/**
+ * TwoThirdsImage - TWO_THIRDS pattern (66vw)
+ * Use: Split 66/33 layouts where image takes the larger side
+ * Pattern: 66vw desktop, 100vw mobile
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+  priority?: boolean;
+}
+
+const { src, alt, class: className, priority = false } = Astro.props;
+
+// TWO_THIRDS pattern from astro-images skill
+const widths = [384, 640, 768, 1024, 1280, 1706, 2048];
+const sizes = '(min-width: 1024px) 66vw, 100vw';
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={['avif', 'webp', 'jpg']}
+  quality={60}
+  class={className}
+  loading={priority ? 'eager' : 'lazy'}
+  fetchpriority={priority ? 'high' : undefined}
+  decoding={priority ? undefined : 'async'}
+/>

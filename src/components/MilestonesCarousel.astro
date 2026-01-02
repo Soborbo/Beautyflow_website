@@ -1,0 +1,255 @@
+---
+/**
+ * MilestonesCarousel - Horizontally scrollable timeline
+ * Features:
+ * - Touch/drag scrollable
+ * - Next item partially visible as hint
+ * - Pulsing animation on scroll indicator
+ */
+
+interface Milestone {
+  year: string;
+  event: string;
+  isAward?: boolean;
+}
+
+interface Props {
+  milestones: Milestone[];
+  title: string;
+}
+
+const { milestones, title } = Astro.props;
+---
+
+<section class="py-16 lg:py-20 bg-gradient-to-b from-[#fdf8f6] to-white overflow-hidden">
+  <div class="max-w-[1100px] mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="font-heading text-3xl lg:text-4xl text-gray-900">
+        {title}
+      </h2>
+    </div>
+  </div>
+
+  <!-- Scrollable container -->
+  <div class="relative">
+    <!-- Scroll hint gradient - right side -->
+    <div class="scroll-hint-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white/90 to-transparent z-10 flex items-center justify-end pr-2">
+      <div class="scroll-indicator w-10 h-10 rounded-full bg-[#c53f75]/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Scroll hint gradient - left side (hidden initially) -->
+    <div class="scroll-hint-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white/90 to-transparent z-10 flex items-center justify-start pl-2 opacity-0 transition-opacity duration-300">
+      <div class="w-10 h-10 rounded-full bg-[#c53f75]/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Timeline track -->
+    <div
+      class="milestones-track flex gap-4 overflow-x-auto px-4 pb-4 select-none"
+      style="scrollbar-width: none; -ms-overflow-style: none;"
+    >
+      <!-- Left padding spacer - small padding to show first item at left edge -->
+      <div class="flex-shrink-0 w-4 lg:w-8"></div>
+
+      {milestones.map((milestone, index) => (
+        <div class="milestone-item flex flex-col items-center min-w-[220px] lg:min-w-[240px] relative flex-shrink-0">
+          <!-- Year circle -->
+          <div class={`w-20 h-20 rounded-full flex items-center justify-center text-white font-heading text-sm font-semibold shadow-lg z-10 relative ${milestone.isAward ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-[#c53f75]'}`}>
+            {milestone.isAward && (
+              <svg class="w-5 h-5 absolute -top-1 -right-1 text-yellow-400 drop-shadow" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            )}
+            <span class="text-center leading-tight px-2">{milestone.year}</span>
+          </div>
+
+          <!-- Connecting line -->
+          {index < milestones.length - 1 && (
+            <div class="absolute top-10 left-[calc(50%+40px)] w-[calc(220px-40px)] lg:w-[calc(240px-40px)] h-0.5 bg-[#c53f75]/30"></div>
+          )}
+
+          <!-- Event card -->
+          <div class={`mt-4 p-4 rounded-xl shadow-md text-center max-w-[200px] ${milestone.isAward ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200' : 'bg-white border border-gray-100'}`}>
+            {milestone.isAward && <span class="text-yellow-500 text-lg">&#11088;</span>}
+            <p class="text-gray-700 text-sm leading-relaxed">{milestone.event}</p>
+          </div>
+        </div>
+      ))}
+
+      <!-- Right padding spacer - enough to show hint of next item -->
+      <div class="flex-shrink-0 w-16 lg:w-24"></div>
+    </div>
+
+    <!-- Progress dots -->
+    <div class="flex justify-center gap-1.5 mt-6">
+      {milestones.map((_, index) => (
+        <div
+          class="progress-dot w-2 h-2 rounded-full bg-[#c53f75]/30 transition-all duration-300 cursor-pointer"
+          data-index={index}
+        ></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .milestones-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .milestones-track {
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .milestones-track.dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
+
+  /* Pulsing animation for scroll indicator */
+  .scroll-indicator {
+    animation: pulse-hint 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-hint {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 0.7;
+    }
+  }
+
+  /* Active progress dot */
+  .progress-dot.active {
+    background-color: #c53f75;
+    transform: scale(1.3);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const track = document.querySelector('.milestones-track') as HTMLElement;
+    const hintRight = document.querySelector('.scroll-hint-right') as HTMLElement;
+    const hintLeft = document.querySelector('.scroll-hint-left') as HTMLElement;
+    const progressDots = document.querySelectorAll('.progress-dot');
+    const milestoneItems = document.querySelectorAll('.milestone-item');
+
+    if (!track) return;
+
+    // Drag to scroll functionality
+    let isDown = false;
+    let startX: number;
+    let scrollLeft: number;
+    let hasMoved = false;
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      hasMoved = false;
+      track.classList.add('dragging');
+      startX = e.pageX;
+      scrollLeft = track.scrollLeft;
+      e.preventDefault();
+    };
+
+    const onMouseUp = () => {
+      if (!isDown) return;
+      isDown = false;
+      track.classList.remove('dragging');
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX;
+      const walk = startX - x;
+
+      if (Math.abs(walk) > 5) {
+        hasMoved = true;
+      }
+
+      track.scrollLeft = scrollLeft + walk;
+    };
+
+    track.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+
+    // Prevent click events after drag
+    track.addEventListener('click', (e) => {
+      if (hasMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+    // Update hints and progress on scroll
+    const updateScrollState = () => {
+      const scrollPosition = track.scrollLeft;
+      const maxScroll = track.scrollWidth - track.clientWidth;
+
+      // Show/hide hints based on scroll position
+      if (hintRight) {
+        hintRight.style.opacity = scrollPosition >= maxScroll - 10 ? '0' : '1';
+      }
+      if (hintLeft) {
+        hintLeft.style.opacity = scrollPosition <= 10 ? '0' : '1';
+      }
+
+      // Update progress dots based on visible items
+      const trackRect = track.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
+
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      milestoneItems.forEach((item, index) => {
+        const itemRect = (item as HTMLElement).getBoundingClientRect();
+        const itemCenter = itemRect.left + itemRect.width / 2;
+        const distance = Math.abs(itemCenter - trackCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      progressDots.forEach((dot, index) => {
+        if (index === closestIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    };
+
+    track.addEventListener('scroll', updateScrollState, { passive: true });
+
+    // Click on dots to scroll
+    progressDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        const targetItem = milestoneItems[index] as HTMLElement;
+        if (targetItem) {
+          const trackRect = track.getBoundingClientRect();
+          const itemRect = targetItem.getBoundingClientRect();
+          const scrollOffset = itemRect.left - trackRect.left - (trackRect.width / 2) + (itemRect.width / 2);
+          track.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Initial state
+    updateScrollState();
+  });
+</script>

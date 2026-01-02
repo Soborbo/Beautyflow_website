@@ -1,7 +1,11 @@
 ---
-import { Image, Picture } from 'astro:assets';
+export const prerender = true;
+
+import { Image, getImage } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
+import ContentImage from '../../components/images/ContentImage.astro';
+import CardImage from '../../components/images/CardImage.astro';
 
 // Import images
 import carbonPeelingFo from '../../assets/images/carbon-peeling-fo.jpg';
@@ -12,7 +16,7 @@ import carbonPeelingTetovalas from '../../assets/images/carbon-peeling-tetovalas
 import szemoldokSminktetovalas from '../../assets/images/szemoldok-sminktetovalas.jpg';
 import hydrabeautyArckezelesBeautyflow from '../../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
 import depositphotosCarbonNanogel from '../../assets/images/depositphotos-carbon-nanogel.jpg';
-import carbonPeelingHatter from '../../assets/images/carbon-peeling-hatter.webp';
+import carbonPeelingHatter from '../../assets/images/originals/carbon-peeling-hatter.webp';
 import konyaFanniSzepsegszalon from '../../assets/images/Konya-Fanni-szepsegszalon.jpg';
 import konyaFanniSzepsegszalonja from '../../assets/images/konya-fanni-szepsegszalonja.jpg';
 import notinoIkon from '../../assets/images/notino-ikon.png';
@@ -204,7 +208,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} loading="eager" />
+                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
                 </div>
               </div>
             </div>
@@ -250,21 +254,18 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <Image
+        <ContentImage
           src={carbonPeelingFo}
           alt="Carbon Peeling Budapest"
           class="w-full h-full object-cover"
-          loading="eager"
-          fetchpriority="high"
-          format="webp"
-          quality={80}
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="eager" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -306,13 +307,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <Image
+            <ContentImage
               src={konyaFanniSzepsegszalon}
               alt="Fanni Konya Carbon Peeling expert"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -360,13 +358,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
           alt="Guaranteed glass skin with Carbon Peeling"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -404,13 +399,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={carbonPeelingLezeres}
           alt="60-minute Carbon Peeling treatment"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -420,13 +412,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={carbonPeelingArchamlasztas}
           alt="Carbon Peeling results"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -464,13 +453,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={szemoldokSminktetovalas}
           alt="Permanent makeup refresh with Carbon Peeling"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -542,20 +528,23 @@ const faqs = [
 
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
-    <!-- Egyetlen optimalizált háttérkép - mobile-on felül, desktop-on teljes szekció -->
-    <div class="how-it-works-bg">
-      <Picture
+    <!-- Mobile: Image above everything like benefit sections -->
+    <div class="lg:hidden">
+      <ContentImage
         src={carbonPeelingHatter}
         alt="Carbon Peeling treatment process"
-        formats={['avif', 'webp']}
-        fallbackFormat="jpg"
-        widths={[640, 828, 1200, 1600]}
-        sizes="100vw"
-        class="w-full h-full object-cover object-top lg:object-[center_30%]"
-        loading="lazy"
+        class="w-full h-64 object-cover object-top"
       />
-      <!-- Desktop gradient overlay -->
-      <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
+    </div>
+
+    <!-- Background image for desktop -->
+    <div class="hidden lg:block absolute inset-0">
+      <ContentImage
+        src={carbonPeelingHatter}
+        alt=""
+        class="w-full h-full object-cover object-[center_30%]"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
     <!-- Mobile background for content area -->
@@ -611,14 +600,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <Image
+            <ContentImage
               src={konyaFanniSzepsegszalon}
               alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -700,6 +685,7 @@ const faqs = [
                 class="w-7 h-7 object-contain flex-shrink-0"
                 width={28}
                 height={28}
+                quality={60}
                 loading="lazy"
               />
             </div>
@@ -717,10 +703,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
         </div>
       </div>
     </div>
@@ -740,13 +726,10 @@ const faqs = [
         <!-- 60-minute treatment -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={carbonPeelingArchamlasztas}
               alt="60-minute Carbon Peeling treatment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -760,13 +743,10 @@ const faqs = [
         <!-- Immediate results -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={carbonPeelingLezeres}
               alt="Immediate Carbon Peeling results"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -780,13 +760,10 @@ const faqs = [
         <!-- Friendly atmosphere -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={konyaFanniSzepsegszalonja}
               alt="Beautyflow salon friendly atmosphere"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -800,13 +777,10 @@ const faqs = [
         <!-- Medical cleanliness -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={higienia}
               alt="Sterile Carbon Peeling environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -820,13 +794,10 @@ const faqs = [
         <!-- For all skin types -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={testmeret}
               alt="Personalized Carbon Peeling"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -840,13 +811,10 @@ const faqs = [
         <!-- 7-day opening hours -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={nyitva}
               alt="Open 7 days a week"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -992,19 +960,6 @@ const faqs = [
 </script>
 
 <style>
-  /* How It Works háttérkép - egyszer betöltve, responsive pozicionálás */
-  .how-it-works-bg {
-    height: 16rem; /* h-64 mobile-on */
-    position: relative;
-  }
-  @media (min-width: 1024px) {
-    .how-it-works-bg {
-      position: absolute;
-      inset: 0;
-      height: auto;
-    }
-  }
-
   .stat-item {
     opacity: 1;
   }

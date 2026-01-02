@@ -1,7 +1,11 @@
 ---
+export const prerender = true;
+
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
-import { Image, Picture } from 'astro:assets';
+import { Image } from 'astro:assets';
+import ContentImage from '../../components/images/ContentImage.astro';
+import CardImage from '../../components/images/CardImage.astro';
 
 // Image imports
 import heroImage from '../../assets/images/sminktetovalas-mb-2.jpg';
@@ -264,7 +268,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIcon} alt="Notino" class="w-8 h-8" width={32} height={32} loading="lazy" format="webp" quality={80} />
+                  <Image src={notinoIcon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
                 </div>
               </div>
             </div>
@@ -310,21 +314,18 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <Image
+        <ContentImage
           src={heroImage}
           alt="Permanent Makeup Budapest"
           class="w-full h-full object-cover"
-          loading="eager"
-          fetchpriority="high"
-          format="webp"
-          quality={80}
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="lazy" format="webp" quality={80} />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -366,13 +367,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <Image
+            <ContentImage
               src={fanniKonzultacio}
               alt="Fanni Konya permanent makeup expert"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -433,13 +431,10 @@ const faqs = [
             style="border-top-color: #5851e4; background: linear-gradient(to bottom, #eef2ff, white 30%);"
           >
             <div class="relative overflow-hidden">
-              <Image
+              <CardImage
                 src={treatment.image}
                 alt={treatment.title}
                 class="w-full h-40 md:h-48 object-cover transition-transform duration-300 hover:scale-105"
-                loading="lazy"
-                format="webp"
-                quality={80}
               />
               <div class="absolute top-0 left-0 right-0 h-1 bg-[#5851e4]"></div>
             </div>
@@ -477,13 +472,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={sminktetovalasBeautyflow}
           alt="Painless permanent makeup"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          loading="lazy"
-          format="webp"
-          quality={80}
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -521,13 +513,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={sminktetovalasImage}
           alt="Premium quality pigments"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          loading="lazy"
-          format="webp"
-          quality={80}
         />
       </div>
     </div>
@@ -537,13 +526,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={sminktetovalasBemeres}
           alt="Custom designed permanent makeup"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          loading="lazy"
-          format="webp"
-          quality={80}
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -573,13 +559,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={szemhejTetovalas}
           alt="Long-lasting permanent makeup results"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          loading="lazy"
-          format="webp"
-          quality={80}
         />
       </div>
     </div>
@@ -589,13 +572,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={sminktetovalasBeautyflow}
           alt="Confident makeup in every situation"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          loading="lazy"
-          format="webp"
-          quality={80}
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -621,20 +601,23 @@ const faqs = [
 
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
-    <!-- Egyetlen optimalizált háttérkép - mobile-on felül, desktop-on teljes szekció -->
-    <div class="how-it-works-bg">
-      <Picture
+    <!-- Mobile: Image above everything like benefit sections -->
+    <div class="lg:hidden">
+      <ContentImage
         src={sminktetovalasBg}
         alt="Permanent makeup treatment"
-        formats={['avif', 'webp']}
-        fallbackFormat="jpg"
-        widths={[640, 828, 1200, 1600]}
-        sizes="100vw"
-        class="w-full h-full object-cover object-[center_20%] lg:object-right"
-        loading="lazy"
+        class="w-full h-64 object-cover object-[center_20%]"
       />
-      <!-- Desktop gradient overlay -->
-      <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
+    </div>
+
+    <!-- Background image for desktop -->
+    <div class="hidden lg:block absolute inset-0">
+      <ContentImage
+        src={sminktetovalasBg}
+        alt=""
+        class="w-full h-full object-cover object-right"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
     <!-- Mobile background for content area -->
@@ -690,14 +673,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <Image
+            <ContentImage
               src={fanniKonzultacio}
               alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -779,9 +758,8 @@ const faqs = [
                 class="w-7 h-7 object-contain flex-shrink-0"
                 width={28}
                 height={28}
+                quality={60}
                 loading="lazy"
-                format="webp"
-                quality={80}
               />
             </div>
           </div>
@@ -798,10 +776,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogo} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" loading="lazy" format="webp" quality={80} />
+          <Image src={notinoLogo} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" loading="lazy" format="webp" quality={80} />
+          <Image src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
         </div>
       </div>
     </div>
@@ -821,13 +799,10 @@ const faqs = [
         <!-- Professional equipment -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={professzionalisGepek}
               alt="Professional permanent makeup equipment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -841,13 +816,10 @@ const faqs = [
         <!-- First-timers welcome -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={szegyenlosVendeg}
               alt="Comfortable permanent makeup environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -861,13 +833,10 @@ const faqs = [
         <!-- Friendly atmosphere -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={fanniSzalon}
               alt="Beautyflow salon friendly atmosphere"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -881,13 +850,10 @@ const faqs = [
         <!-- Medical-grade cleanliness -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={higienia}
               alt="Sterile permanent makeup environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -901,13 +867,10 @@ const faqs = [
         <!-- All skin types -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={testmeret}
               alt="Customized permanent makeup"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -921,13 +884,10 @@ const faqs = [
         <!-- Open 7 days a week -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={nyitva}
               alt="Open 7 days a week"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              loading="lazy"
-              format="webp"
-              quality={80}
             />
           </div>
           <div class="p-5">
@@ -1073,19 +1033,6 @@ const faqs = [
 </script>
 
 <style>
-  /* How It Works háttérkép - egyszer betöltve, responsive pozicionálás */
-  .how-it-works-bg {
-    height: 16rem; /* h-64 mobile-on */
-    position: relative;
-  }
-  @media (min-width: 1024px) {
-    .how-it-works-bg {
-      position: absolute;
-      inset: 0;
-      height: auto;
-    }
-  }
-
   .stat-item {
     opacity: 1;
   }

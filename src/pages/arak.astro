@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Layout from '../layouts/Layout.astro';
 
 // Color scheme matching FAQ page
@@ -12,12 +14,14 @@ const categoryColors = {
 
 // Lézeres Szőrtelenítés Csomagok
 const lezerCsomagok = [
-  { name: 'Diamond', zones: 'Teljes intim + Popsi belső + Teljes kar + Hónalj + Teljes láb', price: '55 000', popular: true },
-  { name: 'Gold', zones: 'Teljes intim + Popsi belső + Hónalj + Teljes láb', price: '45 000' },
-  { name: 'Silver', zones: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '35 000' },
-  { name: 'White', zones: 'Teljes intim + Popsi belső + Hónalj', price: '23 000' },
-  { name: 'Pearl', zones: 'Hónalj + Lábszár térdig', price: '21 000' },
-  { name: 'Shine', zones: 'Hónalj + Bikinivonal', price: '16 000' },
+  { name: 'Diamond', zones: 'Teljes intim + Popsi belső + Teljes kar + Hónalj + Teljes láb', price: '60 000', popular: true },
+  { name: 'Gold', zones: 'Teljes intim + Popsi belső + Hónalj + Teljes láb', price: '50 000' },
+  { name: 'Silver', zones: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '40 000' },
+  { name: 'Bronze', zones: 'Teljes láb + Hónalj', price: '38 000' },
+  { name: 'Platinum - PCOS', zones: 'Mellbimbó körül + Mellek között + Pajesz + Bajusz + Arc + Áll + Nyak + Hascsík', price: '34 000' },
+  { name: 'White', zones: 'Teljes intim + Popsi belső + Hónalj + Hascsík', price: '26 000' },
+  { name: 'Pearl', zones: 'Hónalj + Lábszár térdig', price: '24 000' },
+  { name: 'Shine', zones: 'Hónalj + Bikinivonal', price: '18 000' },
 ];
 
 // Lézeres Szőrtelenítés Bérletek - csoportosítva
@@ -25,56 +29,58 @@ const lezerBerletekGrouped = [
   {
     group: 'Arc',
     items: [
-      { zone: 'Bajusz', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Áll', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Bajusz + Áll', prices: ['10 000', '25 000', '50 000', '85 000'] },
-      { zone: 'Teljes arc', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Bajusz', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Áll', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Bajusz + Áll', prices: ['12 000', '32 000', '61 000', '96 000'] },
+      { zone: 'Teljes arc', prices: ['18 000', '48 500', '91 500', '144 000'] },
+      { zone: 'Pajesz', prices: ['7 000', '18 500', '35 500', '56 000'] },
     ]
   },
   {
     group: 'Kar',
     items: [
-      { zone: 'Alkar', prices: ['10 000', '25 000', '50 000', '85 000'] },
-      { zone: 'Teljes kar', prices: ['16 000', '40 000', '80 000', '136 000'] },
-      { zone: 'Hónalj', prices: ['10 000', '25 000', '50 000', '85 000'] },
+      { zone: 'Alkar', prices: ['13 000', '35 000', '66 000', '104 000'] },
+      { zone: 'Teljes kar', prices: ['18 000', '48 500', '91 500', '144 000'] },
+      { zone: 'Hónalj', prices: ['12 000', '32 000', '61 000', '96 000'] },
     ]
   },
   {
     group: 'Mellkas',
     items: [
-      { zone: 'Mellek közt', prices: ['5 000', '12 500', '25 000', '42 500'] },
+      { zone: 'Mellbimbó körül', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Mellek közt', prices: ['7 000', '18 500', '35 500', '56 000'] },
     ]
   },
   {
     group: 'Törzs',
     items: [
-      { zone: 'Hascsík', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Has', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Hát', prices: ['20 000', '50 000', '100 000', '170 000'] },
+      { zone: 'Hascsík', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Has', prices: ['15 000', '40 500', '76 500', '120 000'] },
+      { zone: 'Hát', prices: ['20 000', '54 000', '102 000', '160 000'] },
     ]
   },
   {
     group: 'Intim',
     items: [
-      { zone: 'Bikinivonal', prices: ['9 000', '22 500', '45 000', '76 500'] },
-      { zone: 'Teljes intim', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Teljes intim + popsi belső', prices: ['17 000', '42 500', '85 000', '144 500'] },
-      { zone: 'Popsi belső ív', prices: ['8 000', '20 000', '40 000', '68 000'] },
+      { zone: 'Bikinivonal', prices: ['10 000', '27 000', '51 000', '80 000'] },
+      { zone: 'Teljes intim', prices: ['17 000', '45 500', '86 500', '136 000'] },
+      { zone: 'Teljes intim + popsi belső', prices: ['19 000', '51 000', '96 500', '152 000'] },
+      { zone: 'Popsi belső ív', prices: ['9 000', '24 000', '45 500', '72 000'] },
     ]
   },
   {
     group: 'Fenék',
     items: [
-      { zone: 'Farpofák', prices: ['12 000', '30 000', '60 000', '102 000'] },
-      { zone: 'Teljes far + popsi belső', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Farpofák', prices: ['14 000', '37 500', '71 000', '112 000'] },
+      { zone: 'Teljes far + popsi belső', prices: ['18 000', '48 500', '91 500', '144 000'] },
     ]
   },
   {
     group: 'Láb',
     items: [
-      { zone: 'Lábszár térdig', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Comb', prices: ['17 000', '42 500', '85 000', '144 500'] },
-      { zone: 'Teljes láb', prices: ['28 000', '70 000', '140 000', '238 000'] },
+      { zone: 'Lábszár térdig', prices: ['17 000', '45 500', '86 500', '136 000'] },
+      { zone: 'Comb', prices: ['19 000', '51 000', '96 500', '152 000'] },
+      { zone: 'Teljes láb', prices: ['31 000', '83 500', '158 000', '248 000'] },
     ]
   },
 ];
@@ -332,9 +338,24 @@ const breadcrumbSchema = {
                 <tr>
                   <th class="text-left py-3 px-4 font-semibold text-gray-700">Terület</th>
                   <th class="text-center py-3 px-3 font-semibold text-gray-700">1 alk.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">3 alk.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">6 alk.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">10 alk.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>3 alk.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-10%</span>
+                    </div>
+                  </th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>6 alk.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-15%</span>
+                    </div>
+                  </th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>10 alk.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-20%</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>

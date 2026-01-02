@@ -1,19 +1,41 @@
 ---
+export const prerender = true;
+
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
+
+// Image imports
+import lezeresImg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+import hydraImg from '../assets/images/hydrabeauty-arckezeles.jpg';
+import sminkImg from '../assets/images/sminktetovalas-budapest-beautyflow.jpg';
+import carbonImg from '../assets/images/carbon-peeling-lezeres.jpg';
+import tetovalasImg from '../assets/images/tetovalas-eltavolitas-budapest.jpg';
+import pigmentImg from '../assets/images/pigmentfolt-eltavoitas.webp';
+import googleLogo from '../assets/images/google-logo.jpg';
+
+// Optimize images - 1x and 2x for retina displays, webp for broad support
+// Card size is ~150-200px on mobile, ~180px on desktop, so 200px 1x + 400px 2x covers all cases
+const treatmentImages = await Promise.all([
+  { id: 'lezer', name: 'Dióda Lézeres Szőrtelenítés', src: lezeresImg },
+  { id: 'hydra', name: 'HydraBeauty Arckezelés', src: hydraImg },
+  { id: 'smink', name: 'Tartós Sminktetoválás', src: sminkImg },
+  { id: 'carbon', name: 'Carbon Peeling', src: carbonImg },
+  { id: 'tetovalas', name: 'Lézeres Tetoválás Eltávolítás', src: tetovalasImg },
+  { id: 'pigment', name: 'Pigmentfolt Eltávolítás', src: pigmentImg },
+].map(async (t) => {
+  const img1x = await getImage({ src: t.src, width: 200, height: 200, format: 'webp', quality: 75 });
+  const img2x = await getImage({ src: t.src, width: 400, height: 400, format: 'webp', quality: 70 });
+  return { id: t.id, name: t.name, src1x: img1x.src, src2x: img2x.src };
+}));
+
+const googleLogoOptimized = await getImage({ src: googleLogo, width: 16, height: 16, format: 'webp', quality: 70 });
 
 const lang = 'hu';
 const canonicalUrl = 'https://beautyflow.pro/ingyenes-konzultacio';
 const huUrl = '/ingyenes-konzultacio';
 const enUrl = '/en/free-consultation';
 
-const treatments = [
-  { id: 'lezer', name: 'Dióda Lézeres Szőrtelenítés', image: '/images/lezeres-szortelenites-beautyflow.jpg' },
-  { id: 'hydra', name: 'HydraBeauty Arckezelés', image: '/images/hydrabeauty-arckezeles.jpg' },
-  { id: 'smink', name: 'Tartós Sminktetoválás', image: '/images/sminktetovalas-budapest.jpg' },
-  { id: 'carbon', name: 'Carbon Peeling', image: '/images/carbon-peeling-lezeres.jpg' },
-  { id: 'tetovalas', name: 'Lézeres Tetoválás Eltávolítás', image: '/images/tetovalas-eltavolitas-budapest.jpg' },
-  { id: 'pigment', name: 'Pigmentfolt Eltávolítás', image: '/images/pigmentfolt-eltavoitas.webp' },
-];
+const treatments = treatmentImages;
 
 const socialProofs = [
   { name: 'Bátor Blanka', text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!' },
@@ -130,9 +152,14 @@ const breadcrumbSchema = {
                     />
                     <div class="aspect-square overflow-hidden">
                       <img
-                        src={treatment.image}
+                        src={treatment.src1x}
+                        srcset={`${treatment.src1x} 1x, ${treatment.src2x} 2x`}
                         alt={treatment.name}
+                        width="200"
+                        height="200"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
@@ -165,7 +192,7 @@ const breadcrumbSchema = {
               <!-- Social Proof -->
               <div class="mt-3 pt-3 border-t border-gray-100 text-center -mb-4 sm:-mb-5 md:-mb-6">
                 <div class="flex items-center justify-center gap-1 mb-2">
-                  <img src="/images/google-logo.jpg" alt="Google" class="w-4 h-4 rounded-full" />
+                  <img src={googleLogoOptimized.src} alt="Google" class="w-4 h-4 rounded-full" width="16" height="16" />
                   <div class="flex">
                     {[1,2,3,4,5].map(() => (
                       <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
@@ -236,7 +263,7 @@ const breadcrumbSchema = {
               <!-- Social Proof -->
               <div class="mt-8 pt-4 border-t border-gray-100 text-center">
                 <div class="flex items-center justify-center gap-1 mb-2">
-                  <img src="/images/google-logo.jpg" alt="Google" class="w-4 h-4 rounded-full" />
+                  <img src={googleLogoOptimized.src} alt="Google" class="w-4 h-4 rounded-full" width="16" height="16" />
                   <div class="flex">
                     {[1,2,3,4,5].map(() => (
                       <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
@@ -291,7 +318,7 @@ const breadcrumbSchema = {
               <!-- Social Proof -->
               <div class="mt-8 pt-4 border-t border-gray-100 text-center">
                 <div class="flex items-center justify-center gap-1 mb-2">
-                  <img src="/images/google-logo.jpg" alt="Google" class="w-4 h-4 rounded-full" />
+                  <img src={googleLogoOptimized.src} alt="Google" class="w-4 h-4 rounded-full" width="16" height="16" />
                   <div class="flex">
                     {[1,2,3,4,5].map(() => (
                       <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
@@ -364,7 +391,7 @@ const breadcrumbSchema = {
               <!-- Social Proof -->
               <div class="mt-8 pt-4 border-t border-gray-100 text-center">
                 <div class="flex items-center justify-center gap-1 mb-2">
-                  <img src="/images/google-logo.jpg" alt="Google" class="w-4 h-4 rounded-full" />
+                  <img src={googleLogoOptimized.src} alt="Google" class="w-4 h-4 rounded-full" width="16" height="16" />
                   <div class="flex">
                     {[1,2,3,4,5].map(() => (
                       <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">

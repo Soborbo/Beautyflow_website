@@ -1,6 +1,10 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { type Locale, defaultLang } from '../i18n';
+import saraImg from '../assets/images/sara.png';
+import blankaImg from '../assets/images/blanka-1.png';
+import blankaBatImg from '../assets/images/Blanka-bat.png';
+import googleLogoImg from '../assets/images/google-logo.jpg';
 
 interface Props {
   lang?: Locale;
@@ -8,20 +12,36 @@ interface Props {
 
 const { lang = defaultLang } = Astro.props;
 
+// FIXED pattern for avatars (48px) and google logo (28px)
+const sara1x = await getImage({ src: saraImg, width: 48, quality: 80, format: 'webp' });
+const sara2x = await getImage({ src: saraImg, width: 96, quality: 60, format: 'webp' });
+const blanka1x = await getImage({ src: blankaImg, width: 48, quality: 80, format: 'webp' });
+const blanka2x = await getImage({ src: blankaImg, width: 96, quality: 60, format: 'webp' });
+const blankaBat1x = await getImage({ src: blankaBatImg, width: 48, quality: 80, format: 'webp' });
+const blankaBat2x = await getImage({ src: blankaBatImg, width: 96, quality: 60, format: 'webp' });
+const googleLogo1x = await getImage({ src: googleLogoImg, width: 28, quality: 80, format: 'webp' });
+const googleLogo2x = await getImage({ src: googleLogoImg, width: 56, quality: 60, format: 'webp' });
+
+const avatarImages = [
+  { src1x: sara1x, src2x: sara2x },
+  { src1x: blanka1x, src2x: blanka2x },
+  { src1x: blankaBat1x, src2x: blankaBat2x },
+];
+
 const testimonials = {
   hu: [
-    { text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!', author: 'Szilágyi Sára', image: '/images/sara.png' },
-    { text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
-    { text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+    { text: 'Kedves fogadtatás, szép és nyugodt környezet, részletes tájékoztatás a kezelésről. Nagyon meg vagyok elégedve, már foglalom is a következő időpontot!', author: 'Szilágyi Sára' },
+    { text: 'Hosszú idő után végre én is eljutottam a szalonba, amit bárcsak megtehettem volna hamarabb. Alig várom a következő alkalmat és bátran ajánlom mindenkinek!', author: 'Imregi Blanka' },
+    { text: 'Teljes szívből ajánlom őket, profi munka, tündéri szakemberek!', author: 'Bátor Blanka' },
   ],
   en: [
-    { text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied, already booking my next appointment!', author: 'Szilágyi Sára', image: '/images/sara.png' },
-    { text: 'After a long time I finally got to the salon, which I wish I could have done sooner. I can\'t wait for the next time and I highly recommend it to everyone!', author: 'Imregi Blanka', image: '/images/blanka-1.png' },
-    { text: 'I wholeheartedly recommend them, professional work, lovely staff!', author: 'Bátor Blanka', image: '/images/Blanka-bat.png' },
+    { text: 'Warm welcome, beautiful and calm environment, detailed information about the treatment. I am very satisfied, already booking my next appointment!', author: 'Szilágyi Sára' },
+    { text: 'After a long time I finally got to the salon, which I wish I could have done sooner. I can\'t wait for the next time and I highly recommend it to everyone!', author: 'Imregi Blanka' },
+    { text: 'I wholeheartedly recommend them, professional work, lovely staff!', author: 'Bátor Blanka' },
   ],
 };
 
-const currentTestimonials = testimonials[lang];
+const currentTestimonials = testimonials[lang].map((t, i) => ({ ...t, avatar: avatarImages[i] }));
 ---
 
 <section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
@@ -45,23 +65,23 @@ const currentTestimonials = testimonials[lang];
 
           <!-- Author row - always at bottom, aligned across cards -->
           <div class="flex items-center gap-3 pt-3 border-t border-gray-100 mt-auto">
-            <Image
-              src={testimonial.image}
+            <img
+              src={testimonial.avatar.src1x.src}
+              srcset={`${testimonial.avatar.src1x.src} 1x, ${testimonial.avatar.src2x.src} 2x`}
               alt={testimonial.author}
-              width={48}
-              height={48}
-              format="webp"
+              width="48"
+              height="48"
               class="w-12 h-12 rounded-full object-cover flex-shrink-0 aspect-square"
               loading="lazy"
               decoding="async"
             />
             <span class="font-semibold text-gray-900 text-sm flex-1 leading-none">{testimonial.author}</span>
-            <Image
-              src="/images/google-logo.jpg"
+            <img
+              src={googleLogo1x.src}
+              srcset={`${googleLogo1x.src} 1x, ${googleLogo2x.src} 2x`}
               alt="Google"
-              width={28}
-              height={28}
-              format="webp"
+              width="28"
+              height="28"
               class="w-7 h-7 object-contain flex-shrink-0"
               loading="lazy"
               decoding="async"

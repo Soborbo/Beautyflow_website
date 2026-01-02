@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { ContentImage, FixedImage } from './images';
 import bookingImage from '../assets/images/notino-beautyflow.jpg';
 import notinoIcon from '../assets/images/notino-ikon.png';
 import { type Locale, defaultLang } from '../i18n';
@@ -37,15 +37,10 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
   <div class="flex flex-col lg:flex-row">
     <!-- Image - 50% width -->
     <div class="w-full lg:w-1/2">
-      <Image
+      <ContentImage
         src={bookingImage}
         alt={t.imageAlt}
         class="w-full h-full object-cover"
-        width={600}
-        height={400}
-        format="webp"
-        quality={80}
-        loading="lazy"
       />
     </div>
 
@@ -68,7 +63,7 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
             rel="noopener"
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a83363] transition-colors"
           >
-            <Image src={notinoIcon} alt="Notino" width={20} height={20} class="w-5 h-5" />
+            <FixedImage src={notinoIcon} alt="Notino" width={20} class="w-5 h-5" />
             {t.budaBtn}
           </a>
 
@@ -78,7 +73,7 @@ const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_cal
             rel="noopener"
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a83363] transition-colors"
           >
-            <Image src={notinoIcon} alt="Notino" width={20} height={20} class="w-5 h-5" />
+            <FixedImage src={notinoIcon} alt="Notino" width={20} class="w-5 h-5" />
             {t.pestBtn}
           </a>
         </div>

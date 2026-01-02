@@ -1,7 +1,12 @@
 ---
+export const prerender = true;
+
 import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
+import ContentImage from '../../components/images/ContentImage.astro';
+import CardImage from '../../components/images/CardImage.astro';
+import FixedImage from '../../components/images/FixedImage.astro';
 
 // Image imports
 import notinoIkon from '../../assets/images/notino-ikon.png';
@@ -218,7 +223,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" format="webp" quality={80} loading="lazy" />
+                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
                 </div>
               </div>
             </div>
@@ -264,21 +269,18 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <Image
+        <ContentImage
           src={heroImage}
           alt="Laser Tattoo Removal Budapest"
           class="w-full h-full object-cover"
-          format="webp"
-          quality={80}
-          loading="eager"
-          fetchpriority="high"
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" format="webp" quality={80} loading="lazy" />
+            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -319,13 +321,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <Image
+            <ContentImage
               src={konnyaFanniKonzultacio}
               alt="Fanni Konya tattoo removal expert"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
               <div class="w-10 h-10 rounded-full bg-[#c53f75]/10 flex items-center justify-center">
@@ -370,13 +369,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={sminktetovalasEltavolitas}
           alt="Enjoy looking in the mirror again"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -420,13 +416,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={tetovalasEltavolitasAgy}
           alt="Scar-free tattoo removal"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -436,13 +429,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={szemoldokTetovalasEltavolitas}
           alt="Less painful tattoo removal"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -472,13 +462,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={tetovalasEltavolitasBp}
           alt="Tattoo removal on any body area"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -488,13 +475,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={secondSkinVedelem}
           alt="Second Skin protection after tattoo removal"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -559,13 +543,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={egyediUtoapoloKrem}
           alt="Custom aftercare cream after tattoo removal"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -778,24 +759,18 @@ const faqs = [
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
     <div class="lg:hidden">
-      <Image
+      <ContentImage
         src={lezeresGep}
         alt="Laser tattoo removal treatment"
         class="w-full h-64 object-cover object-center"
-        format="webp"
-        quality={80}
-        loading="lazy"
       />
     </div>
 
     <div class="hidden lg:block absolute inset-0">
-      <Image
+      <ContentImage
         src={lezeresGep}
         alt=""
         class="w-full h-full object-cover object-right"
-        format="webp"
-        quality={80}
-        loading="lazy"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
@@ -844,15 +819,11 @@ const faqs = [
     <div class="container mx-auto px-4">
       <div class="bg-white overflow-hidden max-w-[768px] mx-auto">
         <div class="flex flex-col lg:flex-row">
-          <div class="lg:w-1/2 relative">
-            <Image
+          <div class="lg:w-1/2 relative min-h-[350px]">
+            <ContentImage
               src={konnyaFanniKonzultacio}
               alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -931,8 +902,9 @@ const faqs = [
                 src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
-                format="webp"
-                quality={80}
+                width={28}
+                height={28}
+                quality={60}
                 loading="lazy"
               />
             </div>
@@ -950,10 +922,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <FixedImage src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <FixedImage src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} />
         </div>
       </div>
     </div>
@@ -972,7 +944,7 @@ const faqs = [
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image src={lezerBeallitas} alt="Modern tattoo removal laser" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
+            <CardImage src={lezerBeallitas} alt="Modern tattoo removal laser" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Custom frequency settings</h3>
@@ -984,7 +956,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image src={hidegkalapacs} alt="Cold hammer cooling" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
+            <CardImage src={hidegkalapacs} alt="Cold hammer cooling" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Cold hammer cooling</h3>
@@ -996,7 +968,7 @@ const faqs = [
 
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image src={higieniaImage} alt="Medical cleanliness" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" format="webp" quality={80} loading="lazy" />
+            <CardImage src={higieniaImage} alt="Medical cleanliness" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Medical-grade hygiene</h3>

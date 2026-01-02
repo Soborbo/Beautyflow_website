@@ -1,5 +1,5 @@
 ---
-import { Picture, Image } from 'astro:assets';
+import { ContentImage, HeroImage, FixedImage } from './images';
 import heroImage from '../assets/images/breautyflow-fokep.jpg';
 import googleLogo from '../assets/images/google-logo.jpg';
 import notinoIcon from '../assets/images/notino-ikon.png';
@@ -68,22 +68,16 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
   <div class="flex flex-col lg:flex-row lg:flex-1 lg:min-h-0">
     <!-- Left side - Image with Google rating badge -->
     <div class="hidden lg:flex lg:w-1/2 relative">
-      <Picture
+      <ContentImage
         src={heroImage}
         alt={t.imageAlt}
-        formats={['avif', 'webp']}
-        fallbackFormat="jpg"
-        widths={[640, 828, 1200, 1600]}
-        sizes="50vw"
         class="absolute inset-0 w-full h-full object-cover"
-        loading="eager"
-        fetchpriority="high"
-        decoding="sync"
+        priority={true}
       />
       <!-- Google Rating Badge - bottom right corner -->
       <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-4 google-rating-badge">
         <div class="flex items-center gap-3">
-          <Image src={googleLogo} alt="Google" class="w-10 h-10 rounded-full object-cover" width={40} height={40} format="webp" loading="lazy" decoding="async" />
+          <FixedImage src={googleLogo} alt="Google" width={40} class="rounded-full object-cover" />
           <div>
             <div class="flex items-center gap-1 mb-1">
               <span class="text-2xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -106,22 +100,16 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
       <div class="w-full px-5 text-center">
         <!-- Mobile image with Google rating -->
         <div class="relative lg:hidden -mx-5 mb-6">
-          <Picture
+          <HeroImage
             src={heroImage}
             alt={t.imageAlt}
-            formats={['avif', 'webp']}
-            fallbackFormat="jpg"
-            widths={[320, 640, 828]}
-            sizes="100vw"
             class="w-full h-48 object-cover aspect-[16/9]"
-            loading="eager"
-            fetchpriority="high"
-            decoding="sync"
+            priority={true}
           />
           <!-- Mobile Google Rating Badge -->
           <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-2 google-rating-badge">
             <div class="flex items-center gap-2">
-              <Image src={googleLogo} alt="Google" class="w-6 h-6 rounded-full object-cover" width={24} height={24} format="webp" loading="lazy" decoding="async" />
+              <FixedImage src={googleLogo} alt="Google" width={24} class="rounded-full object-cover" />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-lg font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -141,7 +129,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
             <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
             <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
               <div class="bg-white rounded-full p-1">
-                <Image src={notinoIcon} alt="Notino" class="w-8 h-8" width={32} height={32} format="webp" loading="lazy" decoding="async" />
+                <FixedImage src={notinoIcon} alt="Notino" width={32} class="w-8 h-8" />
               </div>
             </div>
           </div>
@@ -219,7 +207,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
         <!-- Notino Partner -->
         <div class="flex items-center gap-2 sm:gap-3">
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-            <Image src={notinoIcon} alt="Notino" class="w-4 h-4 sm:w-5 sm:h-5" width={20} height={20} format="webp" loading="lazy" decoding="async" />
+            <FixedImage src={notinoIcon} alt="Notino" width={20} class="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <span class="text-xs sm:text-sm font-medium text-white/90 tracking-wide">{t.awards.notinoPartner}</span>
         </div>

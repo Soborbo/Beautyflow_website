@@ -1,7 +1,12 @@
 ---
-import { Image, Picture } from 'astro:assets';
+export const prerender = true;
+
+import { getImage } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
+import ContentImage from '../components/images/ContentImage.astro';
+import CardImage from '../components/images/CardImage.astro';
+import HeroImage from '../components/images/HeroImage.astro';
 
 // Import images
 import carbonPeelingFo from '../assets/images/carbon-peeling-fo.jpg';
@@ -12,7 +17,7 @@ import carbonPeelingTetovalas from '../assets/images/carbon-peeling-tetovalas.we
 import szemoldokSminktetovalas from '../assets/images/szemoldok-sminktetovalas.jpg';
 import hydrabeautyArckezelesBeautyflow from '../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
 import depositphotosCarbonNanogel from '../assets/images/depositphotos-carbon-nanogel.jpg';
-import carbonPeelingHatter from '../assets/images/carbon-peeling-hatter.webp';
+import carbonPeelingHatter from '../assets/images/originals/carbon-peeling-hatter.webp';
 import konyaFanniSzepsegszalon from '../assets/images/Konya-Fanni-szepsegszalon.jpg';
 import konyaFanniSzepsegszalonja from '../assets/images/konya-fanni-szepsegszalonja.jpg';
 import notinoIkon from '../assets/images/notino-ikon.png';
@@ -22,6 +27,18 @@ import testmeret from '../assets/images/testmeret.jpg';
 import nyitva from '../assets/images/nyitva.jpg';
 import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
 import skinlab from '../assets/images/logok/skinlab.webp';
+
+// Generate optimized images for small fixed-size elements (1x + 2x srcset pattern)
+const notinoIkonOptimized = await getImage({ src: notinoIkon, width: 64, format: 'webp', quality: 60 });
+const notinoIkon1x = await getImage({ src: notinoIkon, width: 32, format: 'webp', quality: 60 });
+const googleLogoOptimized = await getImage({ src: googleLogo, width: 72, format: 'webp', quality: 60 });
+const googleLogo1x = await getImage({ src: googleLogo, width: 36, format: 'webp', quality: 60 });
+const googleLogoSmallOptimized = await getImage({ src: googleLogo, width: 56, format: 'webp', quality: 60 });
+const googleLogoSmall1x = await getImage({ src: googleLogo, width: 28, format: 'webp', quality: 60 });
+const notinoLogoSmOptimized = await getImage({ src: notinoLogoSm, width: 96, format: 'webp', quality: 60 });
+const notinoLogoSm1x = await getImage({ src: notinoLogoSm, width: 48, format: 'webp', quality: 60 });
+const skinlabOptimized = await getImage({ src: skinlab, width: 96, format: 'webp', quality: 60 });
+const skinlab1x = await getImage({ src: skinlab, width: 48, format: 'webp', quality: 60 });
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -204,7 +221,15 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} loading="eager" />
+                  <img
+                    src={notinoIkon1x.src}
+                    srcset={`${notinoIkon1x.src} 1x, ${notinoIkonOptimized.src} 2x`}
+                    alt="Notino"
+                    class="w-8 h-8"
+                    width="32"
+                    height="32"
+                    loading="eager"
+                  />
                 </div>
               </div>
             </div>
@@ -250,21 +275,26 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <Image
+        <ContentImage
           src={carbonPeelingFo}
           alt="Carbon Peeling Budapest"
           class="w-full h-full object-cover"
-          loading="eager"
-          fetchpriority="high"
-          format="webp"
-          quality={80}
+          priority
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} loading="eager" />
+            <img
+              src={googleLogo1x.src}
+              srcset={`${googleLogo1x.src} 1x, ${googleLogoOptimized.src} 2x`}
+              alt="Google"
+              class="w-7 h-7 lg:w-9 lg:h-9 rounded-full"
+              width="36"
+              height="36"
+              loading="eager"
+            />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -306,13 +336,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <Image
+            <ContentImage
               src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni Carbon Peeling szakértő"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <!-- Mobile signature - right below image -->
             <div class="lg:hidden flex items-center gap-3 p-4 bg-gray-50 border-t border-gray-100">
@@ -360,13 +387,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
           alt="Garantált glass skin Carbon Peelinggel"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -404,13 +428,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={carbonPeelingLezeres}
           alt="60 perces Carbon Peeling kezelés"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -420,13 +441,10 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <Image
+        <ContentImage
           src={carbonPeelingArchamlasztas}
           alt="Carbon Peeling eredmények"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
       <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 bg-white">
@@ -464,13 +482,10 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <Image
+        <ContentImage
           src={szemoldokSminktetovalas}
           alt="Sminktetoválás felfrissítés Carbon Peelinggel"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
-          format="webp"
-          quality={80}
-          loading="lazy"
         />
       </div>
     </div>
@@ -542,20 +557,23 @@ const faqs = [
 
   <!-- How It Works Section -->
   <section class="how-it-works-section relative overflow-hidden">
-    <!-- Egyetlen optimalizált háttérkép - mobile-on felül, desktop-on teljes szekció -->
-    <div class="how-it-works-bg">
-      <Picture
+    <!-- Mobile: Image above everything like benefit sections -->
+    <div class="lg:hidden">
+      <HeroImage
         src={carbonPeelingHatter}
         alt="Carbon Peeling kezelés folyamata"
-        formats={['avif', 'webp']}
-        fallbackFormat="jpg"
-        widths={[640, 828, 1200, 1600]}
-        sizes="100vw"
-        class="w-full h-full object-cover object-top lg:object-[center_30%]"
-        loading="lazy"
+        class="w-full h-64 object-cover object-top"
       />
-      <!-- Desktop gradient overlay -->
-      <div class="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
+    </div>
+
+    <!-- Background image for desktop -->
+    <div class="hidden lg:block absolute inset-0">
+      <HeroImage
+        src={carbonPeelingHatter}
+        alt=""
+        class="w-full h-full object-cover object-[center_30%]"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent"></div>
     </div>
 
     <!-- Mobile background for content area -->
@@ -611,14 +629,10 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <Image
+            <ContentImage
               src={konyaFanniSzepsegszalon}
               alt="Kónya Fanni konzultáció"
               class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -694,12 +708,13 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <Image
-                src={googleLogo}
+              <img
+                src={googleLogoSmall1x.src}
+                srcset={`${googleLogoSmall1x.src} 1x, ${googleLogoSmallOptimized.src} 2x`}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
-                width={28}
-                height={28}
+                width="28"
+                height="28"
                 loading="lazy"
               />
             </div>
@@ -717,10 +732,24 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <img
+            src={notinoLogoSm1x.src}
+            srcset={`${notinoLogoSm1x.src} 1x, ${notinoLogoSmOptimized.src} 2x`}
+            alt="Notino Partner"
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+            height="48"
+            loading="lazy"
+          />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" format="webp" quality={80} loading="lazy" />
+          <img
+            src={skinlab1x.src}
+            srcset={`${skinlab1x.src} 1x, ${skinlabOptimized.src} 2x`}
+            alt="Skinlab Partner"
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+            height="48"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
@@ -740,13 +769,10 @@ const faqs = [
         <!-- 60 perces kezelés -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={carbonPeelingArchamlasztas}
               alt="60 perces Carbon Peeling kezelés"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -760,13 +786,10 @@ const faqs = [
         <!-- Azonnali eredmény -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={carbonPeelingLezeres}
               alt="Azonnali Carbon Peeling eredmény"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -780,13 +803,10 @@ const faqs = [
         <!-- Barátságos légkör -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={konyaFanniSzepsegszalonja}
               alt="Beautyflow szalon barátságos légköre"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -800,13 +820,10 @@ const faqs = [
         <!-- Orvosi tisztaság -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={higienia}
               alt="Steril Carbon Peeling környezet"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -820,13 +837,10 @@ const faqs = [
         <!-- Minden bőrtípushoz -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={testmeret}
               alt="Egyénre szabott Carbon Peeling"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -840,13 +854,10 @@ const faqs = [
         <!-- Heti 7 napos nyitvatartás -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <Image
+            <CardImage
               src={nyitva}
               alt="Heti 7 napos nyitvatartás"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              format="webp"
-              quality={80}
-              loading="lazy"
             />
           </div>
           <div class="p-5">
@@ -992,19 +1003,6 @@ const faqs = [
 </script>
 
 <style>
-  /* How It Works háttérkép - egyszer betöltve, responsive pozicionálás */
-  .how-it-works-bg {
-    height: 16rem; /* h-64 mobile-on */
-    position: relative;
-  }
-  @media (min-width: 1024px) {
-    .how-it-works-bg {
-      position: absolute;
-      inset: 0;
-      height: auto;
-    }
-  }
-
   .stat-item {
     opacity: 1;
   }

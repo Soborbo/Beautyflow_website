@@ -1,6 +1,5 @@
 ---
 import { type Locale, defaultLang, getLocalizedPath, getAlternateRoute } from '../i18n';
-import Logo from './Logo.astro';
 
 interface Props {
   lang?: Locale;
@@ -63,6 +62,13 @@ const menuItems: Record<Locale, MenuItem[]> = {
         { label: 'Pigment Removal', href: '/pigment-removal' },
       ]
     },
+    {
+      label: 'Guides',
+      href: '/knowledge-base',
+      children: [
+        { label: 'Diode Laser Hair Removal Guide', href: '/knowledge-base/diode-laser-hair-removal-everything-you-need-to-know' },
+      ]
+    },
     { label: 'FAQ', href: '/faq' },
     { label: 'Prices', href: '/prices' },
     {
@@ -112,7 +118,15 @@ const flags = {
   <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
     <!-- Logo -->
     <a href="/" class="flex-shrink-0">
-      <Logo class="h-8 w-auto" />
+      <img
+        src="/images/beautyflow-logo.svg"
+        alt="Beautyflow"
+        class="h-8 w-auto"
+        width="96"
+        height="32"
+        loading="eager"
+        decoding="async"
+      />
     </a>
 
     <!-- Addresses -->
@@ -164,7 +178,15 @@ const flags = {
   <div class="flex items-center h-full px-4 lg:px-6">
     <!-- Logo - pushed to left edge on lg -->
     <a href="/" class="flex-shrink-0">
-      <Logo class="h-10 md:h-10 lg:h-12 w-auto" alt="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest" />
+      <img
+        src="/images/beautyflow-logo.svg"
+        alt="Beautyflow Szépségszalon és Lézeres Szőrtelenítés Budapest"
+        class="h-10 md:h-10 lg:h-12 w-auto"
+        width="168"
+        height="56"
+        loading="eager"
+        decoding="async"
+      />
     </a>
 
     <!-- Spacer to push nav to the right -->
@@ -173,10 +195,10 @@ const flags = {
     <!-- Desktop Navigation -->
     <nav class="hidden lg:flex items-center gap-3 xl:gap-6 flex-shrink-0">
         {currentMenuItems.map((item) => (
-          <div class="relative group">
+          <div class="relative group flex items-center">
             {item.children ? (
               <>
-                <button class="text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase">
+                <button class="text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase leading-none">
                   {item.label}
                 </button>
                 <div class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -193,7 +215,7 @@ const flags = {
                 </div>
               </>
             ) : (
-              <a href={item.href} class="text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase">
+              <a href={item.href} class="text-[13px] font-semibold text-gray-700 hover:text-[#c53f75] transition-colors py-2 tracking-wide uppercase leading-none">
                 {item.label}
               </a>
             )}
@@ -263,7 +285,15 @@ const flags = {
   <div class="flex flex-col h-full">
     <!-- Header with close button -->
     <div class="flex items-center justify-between p-4 border-b border-gray-100">
-      <Logo class="h-10 w-auto" />
+      <img
+        src="/images/beautyflow-logo.svg"
+        alt="Beautyflow"
+        class="h-10 w-auto"
+        width="120"
+        height="40"
+        loading="lazy"
+        decoding="async"
+      />
       <button id="mobile-close-btn" class="p-2 text-gray-700 hover:text-[#c53f75] transition-colors" aria-label={closeMenuLabel}>
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

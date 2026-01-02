@@ -1,0 +1,33 @@
+---
+/**
+ * QuarterImage - QUARTER pattern (25vw)
+ * Use: 4-column grids, team member photos
+ * Pattern: 25vw desktop, 50vw tablet, 100vw mobile
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+}
+
+const { src, alt, class: className } = Astro.props;
+
+// QUARTER pattern from astro-images skill
+const widths = [192, 384, 512, 640, 960];
+const sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw';
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={['avif', 'webp', 'jpg']}
+  quality={60}
+  class={className}
+  loading="lazy"
+  decoding="async"
+/>
