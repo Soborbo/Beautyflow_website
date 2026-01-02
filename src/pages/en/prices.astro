@@ -14,12 +14,14 @@ const categoryColors = {
 
 // Laser Hair Removal Packages
 const laserPackages = [
-  { name: 'Diamond', zones: 'Full bikini + Inner buttocks + Full arms + Underarms + Full legs', price: '55 000', popular: true },
-  { name: 'Gold', zones: 'Full bikini + Inner buttocks + Underarms + Full legs', price: '45 000' },
-  { name: 'Silver', zones: 'Full bikini + Inner buttocks + Underarms + Lower legs', price: '35 000' },
-  { name: 'White', zones: 'Full bikini + Inner buttocks + Underarms', price: '23 000' },
-  { name: 'Pearl', zones: 'Underarms + Lower legs', price: '21 000' },
-  { name: 'Shine', zones: 'Underarms + Bikini line', price: '16 000' },
+  { name: 'Diamond', zones: 'Full bikini + Inner buttocks + Full arms + Underarms + Full legs', price: '60 000', popular: true },
+  { name: 'Gold', zones: 'Full bikini + Inner buttocks + Underarms + Full legs', price: '50 000' },
+  { name: 'Silver', zones: 'Full bikini + Inner buttocks + Underarms + Lower legs', price: '40 000' },
+  { name: 'Bronze', zones: 'Full legs + Underarms', price: '38 000' },
+  { name: 'Platinum - PCOS', zones: 'Areola + Between breasts + Sideburns + Upper lip + Face + Chin + Neck + Stomach line', price: '34 000' },
+  { name: 'White', zones: 'Full bikini + Inner buttocks + Underarms + Stomach line', price: '26 000' },
+  { name: 'Pearl', zones: 'Underarms + Lower legs', price: '24 000' },
+  { name: 'Shine', zones: 'Underarms + Bikini line', price: '18 000' },
 ];
 
 // Laser Hair Removal Passes - grouped
@@ -27,56 +29,58 @@ const laserPassesGrouped = [
   {
     group: 'Face',
     items: [
-      { zone: 'Upper lip', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Chin', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Upper lip + Chin', prices: ['10 000', '25 000', '50 000', '85 000'] },
-      { zone: 'Full face', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Upper lip', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Chin', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Upper lip + Chin', prices: ['12 000', '32 000', '61 000', '96 000'] },
+      { zone: 'Full face', prices: ['18 000', '48 500', '91 500', '144 000'] },
+      { zone: 'Sideburns', prices: ['7 000', '18 500', '35 500', '56 000'] },
     ]
   },
   {
     group: 'Arms',
     items: [
-      { zone: 'Forearms', prices: ['10 000', '25 000', '50 000', '85 000'] },
-      { zone: 'Full arms', prices: ['16 000', '40 000', '80 000', '136 000'] },
-      { zone: 'Underarms', prices: ['10 000', '25 000', '50 000', '85 000'] },
+      { zone: 'Forearms', prices: ['13 000', '35 000', '66 000', '104 000'] },
+      { zone: 'Full arms', prices: ['18 000', '48 500', '91 500', '144 000'] },
+      { zone: 'Underarms', prices: ['12 000', '32 000', '61 000', '96 000'] },
     ]
   },
   {
     group: 'Chest',
     items: [
-      { zone: 'Between breasts', prices: ['5 000', '12 500', '25 000', '42 500'] },
+      { zone: 'Areola', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Between breasts', prices: ['7 000', '18 500', '35 500', '56 000'] },
     ]
   },
   {
     group: 'Torso',
     items: [
-      { zone: 'Stomach line', prices: ['6 000', '15 000', '30 000', '51 000'] },
-      { zone: 'Stomach', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Back', prices: ['20 000', '50 000', '100 000', '170 000'] },
+      { zone: 'Stomach line', prices: ['7 000', '18 500', '35 500', '56 000'] },
+      { zone: 'Stomach', prices: ['15 000', '40 500', '76 500', '120 000'] },
+      { zone: 'Back', prices: ['20 000', '54 000', '102 000', '160 000'] },
     ]
   },
   {
     group: 'Intimate',
     items: [
-      { zone: 'Bikini line', prices: ['9 000', '22 500', '45 000', '76 500'] },
-      { zone: 'Full bikini', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Full bikini + inner buttocks', prices: ['17 000', '42 500', '85 000', '144 500'] },
-      { zone: 'Inner buttocks', prices: ['8 000', '20 000', '40 000', '68 000'] },
+      { zone: 'Bikini line', prices: ['10 000', '27 000', '51 000', '80 000'] },
+      { zone: 'Full bikini', prices: ['17 000', '45 500', '86 500', '136 000'] },
+      { zone: 'Full bikini + inner buttocks', prices: ['19 000', '51 000', '96 500', '152 000'] },
+      { zone: 'Inner buttocks', prices: ['9 000', '24 000', '45 500', '72 000'] },
     ]
   },
   {
     group: 'Buttocks',
     items: [
-      { zone: 'Buttocks', prices: ['12 000', '30 000', '60 000', '102 000'] },
-      { zone: 'Full buttocks + inner buttocks', prices: ['15 000', '37 500', '75 000', '127 500'] },
+      { zone: 'Buttocks', prices: ['14 000', '37 500', '71 000', '112 000'] },
+      { zone: 'Full buttocks + inner buttocks', prices: ['18 000', '48 500', '91 500', '144 000'] },
     ]
   },
   {
     group: 'Legs',
     items: [
-      { zone: 'Lower legs', prices: ['15 000', '37 500', '75 000', '127 500'] },
-      { zone: 'Thighs', prices: ['17 000', '42 500', '85 000', '144 500'] },
-      { zone: 'Full legs', prices: ['28 000', '70 000', '140 000', '238 000'] },
+      { zone: 'Lower legs', prices: ['17 000', '45 500', '86 500', '136 000'] },
+      { zone: 'Thighs', prices: ['19 000', '51 000', '96 500', '152 000'] },
+      { zone: 'Full legs', prices: ['31 000', '83 500', '158 000', '248 000'] },
     ]
   },
 ];
@@ -334,9 +338,24 @@ const breadcrumbSchema = {
                 <tr>
                   <th class="text-left py-3 px-4 font-semibold text-gray-700">Area</th>
                   <th class="text-center py-3 px-3 font-semibold text-gray-700">1 sess.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">3 sess.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">6 sess.</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">10 sess.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>3 sess.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-10%</span>
+                    </div>
+                  </th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>6 sess.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-15%</span>
+                    </div>
+                  </th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">
+                    <div class="flex flex-col items-center gap-1">
+                      <span>10 sess.</span>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-20%</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>

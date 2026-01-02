@@ -8,6 +8,10 @@ import GTMTracking from '../components/GTMTracking.astro';
 import { LCPTracker } from '../components/images';
 import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
 
+// Import fonts as assets to get hashed URLs for preloading
+import openSansLatin400 from '@fontsource/open-sans/files/open-sans-latin-400-normal.woff2?url';
+import cormorantLatin700 from '@fontsource/cormorant/files/cormorant-latin-700-normal.woff2?url';
+
 interface Props {
   title: string;
   description?: string;
@@ -47,6 +51,13 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
     <title>{title}</title>
+
+    <!--
+      Font preloading for critical fonts (body text + headings)
+      These are the most important fonts for FCP/LCP - preload them early
+    -->
+    <link rel="preload" href={openSansLatin400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={cormorantLatin700} as="font" type="font/woff2" crossorigin />
 
     <link rel="canonical" href={canonicalUrl} />
 
