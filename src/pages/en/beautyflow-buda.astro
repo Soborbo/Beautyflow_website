@@ -2,6 +2,17 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import { ContentImage, CardImage, FixedImage } from '../../components/images';
+
+// Image imports
+import beautyflowBudaImg from '../../assets/images/Beautyflow-buda.jpg';
+import beautyflowPestImg from '../../assets/images/Beautyflow-Pest.jpg';
+import notinoIkon from '../../assets/images/notino-ikon.png';
+import googleLogo from '../../assets/images/google-logo.jpg';
+import lezeresSzortelenites from '../../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
+import hydrabeautyArckezeles from '../../assets/images/hydrabeauty-arckezeles.jpg';
+import sminktetovalasBudapest from '../../assets/images/sminktetovalas-budapest-beautyflow.jpg';
+import carbonPeelingLezeres from '../../assets/images/carbon-peeling-lezeres.jpg';
 
 // Location data
 const location = {
@@ -55,25 +66,25 @@ const services = [
     name: 'Diode Laser Hair Removal',
     description: 'At our Buda salon, we perform permanent hair removal using the most advanced 808nm diode laser technology. Painless, fast and effective treatment for all skin types.',
     link: '/en/diode-laser-hair-removal',
-    image: '/images/lezeres-szortelenites-beautyflow.jpg',
+    image: lezeresSzortelenites,
   },
   {
     name: 'HydraBeauty Facial Treatment',
     description: 'Deep cleansing and hydrating facial treatment that delivers immediately visible results. In our Buda salon, you can relax in a quiet, peaceful environment during the treatment.',
     link: '/en/hydrabeauty',
-    image: '/images/hydrabeauty-arckezeles.jpg',
+    image: hydrabeautyArckezeles,
   },
   {
     name: 'Permanent Makeup',
     description: 'Professional eyebrow, eyeliner and lip tattooing by our experienced specialists. Natural effect, customized shape and color.',
     link: '/en/permanent-makeup',
-    image: '/images/sminktetovalas-budapest.jpg',
+    image: sminktetovalasBudapest,
   },
   {
     name: 'Carbon Peeling',
     description: 'The favorite skin rejuvenation treatment of Hollywood stars. Pore-tightening, skin cleansing and collagen-stimulating effects in a single treatment.',
     link: '/en/carbon-peeling',
-    image: '/images/carbon-peeling-lezeres.jpg',
+    image: carbonPeelingLezeres,
   },
 ];
 
@@ -217,7 +228,7 @@ const notinoUrl = location.bookingUrl;
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <FixedImage src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} />
                 </div>
               </div>
             </div>
@@ -269,17 +280,18 @@ const notinoUrl = location.bookingUrl;
 
       <!-- Right column: Buda image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden bg-[#c53f75]">
-        <img
-          src="/images/Beautyflow-buda.jpg"
+        <ContentImage
+          src={beautyflowBudaImg}
           alt="Beautyflow Buda beauty salon"
           class="w-full h-full object-cover min-h-[250px] lg:min-h-0"
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 right-3 lg:bottom-5 lg:right-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <FixedImage src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -366,7 +378,7 @@ const notinoUrl = location.bookingUrl;
                   class="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:border-[#c53f75]/20 transition-all"
                 >
                   <div class="aspect-[16/10] overflow-hidden">
-                    <img
+                    <CardImage
                       src={service.image}
                       alt={service.name}
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

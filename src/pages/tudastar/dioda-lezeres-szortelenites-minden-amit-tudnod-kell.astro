@@ -3,11 +3,36 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import { getImage } from 'astro:assets';
-import HeroImage from '../../components/images/HeroImage.astro';
+import { ContentImage, CardImage } from '../../components/images';
 
 // Image imports
 import konyaFanniKozmetikus from '../../assets/images/konya-fanni-kozmetikus.jpg';
 import lezeresLabEredmeny from '../../assets/images/lezeres-lab-szortelenites-eredmenye.jpg';
+
+// Hero and content images from originals folder
+import lezeresBeautyflow from '../../assets/images/originals/lezeres-szortelenites-beautyflow.jpg';
+import lezeresHogyanMukodik from '../../assets/images/originals/lezeres-szortelenites-hogyan-mukodik.jpg';
+import lezerDioda from '../../assets/images/originals/lezeres-szortelenites-dioda.jpg';
+import lezerDiodaBudapest from '../../assets/images/originals/lezeres-dioda-szortelenites-budapest.jpg';
+import beautyflowKapcsolat from '../../assets/images/originals/beautyflow-kapcsolat-sm-1.jpg';
+
+// Felkészülés card images
+import neGyantazz from '../../assets/images/originals/ne-gyantazz.jpg';
+import neNapozz from '../../assets/images/originals/nenapozz.jpg';
+import neHamlassz from '../../assets/images/originals/ne-hamlassz.jpg';
+import smink from '../../assets/images/originals/smink.jpg';
+import gyogyszer from '../../assets/images/originals/gyogyser.jpg';
+import borotvalkozas from '../../assets/images/originals/borotvalkozas.jpg';
+
+// Kezelés után card images
+import napozas from '../../assets/images/originals/napozas.jpg';
+import onbarnito from '../../assets/images/originals/onbarnito.jpg';
+import krem from '../../assets/images/originals/krem.jpg';
+import borruha from '../../assets/images/originals/borruha.jpg';
+import szauna from '../../assets/images/originals/szauna.jpg';
+import borradir from '../../assets/images/originals/borradir.jpg';
+import tisztaSzaraz from '../../assets/images/originals/tiszta-szaraz.jpg';
+import vizivaas from '../../assets/images/originals/vizivaas.jpg';
 
 // Blog metadata
 const meta = {
@@ -64,7 +89,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
   <article class="bg-white">
     <!-- Header with Title and Author -->
     <header class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-6 border-b border-gray-100">
-      <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+      <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight text-center">
         Minden, amit tudnod kell a végleges, dióda lézeres szőrtelenítés kapcsán
       </h1>
 
@@ -185,12 +210,13 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Hero Image -->
           <div class="mb-12">
-        <img
-          src="/images/lezeres-szortelenites-beautyflow.jpg"
-          alt="Dióda lézeres szőrtelenítés kezelés a Beautyflow szalonban"
-          class="w-full rounded-xl"
-        />
-      </div>
+            <ContentImage
+              src={lezeresBeautyflow}
+              alt="Dióda lézeres szőrtelenítés kezelés a Beautyflow szalonban"
+              class="w-full rounded-xl"
+              priority={true}
+            />
+          </div>
 
       <!-- Section: Hogyan működik -->
       <section id="hogyan-mukodik" class="mb-16 scroll-mt-24">
@@ -216,8 +242,8 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
         <!-- How it works image -->
         <div class="mb-8">
-          <img
-            src="/images/lezeres-szortelenites-hogyan-mukodik.jpg"
+          <ContentImage
+            src={lezeresHogyanMukodik}
             alt="Hogyan működik a lézeres szőrtelenítés - 4 lépés illusztráció"
             class="w-full rounded-xl"
           />
@@ -252,8 +278,8 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
       <!-- Diode treatment image -->
       <div class="mb-12">
-        <img
-          src="/images/lezeres-szortelenites-dioda.jpg"
+        <ContentImage
+          src={lezerDioda}
           alt="Dióda lézeres szőrtelenítés hónalj kezelés"
           class="w-full rounded-xl"
         />
@@ -316,8 +342,8 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
       <!-- Face treatment image -->
       <div class="mb-12">
-        <img
-          src="/images/lezeres-dioda-szortelenites-budapest.jpg"
+        <ContentImage
+          src={lezerDiodaBudapest}
           alt="Dióda lézeres szőrtelenítés arc kezelés Budapesten"
           class="w-full rounded-xl"
         />
@@ -364,7 +390,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
       <!-- Before/After image -->
       <div class="mb-12">
-        <HeroImage
+        <ContentImage
           src={lezeresLabEredmeny}
           alt="Lézeres szőrtelenítés előtte-utána eredmény lábon"
           class="w-full rounded-xl"
@@ -476,8 +502,8 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
       <!-- Salon image -->
       <div class="mb-12">
-        <img
-          src="/images/beautyflow-kapcsolat-sm-1.jpg"
+        <ContentImage
+          src={beautyflowKapcsolat}
           alt="Beautyflow szalon recepció"
           class="w-full rounded-xl"
         />
@@ -535,7 +561,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <!-- Card 1 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/ne-gyantazz.jpg" alt="Ne gyantázz" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={neGyantazz} alt="Ne gyantázz" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne gyantázz és ne epilálj</h3>
               <p class="text-gray-600 text-sm">
@@ -547,7 +573,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 2 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/nenapozz.jpg" alt="Ne napozz" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={neNapozz} alt="Ne napozz" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne akarj barnulni előtte</h3>
               <p class="text-gray-600 text-sm">
@@ -559,7 +585,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 3 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/ne-hamlassz.jpg" alt="Ne hámlaszd" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={neHamlassz} alt="Ne hámlaszd" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne szőkítsd és ne hámlaszd</h3>
               <p class="text-gray-600 text-sm">
@@ -571,7 +597,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 4 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/smink.jpg" alt="Ne sminkelj" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={smink} alt="Ne sminkelj" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne sminkelj vagy krémezz</h3>
               <p class="text-gray-600 text-sm">
@@ -583,7 +609,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 5 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/gyogyser.jpg" alt="Gyógyszerek" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={gyogyszer} alt="Gyógyszerek" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Szólj, ha gyógyszert szedsz</h3>
               <p class="text-gray-600 text-sm">
@@ -595,7 +621,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 6 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/borotvalkozas.jpg" alt="Borotválkozás" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={borotvalkozas} alt="Borotválkozás" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Borotválkozz 2 nappal előtte</h3>
               <p class="text-gray-600 text-sm">
@@ -626,7 +652,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Card 1 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/napozas.jpg" alt="Óvd a naptól" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={napozas} alt="Óvd a naptól" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Óvd a naptól</h3>
               <p class="text-gray-600 text-sm">
@@ -638,7 +664,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 2 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/onbarnito.jpg" alt="Ne használj önbarnítót" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={onbarnito} alt="Ne használj önbarnítót" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne használj önbarnítót</h3>
               <p class="text-gray-600 text-sm">
@@ -649,7 +675,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 3 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/krem.jpg" alt="Ne használj illatosított krémet" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={krem} alt="Ne használj illatosított krémet" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne használj illatosított krémet</h3>
               <p class="text-gray-600 text-sm">
@@ -660,7 +686,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 4 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/borruha.jpg" alt="Kerüld a szoros ruhát" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={borruha} alt="Kerüld a szoros ruhát" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Kerüld a szoros ruhát</h3>
               <p class="text-gray-600 text-sm">
@@ -671,7 +697,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 5 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/szauna.jpg" alt="Kerüld az extrém hőt" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={szauna} alt="Kerüld az extrém hőt" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Kerüld az extrém hőt</h3>
               <p class="text-gray-600 text-sm">
@@ -682,7 +708,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 6 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/borradir.jpg" alt="Ne használj bőrradírt" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={borradir} alt="Ne használj bőrradírt" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Ne használj bőrradírt</h3>
               <p class="text-gray-600 text-sm">
@@ -693,7 +719,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 7 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/borotvalkozas.jpg" alt="Csak borotvát használj" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={borotvalkozas} alt="Csak borotvát használj" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Csak borotvát használj</h3>
               <p class="text-gray-600 text-sm">
@@ -704,7 +730,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 8 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/tiszta-szaraz.jpg" alt="Tartsd tisztán és szárazon" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={tisztaSzaraz} alt="Tartsd tisztán és szárazon" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Tartsd tisztán és szárazon</h3>
               <p class="text-gray-600 text-sm">
@@ -715,7 +741,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
           <!-- Card 9 -->
           <div class="bg-gray-50 rounded-xl overflow-hidden">
-            <img src="/images/vizivaas.jpg" alt="Hidratálj kívül-belül" class="w-full aspect-[4/3] object-contain bg-white" />
+            <CardImage src={vizivaas} alt="Hidratálj kívül-belül" class="w-full aspect-[4/3] object-contain bg-white" />
             <div class="p-5">
               <h3 class="font-semibold text-gray-900 mb-2">Hidratálj kívül-belül</h3>
               <p class="text-gray-600 text-sm">

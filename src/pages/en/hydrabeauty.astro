@@ -3,6 +3,23 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
+import { HeroImage, ContentImage, CardImage, FixedImage } from '../../components/images';
+
+// Image imports
+import notinoIkon from '../../assets/images/notino-ikon.png';
+import googleLogo from '../../assets/images/google-logo.jpg';
+import hydrabeautyArckezeles from '../../assets/images/hydrabeauty-arckezeles.jpg';
+import hydrabeautyArckezelesBeautyflow from '../../assets/images/hydrabeauty-arckezeles-beautyflow.jpg';
+import hydrabeauty from '../../assets/images/hydrabeauty.jpg';
+import konyaFanniSzepsegszalonja from '../../assets/images/konya-fanni-szepsegszalonja.jpg';
+import szemhejTetovalasSmink from '../../assets/images/szemhej-tetovalas-smink.jpg';
+import mestersegesIntelligencia from '../../assets/images/mesterseges-intelligencia-szortelenito-gep.jpg';
+import higienia from '../../assets/images/higienia.jpg';
+import nyitva from '../../assets/images/nyitva.jpg';
+import notinoLogoSm from '../../assets/images/logok/notino-logo-sm.jpg';
+import skinlabLogo from '../../assets/images/logok/skinlab.webp';
+import testmeret from '../../assets/images/testmeret.jpg';
+import aiVezreltGepek from '../../assets/images/ai-vezrelt-gepek.jpg';
 
 const stats = [
   { value: '10+ years', label: 'experience' },
@@ -177,7 +194,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src="/images/notino-ikon.png" alt="Notino" class="w-8 h-8" />
+                  <FixedImage src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} />
                 </div>
               </div>
             </div>
@@ -223,17 +240,18 @@ const faqs = [
 
       <!-- Right column: Hero image -->
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
-        <img
-          src="/images/hydrabeauty-arckezeles.jpg"
+        <ContentImage
+          src={hydrabeautyArckezeles}
           alt="HydraBeauty facial treatment Budapest"
           class="w-full h-full object-cover"
+          priority={true}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent lg:hidden"></div>
 
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src="/images/google-logo.jpg" alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
+            <FixedImage src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -275,8 +293,8 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image - full width on mobile, stretch to fill height on desktop -->
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <ContentImage
+              src={konyaFanniSzepsegszalonja}
               alt="Fanni Konya HydraBeauty specialist"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
             />
@@ -326,8 +344,8 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        <ContentImage
+          src={hydrabeautyArckezelesBeautyflow}
           alt="Younger skin with HydraBeauty treatment"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -367,8 +385,8 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/hydrabeauty.jpg"
+        <ContentImage
+          src={hydrabeauty}
           alt="HydraBeauty deep cleansing"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -380,8 +398,8 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty-arckezeles.jpg"
+        <ContentImage
+          src={hydrabeautyArckezeles}
           alt="HydraBeauty hydration"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -413,8 +431,8 @@ const faqs = [
         </div>
       </div>
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
-        <img
-          src="/images/hydrabeauty-arckezeles-beautyflow.jpg"
+        <ContentImage
+          src={hydrabeautyArckezelesBeautyflow}
           alt="HydraBeauty vitamins"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -426,8 +444,8 @@ const faqs = [
   <section class="section-animate">
     <div class="flex flex-col lg:flex-row">
       <div class="w-full lg:w-1/2 relative overflow-hidden">
-        <img
-          src="/images/hydrabeauty.jpg"
+        <ContentImage
+          src={hydrabeauty}
           alt="HydraBeauty immediate results"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
@@ -520,8 +538,8 @@ const faqs = [
   <section class="how-it-works-section relative overflow-hidden">
     <!-- Mobile: Image above everything like benefit sections -->
     <div class="lg:hidden">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
+      <ContentImage
+        src={hydrabeautyArckezeles}
         alt="HydraBeauty treatment process"
         class="w-full h-64 object-cover object-top"
       />
@@ -529,8 +547,8 @@ const faqs = [
 
     <!-- Background image for desktop -->
     <div class="hidden lg:block absolute inset-0">
-      <img
-        src="/images/hydrabeauty-arckezeles.jpg"
+      <ContentImage
+        src={hydrabeautyArckezeles}
         alt=""
         class="w-full h-full object-cover object-[center_30%]"
       />
@@ -590,8 +608,8 @@ const faqs = [
         <div class="flex flex-col lg:flex-row">
           <!-- Image Column -->
           <div class="lg:w-1/2 relative">
-            <img
-              src="/images/Konya-Fanni-szepsegszalon.jpg"
+            <ContentImage
+              src={konyaFanniSzepsegszalonja}
               alt="Fanni Konya consultation"
               class="w-full h-full object-cover object-top"
               style="min-height: 350px;"
@@ -670,10 +688,12 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src="/images/google-logo.jpg"
+              <FixedImage
+                src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
+                width={28}
+                height={28}
               />
             </div>
           </div>
@@ -690,10 +710,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src="/images/logok/notino-logo-sm.jpg" alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <FixedImage src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} />
         </div>
         <div class="flex flex-col items-center">
-          <img src="/images/logok/skinlab.webp" alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
+          <FixedImage src={skinlabLogo} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} />
         </div>
       </div>
     </div>
@@ -713,8 +733,8 @@ const faqs = [
         <!-- Premium technology -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/ai-vezrelt-gepek.jpg"
+            <CardImage
+              src={aiVezreltGepek}
               alt="HydraBeauty premium technology"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -730,8 +750,8 @@ const faqs = [
         <!-- Personalized treatment -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/testmeret.jpg"
+            <CardImage
+              src={testmeret}
               alt="Personalized HydraBeauty"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -747,8 +767,8 @@ const faqs = [
         <!-- Relaxing experience -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/konya-fanni-szepsegszalonja.jpg"
+            <CardImage
+              src={konyaFanniSzepsegszalonja}
               alt="Beautyflow relaxing atmosphere"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -764,8 +784,8 @@ const faqs = [
         <!-- Medical-grade cleanliness -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/higienia.jpg"
+            <CardImage
+              src={higienia}
               alt="Sterile HydraBeauty environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -781,8 +801,8 @@ const faqs = [
         <!-- Immediate results -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/hydrabeauty-arckezeles.jpg"
+            <CardImage
+              src={hydrabeautyArckezeles}
               alt="HydraBeauty immediate results"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -798,8 +818,8 @@ const faqs = [
         <!-- Open 7 days a week -->
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="/images/nyitva.jpg"
+            <CardImage
+              src={nyitva}
               alt="Open 7 days a week"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
