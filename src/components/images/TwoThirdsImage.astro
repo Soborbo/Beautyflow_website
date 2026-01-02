@@ -17,7 +17,8 @@ interface Props {
 const { src, alt, class: className, priority = false } = Astro.props;
 
 // TWO_THIRDS pattern from astro-images skill
-const widths = [384, 640, 768, 1024, 1280, 1706, 2048];
+// Added 480 for better mobile coverage
+const widths = [384, 480, 640, 768, 1024, 1280, 1706, 2048];
 const sizes = '(min-width: 1024px) 66vw, 100vw';
 ---
 

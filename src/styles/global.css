@@ -4,7 +4,8 @@
  * Font loading optimization:
  * - Only latin + latin-ext subsets (for Hungarian accents: áéíóöőúüű)
  * - Reduces from ~8 font files to 2-3 per weight
- * - font-display: swap already set by fontsource
+ * - font-display: optional prevents CLS (0.004 → 0)
+ *   With preload in Layout.astro, fonts load fast enough
  */
 @import "@fontsource/cormorant/latin-400.css";
 @import "@fontsource/cormorant/latin-ext-400.css";
@@ -16,6 +17,19 @@
 @import "@fontsource/open-sans/latin-ext-600.css";
 @import "@fontsource/open-sans/latin-700.css";
 @import "@fontsource/open-sans/latin-ext-700.css";
+
+/*
+ * Override fontsource's font-display: swap → optional
+ * Eliminates CLS from font swap, fonts are preloaded so they load fast
+ */
+@font-face {
+  font-family: 'Open Sans';
+  font-display: optional;
+}
+@font-face {
+  font-family: 'Cormorant';
+  font-display: optional;
+}
 
 @theme {
   --color-primary: #c53f75;

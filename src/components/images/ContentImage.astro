@@ -17,7 +17,8 @@ interface Props {
 const { src, alt, class: className, priority = false } = Astro.props;
 
 // HALF pattern from astro-images skill
-const widths = [320, 640, 960, 1280, 1600];
+// Added 480 for better mobile coverage (382-412px renders)
+const widths = [320, 480, 640, 960, 1280, 1600];
 const sizes = '(min-width: 1024px) 50vw, 100vw';
 ---
 

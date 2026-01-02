@@ -16,7 +16,8 @@ interface Props {
 const { src, alt, class: className } = Astro.props;
 
 // QUARTER pattern from astro-images skill
-const widths = [192, 384, 512, 640, 960];
+// Added 480 for better mobile coverage
+const widths = [192, 384, 480, 640, 960];
 const sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw';
 ---
 
