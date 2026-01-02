@@ -21,16 +21,17 @@ export default defineConfig({
     }),
     critters({
       Critters: {
-        // Inline critical CSS, move rest to body (non-blocking)
-        preload: 'body', // Move CSS to end of body (non-blocking)
+        // Inline critical CSS for above-the-fold content
+        preload: 'media', // Preload non-critical CSS with media query trick
         inlineFonts: false, // Don't inline fonts (we use preload instead)
         preloadFonts: false, // Don't preload fonts (we handle it manually)
         pruneSource: true, // Remove inlined CSS from external stylesheets
+        mergeStylesheets: false, // Keep stylesheets separate for better caching
       }
     })
   ],
   build: {
-    inlineStylesheets: 'auto', // Inline small CSS files for better performance
+    inlineStylesheets: 'always', // Inline all CSS for maximum performance
   },
   i18n: {
     defaultLocale: 'hu',
