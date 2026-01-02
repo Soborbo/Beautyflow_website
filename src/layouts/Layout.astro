@@ -4,7 +4,6 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
-import GTMTracking from '../components/GTMTracking.astro';
 import { LCPTracker } from '../components/images';
 import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
 
@@ -80,19 +79,8 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={finalOgImage} />
 
-    <!-- Google Tag Manager -->
-    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-W8V3BVGD');</script>
-    <!-- End Google Tag Manager -->
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W8V3BVGD"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <Header lang={currentLang} />
     <main class="flex-grow">
       <slot />
@@ -100,7 +88,6 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
     <WhatsAppButton />
-    <GTMTracking />
     <LCPTracker />
   </body>
 </html>
