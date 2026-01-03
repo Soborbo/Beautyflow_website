@@ -478,12 +478,19 @@ const serviceSchema = {
           data-videoid="NU5avBZmB58"
           class="w-full h-full relative cursor-pointer group min-h-[300px] lg:min-h-[500px]"
         >
-          <!-- Placeholder image -->
+          <!-- Placeholder image - responsive YouTube thumbnails -->
           <img
-            src="https://i.ytimg.com/vi/NU5avBZmB58/maxresdefault.jpg"
+            srcset="
+              https://i.ytimg.com/vi/NU5avBZmB58/hqdefault.jpg 480w,
+              https://i.ytimg.com/vi/NU5avBZmB58/sddefault.jpg 640w,
+              https://i.ytimg.com/vi/NU5avBZmB58/maxresdefault.jpg 1280w
+            "
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            src="https://i.ytimg.com/vi/NU5avBZmB58/sddefault.jpg"
             alt="Lézeres szőrtelenítés videó"
             class="w-full h-full object-cover absolute inset-0"
             loading="lazy"
+            decoding="async"
           />
           <!-- Play button overlay -->
           <div class="absolute inset-0 flex items-center justify-center">

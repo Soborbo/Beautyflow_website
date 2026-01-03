@@ -239,57 +239,10 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
 </section>
 
 <script>
-  function initRatingAnimation() {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const ratingElements = document.querySelectorAll('.rating-number');
-
-    if (prefersReducedMotion) {
-      ratingElements.forEach(el => {
-        el.textContent = el.getAttribute('data-target') || '5.0';
-      });
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const el = entry.target as HTMLElement;
-          const target = parseFloat(el.getAttribute('data-target') || '5.0');
-          animateRating(el, target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    ratingElements.forEach(el => observer.observe(el));
-  }
-
-  function animateRating(element: HTMLElement, target: number) {
-    const duration = 1500;
-    const start = 1;
-    const startTime = performance.now();
-
-    function update(currentTime: number) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Easing function for smooth animation
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const current = start + (target - start) * easeOut;
-
-      element.textContent = current.toFixed(1);
-
-      if (progress < 1) {
-        requestAnimationFrame(update);
-      }
-    }
-
-    requestAnimationFrame(update);
-  }
-
-  document.addEventListener('DOMContentLoaded', initRatingAnimation);
-  document.addEventListener('astro:page-load', initRatingAnimation);
+  // Show rating immediately without animation to reduce JavaScript
+  document.querySelectorAll('.rating-number').forEach(el => {
+    el.textContent = el.getAttribute('data-target') || '5.0';
+  });
 </script>
 
 <style>
