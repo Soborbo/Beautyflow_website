@@ -58,7 +58,7 @@ async function sendAdminEmail(resend: Resend, data: ContactFormData) {
     .join(', ');
 
   await resend.emails.send({
-    from: 'Beautyflow.pro <noreply@beautyflow.pro>',
+    from: 'Beautyflow.pro <hello@beautyflow.pro>',
     to: 'erdeklodes@beautyflow.pro',
     subject: 'Új visszahíváskérés érkezett a Beautyflow.pro oldalról',
     text: `
