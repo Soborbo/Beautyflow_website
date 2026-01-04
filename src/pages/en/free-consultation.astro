@@ -791,13 +791,25 @@ const breadcrumbSchema = {
             ...trackingData,
           });
 
+          // Add tracking data to formData for Google Sheets
+          const formDataWithTracking = {
+            ...formData,
+            gclid: trackingData.gclid || '',
+            fbclid: trackingData.fbclid || '',
+            utm_source: trackingData.utm_source || '',
+            utm_medium: trackingData.utm_medium || '',
+            utm_campaign: trackingData.utm_campaign || '',
+            utm_content: trackingData.utm_content || '',
+            utm_term: trackingData.utm_term || '',
+          };
+
           try {
             const response = await fetch('/api/contact', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(formData),
+              body: JSON.stringify(formDataWithTracking),
             });
 
             const result = await response.json();

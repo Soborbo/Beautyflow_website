@@ -30,6 +30,14 @@ interface ContactFormData {
   consent: boolean;
   website: string; // honeypot
   lang?: 'hu' | 'en'; // language
+  // Tracking data
+  gclid?: string;
+  fbclid?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
 }
 
 // Validate email format
@@ -261,7 +269,18 @@ async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) 
       .map((t) => treatmentNamesHu[t] || t)
       .join(', ');
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`;
+    const langLabel = data.lang === 'en' ? 'EN' : 'HU';
+
+    // Build UTM string (combine source/medium/campaign)
+    const utmParts = [
+      data.utm_source,
+      data.utm_medium,
+      data.utm_campaign,
+    ].filter(Boolean);
+    const utmString = utmParts.length > 0 ? utmParts.join(' / ') : '';
+
+    // Extended range to include tracking columns: A:L
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:L:append?valueInputOption=USER_ENTERED`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -272,12 +291,18 @@ async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) 
       body: JSON.stringify({
         values: [
           [
-            formatTimestamp(),
-            treatmentList,
-            data.lastName,
-            data.firstName,
-            data.phone,
-            data.email,
+            formatTimestamp(),        // A: Időpont
+            treatmentList,            // B: Kezelések
+            data.lastName,            // C: Vezetéknév
+            data.firstName,           // D: Keresztnév
+            data.phone,               // E: Telefon
+            data.email,               // F: Email
+            langLabel,                // G: Nyelv
+            data.gclid || '',         // H: GCLID
+            data.fbclid || '',        // I: FBCLID
+            utmString,                // J: UTM (source/medium/campaign)
+            data.utm_content || '',   // K: UTM Content
+            data.utm_term || '',      // L: UTM Term
           ],
         ],
       }),
