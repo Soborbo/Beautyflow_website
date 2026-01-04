@@ -578,6 +578,7 @@ const breadcrumbSchema = {
           email: string;
           consent: boolean;
           website: string;
+          lang: 'hu' | 'en';
         } = {
           treatments: [],
           firstName: '',
@@ -585,7 +586,8 @@ const breadcrumbSchema = {
           phone: '',
           email: '',
           consent: false,
-          website: ''
+          website: '',
+          lang: 'hu'
         };
 
         // Elements

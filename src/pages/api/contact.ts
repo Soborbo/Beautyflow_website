@@ -1,14 +1,24 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 
-// Treatment name mapping
-const treatmentNames: Record<string, string> = {
+// Treatment name mapping - Hungarian
+const treatmentNamesHu: Record<string, string> = {
   lezer: 'Dióda Lézeres Szőrtelenítés',
   hydra: 'HydraBeauty Arckezelés',
   smink: 'Tartós Sminktetoválás',
   carbon: 'Carbon Peeling',
   tetovalas: 'Lézeres Tetoválás Eltávolítás',
   pigment: 'Pigmentfolt Eltávolítás',
+};
+
+// Treatment name mapping - English
+const treatmentNamesEn: Record<string, string> = {
+  lezer: 'Diode Laser Hair Removal',
+  hydra: 'HydraBeauty Facial Treatment',
+  smink: 'Permanent Makeup',
+  carbon: 'Carbon Peeling',
+  tetovalas: 'Laser Tattoo Removal',
+  pigment: 'Pigmentation Removal',
 };
 
 interface ContactFormData {
@@ -19,6 +29,7 @@ interface ContactFormData {
   email: string;
   consent: boolean;
   website: string; // honeypot
+  lang?: 'hu' | 'en'; // language
 }
 
 // Validate email format
@@ -51,11 +62,13 @@ function formatTimestamp(): string {
   });
 }
 
-// Send admin notification email
+// Send admin notification email (always in Hungarian for staff)
 async function sendAdminEmail(resend: Resend, data: ContactFormData) {
   const treatmentList = data.treatments
-    .map((t) => treatmentNames[t] || t)
+    .map((t) => treatmentNamesHu[t] || t)
     .join(', ');
+
+  const langLabel = data.lang === 'en' ? '🇬🇧 English' : '🇭🇺 Magyar';
 
   await resend.emails.send({
     from: 'Beautyflow.pro <hello@beautyflow.pro>',
@@ -65,6 +78,7 @@ async function sendAdminEmail(resend: Resend, data: ContactFormData) {
 Új konzultációs igény érkezett!
 
 Időpont: ${formatTimestamp()}
+Nyelv: ${langLabel}
 
 Érdeklődő adatai:
 - Név: ${data.lastName} ${data.firstName}
@@ -80,13 +94,32 @@ Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.
   });
 }
 
-// Send user confirmation email
+// Send user confirmation email (in user's language)
 async function sendUserEmail(resend: Resend, data: ContactFormData) {
-  await resend.emails.send({
-    from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
-    to: data.email,
-    subject: 'Érdeklődésed megkaptuk',
-    text: `
+  const isEnglish = data.lang === 'en';
+
+  if (isEnglish) {
+    await resend.emails.send({
+      from: 'Fanni Kónya - Beautyflow <hello@beautyflow.pro>',
+      to: data.email,
+      subject: 'We received your inquiry',
+      text: `
+Dear ${data.firstName},
+
+Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.
+
+Best regards,
+Fanni Kónya
+Founder of Beautyflow
++36 1 300 9414
+      `.trim(),
+    });
+  } else {
+    await resend.emails.send({
+      from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
+      to: data.email,
+      subject: 'Érdeklődésed megkaptuk',
+      text: `
 Kedves ${data.firstName}!
 
 Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.
@@ -95,8 +128,9 @@ Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak
 Kónya Fanni
 a Beautyflow alapítója
 +36 1 300 9414
-    `.trim(),
-  });
+      `.trim(),
+    });
+  }
 }
 
 // Base64URL encode
