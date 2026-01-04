@@ -53,7 +53,7 @@ export const routeMappings: Array<{ hu: string; en: string }> = [
   { hu: '/aszf', en: '/terms-and-conditions' },
   // Knowledge Base / Tudástár
   { hu: '/tudastar', en: '/knowledge-base' },
-  { hu: '/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell', en: '/knowledge-base/diode-laser-hair-removal-complete-guide' },
+  { hu: '/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell', en: '/knowledge-base/diode-laser-hair-removal-everything-you-need-to-know' },
 ];
 
 // Get the equivalent route in another language
