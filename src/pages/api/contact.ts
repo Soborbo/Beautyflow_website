@@ -1,14 +1,24 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 
-// Treatment name mapping
-const treatmentNames: Record<string, string> = {
+// Treatment name mapping - Hungarian
+const treatmentNamesHu: Record<string, string> = {
   lezer: 'Dióda Lézeres Szőrtelenítés',
   hydra: 'HydraBeauty Arckezelés',
   smink: 'Tartós Sminktetoválás',
   carbon: 'Carbon Peeling',
   tetovalas: 'Lézeres Tetoválás Eltávolítás',
   pigment: 'Pigmentfolt Eltávolítás',
+};
+
+// Treatment name mapping - English
+const treatmentNamesEn: Record<string, string> = {
+  lezer: 'Diode Laser Hair Removal',
+  hydra: 'HydraBeauty Facial Treatment',
+  smink: 'Permanent Makeup',
+  carbon: 'Carbon Peeling',
+  tetovalas: 'Laser Tattoo Removal',
+  pigment: 'Pigmentation Removal',
 };
 
 interface ContactFormData {
@@ -19,6 +29,7 @@ interface ContactFormData {
   email: string;
   consent: boolean;
   website: string; // honeypot
+  lang?: 'hu' | 'en'; // language
 }
 
 // Validate email format
@@ -51,20 +62,23 @@ function formatTimestamp(): string {
   });
 }
 
-// Send admin notification email
+// Send admin notification email (always in Hungarian for staff)
 async function sendAdminEmail(resend: Resend, data: ContactFormData) {
   const treatmentList = data.treatments
-    .map((t) => treatmentNames[t] || t)
+    .map((t) => treatmentNamesHu[t] || t)
     .join(', ');
 
+  const langLabel = data.lang === 'en' ? '🇬🇧 English' : '🇭🇺 Magyar';
+
   await resend.emails.send({
-    from: 'Beautyflow.pro <noreply@beautyflow.pro>',
+    from: 'Beautyflow.pro <hello@beautyflow.pro>',
     to: 'erdeklodes@beautyflow.pro',
     subject: 'Új visszahíváskérés érkezett a Beautyflow.pro oldalról',
     text: `
 Új konzultációs igény érkezett!
 
 Időpont: ${formatTimestamp()}
+Nyelv: ${langLabel}
 
 Érdeklődő adatai:
 - Név: ${data.lastName} ${data.firstName}
@@ -80,13 +94,32 @@ Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.
   });
 }
 
-// Send user confirmation email
+// Send user confirmation email (in user's language)
 async function sendUserEmail(resend: Resend, data: ContactFormData) {
-  await resend.emails.send({
-    from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
-    to: data.email,
-    subject: 'Érdeklődésed megkaptuk',
-    text: `
+  const isEnglish = data.lang === 'en';
+
+  if (isEnglish) {
+    await resend.emails.send({
+      from: 'Fanni Kónya - Beautyflow <hello@beautyflow.pro>',
+      to: data.email,
+      subject: 'We received your inquiry',
+      text: `
+Dear ${data.firstName},
+
+Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.
+
+Best regards,
+Fanni Kónya
+Founder of Beautyflow
++36 1 300 9414
+      `.trim(),
+    });
+  } else {
+    await resend.emails.send({
+      from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
+      to: data.email,
+      subject: 'Érdeklődésed megkaptuk',
+      text: `
 Kedves ${data.firstName}!
 
 Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.
@@ -95,8 +128,9 @@ Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak
 Kónya Fanni
 a Beautyflow alapítója
 +36 1 300 9414
-    `.trim(),
-  });
+      `.trim(),
+    });
+  }
 }
 
 // Base64URL encode
@@ -272,16 +306,17 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    // Get Cloudflare runtime environment - try multiple methods
+    // Get Cloudflare runtime environment
+    // In Astro 5 + @astrojs/cloudflare 12+, env vars are in locals.runtime.env
     const runtime = (locals as any).runtime;
-    const cfEnv = runtime?.env || {};
+    const env = runtime?.env || {};
 
-    // Also check context.locals directly and platform
-    const platform = (context as any).platform;
-    const platformEnv = platform?.env || {};
-
-    // Merge all possible env sources
-    const env = { ...platformEnv, ...cfEnv };
+    // Debug logging for troubleshooting
+    if (!runtime) {
+      console.error('Cloudflare runtime not available. locals keys:', Object.keys(locals));
+    } else if (!runtime.env) {
+      console.error('Cloudflare runtime.env not available. runtime keys:', Object.keys(runtime));
+    }
 
     // Honeypot check - if filled, silently succeed
     if (data.website) {
@@ -334,37 +369,89 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    // Initialize Resend - try Cloudflare env first, then fallback to import.meta.env
-    const resendApiKey = env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY;
+    // Initialize Resend - try multiple sources for API key
+    // Priority: Cloudflare runtime env > process.env > import.meta.env
+    const resendApiKey =
+      env.RESEND_API_KEY ||
+      (typeof process !== 'undefined' && process.env?.RESEND_API_KEY) ||
+      import.meta.env.RESEND_API_KEY;
+
     if (!resendApiKey) {
-      console.error('RESEND_API_KEY not configured. Cloudflare env:', Object.keys(env));
+      console.error('RESEND_API_KEY not configured.');
+      console.error('Available env keys:', Object.keys(env));
+      console.error('Runtime available:', !!runtime);
+      console.error('Runtime.env available:', !!runtime?.env);
       return new Response(
-        JSON.stringify({ success: false, error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon.' }),
+        JSON.stringify({
+          success: false,
+          error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon: +36 1 300 9414'
+        }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const resend = new Resend(resendApiKey);
 
-    // Get Google Sheets credentials from Cloudflare env
+    // Get Google Sheets credentials - try multiple sources
     const googleEnv = {
-      sheetId: env.GOOGLE_SHEETS_ID || import.meta.env.GOOGLE_SHEETS_ID,
-      serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL || import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      privateKey: env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY,
+      sheetId:
+        env.GOOGLE_SHEETS_ID ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_SHEETS_ID) ||
+        import.meta.env.GOOGLE_SHEETS_ID,
+      serviceAccountEmail:
+        env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_SERVICE_ACCOUNT_EMAIL) ||
+        import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      privateKey:
+        env.GOOGLE_PRIVATE_KEY ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_PRIVATE_KEY) ||
+        import.meta.env.GOOGLE_PRIVATE_KEY,
     };
 
     // Send emails and append to sheet in parallel
     try {
-      await Promise.all([
+      const results = await Promise.allSettled([
         sendAdminEmail(resend, data),
         sendUserEmail(resend, data),
         appendToGoogleSheet(data, googleEnv),
       ]);
+
+      // Check for email failures (first two promises)
+      const emailResults = results.slice(0, 2);
+      const failedEmails = emailResults.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      );
+
+      if (failedEmails.length > 0) {
+        const errors = failedEmails.map((r) => r.reason?.message || 'Unknown error');
+        console.error('Email sending failed:', errors);
+
+        // If both emails failed, return error
+        if (failedEmails.length === 2) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: `Email küldési hiba: ${errors[0]}`
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        // If only one failed, log but continue (partial success)
+        console.warn('Partial email failure, but continuing:', errors);
+      }
+
+      // Log Google Sheets result
+      if (results[2].status === 'rejected') {
+        console.error('Google Sheets append failed:', (results[2] as PromiseRejectedResult).reason);
+      }
     } catch (emailError) {
       console.error('Email sending error:', emailError);
       const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown email error';
       return new Response(
-        JSON.stringify({ success: false, error: `Email küldési hiba: ${errorMessage}` }),
+        JSON.stringify({
+          success: false,
+          error: `Email küldési hiba: ${errorMessage}`
+        }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }

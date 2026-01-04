@@ -210,6 +210,26 @@ export async function onRequest(context) {
     });
   }
 
-  // Continue to next handler
-  return context.next();
+  // Continue to next handler and check for 404
+  const response = await context.next();
+
+  // If it's a 404 and the path starts with /en/, serve the English 404 page
+  if (response.status === 404 && pathname.startsWith('/en/')) {
+    try {
+      const en404Url = new URL('/en/404', url.origin);
+      const en404Response = await context.env.ASSETS.fetch(en404Url);
+      if (en404Response.ok) {
+        return new Response(en404Response.body, {
+          status: 404,
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+          },
+        });
+      }
+    } catch (e) {
+      // Fall back to default 404
+    }
+  }
+
+  return response;
 }
