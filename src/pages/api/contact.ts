@@ -258,7 +258,7 @@ async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) 
     const accessToken = await getGoogleAccessToken(serviceAccountEmail, privateKey);
 
     const treatmentList = data.treatments
-      .map((t) => treatmentNames[t] || t)
+      .map((t) => treatmentNamesHu[t] || t)
       .join(', ');
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`;
