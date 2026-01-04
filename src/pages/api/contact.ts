@@ -272,16 +272,17 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    // Get Cloudflare runtime environment - try multiple methods
+    // Get Cloudflare runtime environment
+    // In Astro 5 + @astrojs/cloudflare 12+, env vars are in locals.runtime.env
     const runtime = (locals as any).runtime;
-    const cfEnv = runtime?.env || {};
+    const env = runtime?.env || {};
 
-    // Also check context.locals directly and platform
-    const platform = (context as any).platform;
-    const platformEnv = platform?.env || {};
-
-    // Merge all possible env sources
-    const env = { ...platformEnv, ...cfEnv };
+    // Debug logging for troubleshooting
+    if (!runtime) {
+      console.error('Cloudflare runtime not available. locals keys:', Object.keys(locals));
+    } else if (!runtime.env) {
+      console.error('Cloudflare runtime.env not available. runtime keys:', Object.keys(runtime));
+    }
 
     // Honeypot check - if filled, silently succeed
     if (data.website) {
@@ -334,37 +335,89 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    // Initialize Resend - try Cloudflare env first, then fallback to import.meta.env
-    const resendApiKey = env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY;
+    // Initialize Resend - try multiple sources for API key
+    // Priority: Cloudflare runtime env > process.env > import.meta.env
+    const resendApiKey =
+      env.RESEND_API_KEY ||
+      (typeof process !== 'undefined' && process.env?.RESEND_API_KEY) ||
+      import.meta.env.RESEND_API_KEY;
+
     if (!resendApiKey) {
-      console.error('RESEND_API_KEY not configured. Cloudflare env:', Object.keys(env));
+      console.error('RESEND_API_KEY not configured.');
+      console.error('Available env keys:', Object.keys(env));
+      console.error('Runtime available:', !!runtime);
+      console.error('Runtime.env available:', !!runtime?.env);
       return new Response(
-        JSON.stringify({ success: false, error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon.' }),
+        JSON.stringify({
+          success: false,
+          error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon: +36 1 300 9414'
+        }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const resend = new Resend(resendApiKey);
 
-    // Get Google Sheets credentials from Cloudflare env
+    // Get Google Sheets credentials - try multiple sources
     const googleEnv = {
-      sheetId: env.GOOGLE_SHEETS_ID || import.meta.env.GOOGLE_SHEETS_ID,
-      serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL || import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      privateKey: env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY,
+      sheetId:
+        env.GOOGLE_SHEETS_ID ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_SHEETS_ID) ||
+        import.meta.env.GOOGLE_SHEETS_ID,
+      serviceAccountEmail:
+        env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_SERVICE_ACCOUNT_EMAIL) ||
+        import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      privateKey:
+        env.GOOGLE_PRIVATE_KEY ||
+        (typeof process !== 'undefined' && process.env?.GOOGLE_PRIVATE_KEY) ||
+        import.meta.env.GOOGLE_PRIVATE_KEY,
     };
 
     // Send emails and append to sheet in parallel
     try {
-      await Promise.all([
+      const results = await Promise.allSettled([
         sendAdminEmail(resend, data),
         sendUserEmail(resend, data),
         appendToGoogleSheet(data, googleEnv),
       ]);
+
+      // Check for email failures (first two promises)
+      const emailResults = results.slice(0, 2);
+      const failedEmails = emailResults.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      );
+
+      if (failedEmails.length > 0) {
+        const errors = failedEmails.map((r) => r.reason?.message || 'Unknown error');
+        console.error('Email sending failed:', errors);
+
+        // If both emails failed, return error
+        if (failedEmails.length === 2) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: `Email küldési hiba: ${errors[0]}`
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        // If only one failed, log but continue (partial success)
+        console.warn('Partial email failure, but continuing:', errors);
+      }
+
+      // Log Google Sheets result
+      if (results[2].status === 'rejected') {
+        console.error('Google Sheets append failed:', (results[2] as PromiseRejectedResult).reason);
+      }
     } catch (emailError) {
       console.error('Email sending error:', emailError);
       const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown email error';
       return new Response(
-        JSON.stringify({ success: false, error: `Email küldési hiba: ${errorMessage}` }),
+        JSON.stringify({
+          success: false,
+          error: `Email küldési hiba: ${errorMessage}`
+        }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
