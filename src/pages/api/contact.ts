@@ -141,9 +141,56 @@ a Beautyflow alapítója
   }
 }
 
-// Base64URL encode
+// Custom base64 encoding (Cloudflare Workers compatible - no btoa)
+function bytesToBase64(bytes: Uint8Array): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let result = '';
+  const len = bytes.length;
+  for (let i = 0; i < len; i += 3) {
+    const b1 = bytes[i];
+    const b2 = i + 1 < len ? bytes[i + 1] : 0;
+    const b3 = i + 2 < len ? bytes[i + 2] : 0;
+    result += chars[b1 >> 2];
+    result += chars[((b1 & 3) << 4) | (b2 >> 4)];
+    result += i + 1 < len ? chars[((b2 & 15) << 2) | (b3 >> 6)] : '=';
+    result += i + 2 < len ? chars[b3 & 63] : '=';
+  }
+  return result;
+}
+
+// Custom base64 decoding (Cloudflare Workers compatible - no atob)
+function base64ToBytes(base64: string): Uint8Array {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const lookup = new Uint8Array(256);
+  for (let i = 0; i < chars.length; i++) {
+    lookup[chars.charCodeAt(i)] = i;
+  }
+
+  // Remove padding
+  let len = base64.length;
+  if (base64[len - 1] === '=') len--;
+  if (base64[len - 1] === '=') len--;
+
+  const bytes = new Uint8Array((len * 3) >> 2);
+  let p = 0;
+
+  for (let i = 0; i < len; i += 4) {
+    const c1 = lookup[base64.charCodeAt(i)];
+    const c2 = lookup[base64.charCodeAt(i + 1)];
+    const c3 = i + 2 < len ? lookup[base64.charCodeAt(i + 2)] : 0;
+    const c4 = i + 3 < len ? lookup[base64.charCodeAt(i + 3)] : 0;
+
+    bytes[p++] = (c1 << 2) | (c2 >> 4);
+    if (i + 2 < len) bytes[p++] = ((c2 & 15) << 4) | (c3 >> 2);
+    if (i + 3 < len) bytes[p++] = ((c3 & 3) << 6) | c4;
+  }
+
+  return bytes;
+}
+
+// Base64URL encode (Cloudflare Workers compatible - no btoa)
 function base64UrlEncode(str: string): string {
-  const base64 = btoa(str);
+  const base64 = bytesToBase64(new TextEncoder().encode(str));
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
@@ -171,12 +218,8 @@ async function importPrivateKey(pemKey: string): Promise<CryptoKey> {
     .replace(/-----END PRIVATE KEY-----/, '')
     .replace(/[\s\r\n]/g, '');
 
-  // Decode base64
-  const binaryString = atob(pemContents);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
+  // Decode base64 (Cloudflare Workers compatible - no atob)
+  const bytes = base64ToBytes(pemContents);
 
   return await crypto.subtle.importKey(
     'pkcs8',

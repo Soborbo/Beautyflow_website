@@ -11,6 +11,7 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/sitemap": "^3.6.0",
+    "@leadgen/conversion-tracking": "file:packages/conversion-tracking",
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^5.16.4",
     "astro-critters": "^2.2.1",

@@ -32,7 +32,7 @@ const RATE_LIMIT_MAX = 10; // max 10 requests per minute per IP
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
-  const key = `beacon:${ip}`;
+  const keyPrefix = `beacon:${ip}:`;
 
   // Clean old entries
   for (const [k, v] of recentRequests) {
@@ -41,15 +41,17 @@ function isRateLimited(ip: string): boolean {
     }
   }
 
-  const count = [...recentRequests.entries()]
-    .filter(([k]) => k.startsWith(`beacon:${ip}:`))
+  // Count requests from this IP within the window
+  const count = [...recentRequests.keys()]
+    .filter((k) => k.startsWith(keyPrefix))
     .length;
 
   if (count >= RATE_LIMIT_MAX) {
     return true;
   }
 
-  recentRequests.set(`${key}:${now}`, now);
+  // Store with unique key (IP + timestamp)
+  recentRequests.set(`${keyPrefix}${now}`, now);
   return false;
 }
 

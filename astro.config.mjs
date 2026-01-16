@@ -4,12 +4,21 @@ import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import critters from 'astro-critters';
 import sitemap from '@astrojs/sitemap';
+import tracking from '@leadgen/conversion-tracking';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://beautyflow.pro',
   output: 'server',
   integrations: [
+    tracking({
+      // GTM ID optional - Zaraz handles server-side tracking via Cloudflare
+      // gtmId: 'GTM-XXXXXXX', // Uncomment if you want client-side GTM as well
+      currency: 'HUF',
+      sessionTimeoutMinutes: 30,
+      debug: import.meta.env.DEV, // Debug overlay in dev mode
+      enableOfflineQueue: true,
+    }),
     sitemap({
       i18n: {
         defaultLocale: 'hu',

@@ -507,25 +507,29 @@ const breadcrumbSchema = {
 
     <script>
       import {
-        persistTrackingParams,
-        trackFullConversion,
-        getAllTrackingData,
-        hasMarketingConsent,
-        onConsentChange,
-        pushStepEvent,
-      } from '../../lib/tracking';
+        trackConversion,
+        getFirstTouch,
+        getLastTouch,
+        getGclid,
+        getFbclid,
+        pushCalculatorStep,
+      } from '@leadgen/conversion-tracking/client';
 
-      // Initialize tracking on page load
-      function initTracking() {
-        onConsentChange((consent) => {
-          if (consent.marketing) {
-            persistTrackingParams();
-          }
-        });
+      // Tracking is auto-initialized by the Astro integration
 
-        if (hasMarketingConsent()) {
-          persistTrackingParams();
-        }
+      // Helper to get all tracking data for beacon/forms
+      function getAllTrackingData() {
+        const first = getFirstTouch();
+        const last = getLastTouch();
+        return {
+          gclid: getGclid(),
+          fbclid: getFbclid(),
+          utm_source: last?.utm_source || first?.utm_source || '',
+          utm_medium: last?.utm_medium || first?.utm_medium || '',
+          utm_campaign: last?.utm_campaign || first?.utm_campaign || '',
+          utm_content: last?.utm_content || first?.utm_content || '',
+          utm_term: last?.utm_term || first?.utm_term || '',
+        };
       }
 
       // Send tracking beacon (guaranteed delivery)
@@ -562,8 +566,7 @@ const breadcrumbSchema = {
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        // Initialize tracking
-        initTracking();
+        // Tracking is auto-initialized by Astro integration
 
         let currentStep = 1;
 
@@ -643,7 +646,7 @@ const breadcrumbSchema = {
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
-            pushStepEvent('treatments', 1);
+            pushCalculatorStep(1, 'treatments');
             showStep(2);
           }
         });
@@ -667,7 +670,7 @@ const breadcrumbSchema = {
 
         btnStep2.addEventListener('click', () => {
           if (formData.firstName.length >= 2 && formData.lastName.length >= 2) {
-            pushStepEvent('name', 2);
+            pushCalculatorStep(2, 'name');
             showStep(3);
           }
         });
@@ -691,7 +694,7 @@ const breadcrumbSchema = {
 
         btnStep3.addEventListener('click', () => {
           if (validatePhone(formData.phone)) {
-            pushStepEvent('phone', 3);
+            pushCalculatorStep(3, 'phone');
             showStep(4);
           }
         });
@@ -767,15 +770,13 @@ const breadcrumbSchema = {
           const transactionId = generateTransactionId();
 
           // Track conversion (GTM + Zaraz) - consent-aware
-          const trackingResult = trackFullConversion({
+          const trackingResult = trackConversion('contact_form', {
             email: formData.email,
             phone: formData.phone,
             firstName: formData.firstName,
             lastName: formData.lastName,
             value: 5000, // Lead value in HUF
             currency: 'HUF',
-            transactionId,
-            contentName: 'Free Consultation',
           });
 
           // Get all tracking data for beacon
@@ -787,7 +788,7 @@ const breadcrumbSchema = {
             phone: formData.phone,
             transactionId,
             gclid: trackingResult.gclid,
-            fbclid: trackingResult.fbclid,
+            fbclid: trackingData.fbclid,
             ...trackingData,
           });
 
