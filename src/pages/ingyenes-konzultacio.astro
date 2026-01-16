@@ -101,6 +101,8 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
+    <!-- CookieYes banner (consent defaults & GTM are injected by Astro before this) -->
+    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />
@@ -112,8 +114,6 @@ const breadcrumbSchema = {
     <link rel="alternate" hreflang="x-default" href={`https://beautyflow.pro${huUrl}`} />
     <script type="application/ld+json" set:html={JSON.stringify(contactSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
-    <!-- CookieYes banner (must load AFTER consent defaults and GTM injected by Astro integration) -->
-    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
   </head>
   <body class="bg-[#fdf8f6] min-h-[100dvh] md:h-screen md:overflow-hidden">
     <main class="min-h-[100dvh] md:h-full py-4 md:py-0">
