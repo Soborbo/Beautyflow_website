@@ -42,9 +42,10 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
 
         // STEP 1: Google Consent Mode v2 - Default consent state
         // CRITICAL: Must be in SEPARATE script tag, runs FIRST before any other scripts
+        // Per CookieYes docs: https://www.cookieyes.com/documentation/implementing-google-consent-mode-using-cookieyes/
         injectScript(
           'head-inline',
-          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','analytics_storage':'denied','functionality_storage':'denied','personalization_storage':'denied','security_storage':'granted','wait_for_update':500});`
+          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','analytics_storage':'denied','functionality_storage':'denied','personalization_storage':'denied','security_storage':'granted','wait_for_update':2000});gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);`
         );
 
         // STEP 2: Tracking config (separate script tag)
