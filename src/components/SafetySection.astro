@@ -1,0 +1,95 @@
+---
+import { ContentImage } from './images';
+import safetyImage from '../assets/images/beautyflow-kezeles.jpg';
+import friendsImage from '../assets/images/beautyflow-csapat.jpg';
+import { type Locale, defaultLang } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    safety: {
+      title: 'Legyél mindig biztonságban',
+      description: 'A mesterséges intelligenciával segített, csúcstechnikát képviselő gépeink és munkatársaink sokéves tapasztalata garantálja, hogy nálunk minden kezelés során biztonságban érezheted magad.',
+      imageAlt: 'Beautyflow kezelés',
+    },
+    friends: {
+      title: 'Érezd magad barátok között',
+      description: 'Hisszük, hogy a szépség belülről fakad, ezért számunkra ugyanolyan fontos a kezelésed fizikai hatékonysága mellett az is, hogy jól érezd magad nálunk. A Beautyflow szépségszalonban a tested mellett a lelked is feltöltődik.',
+      imageAlt: 'Beautyflow csapat',
+    },
+  },
+  en: {
+    safety: {
+      title: 'Always be safe',
+      description: 'Our AI-assisted, state-of-the-art equipment and our staff\'s years of experience guarantee that you will feel safe during every treatment with us.',
+      imageAlt: 'Beautyflow treatment',
+    },
+    friends: {
+      title: 'Feel at home among friends',
+      description: 'We believe that beauty comes from within, so the physical effectiveness of your treatment is just as important to us as making you feel comfortable. At Beautyflow beauty salon, both your body and soul will be recharged.',
+      imageAlt: 'Beautyflow team',
+    },
+  },
+};
+
+const t = content[lang];
+---
+
+<!-- Safety Section - Content Left, Image Right -->
+<section>
+  <div class="flex flex-col lg:flex-row">
+    <!-- Content - 50% width with same padding as other sections -->
+    <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16 order-2 lg:order-1">
+      <div class="w-full px-[10%] text-center lg:text-left">
+        <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 uppercase">
+          {t.safety.title}
+        </h2>
+
+        <p class="text-gray-600">
+          {t.safety.description}
+        </p>
+      </div>
+    </div>
+
+    <!-- Image - 50% width -->
+    <div class="w-full lg:w-1/2 order-1 lg:order-2">
+      <ContentImage
+        src={safetyImage}
+        alt={t.safety.imageAlt}
+        class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
+      />
+    </div>
+  </div>
+</section>
+
+<!-- Friends Section - Image Left, Content Right -->
+<section>
+  <div class="flex flex-col lg:flex-row">
+    <!-- Image - 50% width -->
+    <div class="w-full lg:w-1/2">
+      <ContentImage
+        src={friendsImage}
+        alt={t.friends.imageAlt}
+        class="w-full h-64 lg:h-full object-cover aspect-[4/3]"
+      />
+    </div>
+
+    <!-- Content - 50% width with same padding as other sections -->
+    <div class="w-full lg:w-1/2 flex items-center py-12 lg:py-16">
+      <div class="w-full px-[10%] text-center lg:text-left">
+        <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 uppercase">
+          {t.friends.title}
+        </h2>
+
+        <p class="text-gray-600">
+          {t.friends.description}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

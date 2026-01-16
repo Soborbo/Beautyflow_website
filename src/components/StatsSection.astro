@@ -1,0 +1,91 @@
+---
+const stats = [
+  {
+    icon: '/images/szepsegszalon-virag.jpg',
+    target: 10,
+    suffix: '+ év',
+    label: 'tapasztalat'
+  },
+  {
+    icon: '/images/szepsegszalon-ruzs.jpg',
+    target: 10000,
+    suffix: '+',
+    label: 'elvégzett kezelés'
+  },
+  {
+    icon: '/images/szepsegszalon-trofea.jpg',
+    target: 10,
+    suffix: '',
+    label: 'csúcskategóriás gép'
+  },
+  {
+    icon: '/images/szepsegszalon-ugyfelvelemeny.jpg',
+    target: 1500,
+    suffix: '+',
+    label: 'elégedett vendég'
+  }
+];
+---
+
+<section class="py-12 bg-[#fff9f7]">
+  <div class="max-w-[996px] mx-auto px-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+      {stats.map((stat, index) => (
+        <div class="text-center">
+          <img
+            src={stat.icon}
+            alt={stat.label}
+            class="w-[60px] h-[60px] mx-auto mb-2 object-contain"
+          />
+          <p class="text-2xl lg:text-3xl font-heading text-gray-900 font-bold leading-none mb-1">
+            <span class="counter" data-target={stat.target} data-suffix={stat.suffix} data-index={index}>0</span>{stat.suffix}
+          </p>
+          <p class="text-gray-600 text-xs">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  function animateCounters() {
+    const counters = document.querySelectorAll('.counter');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target as HTMLElement;
+          const target = parseInt(counter.dataset.target || '0');
+          const suffix = counter.dataset.suffix || '';
+          const duration = 2000;
+          const startTime = performance.now();
+
+          function updateCounter(currentTime: number) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(easeOut * target);
+
+            if (target >= 1000) {
+              counter.textContent = current.toLocaleString('hu-HU').replace(/\s/g, ' ');
+            } else {
+              counter.textContent = current.toString();
+            }
+
+            if (progress < 1) {
+              requestAnimationFrame(updateCounter);
+            }
+          }
+
+          requestAnimationFrame(updateCounter);
+          observer.unobserve(counter);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => observer.observe(counter));
+  }
+
+  document.addEventListener('DOMContentLoaded', animateCounters);
+  document.addEventListener('astro:page-load', animateCounters);
+</script>

@@ -1,0 +1,110 @@
+---
+import { ContentImage } from './images';
+import consultationImage from '../assets/images/konya-fanni-konzultacio.webp';
+import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const content = {
+  hu: {
+    imageAlt: 'Kónya Fanni konzultáció',
+    role: 'ügyvezető',
+    title: 'Igényeld az ingyenes<br />konzultációdat!',
+    intro: 'Beszéljünk, mielőtt belevágsz bármilyen kezelésbe!',
+    description: 'Az ingyenes konzultáció során megbeszéljük a számodra legmegfelelőbb kezelést és válaszolunk minden kérdésedre.',
+    benefits: [
+      'Felmérjük a bőröd állapotát és igényeidet',
+      'Megbeszéljük a lehetőségeket és az árakat',
+      'Kiválasztjuk a számodra ideális kezelést',
+      'Válaszolunk minden kérdésedre',
+    ],
+    phoneIntro: 'Kérd az ingyenes konzultációt telefonon az alábbi számon',
+    or: 'vagy',
+    cta: 'Ingyenes konzultációt kérek',
+  },
+  en: {
+    imageAlt: 'Kónya Fanni consultation',
+    role: 'CEO',
+    title: 'Request your free<br />consultation!',
+    intro: "Let's talk before you start any treatment!",
+    description: 'During the free consultation, we discuss the most suitable treatment for you and answer all your questions.',
+    benefits: [
+      'We assess your skin condition and needs',
+      'We discuss options and prices',
+      'We select the ideal treatment for you',
+      'We answer all your questions',
+    ],
+    phoneIntro: 'Request a free consultation by phone',
+    or: 'or',
+    cta: 'Request Free Consultation',
+  },
+};
+
+const t = content[lang];
+const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
+---
+
+<section class="py-12 bg-[#c53f75]">
+  <div class="container mx-auto px-4">
+    <div class="bg-white overflow-hidden max-w-[768px] mx-auto">
+      <div class="flex flex-col lg:flex-row">
+        <!-- Image Column - 50% width -->
+        <div class="lg:w-1/2 relative">
+          <ContentImage
+            src={consultationImage}
+            alt={t.imageAlt}
+            class="w-full h-full object-cover object-top"
+          />
+          <!-- Name overlay on image -->
+          <div class="absolute bottom-6 left-0 right-0 text-center">
+            <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
+              Kónya Fanni<br />
+              <span class="text-sm text-gray-500 font-normal">{t.role}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Content Column - 50% width -->
+        <div class="lg:w-1/2 p-6 lg:p-8 flex flex-col justify-center">
+          <h2 class="font-heading text-xl lg:text-2xl text-gray-900 mb-4 uppercase leading-tight font-bold text-center" set:html={t.title} />
+
+          <p class="text-gray-700 mb-2 text-sm">
+            <span class="font-semibold">{t.intro}</span>
+          </p>
+          <p class="text-gray-600 mb-3 text-sm">
+            {t.description}
+          </p>
+
+          <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
+            {t.benefits.map((benefit) => (
+              <li>{benefit}</li>
+            ))}
+          </ul>
+
+          <div class="text-center">
+            <p class="text-gray-600 mb-1 text-sm">
+              {t.phoneIntro}
+            </p>
+            <a
+              href="tel:+3613009414"
+              class="text-xl text-[#c53f75] font-bold hover:underline block mb-1"
+            >
+              +36 1 300 9414
+            </a>
+            <p class="text-gray-500 mb-3 text-sm">{t.or}</p>
+            <a
+              href={consultationPath}
+              class="inline-block px-6 py-2 bg-[#c53f75] text-white font-semibold uppercase text-xs tracking-wide hover:bg-[#a33460] transition-colors rounded-full"
+            >
+              {t.cta}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

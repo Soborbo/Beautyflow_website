@@ -1,0 +1,104 @@
+---
+/**
+ * ResponsiveBackground - Optimalizált háttérkép komponens
+ *
+ * Megoldja a duplikált mobile/desktop háttérkép problémát:
+ * - Egy Picture elem, CSS-el pozicionálva
+ * - AVIF/WebP formátumok automatikusan
+ * - Responsive widths a megfelelő méretű kép betöltéséhez
+ *
+ * Használat:
+ * <ResponsiveBackground
+ *   src={bgImage}
+ *   alt="Háttér leírása"
+ *   position="center"
+ *   mobileHeight="h-64"
+ * />
+ */
+
+import { Picture } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** CSS object-position érték (pl. "center", "center 30%", "top") */
+  position?: string;
+  /** Mobile magasság Tailwind class-ként (pl. "h-64", "h-48") */
+  mobileHeight?: string;
+  /** Desktop-on a kép a szekció teljes magasságát kitölti */
+  class?: string;
+  /** Overlay gradient (pl. "from-[#e8e4e1] via-[#e8e4e1]/95 to-transparent") */
+  overlayGradient?: string;
+  /** Overlay irány (pl. "to-r", "to-b") */
+  overlayDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b';
+}
+
+const {
+  src,
+  alt,
+  position = 'center',
+  mobileHeight = 'h-64',
+  class: className = '',
+  overlayGradient,
+  overlayDirection = 'to-r',
+} = Astro.props;
+
+const gradientClass = overlayGradient
+  ? `bg-gradient-${overlayDirection} ${overlayGradient}`
+  : '';
+---
+
+<div class:list={['responsive-background', className]}>
+  <!-- Kép - egyszer betöltve, CSS-el pozicionálva mobile/desktop-on -->
+  <Picture
+    src={src}
+    alt={alt}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    widths={[640, 828, 1200, 1600, 2000]}
+    sizes="100vw"
+    class="responsive-bg-image"
+    loading="lazy"
+    decoding="async"
+  />
+
+  <!-- Opcionális overlay gradient -->
+  {overlayGradient && (
+    <div class:list={['responsive-bg-overlay', gradientClass]} />
+  )}
+</div>
+
+<style define:vars={{ position, mobileHeight }}>
+  .responsive-background {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .responsive-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--position);
+  }
+
+  /* Mobile: fix magasság a szekción belül */
+  @media (max-width: 1023px) {
+    .responsive-background {
+      position: relative;
+      height: var(--mobileHeight);
+    }
+  }
+
+  /* Desktop: absolute positioned, teljes magasság */
+  @media (min-width: 1024px) {
+    .responsive-background {
+      position: absolute;
+    }
+  }
+
+  .responsive-bg-overlay {
+    position: absolute;
+    inset: 0;
+  }
+</style>

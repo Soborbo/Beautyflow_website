@@ -1,0 +1,68 @@
+// @ts-check
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
+import tailwindcss from '@tailwindcss/vite';
+import critters from 'astro-critters';
+import sitemap from '@astrojs/sitemap';
+import tracking from '@leadgen/conversion-tracking';
+
+// https://astro.build/config
+export default defineConfig({
+  site: 'https://beautyflow.pro',
+  output: 'server',
+  integrations: [
+    tracking({
+      // GTM ID optional - Zaraz handles server-side tracking via Cloudflare
+      // gtmId: 'GTM-XXXXXXX', // Uncomment if you want client-side GTM as well
+      currency: 'HUF',
+      sessionTimeoutMinutes: 30,
+      debug: import.meta.env.DEV, // Debug overlay in dev mode
+      enableOfflineQueue: true,
+    }),
+    sitemap({
+      i18n: {
+        defaultLocale: 'hu',
+        locales: {
+          hu: 'hu',
+          en: 'en',
+        },
+      },
+    }),
+    critters({
+      Critters: {
+        // Inline critical CSS for above-the-fold content
+        preload: 'media', // Preload non-critical CSS with media query trick
+        inlineFonts: false, // Don't inline fonts (we use preload instead)
+        preloadFonts: false, // Don't preload fonts (we handle it manually)
+        pruneSource: true, // Remove inlined CSS from external stylesheets
+        mergeStylesheets: false, // Keep stylesheets separate for better caching
+      }
+    })
+  ],
+  build: {
+    inlineStylesheets: 'always', // Inline all CSS for maximum performance
+  },
+  i18n: {
+    defaultLocale: 'hu',
+    locales: ['hu', 'en'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  },
+  adapter: cloudflare({
+    imageService: 'compile',
+    routes: {
+      strategy: 'include',
+      include: ['/*'],
+      exclude: ['/_astro/*', '/images/*', '/favicon.svg']
+    }
+  }),
+  image: {
+    // With imageService: 'compile', images are processed at build time
+    // No need for sharp service - Cloudflare adapter handles it
+    domains: [],
+  },
+  vite: {
+    plugins: [tailwindcss()]
+  }
+});

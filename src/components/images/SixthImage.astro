@@ -1,0 +1,33 @@
+---
+/**
+ * SixthImage - SIXTH pattern (16vw)
+ * Use: 6-column logo grids, partner logos, small thumbnails
+ * Pattern: 16vw desktop, 33vw tablet, 50vw mobile
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+}
+
+const { src, alt, class: className } = Astro.props;
+
+// SIXTH pattern from astro-images skill
+const widths = [128, 256, 427, 512, 640];
+const sizes = '(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw';
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={['avif', 'webp', 'jpg']}
+  quality={60}
+  class={className}
+  loading="lazy"
+  decoding="async"
+/>

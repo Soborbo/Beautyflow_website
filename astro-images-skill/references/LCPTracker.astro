@@ -1,0 +1,18 @@
+---
+/**
+ * LCPTracker - Development-only warning for multiple priority images
+ * Add once per page layout to enforce single LCP rule
+ */
+---
+
+<script>
+  if (import.meta.env.DEV) {
+    const priorityImages = document.querySelectorAll('img[fetchpriority="high"]');
+    if (priorityImages.length > 1) {
+      console.error(
+        `[astro-images] LCP violation: ${priorityImages.length} images have fetchpriority="high". Only ONE allowed per page.`,
+        Array.from(priorityImages)
+      );
+    }
+  }
+</script>

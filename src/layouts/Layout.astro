@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { LCPTracker } from '../components/images';
+import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: Locale;
+  translationOf?: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+const currentLang = Astro.props.lang || getLangFromUrl(Astro.url);
+const t = useTranslations(currentLang);
+
+const defaultDescription = t('meta.defaultDescription');
+const siteName = t('meta.siteName');
+
+const { title, description = defaultDescription, translationOf, noindex = false, ogImage } = Astro.props;
+const defaultOgImage = 'https://beautyflow.pro/images/beautyflow-fb.jpg';
+const finalOgImage = ogImage ? `https://beautyflow.pro${ogImage}` : defaultOgImage;
+
+const ogLocale = currentLang === 'hu' ? 'hu_HU' : 'en_US';
+const currentUrl = Astro.url.pathname;
+
+// Generate proper hreflang URLs using route mappings
+const pathWithoutLang = currentUrl.replace(/^\/(en)/, '') || '/';
+const huUrl = getAlternateRoute(pathWithoutLang, currentLang, 'hu');
+const enUrl = getAlternateRoute(pathWithoutLang, currentLang, 'en');
+const canonicalUrl = `https://beautyflow.pro${currentUrl}`;
+const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
+---
+
+<!DOCTYPE html>
+<html lang={currentLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
+    <title>{title}</title>
+
+    <!--
+      Font preloading: Cormorant Variable for headings
+      Body uses system fonts (no download needed)
+      Variable font contains all weights (300-700) in one file
+    -->
+    <link rel="preload" href="/fonts/cormorant-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/cormorant-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Alternate language links for SEO -->
+    <link rel="alternate" hreflang="hu" href={`https://beautyflow.pro${huUrl}`} />
+    <link rel="alternate" hreflang="en" href={`https://beautyflow.pro${enUrl}`} />
+    <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={currentLang === 'hu' ? 'en_US' : 'hu_HU'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:image" content={finalOgImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={finalOgImage} />
+  </head>
+  <body class="min-h-screen flex flex-col overflow-x-hidden">
+    <Header lang={currentLang} />
+    <main class="flex-grow">
+      <slot />
+    </main>
+    <Footer lang={currentLang} />
+    <StickyMobileCTA lang={currentLang} />
+    <WhatsAppButton />
+    <LCPTracker />
+  </body>
+</html>

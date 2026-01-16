@@ -1,0 +1,482 @@
+---
+export const prerender = true;
+
+import { getImage } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import ContentImage from '../../components/images/ContentImage.astro';
+import LocationsSection from '../../components/LocationsSection.astro';
+import MilestonesCarousel from '../../components/MilestonesCarousel.astro';
+import { type Locale, getLocalizedPath } from '../../i18n';
+
+const lang: Locale = 'en';
+
+// Image imports
+import beautyflowDijak from '../../assets/images/beautyflow-dijak.webp';
+import konyaFanniSq from '../../assets/images/Konya-Fanni-sq.jpg';
+import fodorInez from '../../assets/images/fodor-inez.jpg';
+import nagyPiroska from '../../assets/images/Nagy-Piroska.jpg';
+import desvariLiliRozi from '../../assets/images/Desvari-Lili-Rozi.jpg';
+import trexlerJanka from '../../assets/images/trexler-janka-kozmetikus.jpg';
+import vargaAndrea from '../../assets/images/Varga-Andrea.jpg';
+import barnaNiki from '../../assets/images/Barna-niki-beautyflow.jpg';
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Beautyflow Beauty Salon",
+  "url": "https://beautyflow.pro/en/",
+  "logo": "https://beautyflow.pro/images/Beautyflow-favicon.png",
+  "description": "Award-winning beauty salon in Budapest. Laser hair removal, permanent makeup, facial treatments.",
+  "foundingDate": "2014",
+  "founder": {
+    "@type": "Person",
+    "name": "Kónya Fanni"
+  },
+  "numberOfEmployees": "7",
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Vegyész utca 1.",
+      "addressLocality": "Budapest",
+      "postalCode": "1116",
+      "addressCountry": "HU"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "Reitter Ferenc utca 90.",
+      "addressLocality": "Budapest",
+      "postalCode": "1135",
+      "addressCountry": "HU"
+    }
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+36 1 300 9414",
+    "contactType": "customer service",
+    "availableLanguage": ["Hungarian", "English"]
+  },
+  "sameAs": [
+    "https://www.instagram.com/beautyflow.pro/",
+    "https://www.facebook.com/beautyflow.pro/"
+  ]
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://beautyflow.pro/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "About Us",
+      "item": "https://beautyflow.pro/en/about"
+    }
+  ]
+};
+
+const milestones = [
+  { year: 'Feb 2015', event: "Fanni's journey in the beauty industry begins" },
+  { year: 'Oct 2017', event: 'First permanent makeup training completed' },
+  { year: 'Feb 2018', event: 'Certified beauty consultant with excellent results' },
+  { year: 'Aug 2019', event: 'Became an eyebrow stylist and eyelash extension instructor' },
+  { year: 'Jan 2020', event: 'Became a cosmetician with top grades, learned permanent makeup removal' },
+  { year: '2021', event: 'During COVID, focused exclusively on training: PMU ART School lip and eyelid permanent makeup, sugar paste depilation' },
+  { year: '2022', event: 'Purchased first electro-cosmetic device, diode laser hair removal machine' },
+  { year: '2023', event: 'Second diode laser machine acquired, conscious move towards electro-cosmetics' },
+  { year: '2024', event: 'Beautyflow Buda opens' },
+  { year: '2024', event: 'Entrepreneur of the Year Award', isAward: true },
+  { year: '2024', event: 'Became Notino Partner', isAward: true },
+  { year: 'Mar 2025', event: 'Salon of the Month Award', isAward: true },
+  { year: '2025', event: 'Entrepreneur of the Year Award', isAward: true },
+  { year: '2025', event: 'Expanding with Nd:YAG laser and HydraBeauty machine' },
+  { year: '2026', event: 'New services: BioPen Q2, seaweed exfoliation, diamond dermabrasion, electrolysis hair removal' }
+];
+
+const teamMembers = [
+  {
+    name: 'Fanni Kónya',
+    role: 'Owner, Lead Cosmetician',
+    image: konyaFanniSq,
+    description: 'The founder and soul of Beautyflow. Fanni has over 10 years of experience in the beauty industry and performs almost all treatments at the salon. She also handles phone consultations – if you have questions, feel free to call!',
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Permanent Makeup', url: '/permanent-makeup' },
+      { name: 'Tattoo Removal', url: '/tattoo-removal' },
+      { name: 'Pigment Removal', url: '/pigment-removal' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+    ]
+  },
+  {
+    name: 'Inez Vivien Fodor',
+    role: 'Cosmetician',
+    image: fodorInez,
+    description: "I focus on details, not the clock. I've been doing diode laser hair removal for years, and I've learned one thing for sure: good results take time. With me, there's no rushing. Every treatment is tailored to your skin – whether it's laser, Hydrabeauty, or carbon peeling.",
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+    ]
+  },
+  {
+    name: 'Piroska Nagy',
+    role: 'Cosmetician',
+    image: nagyPiroska,
+    description: "Cosmetician since 2016. Precision isn't optional for me – it's fundamental. I started in Gyöngyös, continued in Budapest. Multiple cities, multiple salons, thousands of treatments – and I learned something from each. Currently specializing in diode laser hair removal.",
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' }
+    ]
+  },
+  {
+    name: 'Lili Rozi Désvári',
+    role: 'Cosmetician',
+    image: desvariLiliRozi,
+    description: "I'm available on Sundays in Buda – and constantly improving. As a member of the Beautyflow team, I regularly train myself because the beauty industry doesn't stop, and neither do I. I offer diode laser hair removal, Hydrabeauty, and carbon peeling – always with the latest knowledge.",
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+    ]
+  },
+  {
+    name: 'Janka Trexler',
+    role: 'Cosmetician',
+    image: trexlerJanka,
+    description: "I learned the profession at Sisi. The good mood I brought from myself. Being a cosmetician means I can help. Not just with your skin, but also to help you recharge from everyday life. Carbon peeling, Hydrabeauty, diode laser – whichever you choose, one thing's certain: you'll leave with a smile.",
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+    ]
+  },
+  {
+    name: 'Andrea Varga',
+    role: 'Cosmetician, Permanent Makeup Artist',
+    image: vargaAndrea,
+    description: "Cosmetician and permanent makeup artist – I believe in details. I've been working in the beauty industry for years, and one thing hasn't changed: I treat every guest individually. Literally. Carbon peeling, laser, Hydrabeauty, pigment removal, or permanent makeup removal – I always tailor the treatment to the specific skin and needs.",
+    treatments: [
+      { name: 'Carbon Peeling', url: '/carbon-peeling' },
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Hydrabeauty', url: '/hydrabeauty' },
+      { name: 'Pigment Removal', url: '/pigment-removal' },
+      { name: 'Permanent Makeup Removal', url: '/tattoo-removal' }
+    ]
+  },
+  {
+    name: 'Nikolett Barna',
+    role: 'Cosmetician',
+    image: barnaNiki,
+    description: "I'm the newest member of the team – but I don't fall behind in enthusiasm. I do diode laser hair removal and carbon peeling, and I love chatting during treatments. Time flies with me because it's not just treatment, it's connection. If you're a bit nervous before your first visit, don't be. I'm direct and I pay attention to you.",
+    treatments: [
+      { name: 'Diode Laser Hair Removal', url: '/laser-hair-removal' },
+      { name: 'Carbon Peeling', url: '/carbon-peeling' }
+    ]
+  }
+];
+
+const values = [
+  {
+    icon: 'heart',
+    title: 'Care',
+    description: "We treat every guest with individual attention and care. You're not just a number or an appointment here."
+  },
+  {
+    icon: 'star',
+    title: 'Quality',
+    description: 'We only work with the best equipment and products. We continuously train ourselves to apply the most modern techniques.'
+  },
+  {
+    icon: 'shield',
+    title: 'Safety',
+    description: 'We meet all hygiene standards and do everything to make you feel safe.'
+  }
+];
+
+const t = {
+  pageTitle: 'About Us - Beautyflow Beauty Salon Budapest',
+  pageDescription: 'Meet the Beautyflow team, our story and values. Award-winning beauty salon in Budapest where the guest always comes first.',
+  heroTitle: 'The Beautyflow Team',
+  heroSubtitle: 'Meet the professionals who take care of you! Our team is committed to quality and personalized service.',
+  storyTitle: 'Our Story',
+  storyP1: 'Beautyflow was founded in 2014 by Fanni Kónya, with the goal of creating a beauty salon where every guest receives genuine care and professional service.',
+  storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
+  storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
+  storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
+  milestonesTitle: 'Milestones',
+  teamTitle: 'Meet Our Team',
+  valuesTitle: 'Our Values',
+  ctaTitle: "Let's meet in person!",
+  ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
+  ctaButton: 'Request Free Consultation',
+};
+
+const consultationPath = getLocalizedPath('/free-consultation', lang);
+
+// Pre-generate team member images with 1x, 2x versions and full-size for lightbox
+const teamMemberImages = await Promise.all(
+  teamMembers.map(async (member) => {
+    if (member.image) {
+      const img1x = await getImage({ src: member.image, width: 128, height: 128, format: 'webp', quality: 60 });
+      const img2x = await getImage({ src: member.image, width: 256, height: 256, format: 'webp', quality: 60 });
+      const imgFull = await getImage({ src: member.image, width: 800, height: 800, format: 'webp', quality: 85 });
+      return { name: member.name, img1x, img2x, imgFull };
+    }
+    return { name: member.name, img1x: null, img2x: null, imgFull: null };
+  })
+);
+---
+
+<Layout title={t.pageTitle} description={t.pageDescription} lang={lang}>
+  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="py-16 lg:py-20 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
+    <div class="max-w-[1100px] mx-auto px-4 text-center">
+      <h1 class="font-heading text-4xl lg:text-5xl text-gray-900 mb-4">
+        {t.heroTitle}
+      </h1>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        {t.heroSubtitle}
+      </p>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section class="py-16 lg:py-20 bg-white">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+        <div class="order-2 lg:order-1">
+          <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-6">
+            {t.storyTitle}
+          </h2>
+          <div class="space-y-4 text-gray-600">
+            <p>{t.storyP1}</p>
+            <p>{t.storyP2}</p>
+            <p>{t.storyP3}</p>
+          </div>
+        </div>
+        <div class="order-1 lg:order-2">
+          <ContentImage
+            src={beautyflowDijak}
+            alt={t.storyImageAlt}
+            class="w-full rounded-2xl shadow-lg"
+            priority={true}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline Section - Horizontal Scroll Carousel -->
+  <MilestonesCarousel milestones={milestones} title={t.milestonesTitle} />
+
+  <!-- Team Section -->
+  <section class="py-16 lg:py-20 bg-gradient-to-br from-[#fdf8f6] via-[#fef5f2] to-[#fff9f7]">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4">
+          {t.teamTitle}
+        </h2>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {teamMembers.map((member, index) => {
+          const memberImg = teamMemberImages[index];
+          return (
+          <div class="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow flex flex-col">
+            <!-- Image or Initials -->
+            <div class="flex justify-center pt-6">
+              {memberImg.img1x && memberImg.img2x && memberImg.imgFull ? (
+                <button
+                  type="button"
+                  class="team-image-trigger cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#c53f75] focus:ring-offset-2 rounded-full transition-transform hover:scale-105"
+                  data-fullsrc={memberImg.imgFull.src}
+                  data-name={member.name}
+                  aria-label={`View ${member.name}'s photo`}
+                >
+                  <img
+                    src={memberImg.img1x.src}
+                    srcset={`${memberImg.img1x.src} 1x, ${memberImg.img2x.src} 2x`}
+                    alt={member.name}
+                    class="w-32 h-32 rounded-full object-cover shadow-md"
+                    width="128"
+                    height="128"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </button>
+              ) : (
+                <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">
+                  <span class="font-heading text-3xl text-[#c53f75]">{member.name.split(' ').map(n => n[0]).join('')}</span>
+                </div>
+              )}
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 flex flex-col flex-1">
+              <h3 class="font-heading text-xl text-gray-900 mb-1 text-center">{member.name}</h3>
+              <p class="text-[#c53f75] text-sm font-medium mb-3 text-center">{member.role}</p>
+              <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-1 text-left">{member.description}</p>
+
+              <!-- Treatments as buttons -->
+              <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-auto">
+                {member.treatments.map((treatment) => (
+                  <a
+                    href={getLocalizedPath(treatment.url, lang)}
+                    class="inline-block px-4 py-2 text-xs text-[#c53f75] bg-[#c53f75]/10 rounded-full hover:bg-[#c53f75]/20 transition-colors"
+                  >
+                    {treatment.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )})}
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="py-16 lg:py-20 bg-gradient-to-b from-[#fdf8f6] to-white">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="font-heading text-3xl lg:text-4xl text-gray-900">
+          {t.valuesTitle}
+        </h2>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-3">
+        {values.map((value) => (
+          <div class="text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-[#c53f75]/10 rounded-full flex items-center justify-center text-[#c53f75]">
+              {value.icon === 'heart' && (
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              )}
+              {value.icon === 'star' && (
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              )}
+              {value.icon === 'shield' && (
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              )}
+            </div>
+            <h3 class="font-heading text-xl text-gray-900 mb-3">{value.title}</h3>
+            <p class="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">{value.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 lg:py-20 bg-[#c53f75]">
+    <div class="max-w-[900px] mx-auto px-4 text-center">
+      <p class="font-heading text-3xl lg:text-4xl text-white mb-6">
+        {t.ctaTitle}
+      </p>
+      <p class="text-white/80 mb-8 max-w-xl mx-auto">
+        {t.ctaSubtitle}
+      </p>
+      <div class="flex justify-center">
+        <a
+          href={consultationPath}
+          class="inline-block px-8 py-4 bg-white text-[#c53f75] font-bold uppercase text-sm rounded-full shadow-lg hover:bg-gray-100 transition-all"
+        >
+          {t.ctaButton}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Locations Section -->
+  <LocationsSection lang={lang} />
+
+  <!-- Image Lightbox Modal -->
+  <div id="image-lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+    <button
+      type="button"
+      id="lightbox-close"
+      class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+      aria-label="Close"
+    >
+      <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="relative max-w-2xl w-full">
+      <img
+        id="lightbox-image"
+        src=""
+        alt=""
+        class="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl"
+      />
+      <p id="lightbox-title" class="text-white text-center mt-4 text-xl font-heading"></p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const lightbox = document.getElementById('image-lightbox');
+      const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+      const lightboxTitle = document.getElementById('lightbox-title');
+      const lightboxClose = document.getElementById('lightbox-close');
+      const triggers = document.querySelectorAll('.team-image-trigger');
+
+      if (!lightbox || !lightboxImage || !lightboxTitle || !lightboxClose) return;
+
+      // Open lightbox
+      triggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const fullSrc = trigger.getAttribute('data-fullsrc');
+          const name = trigger.getAttribute('data-name');
+
+          if (fullSrc && name) {
+            lightboxImage.src = fullSrc;
+            lightboxImage.alt = name;
+            lightboxTitle.textContent = name;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+      });
+
+      // Close lightbox
+      const closeLightbox = () => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+      };
+
+      lightboxClose.addEventListener('click', closeLightbox);
+
+      // Close on background click
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+          closeLightbox();
+        }
+      });
+    });
+  </script>
+
+</Layout>
