@@ -52,25 +52,17 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           `
           : '';
 
-        // Inject head scripts
+        // Inject head scripts (escape </script> to prevent injection)
         injectScript(
           'head-inline',
-          `
-          // @leadgen/conversion-tracking - dataLayer init
-          window.dataLayer = window.dataLayer || [];
-
-          // @leadgen/conversion-tracking - config
-          // Escape </script> to prevent script injection attacks
-          window.__TRACKING_CONFIG__ = ${JSON.stringify({
+          `window.dataLayer=window.dataLayer||[];window.__TRACKING_CONFIG__=${JSON.stringify({
             gtmId: config.gtmId || '',
             currency: config.currency,
             sessionTimeoutMinutes: config.sessionTimeoutMinutes,
             debug: config.debug,
             linkedDomains: config.linkedDomains,
             enableOfflineQueue: config.enableOfflineQueue,
-          }).replace(/</g, '\\u003c')};
-          ${gtmScript}
-          `.trim()
+          }).replace(/</g, '\\u003c')};${gtmScript}`
         );
 
         // Inject init script
