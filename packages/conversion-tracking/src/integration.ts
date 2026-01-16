@@ -40,46 +40,34 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           logger.info('Configuring tracking without GTM (Zaraz-only mode)');
         }
 
-        // GTM script injection (only if gtmId provided)
-        const gtmScript = config.gtmId
-          ? `
-          // @leadgen/conversion-tracking - GTM
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${config.gtmId}');
-          `
-          : '';
-
-        // Google Consent Mode v2 - Default consent state (must be set before GTM loads)
-        const consentDefaults = `
-          window.dataLayer=window.dataLayer||[];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('consent','default',{
-            'ad_storage':'denied',
-            'ad_user_data':'denied',
-            'ad_personalization':'denied',
-            'analytics_storage':'denied',
-            'functionality_storage':'denied',
-            'personalization_storage':'denied',
-            'security_storage':'granted',
-            'wait_for_update':500
-          });
-        `;
-
-        // Inject head scripts (escape </script> to prevent injection)
+        // STEP 1: Google Consent Mode v2 - Default consent state
+        // CRITICAL: Must be in SEPARATE script tag, runs FIRST before any other scripts
+        // Per CookieYes docs: https://www.cookieyes.com/documentation/implementing-google-consent-mode-using-cookieyes/
         injectScript(
           'head-inline',
-          `${consentDefaults}window.__TRACKING_CONFIG__=${JSON.stringify({
+          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','analytics_storage':'denied','functionality_storage':'denied','personalization_storage':'denied','security_storage':'granted','wait_for_update':2000});gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);`
+        );
+
+        // STEP 2: Tracking config (separate script tag)
+        injectScript(
+          'head-inline',
+          `window.__TRACKING_CONFIG__=${JSON.stringify({
             gtmId: config.gtmId || '',
             currency: config.currency,
             sessionTimeoutMinutes: config.sessionTimeoutMinutes,
             debug: config.debug,
             linkedDomains: config.linkedDomains,
             enableOfflineQueue: config.enableOfflineQueue,
-          }).replace(/</g, '\\u003c')};${gtmScript}`
+          }).replace(/</g, '\\u003c')};`
         );
+
+        // STEP 3: GTM script (separate script tag, AFTER consent defaults)
+        if (config.gtmId) {
+          injectScript(
+            'head-inline',
+            `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${config.gtmId}');`
+          );
+        }
 
         // Inject init script
         injectScript('page', 'import "@leadgen/conversion-tracking/init";');
