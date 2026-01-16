@@ -40,6 +40,8 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
+    <!-- CookieYes banner (consent defaults & GTM are injected by Astro before this) -->
+    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -75,9 +77,6 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={finalOgImage} />
-
-    <!-- CookieYes banner (must load AFTER consent defaults and GTM) -->
-    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
     <Header lang={currentLang} />
