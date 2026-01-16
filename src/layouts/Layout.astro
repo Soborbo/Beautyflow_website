@@ -40,8 +40,9 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <!-- CookieYes banner (consent defaults & GTM are injected by Astro before this) -->
+    <!-- 1. CookieYes FIRST - it sets consent defaults automatically when "Run before banner loads" is enabled -->
     <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
+    <!-- GTM is loaded by Astro integration, proxied through Google Tag Gateway -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />

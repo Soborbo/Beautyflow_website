@@ -40,18 +40,14 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           logger.info('Configuring tracking without GTM (Zaraz-only mode)');
         }
 
-        // STEP 1: Google Consent Mode v2 - Default consent state
-        // CRITICAL: Must be in SEPARATE script tag, runs FIRST before any other scripts
-        // Per CookieYes docs: https://www.cookieyes.com/documentation/implementing-google-consent-mode-using-cookieyes/
-        injectScript(
-          'head-inline',
-          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','analytics_storage':'denied','functionality_storage':'denied','personalization_storage':'denied','security_storage':'granted','wait_for_update':2000});gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);`
-        );
+        // NOTE: Consent defaults are handled by CookieYes with "Run before banner loads" enabled
+        // CookieYes automatically injects gtag('consent', 'default', {...}) before any scripts
+        // See: https://www.cookieyes.com/documentation/implementing-google-consent-mode-using-cookieyes/
 
-        // STEP 2: Tracking config (separate script tag)
+        // Tracking config
         injectScript(
           'head-inline',
-          `window.__TRACKING_CONFIG__=${JSON.stringify({
+          `window.dataLayer=window.dataLayer||[];window.__TRACKING_CONFIG__=${JSON.stringify({
             gtmId: config.gtmId || '',
             currency: config.currency,
             sessionTimeoutMinutes: config.sessionTimeoutMinutes,
@@ -61,7 +57,7 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           }).replace(/</g, '\\u003c')};`
         );
 
-        // STEP 3: GTM script (separate script tag, AFTER consent defaults)
+        // GTM script injection (only if gtmId provided)
         if (config.gtmId) {
           injectScript(
             'head-inline',
