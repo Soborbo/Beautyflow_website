@@ -40,8 +40,10 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           logger.info('Configuring tracking without GTM (Zaraz-only mode)');
         }
 
-        // NOTE: Consent defaults are in HTML templates (Layout.astro, consultation pages)
-        // They must be BEFORE CookieYes script to work correctly
+        // Google Consent Mode v2 - Advanced Mode script order:
+        // 1. Consent defaults (inline script in Layout.astro <head>)
+        // 2. GTM (this integration, head-inline)
+        // 3. CookieYes (updates consent based on user choice)
 
         // Tracking config
         injectScript(
