@@ -37,7 +37,8 @@
       "Bash(brew install:*)",
       "Bash(mkdir:*)",
       "Bash(git remote set-url:*)",
-      "Bash(npx astro build:*)"
+      "Bash(npx astro build:*)",
+      "Bash(git show:*)"
     ]
   }
 }

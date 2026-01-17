@@ -1,7 +1,9 @@
 /**
  * @leadgen/conversion-tracking - Astro Integration
  *
- * Auto-injects GTM and tracking initialization.
+ * Injects tracking config and init script.
+ * NOTE: GTM is loaded manually in Layout.astro (after CookieYes).
+ * This integration does NOT inject GTM to avoid race conditions.
  */
 
 import type { AstroIntegration } from 'astro';
@@ -15,15 +17,7 @@ const DEFAULT_CONFIG: Omit<ResolvedTrackingConfig, 'gtmId'> = {
   enableOfflineQueue: true,
 };
 
-function validateConfig(config: TrackingConfig): void {
-  if (config.gtmId && !config.gtmId.startsWith('GTM-')) {
-    console.warn(`[@leadgen/conversion-tracking] gtmId should start with "GTM-". Got: "${config.gtmId}"`);
-  }
-}
-
 export default function trackingIntegration(userConfig: TrackingConfig): AstroIntegration {
-  validateConfig(userConfig);
-
   const config: ResolvedTrackingConfig = {
     ...DEFAULT_CONFIG,
     ...userConfig,
@@ -34,22 +28,17 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
 
     hooks: {
       'astro:config:setup': ({ injectScript, logger }) => {
-        if (config.gtmId) {
-          logger.info(`Configuring tracking with GTM ID: ${config.gtmId}`);
-        } else {
-          logger.info('Configuring tracking without GTM (Zaraz-only mode)');
-        }
+        logger.info('Configuring tracking (GTM loaded manually in Layout.astro)');
 
-        // Google Consent Mode v2 - Advanced Mode script order:
-        // 1. Consent defaults (inline script in Layout.astro <head>)
-        // 2. GTM (this integration, head-inline)
-        // 3. CookieYes (updates consent based on user choice)
+        // Google Consent Mode v2 - Script order in Layout.astro:
+        // 1. CookieYes (FIRST - handles consent defaults via "Run before banner loads")
+        // 2. GTM (manual script in Layout.astro, proxied by Google Tag Gateway)
+        // 3. This integration only injects config + init script
 
-        // Tracking config
+        // Tracking config (dataLayer init + config object)
         injectScript(
           'head-inline',
           `window.dataLayer=window.dataLayer||[];window.__TRACKING_CONFIG__=${JSON.stringify({
-            gtmId: config.gtmId || '',
             currency: config.currency,
             sessionTimeoutMinutes: config.sessionTimeoutMinutes,
             debug: config.debug,
@@ -57,14 +46,6 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
             enableOfflineQueue: config.enableOfflineQueue,
           }).replace(/</g, '\\u003c')};`
         );
-
-        // GTM script injection (only if gtmId provided)
-        if (config.gtmId) {
-          injectScript(
-            'head-inline',
-            `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${config.gtmId}');`
-          );
-        }
 
         // Inject init script
         injectScript('page', 'import "@leadgen/conversion-tracking/init";');
@@ -76,7 +57,6 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
 
       'astro:build:done': ({ logger }) => {
         logger.info('Tracking integration build complete');
-        logger.info(`GTM ID: ${config.gtmId}`);
         logger.info(`Currency: ${config.currency}`);
         logger.info(`Session timeout: ${config.sessionTimeoutMinutes} minutes`);
       },
