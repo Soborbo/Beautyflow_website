@@ -101,16 +101,8 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
-    <!-- 1. CookieYes MUST be FIRST - handles consent defaults via "Run before banner loads" -->
-    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
-    <!-- 2. GTM - ONLY after CookieYes (Google Tag Gateway proxies this) -->
-    <script is:inline>
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-W8V3BVGD');
-    </script>
+    <!-- CookieYes loaded via GTM (CookieYes CMP tag with consent defaults) -->
+    <!-- GTM loaded by Cloudflare Tag Gateway (injected at edge level) -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />
