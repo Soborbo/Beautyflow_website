@@ -101,9 +101,9 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- 1. CookieYes FIRST - it sets consent defaults automatically when "Run before banner loads" is enabled -->
+    <!-- CookieYes sets consent defaults via "Run before banner loads" in dashboard -->
     <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/dadaccaebea652a6453d3041/script.js"></script>
-    <!-- GTM is loaded by Astro integration, proxied through Google Tag Gateway -->
+    <!-- GTM loaded by Astro integration (after CookieYes) -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Request a free consultation at Beautyflow beauty salon. Personalized advice on laser hair removal, facial treatments, and permanent makeup." />

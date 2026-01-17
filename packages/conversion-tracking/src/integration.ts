@@ -40,17 +40,13 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           logger.info('Configuring tracking without GTM (Zaraz-only mode)');
         }
 
-        // Google Consent Mode v2 - Default consent (denied until user accepts)
-        // This MUST run before GTM loads
-        injectScript(
-          'head-inline',
-          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','analytics_storage':'denied','functionality_storage':'denied','personalization_storage':'denied','security_storage':'granted','wait_for_update':2000});gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);`
-        );
+        // NOTE: Consent defaults are in HTML templates (Layout.astro, consultation pages)
+        // They must be BEFORE CookieYes script to work correctly
 
         // Tracking config
         injectScript(
           'head-inline',
-          `window.__TRACKING_CONFIG__=${JSON.stringify({
+          `window.dataLayer=window.dataLayer||[];window.__TRACKING_CONFIG__=${JSON.stringify({
             gtmId: config.gtmId || '',
             currency: config.currency,
             sessionTimeoutMinutes: config.sessionTimeoutMinutes,
