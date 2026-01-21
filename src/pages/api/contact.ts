@@ -194,14 +194,11 @@ function base64UrlEncode(str: string): string {
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-// Base64URL encode ArrayBuffer
+// Base64URL encode ArrayBuffer (directly encode bytes, don't go through string)
 function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return base64UrlEncode(binary);
+  const base64 = bytesToBase64(bytes);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 // Convert PEM to CryptoKey
