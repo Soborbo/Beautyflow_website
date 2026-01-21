@@ -297,67 +297,70 @@ interface GoogleEnv {
   privateKey?: string;
 }
 
-async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv) {
+async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv): Promise<void> {
   const { sheetId, serviceAccountEmail, privateKey } = googleEnv;
 
+  // Throw error if credentials are missing - don't silently skip!
   if (!sheetId || !serviceAccountEmail || !privateKey) {
-    console.warn('Google Sheets credentials not configured');
-    return;
+    const missing = [];
+    if (!sheetId) missing.push('GOOGLE_SHEETS_ID');
+    if (!serviceAccountEmail) missing.push('GOOGLE_SERVICE_ACCOUNT_EMAIL');
+    if (!privateKey) missing.push('GOOGLE_PRIVATE_KEY');
+    throw new Error(`Google Sheets credentials missing: ${missing.join(', ')}`);
   }
 
-  try {
-    const accessToken = await getGoogleAccessToken(serviceAccountEmail, privateKey);
+  // Don't catch errors here - let them propagate to Promise.allSettled
+  const accessToken = await getGoogleAccessToken(serviceAccountEmail, privateKey);
 
-    const treatmentList = data.treatments
-      .map((t) => treatmentNamesHu[t] || t)
-      .join(', ');
+  const treatmentList = data.treatments
+    .map((t) => treatmentNamesHu[t] || t)
+    .join(', ');
 
-    const langLabel = data.lang === 'en' ? 'EN' : 'HU';
+  const langLabel = data.lang === 'en' ? 'EN' : 'HU';
 
-    // Build UTM string (combine source/medium/campaign)
-    const utmParts = [
-      data.utm_source,
-      data.utm_medium,
-      data.utm_campaign,
-    ].filter(Boolean);
-    const utmString = utmParts.length > 0 ? utmParts.join(' / ') : '';
+  // Build UTM string (combine source/medium/campaign)
+  const utmParts = [
+    data.utm_source,
+    data.utm_medium,
+    data.utm_campaign,
+  ].filter(Boolean);
+  const utmString = utmParts.length > 0 ? utmParts.join(' / ') : '';
 
-    // Extended range to include tracking columns: A:L
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:L:append?valueInputOption=USER_ENTERED`;
+  // Extended range to include tracking columns: A:L
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:L:append?valueInputOption=USER_ENTERED`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        values: [
-          [
-            formatTimestamp(),        // A: Időpont
-            treatmentList,            // B: Kezelések
-            data.lastName,            // C: Vezetéknév
-            data.firstName,           // D: Keresztnév
-            data.phone,               // E: Telefon
-            data.email,               // F: Email
-            langLabel,                // G: Nyelv
-            data.gclid || '',         // H: GCLID
-            data.fbclid || '',        // I: FBCLID
-            utmString,                // J: UTM (source/medium/campaign)
-            data.utm_content || '',   // K: UTM Content
-            data.utm_term || '',      // L: UTM Term
-          ],
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      values: [
+        [
+          formatTimestamp(),        // A: Időpont
+          treatmentList,            // B: Kezelések
+          data.lastName,            // C: Vezetéknév
+          data.firstName,           // D: Keresztnév
+          data.phone,               // E: Telefon
+          data.email,               // F: Email
+          langLabel,                // G: Nyelv
+          data.gclid || '',         // H: GCLID
+          data.fbclid || '',        // I: FBCLID
+          utmString,                // J: UTM (source/medium/campaign)
+          data.utm_content || '',   // K: UTM Content
+          data.utm_term || '',      // L: UTM Term
         ],
-      }),
-    });
+      ],
+    }),
+  });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Sheets API error: ${error}`);
-    }
-  } catch (error) {
-    console.error('Failed to append to Google Sheet:', error);
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Sheets API error: ${error}`);
   }
+
+  console.log('Successfully appended lead to Google Sheet');
 }
 
 export const POST: APIRoute = async (context) => {
@@ -508,9 +511,20 @@ export const POST: APIRoute = async (context) => {
         console.warn('Partial email failure, but continuing:', errors);
       }
 
-      // Log Google Sheets result
+      // Log Google Sheets result - CRITICAL: This is where leads were being lost silently!
       if (results[2].status === 'rejected') {
-        console.error('Google Sheets append failed:', (results[2] as PromiseRejectedResult).reason);
+        const sheetError = (results[2] as PromiseRejectedResult).reason;
+        console.error('🚨 CRITICAL: Google Sheets append FAILED - Lead NOT saved to sheet!');
+        console.error('Lead data that was NOT saved:', {
+          name: `${data.lastName} ${data.firstName}`,
+          email: data.email,
+          phone: data.phone,
+          treatments: data.treatments,
+          timestamp: formatTimestamp(),
+        });
+        console.error('Error details:', sheetError?.message || sheetError);
+      } else {
+        console.log('✅ Lead successfully saved to Google Sheets');
       }
     } catch (emailError) {
       console.error('Email sending error:', emailError);
