@@ -67,10 +67,8 @@ notifyPageView(window.location.pathname);
 
 // Re-initialize on Astro View Transitions
 document.addEventListener('astro:page-load', () => {
-  // Re-capture params (URL may have new UTMs)
-  if (hasMarketingConsent()) {
-    captureAttributionParams();
-  }
+  // Always re-capture attribution params — gclid/utm may be in the new URL
+  captureAttributionParams();
   // Track page view for remarketing
   trackPageView();
   // Notify plugins
@@ -78,9 +76,8 @@ document.addEventListener('astro:page-load', () => {
 });
 
 document.addEventListener('astro:after-swap', () => {
-  if (hasMarketingConsent()) {
-    captureAttributionParams();
-  }
+  // Always re-capture — don't gate on consent, or gclid will be lost
+  captureAttributionParams();
 });
 
 export { initTracking };

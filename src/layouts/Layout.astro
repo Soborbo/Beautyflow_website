@@ -42,6 +42,23 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
   <head>
     <!-- CookieYes loaded via GTM (CookieYes CMP tag with consent defaults) -->
     <!-- GTM loaded by Cloudflare Tag Gateway (injected at edge level) -->
+    <!--
+      WARNING: If Cloudflare Tag Gateway is not injecting GTM, no conversion
+      tags will fire. To add a client-side fallback, replace GTM-XXXXXXX with
+      your real GTM ID and uncomment the gtmId in astro.config.mjs.
+    -->
+    <script is:inline>
+      // Detect if GTM was injected by Cloudflare Tag Gateway
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var gtmFound = document.querySelector('script[src*="googletagmanager.com/gtm.js"]') ||
+                         document.querySelector('script[src*="gtm-"]');
+          if (!gtmFound && window.location.hostname !== 'localhost') {
+            console.warn('[Beautyflow] GTM not detected — Cloudflare Tag Gateway may not be active. Google Ads conversions will NOT fire.');
+          }
+        }, 3000);
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
