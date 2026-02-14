@@ -64,24 +64,21 @@ export interface FullConversionResult {
 
 /**
  * Full conversion tracking (GTM + Zaraz together)
- * Automatically checks consent!
+ * Always pushes to dataLayer — GTM's Consent Mode handles ad_storage gating.
+ * Blocking the push here was preventing conversions from ever reaching Google Ads.
  */
 export function trackFullConversion(params: FullConversionParams): FullConversionResult {
   const gclid = getGclid();
   const fbclid = getFbclid();
+  const hasConsent = hasMarketingConsent();
 
-  // Consent check
-  if (!hasMarketingConsent()) {
-    console.info('[Tracking] Marketing consent not granted, skipping conversion tracking');
-    return {
-      success: false,
-      gclid,
-      fbclid,
-      consentBlocked: true,
-    };
+  if (!hasConsent) {
+    console.info('[Tracking] Marketing consent not granted — GTM Consent Mode will gate ad tags');
   }
 
-  // Google Ads Enhanced Conversions
+  // Always push to dataLayer. GTM's built-in consent settings (consentStatus: NEEDED
+  // for ad_storage) will handle whether the Google Ads tag actually fires.
+  // Blocking the push here meant conversions were silently dropped.
   pushConversion({
     email: params.email,
     phone: params.phone,
@@ -93,7 +90,7 @@ export function trackFullConversion(params: FullConversionParams): FullConversio
     gclid: gclid || undefined,
   });
 
-  // Meta CAPI
+  // Meta CAPI (server-side, consent handled by Zaraz)
   trackMetaLead({
     email: params.email,
     phone: params.phone,
@@ -106,6 +103,6 @@ export function trackFullConversion(params: FullConversionParams): FullConversio
     success: true,
     gclid,
     fbclid,
-    consentBlocked: false,
+    consentBlocked: !hasConsent,
   };
 }

@@ -6,6 +6,7 @@ import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { LCPTracker } from '../components/images';
 import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
+import GTMNoScript from '@leadgen/conversion-tracking/components/GTMNoScript.astro';
 
 interface Props {
   title: string;
@@ -40,8 +41,16 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <!-- CookieYes loaded via GTM (CookieYes CMP tag with consent defaults) -->
-    <!-- GTM loaded by Cloudflare Tag Gateway (injected at edge level) -->
+    <!-- Google Tag Manager (GTM-W8V3BVGD) -->
+    <!-- CookieYes CMP + Consent Mode v2 handled inside GTM -->
+    <script is:inline>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-W8V3BVGD');
+    </script>
+    <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -79,6 +88,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta name="twitter:image" content={finalOgImage} />
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
+    <GTMNoScript gtmId="GTM-W8V3BVGD" />
     <Header lang={currentLang} />
     <main class="flex-grow">
       <slot />

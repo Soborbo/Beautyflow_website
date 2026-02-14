@@ -12,8 +12,7 @@ export default defineConfig({
   output: 'server',
   integrations: [
     tracking({
-      // GTM ID optional - Zaraz handles server-side tracking via Cloudflare
-      // gtmId: 'GTM-XXXXXXX', // Uncomment if you want client-side GTM as well
+      gtmId: 'GTM-W8V3BVGD',
       currency: 'HUF',
       sessionTimeoutMinutes: 30,
       debug: import.meta.env.DEV, // Debug overlay in dev mode

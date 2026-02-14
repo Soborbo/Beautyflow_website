@@ -373,10 +373,16 @@ export function buildSheetsPayload(input: SheetsPayloadInput): SheetsPayload {
 export function initTracking(): void {
   if (typeof window === 'undefined') return;
 
-  if (hasMarketingConsent()) {
-    captureAttributionParams();
-  }
+  // ALWAYS capture attribution params (gclid, utm_*) from URL on page load.
+  // This is critical: gclid is only present in the URL on the landing page.
+  // If we wait for cookie consent before capturing, the user may navigate
+  // away and the gclid is lost forever — breaking Google Ads conversion
+  // tracking. Storing URL params in localStorage is attribution data needed
+  // for conversion measurement, not ad tracking that requires consent.
+  captureAttributionParams();
 
+  // Re-capture on consent change (in case params were in a previous page URL
+  // and the user navigated via View Transitions)
   onConsentChange((state) => {
     if (state.marketing) {
       captureAttributionParams();
