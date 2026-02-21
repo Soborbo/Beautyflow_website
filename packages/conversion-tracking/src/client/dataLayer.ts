@@ -56,9 +56,11 @@ function pushEvent(eventName: string, params: Record<string, unknown> = {}): voi
 // =============================================================================
 
 export function pushPhoneClick(value?: number, currency?: string): void {
+  const attribution = buildAttributionForDataLayer();
   pushEvent(EVENT_NAMES.PHONE_CLICK, {
     value: value || 0,
     currency: currency || getSiteCurrency(),
+    ...attribution,
   });
 }
 

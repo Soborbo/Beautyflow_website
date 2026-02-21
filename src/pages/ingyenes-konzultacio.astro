@@ -514,6 +514,7 @@ const breadcrumbSchema = {
         getLastTouch,
         getGclid,
         getFbclid,
+        pushCalculatorStart,
         pushCalculatorStep,
       } from '@leadgen/conversion-tracking/client';
 
@@ -569,6 +570,7 @@ const breadcrumbSchema = {
 
       document.addEventListener('DOMContentLoaded', () => {
         // Tracking is auto-initialized by Astro integration
+        pushCalculatorStart();
 
         let currentStep = 1;
 
