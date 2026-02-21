@@ -2,6 +2,7 @@
 import { ContentImage } from './images';
 import consultationImage from '../assets/images/konya-fanni-konzultacio.webp';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
+import PhoneLink from '@leadgen/conversion-tracking/components/PhoneLink.astro';
 
 interface Props {
   lang?: Locale;
@@ -89,12 +90,12 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
             <p class="text-gray-600 mb-1 text-sm">
               {t.phoneIntro}
             </p>
-            <a
-              href="tel:+3613009414"
+            <PhoneLink
+              phone="+3613009414"
               class="text-xl text-[#c53f75] font-bold hover:underline block mb-1"
             >
               +36 1 300 9414
-            </a>
+            </PhoneLink>
             <p class="text-gray-500 mb-3 text-sm">{t.or}</p>
             <a
               href={consultationPath}

@@ -12,6 +12,7 @@ import carbonImg from '../../assets/images/carbon-peeling-lezeres.jpg';
 import tetovalasImg from '../../assets/images/tetovalas-eltavolitas-budapest.jpg';
 import pigmentImg from '../../assets/images/pigmentfolt-eltavoitas.webp';
 import googleLogo from '../../assets/images/google-logo.jpg';
+import PhoneLink from '@leadgen/conversion-tracking/components/PhoneLink.astro';
 
 // Optimize images - 1x and 2x for retina displays, webp for broad support
 // Card size is ~150-200px on mobile, ~180px on desktop, so 200px 1x + 400px 2x covers all cases
@@ -421,7 +422,7 @@ const breadcrumbSchema = {
                 We will contact you soon at the provided details.
               </p>
               <p class="text-gray-500 text-sm mb-4">
-                For urgent matters, you can also reach us at <a href="tel:+3613009414" class="text-[#c53f75] font-semibold">+36 1 300 9414</a>.
+                For urgent matters, you can also reach us at <PhoneLink phone="+3613009414" class="text-[#c53f75] font-semibold">+36 1 300 9414</PhoneLink>.
               </p>
               <a
                 href="/en/"
