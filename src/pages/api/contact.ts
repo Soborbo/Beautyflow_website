@@ -77,15 +77,20 @@ async function sendAdminEmail(resend: Resend, data: ContactFormData) {
     .join(', ');
 
   const langLabel = data.lang === 'en' ? '🇬🇧 English' : '🇭🇺 Magyar';
+  const timestamp = formatTimestamp();
 
   await resend.emails.send({
-    from: 'Beautyflow.pro <hello@beautyflow.pro>',
+    from: 'Beautyflow <hello@beautyflow.pro>',
+    replyTo: data.email,
     to: 'erdeklodes@beautyflow.pro',
-    subject: 'Új visszahíváskérés érkezett a Beautyflow.pro oldalról',
+    subject: `Konzultáció - ${data.lastName} ${data.firstName}`,
+    headers: {
+      'X-Entity-Ref-ID': `admin-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    },
     text: `
 Új konzultációs igény érkezett!
 
-Időpont: ${formatTimestamp()}
+Időpont: ${timestamp}
 Nyelv: ${langLabel}
 
 Érdeklődő adatai:
@@ -99,18 +104,40 @@ ${treatmentList}
 ---
 Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.
     `.trim(),
+    html: `
+<!DOCTYPE html>
+<html lang="hu">
+<head><meta charset="utf-8"></head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #8B6F5E;">Új konzultációs igény érkezett!</h2>
+  <p style="color: #666; font-size: 14px;">Időpont: ${timestamp} | Nyelv: ${langLabel}</p>
+  <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 120px;">Név</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${data.lastName} ${data.firstName}</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Telefon</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${data.phone}">${data.phone}</a></td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Kezelések</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${treatmentList}</td></tr>
+  </table>
+  <p style="color: #999; font-size: 12px; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.</p>
+</body>
+</html>
+    `.trim(),
   });
 }
 
 // Send user confirmation email (in user's language)
 async function sendUserEmail(resend: Resend, data: ContactFormData) {
   const isEnglish = data.lang === 'en';
+  const uniqueId = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
   if (isEnglish) {
     await resend.emails.send({
       from: 'Fanni Kónya - Beautyflow <hello@beautyflow.pro>',
+      replyTo: 'hello@beautyflow.pro',
       to: data.email,
       subject: 'We received your inquiry',
+      headers: {
+        'X-Entity-Ref-ID': uniqueId,
+      },
       text: `
 Dear ${data.firstName},
 
@@ -121,12 +148,32 @@ Fanni Kónya
 Founder of Beautyflow
 +36 1 300 9414
       `.trim(),
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"></head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+  <p>Dear ${data.firstName},</p>
+  <p>Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.</p>
+  <p style="margin-top: 24px;">
+    Best regards,<br>
+    <strong>Fanni Kónya</strong><br>
+    <span style="color: #8B6F5E;">Founder of Beautyflow</span><br>
+    <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
+  </p>
+</body>
+</html>
+      `.trim(),
     });
   } else {
     await resend.emails.send({
       from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
+      replyTo: 'hello@beautyflow.pro',
       to: data.email,
       subject: 'Érdeklődésed megkaptuk',
+      headers: {
+        'X-Entity-Ref-ID': uniqueId,
+      },
       text: `
 Kedves ${data.firstName}!
 
@@ -136,6 +183,22 @@ Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak
 Kónya Fanni
 a Beautyflow alapítója
 +36 1 300 9414
+      `.trim(),
+      html: `
+<!DOCTYPE html>
+<html lang="hu">
+<head><meta charset="utf-8"></head>
+<body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+  <p>Kedves ${data.firstName}!</p>
+  <p>Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.</p>
+  <p style="margin-top: 24px;">
+    Üdvözlettel,<br>
+    <strong>Kónya Fanni</strong><br>
+    <span style="color: #8B6F5E;">a Beautyflow alapítója</span><br>
+    <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
+  </p>
+</body>
+</html>
       `.trim(),
     });
   }
