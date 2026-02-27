@@ -83,26 +83,26 @@ async function sendAdminEmail(resend: Resend, data: ContactFormData) {
     from: 'Beautyflow <hello@beautyflow.pro>',
     replyTo: data.email,
     to: 'erdeklodes@beautyflow.pro',
-    subject: `Konzultacio - ${data.lastName} ${data.firstName}`,
+    subject: `Konzultáció - ${data.lastName} ${data.firstName}`,
     headers: {
       'X-Entity-Ref-ID': `admin-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     },
     text: `
-Uj konzultacios igeny erkezett!
+Új konzultációs igény érkezett!
 
-Idopont: ${timestamp}
+Időpont: ${timestamp}
 Nyelv: ${langLabel}
 
-Erdeklodo adatai:
-- Nev: ${data.lastName} ${data.firstName}
+Érdeklődő adatai:
+- Név: ${data.lastName} ${data.firstName}
 - Telefon: ${data.phone}
 - Email: ${data.email}
 
-Erdeklodes targya:
+Érdeklődés tárgya:
 ${treatmentList}
 
 ---
-Ez az email automatikusan lett kuldve a beautyflow.pro weboldalrol.
+Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.
     `.trim(),
     html: `
 <!DOCTYPE html>
@@ -131,7 +131,7 @@ async function sendUserEmail(resend: Resend, data: ContactFormData) {
 
   if (isEnglish) {
     await resend.emails.send({
-      from: 'Fanni Konya - Beautyflow <hello@beautyflow.pro>',
+      from: 'Fanni Kónya - Beautyflow <hello@beautyflow.pro>',
       replyTo: 'hello@beautyflow.pro',
       to: data.email,
       subject: 'We received your inquiry',
@@ -144,7 +144,7 @@ Dear ${data.firstName},
 Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.
 
 Best regards,
-Fanni Konya
+Fanni Kónya
 Founder of Beautyflow
 +36 1 300 9414
       `.trim(),
@@ -157,7 +157,7 @@ Founder of Beautyflow
   <p>Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.</p>
   <p style="margin-top: 24px;">
     Best regards,<br>
-    <strong>Fanni K&oacute;nya</strong><br>
+    <strong>Fanni Kónya</strong><br>
     <span style="color: #8B6F5E;">Founder of Beautyflow</span><br>
     <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
   </p>
@@ -167,21 +167,21 @@ Founder of Beautyflow
     });
   } else {
     await resend.emails.send({
-      from: 'Konya Fanni - Beautyflow <hello@beautyflow.pro>',
+      from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
       replyTo: 'hello@beautyflow.pro',
       to: data.email,
-      subject: 'Erdeklodesed megkaptuk',
+      subject: 'Érdeklődésed megkaptuk',
       headers: {
         'X-Entity-Ref-ID': uniqueId,
       },
       text: `
 Kedves ${data.firstName}!
 
-Koszonom, hogy igenyelted az ingyenes konzultaciodat. Hamarosan meg foglak keresni a megadott elerhetosegeid egyiken.
+Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.
 
-Udvozlettel,
-Konya Fanni
-a Beautyflow alapitoja
+Üdvözlettel,
+Kónya Fanni
+a Beautyflow alapítója
 +36 1 300 9414
       `.trim(),
       html: `
@@ -190,11 +190,11 @@ a Beautyflow alapitoja
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
   <p>Kedves ${data.firstName}!</p>
-  <p>K&ouml;sz&ouml;n&ouml;m, hogy ig&eacute;nyelted az ingyenes konzult&aacute;ci&oacute;dat. Hamarosan meg foglak keresni a megadott el&eacute;rhet&odblac;s&eacute;geid egyik&eacute;n.</p>
+  <p>Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.</p>
   <p style="margin-top: 24px;">
-    &Uuml;dv&ouml;zlettel,<br>
-    <strong>K&oacute;nya Fanni</strong><br>
-    <span style="color: #8B6F5E;">a Beautyflow alap&iacute;t&oacute;ja</span><br>
+    Üdvözlettel,<br>
+    <strong>Kónya Fanni</strong><br>
+    <span style="color: #8B6F5E;">a Beautyflow alapítója</span><br>
     <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
   </p>
 </body>
