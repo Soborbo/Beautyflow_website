@@ -1,11 +1,9 @@
 ---
 export const prerender = true;
 
-import { getImage } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
-import ContentImage from '../components/images/ContentImage.astro';
-import CardImage from '../components/images/CardImage.astro';
+import { ContentImage, CardImage, FixedImage } from '../components/images';
 
 // Image imports
 import notinoIcon from '../assets/images/notino-ikon.png';
@@ -95,17 +93,6 @@ const faqs = [
   { question: 'Mennyire biztonságos a kezelés?', answer: 'Teljesen biztonságos. EU-minősített, orvostechnikai Nd:YAG lézer készülékkel dolgozunk, és csak képzett szakemberek végzik a kezelést.' },
 ];
 
-// Optimized small images with 1x + 2x srcset
-const optimizedNotinoIcon = await getImage({ src: notinoIcon, width: 64, height: 64, format: 'webp', quality: 60 });
-const optimizedNotinoIcon1x = await getImage({ src: notinoIcon, width: 32, height: 32, format: 'webp', quality: 60 });
-const optimizedGoogleLogo = await getImage({ src: googleLogo, width: 72, height: 72, format: 'webp', quality: 60 });
-const optimizedGoogleLogo1x = await getImage({ src: googleLogo, width: 36, height: 36, format: 'webp', quality: 60 });
-const optimizedGoogleLogoSm = await getImage({ src: googleLogo, width: 56, height: 56, format: 'webp', quality: 60 });
-const optimizedGoogleLogoSm1x = await getImage({ src: googleLogo, width: 28, height: 28, format: 'webp', quality: 60 });
-const optimizedNotinoLogo = await getImage({ src: notinoLogo, width: 96, format: 'webp', quality: 60 });
-const optimizedNotinoLogo1x = await getImage({ src: notinoLogo, width: 48, format: 'webp', quality: 60 });
-const optimizedSkinlabLogo = await getImage({ src: skinlabLogo, width: 96, format: 'webp', quality: 60 });
-const optimizedSkinlabLogo1x = await getImage({ src: skinlabLogo, width: 48, format: 'webp', quality: 60 });
 ---
 
 <Layout
@@ -208,7 +195,7 @@ const optimizedSkinlabLogo1x = await getImage({ src: skinlabLogo, width: 48, for
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img src={optimizedNotinoIcon1x.src} srcset={`${optimizedNotinoIcon1x.src} 1x, ${optimizedNotinoIcon.src} 2x`} alt="Notino" class="w-8 h-8" width="32" height="32" loading="lazy" />
+                  <FixedImage src={notinoIcon} alt="Notino" width={32} height={32} class="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -265,7 +252,7 @@ const optimizedSkinlabLogo1x = await getImage({ src: skinlabLogo, width: 48, for
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img src={optimizedGoogleLogo1x.src} srcset={`${optimizedGoogleLogo1x.src} 1x, ${optimizedGoogleLogo.src} 2x`} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width="36" height="36" loading="lazy" />
+            <FixedImage src={googleLogo} alt="Google" width={36} height={36} class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -693,15 +680,7 @@ const optimizedSkinlabLogo1x = await getImage({ src: skinlabLogo, width: 48, for
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src={optimizedGoogleLogoSm1x.src}
-                srcset={`${optimizedGoogleLogoSm1x.src} 1x, ${optimizedGoogleLogoSm.src} 2x`}
-                alt="Google"
-                class="w-7 h-7 object-contain flex-shrink-0"
-                width="28"
-                height="28"
-                loading="lazy"
-              />
+              <FixedImage src={googleLogo} alt="Google" width={28} height={28} class="w-7 h-7 object-contain flex-shrink-0" />
             </div>
           </div>
         ))}
@@ -717,10 +696,10 @@ const optimizedSkinlabLogo1x = await getImage({ src: skinlabLogo, width: 48, for
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img src={optimizedNotinoLogo1x.src} srcset={`${optimizedNotinoLogo1x.src} 1x, ${optimizedNotinoLogo.src} 2x`} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" loading="lazy" />
+          <FixedImage src={notinoLogo} alt="Notino Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
         <div class="flex flex-col items-center">
-          <img src={optimizedSkinlabLogo1x.src} srcset={`${optimizedSkinlabLogo1x.src} 1x, ${optimizedSkinlabLogo.src} 2x`} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" loading="lazy" />
+          <FixedImage src={skinlabLogo} alt="Skinlab Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
       </div>
     </div>

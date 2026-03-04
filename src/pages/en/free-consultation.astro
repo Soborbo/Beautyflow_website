@@ -101,8 +101,7 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- CookieYes loaded via GTM (CookieYes CMP tag with consent defaults) -->
-    <!-- GTM loaded by Cloudflare Tag Gateway (injected at edge level) -->
+    <!-- GTM + tracking injected by @leadgen/conversion-tracking integration -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Request a free consultation at Beautyflow beauty salon. Personalized advice on laser hair removal, facial treatments, and permanent makeup." />
@@ -515,6 +514,8 @@ const breadcrumbSchema = {
         getGclid,
         getFbclid,
         pushCalculatorStep,
+        pushCalculatorStart,
+        pushCalculatorOption,
       } from '@leadgen/conversion-tracking/client';
 
       // Tracking is auto-initialized by the Astro integration
@@ -569,6 +570,7 @@ const breadcrumbSchema = {
 
       document.addEventListener('DOMContentLoaded', () => {
         // Tracking is auto-initialized by Astro integration
+        pushCalculatorStart();
 
         let currentStep = 1;
 
@@ -643,6 +645,10 @@ const breadcrumbSchema = {
               .filter(cb => cb.checked)
               .map(cb => cb.value);
             btnStep1.disabled = formData.treatments.length === 0;
+
+            if (checkbox.checked) {
+              pushCalculatorOption('treatment', checkbox.value);
+            }
           });
         });
 

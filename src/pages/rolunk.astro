@@ -359,7 +359,7 @@ const teamMemberImages = await Promise.all(
                 </button>
               ) : (
                 <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">
-                  <span class="font-heading text-3xl text-[#c53f75]">{member.initials}</span>
+                  <span class="font-heading text-3xl text-[#c53f75]">{member.name.split(' ').map(n => n[0]).join('')}</span>
                 </div>
               )}
             </div>
@@ -374,7 +374,7 @@ const teamMemberImages = await Promise.all(
               <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-auto">
                 {member.treatments.map((treatment) => (
                   <a
-                    href={treatment.url}
+                    href={getLocalizedPath(treatment.url, lang)}
                     class="inline-block px-4 py-2 text-xs text-[#c53f75] bg-[#c53f75]/10 rounded-full hover:bg-[#c53f75]/20 transition-colors"
                   >
                     {treatment.name}

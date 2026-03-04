@@ -10,6 +10,7 @@ import nyitvaImg from '../assets/images/nyitva.jpg';
 import idoImg from '../assets/images/sminktetovalas-budapest-beautyflow.jpg';
 import pcosImg from '../assets/images/pcos-szortelenites.jpg';
 import dijakImg from '../assets/images/beautyflow-dijak.webp';
+import vipImg from '../assets/images/beautyflow-dijak.webp'; // TODO: replace with actual VIP stamp card image
 import notinoIcon from '../assets/images/notino-ikon.png';
 
 interface Props {
@@ -21,7 +22,7 @@ const { lang = defaultLang } = Astro.props;
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
-const featureImages = [aiGepImg, szegyenlosImg, legkorImg, higienaImg, testmeretImg, nyitvaImg, idoImg, pcosImg, dijakImg];
+const featureImages = [aiGepImg, szegyenlosImg, legkorImg, higienaImg, testmeretImg, nyitvaImg, idoImg, pcosImg, dijakImg, vipImg];
 
 const content = {
   hu: {
@@ -38,6 +39,7 @@ const content = {
       { title: 'Mi rád fogjuk szánni\naz időt', description: 'Egyszerre mindig csak egyetlen vendéggel foglalkozunk, hogy teljes és korlátlan figyelmet biztosíthassunk a számodra.' },
       { title: 'Sokéves gyakorlat\nPCOS-es vendégekkel', description: 'A policisztás ovárium szindróma rengeteg nőnek keseríti meg az életét. Különleges odafigyeléssel és a megszokottnál jelentősen jobb eredményekkel várunk!' },
       { title: 'Sokszoros díjnyertes,\nmegbízható vállalkozás', description: 'Az elmúlt évek során számos díjat nyertünk el a "Tisztességes vállalkozás" díjtól a "Notino Hónap szalonja" elismerésig.' },
+      { title: 'Törzsvásárlói VIP\nkedvezmény', description: 'Hűségedet jutalmazzuk! Gyűjts pecsétet minden kezelés után, és 15 pecsét felett élvezd az örökös 10% kedvezményt minden kezelésre.' },
     ],
   },
   en: {
@@ -54,6 +56,7 @@ const content = {
       { title: "We'll dedicate our\ntime to you", description: 'We only work with one client at a time to ensure you receive our full and undivided attention.' },
       { title: 'Years of experience\nwith PCOS clients', description: "Polycystic ovary syndrome affects many women's lives. We welcome you with special care and significantly better results than usual!" },
       { title: 'Multiple award-winning,\nreliable business', description: 'Over the years, we have won numerous awards from the "Fair Business" award to the "Notino Salon of the Month" recognition.' },
+      { title: 'VIP Loyalty\nDiscount', description: 'We reward your loyalty! Collect a stamp after every treatment, and after 15 stamps enjoy a permanent 10% discount on all treatments.' },
     ],
   },
 };

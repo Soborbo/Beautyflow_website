@@ -1,12 +1,9 @@
 ---
 export const prerender = true;
 
-import { getImage } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
-import ContentImage from '../components/images/ContentImage.astro';
-import CardImage from '../components/images/CardImage.astro';
-import HeroImage from '../components/images/HeroImage.astro';
+import { ContentImage, CardImage, HeroImage, FixedImage } from '../components/images';
 
 // Import images
 import carbonPeelingFo from '../assets/images/carbon-peeling-fo.jpg';
@@ -27,18 +24,6 @@ import testmeret from '../assets/images/testmeret.jpg';
 import nyitva from '../assets/images/nyitva.jpg';
 import notinoLogoSm from '../assets/images/logok/notino-logo-sm.jpg';
 import skinlab from '../assets/images/logok/skinlab.webp';
-
-// Generate optimized images for small fixed-size elements (1x + 2x srcset pattern)
-const notinoIkonOptimized = await getImage({ src: notinoIkon, width: 64, format: 'webp', quality: 60 });
-const notinoIkon1x = await getImage({ src: notinoIkon, width: 32, format: 'webp', quality: 60 });
-const googleLogoOptimized = await getImage({ src: googleLogo, width: 72, format: 'webp', quality: 60 });
-const googleLogo1x = await getImage({ src: googleLogo, width: 36, format: 'webp', quality: 60 });
-const googleLogoSmallOptimized = await getImage({ src: googleLogo, width: 56, format: 'webp', quality: 60 });
-const googleLogoSmall1x = await getImage({ src: googleLogo, width: 28, format: 'webp', quality: 60 });
-const notinoLogoSmOptimized = await getImage({ src: notinoLogoSm, width: 96, format: 'webp', quality: 60 });
-const notinoLogoSm1x = await getImage({ src: notinoLogoSm, width: 48, format: 'webp', quality: 60 });
-const skinlabOptimized = await getImage({ src: skinlab, width: 96, format: 'webp', quality: 60 });
-const skinlab1x = await getImage({ src: skinlab, width: 48, format: 'webp', quality: 60 });
 
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
@@ -69,7 +54,7 @@ const singlePrices = [
   { area: 'Pigmentfolt eltávolítás', price: '10 000 Ft' },
   { area: 'Kézfej (mindkettő)', price: '15 000 Ft' },
   { area: 'Hónalj világosítás (mindkettő)', price: '15 000 Ft' },
-  { area: 'Szemöldök', price: '15 000 Ft' },
+  { area: 'Szemöldök halványítás', price: '15 000 Ft' },
   { area: 'Teljes arc', price: '25 000 Ft' },
   { area: 'Dekoltázs', price: '25 000 Ft' },
   { area: 'Teljes hát', price: '35 000 Ft' },
@@ -221,15 +206,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <img
-                    src={notinoIkon1x.src}
-                    srcset={`${notinoIkon1x.src} 1x, ${notinoIkonOptimized.src} 2x`}
-                    alt="Notino"
-                    class="w-8 h-8"
-                    width="32"
-                    height="32"
-                    loading="eager"
-                  />
+                  <FixedImage src={notinoIkon} alt="Notino" width={32} class="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -286,15 +263,7 @@ const faqs = [
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <img
-              src={googleLogo1x.src}
-              srcset={`${googleLogo1x.src} 1x, ${googleLogoOptimized.src} 2x`}
-              alt="Google"
-              class="w-7 h-7 lg:w-9 lg:h-9 rounded-full"
-              width="36"
-              height="36"
-              loading="eager"
-            />
+            <FixedImage src={googleLogo} alt="Google" width={36} class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -708,15 +677,7 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src={googleLogoSmall1x.src}
-                srcset={`${googleLogoSmall1x.src} 1x, ${googleLogoSmallOptimized.src} 2x`}
-                alt="Google"
-                class="w-7 h-7 object-contain flex-shrink-0"
-                width="28"
-                height="28"
-                loading="lazy"
-              />
+              <FixedImage src={googleLogo} alt="Google" width={28} class="w-7 h-7 object-contain flex-shrink-0" />
             </div>
           </div>
         ))}
@@ -732,24 +693,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img
-            src={notinoLogoSm1x.src}
-            srcset={`${notinoLogoSm1x.src} 1x, ${notinoLogoSmOptimized.src} 2x`}
-            alt="Notino Partner"
-            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
-            height="48"
-            loading="lazy"
-          />
+          <FixedImage src={notinoLogoSm} alt="Notino Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
         <div class="flex flex-col items-center">
-          <img
-            src={skinlab1x.src}
-            srcset={`${skinlab1x.src} 1x, ${skinlabOptimized.src} 2x`}
-            alt="Skinlab Partner"
-            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
-            height="48"
-            loading="lazy"
-          />
+          <FixedImage src={skinlab} alt="Skinlab Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
       </div>
     </div>

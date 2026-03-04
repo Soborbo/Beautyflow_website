@@ -57,14 +57,17 @@ const ANONYMOUS_SESSIONS_KEY = 'lg_anonymous_sessions';
  */
 async function sha256(str: string): Promise<string> {
   if (typeof crypto === 'undefined' || !crypto.subtle) {
-    // Fallback for older browsers - simple hash
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
+    // Fallback: use a longer hash to avoid trivially reversible output.
+    // FNV-1a 128-bit-equivalent via two independent 53-bit hashes.
+    const input = str.toLowerCase().trim();
+    let h1 = 0x811c9dc5 >>> 0;
+    let h2 = 0x01000193 >>> 0;
+    for (let i = 0; i < input.length; i++) {
+      const c = input.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
+      h2 = Math.imul(h2 ^ c, 0x0100019d) >>> 0;
     }
-    return Math.abs(hash).toString(16);
+    return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
   }
 
   const msgBuffer = new TextEncoder().encode(str.toLowerCase().trim());
@@ -94,13 +97,29 @@ function normalizePhone(phone: string): string {
 // Storage
 // =============================================================================
 
+function isValidIdentity(obj: unknown): obj is UserIdentity {
+  return (
+    typeof obj === 'object' && obj !== null &&
+    typeof (obj as UserIdentity).emailHash === 'string' &&
+    typeof (obj as UserIdentity).email === 'string' &&
+    typeof (obj as UserIdentity).identifiedAt === 'number' &&
+    Array.isArray((obj as UserIdentity).sessions)
+  );
+}
+
 function getStoredIdentity(): UserIdentity | null {
   const data = safeGetItem(STORAGE_KEY);
   if (!data) return null;
 
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (!isValidIdentity(parsed)) {
+      safeRemoveItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
+    safeRemoveItem(STORAGE_KEY);
     return null;
   }
 }

@@ -76,6 +76,12 @@ class FormTracker {
   private sequenceCounter = 0;
   private lastBlurTime: number | null = null;
 
+  // Bound handlers for proper removal
+  private boundFocusIn: (e: FocusEvent) => void;
+  private boundFocusOut: (e: FocusEvent) => void;
+  private boundKeyDown: ((e: KeyboardEvent) => void) | null = null;
+  private boundSubmit: () => void;
+
   constructor(form: HTMLFormElement, formId: string, options: FormFieldOptions = {}) {
     this.form = form;
     this.formId = formId;
@@ -89,22 +95,36 @@ class FormTracker {
     };
     this.startedAt = Date.now();
 
+    this.boundFocusIn = this.handleFocusIn.bind(this);
+    this.boundFocusOut = this.handleFocusOut.bind(this);
+    this.boundSubmit = this.handleSubmit.bind(this);
+
     this.setupListeners();
     log(`Form tracking started: ${formId}`);
   }
 
   private setupListeners(): void {
     // Focus/blur for timing
-    this.form.addEventListener('focusin', this.handleFocusIn.bind(this));
-    this.form.addEventListener('focusout', this.handleFocusOut.bind(this));
+    this.form.addEventListener('focusin', this.boundFocusIn);
+    this.form.addEventListener('focusout', this.boundFocusOut);
 
     // Input for corrections tracking
     if (this.options.trackCorrections) {
-      this.form.addEventListener('keydown', this.handleKeyDown.bind(this));
+      this.boundKeyDown = this.handleKeyDown.bind(this);
+      this.form.addEventListener('keydown', this.boundKeyDown);
     }
 
     // Submit
-    this.form.addEventListener('submit', this.handleSubmit.bind(this));
+    this.form.addEventListener('submit', this.boundSubmit);
+  }
+
+  private removeListeners(): void {
+    this.form.removeEventListener('focusin', this.boundFocusIn);
+    this.form.removeEventListener('focusout', this.boundFocusOut);
+    this.form.removeEventListener('submit', this.boundSubmit);
+    if (this.boundKeyDown) {
+      this.form.removeEventListener('keydown', this.boundKeyDown);
+    }
   }
 
   private getFieldName(element: HTMLElement): string | null {
@@ -290,6 +310,9 @@ class FormTracker {
   }
 
   destroy(): void {
+    // Remove event listeners to prevent leaks
+    this.removeListeners();
+
     // Mark as abandoned if not submitted
     const metrics = this.getMetrics();
     if (metrics.completionRate < 1 && this.options.pushToDataLayer) {

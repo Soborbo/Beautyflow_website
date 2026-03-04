@@ -316,6 +316,7 @@ export function trackCalculatorForRemarketing(step: 'start' | 'complete', value?
 // =============================================================================
 
 let scrollTrackingInitialized = false;
+let scrollHandler: (() => void) | null = null;
 let timeTrackingInterval: ReturnType<typeof setInterval> | null = null;
 
 /**
@@ -332,7 +333,7 @@ export function initRemarketing(): void {
     scrollTrackingInitialized = true;
 
     let maxScroll = 0;
-    window.addEventListener('scroll', () => {
+    scrollHandler = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight <= 0) return; // Prevent division by zero
       const currentScroll = Math.round((window.scrollY / scrollHeight) * 100);
@@ -340,7 +341,8 @@ export function initRemarketing(): void {
         maxScroll = currentScroll;
         trackScrollDepth(maxScroll);
       }
-    }, { passive: true });
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
   }
 
   // Track time on site (every 10 seconds)
@@ -365,6 +367,11 @@ export function stopRemarketing(): void {
   if (timeTrackingInterval) {
     clearInterval(timeTrackingInterval);
     timeTrackingInterval = null;
+  }
+  if (scrollHandler) {
+    window.removeEventListener('scroll', scrollHandler);
+    scrollHandler = null;
+    scrollTrackingInitialized = false;
   }
 }
 
