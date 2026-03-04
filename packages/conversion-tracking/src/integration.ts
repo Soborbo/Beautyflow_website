@@ -1,9 +1,8 @@
 /**
  * @leadgen/conversion-tracking - Astro Integration
  *
- * Injects tracking config and init script.
- * NOTE: GTM is loaded manually in Layout.astro (after CookieYes).
- * This integration does NOT inject GTM to avoid race conditions.
+ * Injects GTM, tracking config, and init script into every page.
+ * CookieYes CMP is loaded as a GTM tag with consent defaults.
  */
 
 import type { AstroIntegration } from 'astro';
@@ -28,14 +27,20 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
 
     hooks: {
       'astro:config:setup': ({ injectScript, logger }) => {
-        logger.info('Configuring tracking (GTM loaded manually in Layout.astro)');
+        logger.info(`Injecting GTM (${config.gtmId}) + tracking config into all pages`);
 
-        // Google Consent Mode v2 - Script order in Layout.astro:
-        // 1. CookieYes (FIRST - handles consent defaults via "Run before banner loads")
-        // 2. GTM (manual script in Layout.astro, proxied by Google Tag Gateway)
-        // 3. This integration only injects config + init script
+        // 1. GTM snippet — loads on every page via integration (not Layout.astro)
+        //    CookieYes CMP + Consent Mode v2 defaults are handled inside GTM
+        injectScript(
+          'head-inline',
+          `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':` +
+          `new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],` +
+          `j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=` +
+          `'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);` +
+          `})(window,document,'script','dataLayer','${config.gtmId}');`
+        );
 
-        // Tracking config (dataLayer init + config object)
+        // 2. Tracking config (dataLayer init + config object)
         injectScript(
           'head-inline',
           `window.dataLayer=window.dataLayer||[];window.__TRACKING_CONFIG__=${JSON.stringify({
@@ -47,7 +52,7 @@ export default function trackingIntegration(userConfig: TrackingConfig): AstroIn
           }).replace(/</g, '\\u003c')};`
         );
 
-        // Inject init script
+        // 3. Init script (session, attribution, remarketing, etc.)
         injectScript('page', 'import "@leadgen/conversion-tracking/init";');
 
         if (config.debug) {

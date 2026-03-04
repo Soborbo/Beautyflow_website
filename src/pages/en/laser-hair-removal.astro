@@ -3,9 +3,7 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
-import { Image } from 'astro:assets';
-import ContentImage from '../../components/images/ContentImage.astro';
-import CardImage from '../../components/images/CardImage.astro';
+import { ContentImage, CardImage, FixedImage } from '../../components/images';
 
 // Image imports
 import beautyflowBuda from '../../assets/images/Beautyflow-buda.jpg';
@@ -53,7 +51,7 @@ const locations = [
     hours: [
       { days: 'Monday – Friday', time: '08:00 – 20:00' },
       { days: 'Saturday', time: '10:00 – 20:00' },
-      { days: 'Sunday', time: '10:00 – 20:00' },
+      { days: 'Sunday', time: '10:00 – 19:00' },
     ]
   },
   {
@@ -62,9 +60,9 @@ const locations = [
     image: beautyflowPest,
     bookingUrl: notinoUrlPest,
     hours: [
-      { days: 'Monday – Friday', time: '08:00 – 20:00' },
+      { days: 'Monday – Friday', time: '08:00 – 18:00' },
       { days: 'Saturday', time: '10:00 – 20:00' },
-      { days: 'Sunday', time: '10:00 – 20:00' },
+      { days: 'Sunday', time: 'Closed' },
     ]
   }
 ];
@@ -123,6 +121,7 @@ const packages = [
   { name: 'Silver', content: 'Full bikini + Inner buttocks + Underarms + Lower legs', price: '40 000', popular: false },
   { name: 'Bronze', content: 'Full legs + Underarms', price: '38 000', popular: false },
   { name: 'Platinum - PCOS', content: 'Areola + Between breasts + Sideburns + Upper lip + Face + Chin + Neck + Happy trail', price: '34 000', popular: false },
+  { name: 'Crystal', content: 'Full legs + Full arms', price: '45 000', popular: false },
   { name: 'White', content: 'Full bikini + Inner buttocks + Underarms + Happy trail', price: '26 000', popular: false },
   { name: 'Pearl', content: 'Underarms + Lower legs', price: '24 000', popular: false },
   { name: 'Shine', content: 'Underarms + Bikini line', price: '18 000', popular: false },
@@ -290,7 +289,13 @@ const serviceSchema = {
                 <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
                 <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                   <div class="bg-white rounded-full p-1">
-                    <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
+                    <FixedImage
+                      src={notinoIkon}
+                      alt="Notino"
+                      width={32}
+                      height={32}
+                      class="w-8 h-8"
+                    />
                   </div>
                 </div>
               </div>
@@ -345,7 +350,13 @@ const serviceSchema = {
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">
             <div class="flex items-center gap-2">
-              <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
+              <FixedImage
+                src={googleLogo}
+                alt="Google"
+                width={36}
+                height={36}
+                class="w-7 h-7 lg:w-9 lg:h-9 rounded-full"
+              />
               <div>
                 <div class="flex items-center gap-1">
                   <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -552,24 +563,20 @@ const serviceSchema = {
               {testimonial.text}
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-              <Image
+              <FixedImage
                 src={testimonial.image}
                 alt={testimonial.author}
                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
                 width={48}
                 height={48}
-                quality={60}
-                loading="lazy"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <Image
+              <FixedImage
                 src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
                 width={28}
                 height={28}
-                quality={60}
-                loading="lazy"
               />
             </div>
           </div>
@@ -832,7 +839,13 @@ const serviceSchema = {
               <th class="py-4 px-6 text-left font-semibold">Aspect</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
-                  <Image src={notinoIkon} alt="Beautyflow" class="w-6 h-6" width={24} height={24} quality={60} loading="lazy" />
+                  <FixedImage
+                    src={notinoIkon}
+                    alt="Beautyflow"
+                    width={24}
+                    height={24}
+                    class="w-6 h-6"
+                  />
                   Beautyflow
                 </div>
               </th>
@@ -1098,14 +1111,12 @@ const serviceSchema = {
           The best place for diode laser hair removal. Fanni and Piroska do amazing, thorough work, and always make sure to be as comfortable as possible. The machine used for the procedure is phenomenal, and you will see impressive results after the first treatment.
         </p>
         <div class="flex items-center justify-center gap-3">
-          <Image
+          <FixedImage
             src={hajdu}
             alt="Eszter Laszlo"
             class="w-12 h-12 rounded-full object-cover"
             width={48}
             height={48}
-            quality={60}
-            loading="lazy"
           />
           <p class="font-semibold text-gray-900">Eszter Laszlo</p>
         </div>
@@ -1161,10 +1172,22 @@ const serviceSchema = {
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
+          <FixedImage
+            src={notinoLogoSm}
+            alt="Notino Partner"
+            width={48}
+            height={48}
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+          />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
+          <FixedImage
+            src={skinlab}
+            alt="Skinlab Partner"
+            width={48}
+            height={48}
+            class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
+          />
         </div>
       </div>
     </div>

@@ -101,14 +101,8 @@ const wpPatterns = [
   /^\/xmlrpc\.php/,
 ];
 
-// 410 Gone HTML oldal
-const goneHtml = `<!DOCTYPE html>
-<html lang="hu">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>410 - Az oldal véglegesen törlésre került | Beautyflow</title>
-  <style>
+// 410 Gone HTML - shared styles
+const goneStyles = `
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -119,73 +113,59 @@ const goneHtml = `<!DOCTYPE html>
       background: linear-gradient(135deg, #fdf8f6 0%, #fff 50%, #f8f4f9 100%);
       padding: 20px;
     }
-    .container {
-      text-align: center;
-      max-width: 600px;
-    }
+    .container { text-align: center; max-width: 600px; }
     .error-code {
       font-family: Georgia, 'Times New Roman', serif;
-      font-size: 120px;
-      font-weight: 700;
+      font-size: 120px; font-weight: 700;
       background: linear-gradient(90deg, #c53f75, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      margin-bottom: 20px;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1; margin-bottom: 20px;
     }
-    h1 {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 28px;
-      color: #1f2937;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    p {
-      color: #6b7280;
-      font-size: 18px;
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
+    h1 { font-family: Georgia, 'Times New Roman', serif; font-size: 28px; color: #1f2937; text-transform: uppercase; margin-bottom: 16px; }
+    p { color: #6b7280; font-size: 18px; margin-bottom: 32px; line-height: 1.6; }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 16px 32px;
-      background: #c53f75;
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-radius: 9999px;
-      transition: all 0.3s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 32px; background: #c53f75; color: white;
+      text-decoration: none; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.5px; border-radius: 9999px; transition: all 0.3s ease;
     }
-    .btn:hover {
-      background: #a33460;
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(197, 63, 117, 0.3);
-    }
-    .btn svg {
-      width: 20px;
-      height: 20px;
-    }
-  </style>
+    .btn:hover { background: #a33460; transform: scale(1.05); box-shadow: 0 10px 25px rgba(197, 63, 117, 0.3); }
+    .btn svg { width: 20px; height: 20px; }`;
+
+const homeSvg = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>`;
+
+function getGoneHtml(isEnglish) {
+  const lang = isEnglish ? 'en' : 'hu';
+  const title = isEnglish
+    ? '410 - This page has been permanently removed | Beautyflow'
+    : '410 - Az oldal véglegesen törlésre került | Beautyflow';
+  const heading = isEnglish
+    ? 'This page has been permanently removed'
+    : 'Ez az oldal véglegesen törlésre került';
+  const message = isEnglish
+    ? 'The page you are looking for is no longer available and will not return. Please visit our homepage to find all of our services.'
+    : 'A keresett oldal már nem érhető el és nem is fog visszatérni. Kérjük, látogass el a főoldalunkra, ahol megtalálod összes szolgáltatásunkat.';
+  const btnText = isEnglish ? 'Back to homepage' : 'Vissza a főoldalra';
+  const btnHref = isEnglish ? '/en/' : '/';
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>${goneStyles}</style>
 </head>
 <body>
   <div class="container">
     <div class="error-code">410</div>
-    <h1>Ez az oldal véglegesen törlésre került</h1>
-    <p>A keresett oldal már nem érhető el és nem is fog visszatérni. Kérjük, látogass el a főoldalunkra, ahol megtalálod összes szolgáltatásunkat.</p>
-    <a href="/" class="btn">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-      Vissza a főoldalra
-    </a>
+    <h1>${heading}</h1>
+    <p>${message}</p>
+    <a href="${btnHref}" class="btn">${homeSvg} ${btnText}</a>
   </div>
 </body>
 </html>`;
+}
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
@@ -201,7 +181,7 @@ export async function onRequest(context) {
   const isWpPattern = wpPatterns.some(pattern => pattern.test(pathname));
 
   if (isGoneUrl || isWpPattern) {
-    return new Response(goneHtml, {
+    return new Response(getGoneHtml(pathname.startsWith('/en/')), {
       status: 410,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',

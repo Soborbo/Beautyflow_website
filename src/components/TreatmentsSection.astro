@@ -6,6 +6,9 @@ import carbonPeelingImg from '../assets/images/carbon-peeling-mb.jpg';
 import diodaImg from '../assets/images/dioda-lezeres-szortelenites-mob.jpg';
 import tetovalasImg from '../assets/images/sminktetovalas-mb.jpg';
 import pigmentfoltImg from '../assets/images/pigmentfolt-arckezeles.jpg';
+import greenSeaPeelImg from '../assets/images/green-sea-peel-new-hero.jpg';
+import biopenImg from '../assets/images/biopen-new-hero.jpg';
+import antiAgingImg from '../assets/images/anti-aging-jelly-mask.jpg';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
 interface Props {
@@ -25,6 +28,9 @@ const content = {
       { title: 'Dióda lézeres szőrtelenítés', description: 'Legyen mindig tökéletesen sima és vonzó a bőrőd és mondj búcsút a szőrtüszőgyulladásnak', link: '/dioda-lezeres-szortelenites' },
       { title: 'Tetoválás-eltávolítás', description: 'Megbántad egy tetoválásodat? Semmi gond, segítünk, hogy ne zavarjon többé.', link: '/lezeres-tetovalas-eltavolitas' },
       { title: 'Pigmentfolt-eltávolítás', description: 'Legyen tökéletesen tiszta és egészséges az arcbőröd fájdalommentesen.', link: '/pigmentfolt-eltavolitas' },
+      { title: 'Green Sea Peel', description: 'Természetes tengeri hámlasztás - mélyreható bőrmegújítás algákkal és tengeri ásványokkal.', link: '/green-sea-peel' },
+      { title: 'Biopen Q2', description: 'Mikrotűs mezoterápia a bőr mélyreható megújításáért és feszesítéséért.', link: '/biopen-q2' },
+      { title: 'Anti Aging Kezelés', description: 'Fiatalos, feszes arcbőr botox nélkül - ultrahanggal és rádiófrekvenciával.', link: '/anti-aging' },
     ],
   },
   en: {
@@ -37,12 +43,15 @@ const content = {
       { title: 'Diode Laser Hair Removal', description: 'Keep your skin perfectly smooth and attractive, say goodbye to ingrown hairs.', link: '/laser-hair-removal' },
       { title: 'Tattoo Removal', description: 'Regret a tattoo? No problem, we help you make it disappear.', link: '/tattoo-removal' },
       { title: 'Pigment Spot Removal', description: 'Achieve perfectly clean and healthy facial skin painlessly.', link: '/pigment-removal' },
+      { title: 'Green Sea Peel', description: 'Natural sea peeling - deep skin renewal with algae and marine minerals.', link: '/green-sea-peel' },
+      { title: 'Biopen Q2', description: 'Microneedling mesotherapy for deep skin renewal and firming.', link: '/biopen-q2' },
+      { title: 'Anti Aging Treatment', description: 'Youthful, firm skin without botox - with ultrasound and radiofrequency.', link: '/anti-aging' },
     ],
   },
 };
 
 const t = content[lang];
-const images = [hydrabeautyImg, sminktetovalasImg, carbonPeelingImg, diodaImg, tetovalasImg, pigmentfoltImg];
+const images = [hydrabeautyImg, sminktetovalasImg, carbonPeelingImg, diodaImg, tetovalasImg, pigmentfoltImg, greenSeaPeelImg, biopenImg, antiAgingImg];
 
 const treatments = t.treatments.map((treatment, index) => ({
   ...treatment,

@@ -181,41 +181,82 @@ const teamMembers = [
   }
 ];
 
-const values = [
-  {
-    icon: 'heart',
-    title: 'Care',
-    description: "We treat every guest with individual attention and care. You're not just a number or an appointment here."
-  },
-  {
-    icon: 'star',
-    title: 'Quality',
-    description: 'We only work with the best equipment and products. We continuously train ourselves to apply the most modern techniques.'
-  },
-  {
-    icon: 'shield',
-    title: 'Safety',
-    description: 'We meet all hygiene standards and do everything to make you feel safe.'
-  }
-];
-
-const t = {
-  pageTitle: 'About Us - Beautyflow Beauty Salon Budapest',
-  pageDescription: 'Meet the Beautyflow team, our story and values. Award-winning beauty salon in Budapest where the guest always comes first.',
-  heroTitle: 'The Beautyflow Team',
-  heroSubtitle: 'Meet the professionals who take care of you! Our team is committed to quality and personalized service.',
-  storyTitle: 'Our Story',
-  storyP1: 'Beautyflow was founded in 2014 by Fanni Kónya, with the goal of creating a beauty salon where every guest receives genuine care and professional service.',
-  storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
-  storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
-  storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
-  milestonesTitle: 'Milestones',
-  teamTitle: 'Meet Our Team',
-  valuesTitle: 'Our Values',
-  ctaTitle: "Let's meet in person!",
-  ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
-  ctaButton: 'Request Free Consultation',
+const values = {
+  hu: [
+    {
+      icon: 'heart',
+      title: 'Törődés',
+      description: 'Minden vendégünket egyedi figyelemmel és törődéssel kezeljük. Nálunk nem csak egy szám vagy egy időpont vagy.'
+    },
+    {
+      icon: 'star',
+      title: 'Minőség',
+      description: 'Csak a legjobb eszközökkel és termékekkel dolgozunk. Folyamatosan képezzük magunkat, hogy a legmodernebb technikákat alkalmazhassuk.'
+    },
+    {
+      icon: 'shield',
+      title: 'Biztonság',
+      description: 'Minden higiéniai elvárásnak megfelelünk, és mindent megteszünk azért, hogy biztonságban érezd magad.'
+    }
+  ],
+  en: [
+    {
+      icon: 'heart',
+      title: 'Care',
+      description: "We treat every guest with individual attention and care. You're not just a number or an appointment here."
+    },
+    {
+      icon: 'star',
+      title: 'Quality',
+      description: 'We only work with the best equipment and products. We continuously train ourselves to apply the most modern techniques.'
+    },
+    {
+      icon: 'shield',
+      title: 'Safety',
+      description: 'We meet all hygiene standards and do everything to make you feel safe.'
+    }
+  ]
 };
+
+const content = {
+  hu: {
+    pageTitle: 'Rólunk - Beautyflow Szépségszalon Budapest',
+    pageDescription: 'Ismerd meg a Beautyflow történetét, csapatát és értékeit. Többszörösen díjnyertes szépségszalon Budapesten, ahol a vendég mindig az első.',
+    heroTitle: 'A Beautyflow csapata',
+    heroSubtitle: 'Ismerd meg a szakembereket, akik gondoskodnak rólad! Csapatunk elkötelezett a minőség és a személyre szabott szolgáltatás iránt.',
+    storyTitle: 'A történetünk',
+    storyP1: 'A Beautyflow-t 2014-ben alapította Kónya Fanni, azzal a céllal, hogy egy olyan szépségszalont hozzon létre, ahol minden vendég valódi törődést és professzionális szolgáltatást kap.',
+    storyP2: 'Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 7 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.',
+    storyP3: 'Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.',
+    storyImageAlt: 'Beautyflow - Notino Hónap Szalonja díj',
+    milestonesTitle: 'Mérföldkövek',
+    teamTitle: 'Ismerd meg csapatunkat',
+    valuesTitle: 'Értékeink',
+    ctaTitle: 'Ismerjük meg egymást személyesen!',
+    ctaSubtitle: 'Gyere el egy ingyenes konzultációra és ismerd meg csapatunkat, mielőtt döntesz!',
+    ctaButton: 'Ingyenes konzultációt kérek',
+  },
+  en: {
+    pageTitle: 'About Us - Beautyflow Beauty Salon Budapest',
+    pageDescription: 'Meet the Beautyflow team, our story and values. Award-winning beauty salon in Budapest where the guest always comes first.',
+    heroTitle: 'The Beautyflow Team',
+    heroSubtitle: 'Meet the professionals who take care of you! Our team is committed to quality and personalized service.',
+    storyTitle: 'Our Story',
+    storyP1: 'Beautyflow was founded in 2014 by Fanni Kónya, with the goal of creating a beauty salon where every guest receives genuine care and professional service.',
+    storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
+    storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
+    storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
+    milestonesTitle: 'Milestones',
+    teamTitle: 'Meet Our Team',
+    valuesTitle: 'Our Values',
+    ctaTitle: "Let's meet in person!",
+    ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
+    ctaButton: 'Request Free Consultation',
+  }
+};
+
+const t = content[lang];
+const currentValues = values[lang];
 
 const consultationPath = getLocalizedPath('/free-consultation', lang);
 
@@ -354,7 +395,7 @@ const teamMemberImages = await Promise.all(
       </div>
 
       <div class="grid gap-8 md:grid-cols-3">
-        {values.map((value) => (
+        {currentValues.map((value) => (
           <div class="text-center">
             <div class="w-16 h-16 mx-auto mb-4 bg-[#c53f75]/10 rounded-full flex items-center justify-center text-[#c53f75]">
               {value.icon === 'heart' && (

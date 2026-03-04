@@ -32,11 +32,11 @@ const faqCategories = [
       },
       {
         q: "Van parkolási lehetőség?",
-        a: "Mindkét szalonunk közelében van parkolási lehetőség. A Buda szalonnál utcai parkolás és közeli parkolóház érhető el. A Pest szalonnál szintén utcai parkolás lehetséges. Pontos útmutatót a helyszín oldalán találsz."
+        a: "Mindkét szalonunk közelében fizetős utcai parkolás elérhető. A Buda szalonnál a Vegyész utcánál 200 Ft/óra, a Pest szalonnál a Reitter Ferenc utcánál 300 Ft/óra. Ingyenes parkolási lehetőség a környéken nincs. Az Allee Bevásárlóközpont a budai szalontól kb. 15 percre van villamossal."
       },
       {
         q: "Lemondhatom vagy módosíthatom az időpontomat?",
-        a: "Igen, az időpontodat 24 órával a kezelés előtt ingyenesen lemondhatod vagy módosíthatod. Kérjük, telefonon vagy online értesíts minket. 24 órán belüli lemondás esetén lemondási díjat számíthatunk fel."
+        a: "Igen, az időpontodat 48 órával a kezelés előtt ingyenesen lemondhatod vagy módosíthatod. Kérjük, telefonon vagy online értesíts minket. 48 órán belüli lemondás esetén 5 000 Ft/óra lemondási díjat számítunk fel."
       },
       {
         q: "Ajándékutalványt lehet vásárolni?",
@@ -300,6 +300,104 @@ const faqCategories = [
     ]
   },
   {
+    id: 'green-sea-peel',
+    title: 'Green Sea Peel',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a Green Sea Peel?",
+        a: "A Green Sea Peel egy természetes, folyékony mikrotűs kezelés. Hasonló hatású, mint a BioPen mikrotűs kezelés, de itt természetes tengeri szivacs kivonattal dolgozunk, amelyben adagonként kb. 800 000 stimuláló mikrotű található. Így kezelésenként 800 000 mikrotű hatol a bőrbe, beindítva a mélyhámlást és a bőr megújulását."
+      },
+      {
+        q: "Mennyire fájdalmas a Green Sea Peel kezelés?",
+        a: "A kezelés kellemetlen érzéssel jár – sokan az üvegszilánkokkal való radírozáshoz hasonlítják. A tengeri szivacs 800 000 mikrotűje okozza ezt az érzést a bemasszírozás során, de a kezelés összesen csak 7-10 percig tart."
+      },
+      {
+        q: "Kinek ajánlott a Green Sea Peel?",
+        a: "Pigmentfoltos, heges (aknéheg, bárányhimlőheg), zsíros, tágpórusú bőrre, valamint anti-aging kezelésként is kiváló. Kortól függetlenül végezhető."
+      },
+      {
+        q: "Kinek NEM ajánlott a kezelés?",
+        a: "Rozáciás, nagyon érzékeny, aktív aknés bőrre, herpesz esetén, illetve rák/kagyló/alga allergia esetén nem végezhető. Anyajegyeket ki kell kerülni, túl anyajegyes bőr esetén nem javasolt."
+      },
+      {
+        q: "Hány kezelés szükséges?",
+        a: "Már egy kezelés után is komplett bőrmegújulás tapasztalható. Hegek kezelésére 4 alkalmas kúra javasolt, 28 naponként. Utána évente 1 fenntartó kezelés elegendő."
+      },
+      {
+        q: "Milyen a hámlás?",
+        a: "A hámlás 3-4 nap után indul és kb. egy hétig tart. Light kezelésnél púderszerű, medium esetén közepes, deep kezelésnél lemezes hámlás várható – nagy bőrdarabokban jön le a régi bőr, alatta friss, megújult bőr jelenik meg."
+      },
+      {
+        q: "Mit kell tennem a kezelés után?",
+        a: "Csak langyos víz és fényvédő használata megengedett. Tilos a hidratáló, lemosó, retinol és bármilyen ápoló termék használata a hámlás ideje alatt. A bőr öngyógyító mechanizmusára kell bízni a folyamatot."
+      },
+      {
+        q: "Mikor végezhető a kezelés?",
+        a: "Kizárólag a téli hónapokban, novembertől májusig. Nyáron a fokozott UV-sugárzás miatt nem végezhető."
+      },
+      {
+        q: "Van-e leállási idő?",
+        a: "Igen, a kezelés után 3-7 napig hámlás várható, ami során pirosság is jelentkezik. Ez idő alatt nem ajánlott fontos események előtt elvégeztetni."
+      },
+      {
+        q: "Kombinálható más kezelésekkel?",
+        a: "A Green Sea Peel önmagában egy komplex kezelés. Nálunk LED fényterápiával is kiegészítjük az árban benne foglaltan. Más kezeléssel nem kombinálható egyidejűleg."
+      },
+      {
+        q: "Mit tartalmaz a kezelés ára?",
+        a: "75 perces kezelést kapsz, prémium koreai és német termékekkel, LED fényterápiával kiegészítve. A bőrt a kezelés végén gondosan visszanyugtatjuk szenzitív termékekkel."
+      }
+    ]
+  },
+  {
+    id: 'biopen-q2',
+    title: 'BioPen Q2',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>`,
+    questions: [
+      {
+        q: "Mi az a BioPen Q2?",
+        a: "A BioPen Q2 egy 3-in-1 kozmetikai készülék, amely mikrotűs mezoterápiát, elektroporációt és LED fényterápiát ötvöz egyetlen kezelésben. Orvosi tisztaságú hatóanyagokat juttat a bőr mélyrétégeibe, beindítva a kollagén és elasztin termelést."
+      },
+      {
+        q: "Fájdalmas a kezelés?",
+        a: "Nem. A kezelés előtt lidokainos érzéstelenítő krémet alkalmazunk, így a mikrotűs kezelés fájdalommentes. Az elektroporáció enyhe áramérzetet adhat, de ez kikapcsolható, ha kellemetlen."
+      },
+      {
+        q: "Kinek ajánlott a BioPen Q2?",
+        a: "25 éves kor felett ajánljuk, amikor a természetes kollagéntermelés lelassul. Kiváló ráncokra, hegekre, pigmentfoltokra, dehidratált bőrre, tágpórusokra és szemkörnyék problémákra."
+      },
+      {
+        q: "Milyen hatóanyagokkal dolgoztok?",
+        a: "20-féle orvosi tisztaságú ampullával dolgozunk: kollagén, hialuronsav, C-vitamin, peptidek, lifting hatóanyagok, és speciális keverékek dehidratált, pigmentfoltos vagy aknés bőrre."
+      },
+      {
+        q: "Hány kezelés szükséges?",
+        a: "Már az első kezelés után látható javulás tapasztalható. Optimális eredményhez 4 alkalmas kúra javasolt, 3-4 hetente. Utána évente 1-2 fenntartó kezelés elegendő."
+      },
+      {
+        q: "Mikor végezhető a kezelés?",
+        a: "Télen mikrotűvel dolgozunk (mélyebb rétegek), nyáron nanotűvel (felszíni kezelés). Így egész évben végezhető, a szezonhoz igazítva az intenzitást."
+      },
+      {
+        q: "Mi a különbség a mikrotű és a nanotű között?",
+        a: "A mikrotű mélyebb rétegekbe hatol, intenzívebb eredményt ad – ezt télen alkalmazzuk. A nanotű a felszíni rétegekben dolgozik, kíméletesebb, nyáron is biztonságos."
+      },
+      {
+        q: "Kombinálható más kezelésekkel?",
+        a: "A BioPen Q2 önmagában komplex kezelés, amelyet nem kombinálunk más elektrokozmetikai eljárásokkal. A készülék 3 funkciója (mikrotű, elektroporáció, LED) egymást erősíti."
+      },
+      {
+        q: "Van-e leállási idő?",
+        a: "Minimális. A kezelés után enyhe pirosság jelentkezhet, ami néhány órán belül elmúlik. Másnap már normálisan folytathatod a napirendedet."
+      },
+      {
+        q: "Miért érdemes a Beautyflow-ba jönni?",
+        a: "Mi 75 perces kezelést végzünk érzéstelenítéssel, 20-féle orvosi tisztaságú hatóanyaggal dolgozunk, és a LED fényterápiát az árban benne foglaljuk. Díjnyertes szalonunkban a prémiumból is a prémiumot kapod."
+      }
+    ]
+  },
+  {
     id: 'pigmentfolt',
     title: 'Pigmentfolt Eltávolítás',
     icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`,
@@ -356,6 +454,8 @@ const categoryColors: Record<string, { primary: string; light: string; bg: strin
   'tetovalas-eltavolitas': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2', shadow: 'rgba(239, 68, 68, 0.15)' },
   'sminktetovalas': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff', shadow: 'rgba(99, 102, 241, 0.15)' },
   'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff', shadow: 'rgba(139, 92, 246, 0.15)' },
+  'green-sea-peel': { primary: '#059669', light: '#6ee7b7', bg: '#ecfdf5', shadow: 'rgba(5, 150, 105, 0.15)' },
+  'biopen-q2': { primary: '#0891b2', light: '#67e8f9', bg: '#ecfeff', shadow: 'rgba(8, 145, 178, 0.15)' },
   'pigmentfolt': { primary: '#f59e0b', light: '#fcd34d', bg: '#fffbeb', shadow: 'rgba(245, 158, 11, 0.15)' },
 };
 
@@ -422,7 +522,7 @@ const breadcrumbSchema = {
   <!-- Category Navigation -->
   <section class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
     <div class="container mx-auto px-4">
-      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:justify-center" id="faq-nav">
+      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:flex-wrap md:justify-center" id="faq-nav">
         {faqCategories.map((category, index) => {
           const colors = categoryColors[category.id];
           return (

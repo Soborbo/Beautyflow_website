@@ -6,6 +6,7 @@ import type { DataLayerEvent } from '../types';
 import { TRACKING_VERSION, EVENT_NAMES, DEVICE_BREAKPOINTS, getSiteCurrency, log } from './constants';
 import { getOrCreateSessionId } from './session';
 import { buildAttributionForDataLayer } from './params';
+import { generateLeadId } from './idempotency';
 
 function ensureDataLayer(): DataLayerEvent[] {
   if (typeof window !== 'undefined') {
@@ -56,9 +57,13 @@ function pushEvent(eventName: string, params: Record<string, unknown> = {}): voi
 // =============================================================================
 
 export function pushPhoneClick(value?: number, currency?: string): void {
+  const attribution = buildAttributionForDataLayer();
+
   pushEvent(EVENT_NAMES.PHONE_CLICK, {
+    lead_id: generateLeadId(),
     value: value || 0,
     currency: currency || getSiteCurrency(),
+    ...attribution,
   });
 }
 
@@ -107,8 +112,11 @@ export function pushCalculatorStart(): void {
   pushEvent(EVENT_NAMES.CALCULATOR_START);
 }
 
-export function pushCalculatorStep(step: number): void {
-  pushEvent(EVENT_NAMES.CALCULATOR_STEP, { step });
+export function pushCalculatorStep(step: number, label?: string): void {
+  pushEvent(EVENT_NAMES.CALCULATOR_STEP, {
+    step,
+    ...(label ? { step_label: label } : {}),
+  });
 }
 
 export function pushCalculatorOption(field: string, value: string): void {

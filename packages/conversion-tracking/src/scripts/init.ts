@@ -22,6 +22,7 @@ import {
   trackPageView,
   hasActiveSession,
   trackNewSession,
+  trackPhoneClick,
 } from '../client/index';
 
 // Get config from window
@@ -79,5 +80,19 @@ document.addEventListener('astro:after-swap', () => {
   // Always re-capture — don't gate on consent, or gclid will be lost
   captureAttributionParams();
 });
+
+// =============================================================================
+// Global tel: link tracking (event delegation)
+// =============================================================================
+
+function handleTelClick(e: Event) {
+  const link = (e.target as Element)?.closest?.('a[href^="tel:"]') as HTMLAnchorElement | null;
+  if (!link) return;
+
+  const phone = link.getAttribute('href')?.replace('tel:', '') || undefined;
+  trackPhoneClick({ phone });
+}
+
+document.addEventListener('click', handleTelClick);
 
 export { initTracking };

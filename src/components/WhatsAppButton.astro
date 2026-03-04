@@ -64,6 +64,8 @@
 </style>
 
 <script>
+  import { trackEvent } from '@leadgen/conversion-tracking/client';
+
   function initWhatsAppButton() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
 
@@ -74,10 +76,8 @@
 
       // Track WhatsApp click (conversion event)
       whatsappBtn.addEventListener('click', () => {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'whatsapp_click',
-          click_location: 'floating_button'
+        trackEvent('whatsapp_click', {
+          click_location: 'floating_button',
         });
       });
     }
