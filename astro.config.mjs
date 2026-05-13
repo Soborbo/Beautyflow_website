@@ -9,6 +9,11 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://beautyflow.pro',
   output: 'server',
+  trailingSlash: 'never',
+  build: {
+    format: 'file',
+    inlineStylesheets: 'always',
+  },
   integrations: [
     sitemap({
       i18n: {
@@ -29,9 +34,6 @@ export default defineConfig({
       }
     })
   ],
-  build: {
-    inlineStylesheets: 'always',
-  },
   i18n: {
     defaultLocale: 'hu',
     locales: ['hu', 'en'],
