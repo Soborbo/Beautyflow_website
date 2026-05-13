@@ -455,21 +455,68 @@ async function getGoogleAccessToken(serviceAccountEmail: string, privateKey: str
   return (await response.json() as { access_token: string }).access_token;
 }
 
-async function appendToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promise<void> {
+// Row 1 is a header; we insert new submissions at row 2 so newest stays on top.
+// 0-indexed for the Sheets API → 1 means "before row 2 in 1-indexed view".
+const INSERT_ROW_INDEX_ZERO_BASED = 1;
+
+async function getSheetGid(sheetId: string, accessToken: string, tabName: string): Promise<number> {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties(sheetId,title)`;
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) throw new Error(`Sheets metadata error: ${await response.text()}`);
+  const body = (await response.json()) as {
+    sheets?: { properties?: { sheetId?: number; title?: string } }[];
+  };
+  const sheet = body.sheets?.find((s) => s.properties?.title === tabName);
+  if (!sheet?.properties?.sheetId && sheet?.properties?.sheetId !== 0) {
+    throw new Error(`Sheet tab "${tabName}" not found`);
+  }
+  return sheet.properties.sheetId!;
+}
+
+async function writeToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promise<void> {
   if (!env.sheetId || !env.serviceAccountEmail || !env.privateKey) {
     return;
   }
   const accessToken = await getGoogleAccessToken(env.serviceAccountEmail, env.privateKey);
   const langLabel = data.lang === 'en' ? 'EN' : 'HU';
-  const topic =
+
+  // Column B aligns with the booking system's "treatment" column:
+  //   - consultation form → list of selected treatments
+  //   - location form     → "Kapcsolat – <Helyszín>"  (e.g. "Kapcsolat – Beautyflow Buda")
+  const treatmentCol =
     data.formType === 'consultation'
       ? data.treatments.map((t) => treatmentNamesHu[t] || t).join(', ')
-      : data.message || data.locationLabel;
-  const source =
-    data.formType === 'consultation' ? 'Konzultáció kalkulátor' : data.locationLabel;
+      : `Kapcsolat – ${data.locationLabel}`;
+
+  const message = data.formType === 'location' ? data.message || '' : '';
   const utm = [data.utm_source, data.utm_medium, data.utm_campaign].filter(Boolean).join(' / ');
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.sheetId}/values/Sheet1!A:M:append?valueInputOption=USER_ENTERED`;
+  const rowValues: string[] = [
+    formatTimestamp(),     // A
+    treatmentCol,          // B
+    data.lastName,         // C
+    data.firstName,        // D
+    data.phone,            // E
+    data.email,            // F
+    langLabel,             // G
+    message,               // H
+    data.gclid || '',      // I
+    data.fbclid || '',     // J
+    utm,                   // K
+    data.utm_content || '',// L
+    data.utm_term || '',   // M
+  ];
+
+  const gid = await getSheetGid(env.sheetId, accessToken, 'Sheet1');
+
+  // Single atomic batchUpdate:
+  //   1. insertDimension — shift everything down to make room at row 2
+  //   2. updateCells     — fill the new row (stringValue ≈ RAW: no formula
+  //                        evaluation, so user input starting with =/+/-/@
+  //                        can't inject formulas)
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.sheetId}:batchUpdate`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -477,21 +524,34 @@ async function appendToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promi
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      values: [[
-        formatTimestamp(),
-        source,
-        topic,
-        data.lastName,
-        data.firstName,
-        data.phone,
-        data.email,
-        langLabel,
-        data.gclid || '',
-        data.fbclid || '',
-        utm,
-        data.utm_content || '',
-        data.utm_term || '',
-      ]],
+      requests: [
+        {
+          insertDimension: {
+            range: {
+              sheetId: gid,
+              dimension: 'ROWS',
+              startIndex: INSERT_ROW_INDEX_ZERO_BASED,
+              endIndex: INSERT_ROW_INDEX_ZERO_BASED + 1,
+            },
+            inheritFromBefore: false,
+          },
+        },
+        {
+          updateCells: {
+            rows: [{
+              values: rowValues.map((v) => ({
+                userEnteredValue: { stringValue: String(v) },
+              })),
+            }],
+            fields: 'userEnteredValue',
+            start: {
+              sheetId: gid,
+              rowIndex: INSERT_ROW_INDEX_ZERO_BASED,
+              columnIndex: 0,
+            },
+          },
+        },
+      ],
     }),
   });
   if (!response.ok) throw new Error(`Sheets error: ${await response.text()}`);
@@ -598,7 +658,7 @@ export const POST: APIRoute = async (context) => {
     const results = await Promise.allSettled([
       sendAdminEmail(resend, data),
       sendUserEmail(resend, data),
-      appendToGoogleSheet(data, googleEnv),
+      writeToGoogleSheet(data, googleEnv),
     ]);
 
     const adminResult = results[0];
