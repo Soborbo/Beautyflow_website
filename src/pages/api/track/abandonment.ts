@@ -12,6 +12,7 @@ import {
   sendGA4MP,
 } from '@/lib/tracking/server';
 import { RATE_LIMIT_ABANDONMENT_MAX } from '@/lib/tracking/config';
+import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 
 export const prerender = false;
 
@@ -91,7 +92,13 @@ export const POST: APIRoute = async (context) => {
       },
     ]);
   } catch (err) {
-    console.warn('[Abandonment] Failed to process beacon', err);
+    reportServerError({
+      code: ERROR_CODES.TRACK_GA4_ABANDONMENT_FAILED,
+      message: 'GA4 abandonment beacon forwarding failed',
+      source: '/api/track/abandonment',
+      request,
+      cause: err,
+    });
   }
   return new Response(null, { status: 204 });
 };

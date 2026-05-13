@@ -23,6 +23,7 @@ import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
+import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 
 export const prerender = false;
 
@@ -530,11 +531,22 @@ export const POST: APIRoute = async (context) => {
       const ip = request.headers.get('CF-Connecting-IP') || undefined;
       const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip);
       if (!result.success) {
-        console.warn('[contact] Turnstile failed:', result.errors);
+        reportServerError({
+          code: ERROR_CODES.CONTACT_TURNSTILE_REJECTED,
+          message: 'Turnstile verification rejected submit',
+          source: '/api/contact',
+          request,
+          context: { errors: result.errors, formType: data.formType },
+        });
         return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
       }
     } else {
-      console.warn('[contact] TURNSTILE_SECRET_KEY not configured — accepting without verification');
+      reportServerError({
+        code: ERROR_CODES.CONTACT_CONFIG_TURNSTILE_MISSING,
+        message: 'TURNSTILE_SECRET_KEY not configured — accepting without verification',
+        source: '/api/contact',
+        request,
+      });
     }
 
     // Type-specific field requirements
@@ -567,7 +579,12 @@ export const POST: APIRoute = async (context) => {
     }
 
     if (!env.RESEND_API_KEY) {
-      console.error('[contact] RESEND_API_KEY not configured');
+      reportServerError({
+        code: ERROR_CODES.CONTACT_CONFIG_RESEND_MISSING,
+        message: 'RESEND_API_KEY not configured — every submit returns 500',
+        source: '/api/contact',
+        request,
+      });
       return jsonError(500, 'Email szolgáltatás nem elérhető. Kérjük hívj minket: +36 1 300 9414');
     }
     const resend = new Resend(env.RESEND_API_KEY);
@@ -588,24 +605,70 @@ export const POST: APIRoute = async (context) => {
     const userResult = results[1];
     const sheetResult = results[2];
 
-    if (adminResult.status === 'rejected') {
-      console.error('[contact] Admin email failed:', adminResult.reason);
+    const bothEmailsFailed =
+      adminResult.status === 'rejected' && userResult.status === 'rejected';
+
+    if (bothEmailsFailed) {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED,
+        message: 'Resend admin AND user emails both failed — lead may be lost',
+        source: '/api/contact',
+        request,
+        cause: (adminResult as PromiseRejectedResult).reason,
+        context: {
+          formType: data.formType,
+          adminReason: String((adminResult as PromiseRejectedResult).reason),
+          userReason: String((userResult as PromiseRejectedResult).reason),
+          lead: {
+            name: `${data.lastName} ${data.firstName}`,
+            email: data.email,
+            phone: data.phone,
+          },
+        },
+        fingerprint: `${ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED}:${data.formType}`,
+      });
+    } else {
+      if (adminResult.status === 'rejected') {
+        reportServerError({
+          code: ERROR_CODES.CONTACT_EMAIL_ADMIN_FAILED,
+          message: 'Resend admin notification email failed',
+          source: '/api/contact',
+          request,
+          cause: adminResult.reason,
+          context: { formType: data.formType },
+        });
+      }
+      if (userResult.status === 'rejected') {
+        reportServerError({
+          code: ERROR_CODES.CONTACT_EMAIL_USER_FAILED,
+          message: 'Resend user confirmation email failed',
+          source: '/api/contact',
+          request,
+          cause: userResult.reason,
+          context: { formType: data.formType },
+        });
+      }
     }
-    if (userResult.status === 'rejected') {
-      console.warn('[contact] User confirmation email failed:', userResult.reason);
-    }
+
     if (sheetResult.status === 'rejected') {
-      console.error('[contact] Sheets append failed (lead saved in logs):', sheetResult.reason);
-      console.error('[contact] Lead data:', {
-        name: `${data.lastName} ${data.firstName}`,
-        email: data.email,
-        phone: data.phone,
-        formType: data.formType,
+      reportServerError({
+        code: ERROR_CODES.CONTACT_SHEETS_APPEND_FAILED,
+        message: 'Google Sheets append failed — lead in email + logs only',
+        source: '/api/contact',
+        request,
+        cause: sheetResult.reason,
+        context: {
+          formType: data.formType,
+          lead: {
+            name: `${data.lastName} ${data.firstName}`,
+            email: data.email,
+            phone: data.phone,
+          },
+        },
       });
     }
 
-    // If both emails failed, treat as a real failure
-    if (adminResult.status === 'rejected' && userResult.status === 'rejected') {
+    if (bothEmailsFailed) {
       return jsonError(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
     }
 
@@ -614,7 +677,13 @@ export const POST: APIRoute = async (context) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    console.error('[contact] Unhandled error:', err);
+    reportServerError({
+      code: ERROR_CODES.CONTACT_UNHANDLED,
+      message: err instanceof Error ? err.message : 'Unknown error',
+      source: '/api/contact',
+      request,
+      cause: err,
+    });
     const message = err instanceof Error ? err.message : 'Unknown error';
     return jsonError(500, `Hiba történt: ${message}`);
   }

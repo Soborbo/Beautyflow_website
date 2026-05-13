@@ -20,6 +20,7 @@ import {
   type MetaCapiEvent,
 } from '@/lib/tracking/server';
 import { DEFAULT_COUNTRY, RATE_LIMIT_CAPI_MAX } from '@/lib/tracking/config';
+import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 
 export const prerender = false;
 
@@ -156,7 +157,13 @@ export const POST: APIRoute = async (context) => {
     const env = readEnv(locals);
     await sendMetaCapi(env as Parameters<typeof sendMetaCapi>[0], [event], { countryCode: DEFAULT_COUNTRY });
   } catch (err) {
-    console.warn('[MetaCAPI] Failed to process mirror request', err);
+    reportServerError({
+      code: ERROR_CODES.TRACK_META_CAPI_FAILED,
+      message: 'Meta Conversions API mirror request failed',
+      source: '/api/meta/capi',
+      request,
+      cause: err,
+    });
   }
 
   return new Response(null, { status: 204 });
