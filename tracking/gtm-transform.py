@@ -132,7 +132,7 @@ for tag in container['containerVersion'].get('tag', []):
 
 # 5) Add new trigger: CE - booking_click
 existing_trigger_ids = {t['triggerId'] for t in container['containerVersion'].get('trigger', [])}
-next_id = max(int(tid) for tid in existing_trigger_ids) + 1
+next_id = max((int(tid) for tid in existing_trigger_ids), default=0) + 1
 
 booking_trigger_id = str(next_id)
 container['containerVersion'].setdefault('trigger', []).append({
@@ -156,7 +156,7 @@ next_id += 1
 
 # 6) Add a DLV for 'source' (used by booking_click / phone_conversion / source param) + service + form_name
 existing_var_ids = {int(v['variableId']) for v in container['containerVersion'].get('variable', [])}
-next_var = max(existing_var_ids) + 1
+next_var = max(existing_var_ids, default=0) + 1
 
 new_dlvs = ['source', 'service', 'event_id']
 existing_dlv_fields = set()
@@ -187,7 +187,7 @@ for field in new_dlvs:
 
 # 7) Add GA4 Event tag - booking_click
 existing_tag_ids = {int(t['tagId']) for t in container['containerVersion'].get('tag', [])}
-next_tag = max(existing_tag_ids) + 1
+next_tag = max(existing_tag_ids, default=0) + 1
 
 container['containerVersion'].setdefault('tag', []).append({
     'accountId': '6252358257',
@@ -266,6 +266,200 @@ container['containerVersion']['tag'].append({
     },
 })
 
+next_tag += 1
+
+# 9) Custom JavaScript variable — reads PII from the tracking-kit hidden div
+#    The kit writes email/phone/name to `#__bf_user_data__` data-attributes.
+#    Google Tag (below) consumes this in eventSettingsTable for Enhanced Conversions.
+user_data_js = (
+    "function() {\n"
+    "  var el = document.getElementById('__bf_user_data__');\n"
+    "  if (!el) return undefined;\n"
+    "  var out = {};\n"
+    "  if (el.dataset.email) out.email = el.dataset.email;\n"
+    "  if (el.dataset.phone) out.phone_number = el.dataset.phone;\n"
+    "  var addr = {};\n"
+    "  if (el.dataset.firstName) addr.first_name = el.dataset.firstName;\n"
+    "  if (el.dataset.lastName)  addr.last_name  = el.dataset.lastName;\n"
+    "  if (el.dataset.city)      addr.city       = el.dataset.city;\n"
+    "  if (el.dataset.postalCode) addr.postal_code = el.dataset.postalCode;\n"
+    "  if (el.dataset.country)   addr.country    = el.dataset.country;\n"
+    "  if (Object.keys(addr).length) out.address = addr;\n"
+    "  return out;\n"
+    "}"
+)
+
+existing_var_names = {v.get('name') for v in container['containerVersion'].get('variable', [])}
+if 'JS - User Data Object' not in existing_var_names:
+    container['containerVersion']['variable'].append({
+        'accountId': '6252358257',
+        'containerId': '196968106',
+        'variableId': str(next_var),
+        'name': 'JS - User Data Object',
+        'type': 'jsm',
+        'parameter': [
+            {'type': 'TEMPLATE', 'key': 'javascript', 'value': user_data_js},
+        ],
+        'fingerprint': '1778666385793',
+        'formatValue': {},
+    })
+    next_var += 1
+
+# 10) Hook user_data into the Google Tag's shared event settings.
+#     This is what makes Enhanced Conversions automatic for every Google Ads
+#     conversion (no per-conversion-tag wiring needed).
+for tag in container['containerVersion'].get('tag', []):
+    if tag.get('type') != 'googtag':
+        continue
+    # Check if eventSettingsTable already exists; create or update
+    event_settings = None
+    for p in tag.get('parameter', []):
+        if p.get('key') == 'eventSettingsTable':
+            event_settings = p
+            break
+    user_data_row = {
+        'type': 'MAP',
+        'map': [
+            {'type': 'TEMPLATE', 'key': 'parameter', 'value': 'user_data'},
+            {'type': 'TEMPLATE', 'key': 'parameterValue', 'value': '{{JS - User Data Object}}'},
+        ],
+    }
+    if event_settings:
+        # Avoid duplicating if already present
+        already = False
+        for row in event_settings.get('list', []):
+            for cell in row.get('map', []):
+                if cell.get('key') == 'parameterValue' and cell.get('value') == '{{JS - User Data Object}}':
+                    already = True
+                    break
+            if already:
+                break
+        if not already:
+            event_settings.setdefault('list', []).append(user_data_row)
+    else:
+        tag.setdefault('parameter', []).append({
+            'type': 'LIST',
+            'key': 'eventSettingsTable',
+            'list': [user_data_row],
+        })
+
+# 11) Meta Pixel base tag (Custom HTML) — fires on every page, requires ad_storage consent
+META_PIXEL_ID = '915395591548632'
+
+meta_base_html = (
+    "<script>\n"
+    "!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?\n"
+    "n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;\n"
+    "n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;\n"
+    "t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,\n"
+    "document,'script','https://connect.facebook.net/en_US/fbevents.js');\n"
+    f"fbq('init', '{META_PIXEL_ID}');\n"
+    "fbq('track', 'PageView');\n"
+    "</script>\n"
+    f"<noscript><img height=\"1\" width=\"1\" style=\"display:none\" src=\"https://www.facebook.com/tr?id={META_PIXEL_ID}&ev=PageView&noscript=1\" /></noscript>"
+)
+
+existing_tag_names = {t.get('name') for t in container['containerVersion'].get('tag', [])}
+
+ALL_PAGES_TRIGGER = '2147479553'
+
+def add_html_tag(name, html, trigger_ids, requires_ads_consent=True):
+    global next_tag
+    if name in existing_tag_names:
+        return
+    consent = {'consentStatus': 'NOT_SET'}
+    if requires_ads_consent:
+        consent = {
+            'consentStatus': 'NEEDED',
+            'consentType': {
+                'type': 'LIST',
+                'list': [{'type': 'TEMPLATE', 'value': 'ad_storage'}],
+            },
+        }
+    container['containerVersion']['tag'].append({
+        'accountId': '6252358257',
+        'containerId': '196968106',
+        'tagId': str(next_tag),
+        'name': name,
+        'type': 'html',
+        'parameter': [
+            {'type': 'TEMPLATE', 'key': 'html', 'value': html},
+            {'type': 'BOOLEAN', 'key': 'supportDocumentWrite', 'value': 'false'},
+        ],
+        'fingerprint': '1778666385794',
+        'firingTriggerId': trigger_ids,
+        'tagFiringOption': 'ONCE_PER_EVENT',
+        'monitoringMetadata': {'type': 'MAP'},
+        'consentSettings': consent,
+    })
+    next_tag += 1
+
+add_html_tag('Meta Pixel - Base', meta_base_html, [ALL_PAGES_TRIGGER])
+
+# Resolve the renamed trigger IDs (they kept their numeric IDs after rename)
+trigger_by_event = {}
+for trig in container['containerVersion'].get('trigger', []):
+    for fil in trig.get('customEventFilter', []):
+        for p in fil.get('parameter', []):
+            if p.get('key') == 'arg1':
+                trigger_by_event[p['value']] = trig['triggerId']
+
+# Meta Contact event — fires on contact_form_submit + phone_conversion + email/whatsapp
+contact_triggers = [
+    trigger_by_event[name]
+    for name in ('contact_form_submit', 'phone_conversion')
+    if name in trigger_by_event
+]
+if contact_triggers:
+    add_html_tag(
+        'Meta Pixel - Contact',
+        (
+            "<script>\n"
+            "  if (window.fbq) {\n"
+            "    fbq('track', 'Contact',\n"
+            "      { value: {{DLV - value}}, currency: '{{DLV - currency}}' },\n"
+            "      { eventID: '{{DLV - event_id}}' }\n"
+            "    );\n"
+            "  }\n"
+            "</script>"
+        ),
+        contact_triggers,
+    )
+
+# Meta Lead event — fires on contact_form_submit (gives Meta both Lead + Contact for the form)
+if 'contact_form_submit' in trigger_by_event:
+    add_html_tag(
+        'Meta Pixel - Lead',
+        (
+            "<script>\n"
+            "  if (window.fbq) {\n"
+            "    fbq('track', 'Lead',\n"
+            "      { value: {{DLV - value}}, currency: '{{DLV - currency}}' },\n"
+            "      { eventID: '{{DLV - event_id}}' }\n"
+            "    );\n"
+            "  }\n"
+            "</script>"
+        ),
+        [trigger_by_event['contact_form_submit']],
+    )
+
+# Meta InitiateCheckout event — fires on booking_click (Notino redirect)
+if 'booking_click' in trigger_by_event:
+    add_html_tag(
+        'Meta Pixel - InitiateCheckout',
+        (
+            "<script>\n"
+            "  if (window.fbq) {\n"
+            "    fbq('track', 'InitiateCheckout',\n"
+            "      { value: {{DLV - value}}, currency: '{{DLV - currency}}' },\n"
+            "      { eventID: '{{DLV - event_id}}' }\n"
+            "    );\n"
+            "  }\n"
+            "</script>"
+        ),
+        [trigger_by_event['booking_click']],
+    )
+
 # Save the result
 with open(DST, 'w', encoding='utf-8') as f:
     json.dump(container, f, indent=4, ensure_ascii=False)
@@ -275,10 +469,10 @@ print(f"Saved: {DST}")
 # Summary
 print("\nTrigger arg1 changes:")
 for old, new in event_rename.items():
-    print(f"  {old} → {new}")
+    print(f"  {old} -> {new}")
 print("\nDLV renames:")
 for old, new in dlv_rename.items():
-    print(f"  {old} → {new}")
+    print(f"  {old} -> {new}")
 print("\nAdded:")
 print(f"  Trigger: CE - booking_click (ID {booking_trigger_id})")
 print(f"  Tag: GA4 Event - booking_click")
