@@ -1,22 +1,14 @@
 import type { MiddlewareHandler } from 'astro';
 
 // 301 redirects — SEO átirányítások
+// Trailing-slash canonicalisation (`/foo/` -> `/foo`) is handled at the edge
+// by Cloudflare via `assets.html_handling: "drop-trailing-slash"` in
+// wrangler.jsonc. Do NOT add `/foo/` -> `/foo` entries here: Astro runs this
+// middleware during prerendering with directory-format URLs (`/foo/`), so a
+// self-redirect causes Astro to write a redirect-stub HTML at
+// `dist/foo/index.html` instead of the real prerendered page — which then
+// gets served to users at `/foo`, breaking the page (and analytics tagging).
 const redirects: Record<string, string> = {
-  '/arak/': '/arak',
-  '/rolunk/': '/rolunk',
-  '/sminktetovalas/': '/sminktetovalas',
-  '/carbon-peeling/': '/carbon-peeling',
-  '/hydrabeauty/': '/hydrabeauty',
-  '/beautyflow-buda/': '/beautyflow-buda',
-  '/beautyflow-pest/': '/beautyflow-pest',
-  '/dioda-lezeres-szortelenites/': '/dioda-lezeres-szortelenites',
-  '/lezeres-tetovalas-eltavolitas/': '/lezeres-tetovalas-eltavolitas',
-  '/gyakran-ismetelt-kerdesek/': '/gyakran-ismetelt-kerdesek',
-  '/adatvedelmi-tajekoztato/': '/adatvedelmi-tajekoztato',
-  '/ingyenes-konzultacio/': '/ingyenes-konzultacio',
-  '/pigmentfolt-eltavolitas/': '/pigmentfolt-eltavolitas',
-  '/koszonjuk/': '/koszonjuk',
-
   '/fanni': '/rolunk',
   '/fanni/': '/rolunk',
   '/janka': '/rolunk',
@@ -58,7 +50,6 @@ const redirects: Record<string, string> = {
 
   '/altalanos-szerzodesi-feltetelek': '/aszf',
   '/altalanos-szerzodesi-feltetelek/': '/aszf',
-  '/aszf/': '/aszf',
   '/adatvedelem': '/adatvedelmi-tajekoztato',
   '/adatvedelem/': '/adatvedelmi-tajekoztato',
   '/adatvedelmi': '/adatvedelmi-tajekoztato',
