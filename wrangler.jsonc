@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "beautyflow",
+  "name": "beautyflow-website",
   "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2025-05-13",
   "compatibility_flags": ["nodejs_compat"],
