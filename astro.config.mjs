@@ -4,20 +4,12 @@ import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import critters from 'astro-critters';
 import sitemap from '@astrojs/sitemap';
-import tracking from '@leadgen/conversion-tracking';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://beautyflow.pro',
   output: 'server',
   integrations: [
-    tracking({
-      gtmId: 'GTM-W8V3BVGD',
-      currency: 'HUF',
-      sessionTimeoutMinutes: 30,
-      debug: import.meta.env.DEV, // Debug overlay in dev mode
-      enableOfflineQueue: true,
-    }),
     sitemap({
       i18n: {
         defaultLocale: 'hu',
@@ -29,17 +21,16 @@ export default defineConfig({
     }),
     critters({
       Critters: {
-        // Inline critical CSS for above-the-fold content
-        preload: 'media', // Preload non-critical CSS with media query trick
-        inlineFonts: false, // Don't inline fonts (we use preload instead)
-        preloadFonts: false, // Don't preload fonts (we handle it manually)
-        pruneSource: true, // Remove inlined CSS from external stylesheets
-        mergeStylesheets: false, // Keep stylesheets separate for better caching
+        preload: 'media',
+        inlineFonts: false,
+        preloadFonts: false,
+        pruneSource: true,
+        mergeStylesheets: false,
       }
     })
   ],
   build: {
-    inlineStylesheets: 'always', // Inline all CSS for maximum performance
+    inlineStylesheets: 'always',
   },
   i18n: {
     defaultLocale: 'hu',
@@ -50,15 +41,11 @@ export default defineConfig({
   },
   adapter: cloudflare({
     imageService: 'compile',
-    routes: {
-      strategy: 'include',
-      include: ['/*'],
-      exclude: ['/_astro/*', '/images/*', '/favicon.svg']
-    }
+    platformProxy: {
+      enabled: true,
+    },
   }),
   image: {
-    // With imageService: 'compile', images are processed at build time
-    // No need for sharp service - Cloudflare adapter handles it
     domains: [],
   },
   vite: {

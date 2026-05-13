@@ -3,6 +3,9 @@ export const prerender = true;
 
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
+import GTMHead from '../components/tracking/GTMHead.astro';
+import GTMBody from '../components/tracking/GTMBody.astro';
+import TrackingBoot from '../components/tracking/TrackingBoot.astro';
 
 // Image imports
 import lezeresImg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
@@ -101,7 +104,7 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
-    <!-- GTM + tracking injected by @leadgen/conversion-tracking integration -->
+    <GTMHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />
@@ -115,6 +118,7 @@ const breadcrumbSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   </head>
   <body class="bg-[#fdf8f6] min-h-[100dvh] md:h-screen md:overflow-hidden">
+    <GTMBody />
     <main class="min-h-[100dvh] md:h-full py-4 md:py-0">
       <!-- Form Container -->
       <div id="form-container" class="min-h-[100dvh] md:h-full flex items-center justify-center px-4">
@@ -508,69 +512,42 @@ const breadcrumbSchema = {
 
     <script>
       import {
-        trackConversion,
-        getFirstTouch,
-        getLastTouch,
-        getGclid,
-        getFbclid,
-        pushCalculatorStep,
-        pushCalculatorStart,
-        pushCalculatorOption,
-      } from '@leadgen/conversion-tracking/client';
+        trackEvent,
+        trackFormStart,
+        trackFormStep,
+        trackFormSubmitted,
+        setUserDataOnDOM,
+        normalizeUserData,
+        mirrorMetaCapi,
+      } from '@/lib/tracking';
 
-      // Tracking is auto-initialized by the Astro integration
+      const FORM_ID = 'consultation-calculator';
+      const FORM_NAME = 'consultation_calculator';
+      const TOTAL_STEPS = 4;
 
-      // Helper to get all tracking data for beacon/forms
-      function getAllTrackingData() {
-        const first = getFirstTouch();
-        const last = getLastTouch();
+      // Read UTM/click ids from URL + cookies for the lead record
+      function getTrackingData() {
+        const params = new URLSearchParams(window.location.search);
+        const cookies = Object.fromEntries(
+          document.cookie.split(';').map(c => {
+            const [k, ...rest] = c.trim().split('=');
+            return [k, rest.join('=')];
+          })
+        );
         return {
-          gclid: getGclid(),
-          fbclid: getFbclid(),
-          utm_source: last?.utm_source || first?.utm_source || '',
-          utm_medium: last?.utm_medium || first?.utm_medium || '',
-          utm_campaign: last?.utm_campaign || first?.utm_campaign || '',
-          utm_content: last?.utm_content || first?.utm_content || '',
-          utm_term: last?.utm_term || first?.utm_term || '',
+          gclid: params.get('gclid') || cookies.gclid || '',
+          fbclid: params.get('fbclid') || cookies.fbclid || '',
+          utm_source: params.get('utm_source') || '',
+          utm_medium: params.get('utm_medium') || '',
+          utm_campaign: params.get('utm_campaign') || '',
+          utm_content: params.get('utm_content') || '',
+          utm_term: params.get('utm_term') || '',
         };
       }
 
-      // Send tracking beacon (guaranteed delivery)
-      function sendTrackingBeacon(data: Record<string, unknown>): void {
-        const endpoint = '/api/tracking-beacon';
-
-        try {
-          const payload = JSON.stringify({
-            ...data,
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-          });
-
-          if (navigator.sendBeacon) {
-            const blob = new Blob([payload], { type: 'application/json' });
-            navigator.sendBeacon(endpoint, blob);
-          } else {
-            fetch(endpoint, {
-              method: 'POST',
-              body: payload,
-              headers: { 'Content-Type': 'application/json' },
-              keepalive: true,
-            }).catch(() => {});
-          }
-        } catch {}
-      }
-
-      // Generate transaction ID
-      function generateTransactionId(): string {
-        const timestamp = Date.now().toString(36);
-        const random = Math.random().toString(36).slice(2, 7);
-        return `LEAD-${timestamp}-${random}`.toUpperCase();
-      }
-
       document.addEventListener('DOMContentLoaded', () => {
-        // Tracking is auto-initialized by Astro integration
-        pushCalculatorStart();
+        // fires once per page-load
+        trackFormStart(FORM_ID, FORM_NAME);
 
         let currentStep = 1;
 
@@ -645,16 +622,12 @@ const breadcrumbSchema = {
               .filter(cb => cb.checked)
               .map(cb => cb.value);
             btnStep1.disabled = formData.treatments.length === 0;
-
-            if (checkbox.checked) {
-              pushCalculatorOption('treatment', checkbox.value);
-            }
           });
         });
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
-            pushCalculatorStep(1, 'treatments');
+            trackFormStep(FORM_ID, 'treatments', 1, TOTAL_STEPS);
             showStep(2);
           }
         });
@@ -678,7 +651,7 @@ const breadcrumbSchema = {
 
         btnStep2.addEventListener('click', () => {
           if (formData.firstName.length >= 2 && formData.lastName.length >= 2) {
-            pushCalculatorStep(2, 'name');
+            trackFormStep(FORM_ID, 'name', 2, TOTAL_STEPS);
             showStep(3);
           }
         });
@@ -702,7 +675,7 @@ const breadcrumbSchema = {
 
         btnStep3.addEventListener('click', () => {
           if (validatePhone(formData.phone)) {
-            pushCalculatorStep(3, 'phone');
+            trackFormStep(FORM_ID, 'phone', 3, TOTAL_STEPS);
             showStep(4);
           }
         });
@@ -767,64 +740,52 @@ const breadcrumbSchema = {
         btnSubmit.addEventListener('click', async () => {
           formData.website = honeypotInput?.value || '';
           if (formData.website) {
-            showThankYou();
+            window.location.href = '/koszonjuk';
             return;
           }
 
           loadingOverlay?.classList.remove('hidden');
           errorMessage?.classList.add('hidden');
 
-          // Generate transaction ID for tracking
-          const transactionId = generateTransactionId();
+          const trackingData = getTrackingData();
 
-          // Track conversion (GTM + Zaraz) - consent-aware
-          const trackingResult = trackConversion('contact_form', {
+          // Stage PII on the side-channel DOM element (NOT dataLayer) so
+          // GTM tags + the Meta CAPI mirror can read it after success.
+          setUserDataOnDOM(normalizeUserData({
             email: formData.email,
-            phone: formData.phone,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            value: 5000, // Lead value in HUF
-            currency: 'HUF',
-          });
+            phone_number: formData.phone,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          }, 'HU'));
 
-          // Get all tracking data for beacon
-          const trackingData = getAllTrackingData();
-
-          // Send beacon (guaranteed delivery even on page unload)
-          sendTrackingBeacon({
-            email: formData.email,
-            phone: formData.phone,
-            transactionId,
-            gclid: trackingResult.gclid,
-            fbclid: trackingData.fbclid,
-            ...trackingData,
-          });
-
-          // Add tracking data to formData for Google Sheets
-          const formDataWithTracking = {
+          const payload = {
             ...formData,
-            gclid: trackingData.gclid || '',
-            fbclid: trackingData.fbclid || '',
-            utm_source: trackingData.utm_source || '',
-            utm_medium: trackingData.utm_medium || '',
-            utm_campaign: trackingData.utm_campaign || '',
-            utm_content: trackingData.utm_content || '',
-            utm_term: trackingData.utm_term || '',
+            formType: 'consultation' as const,
+            ...trackingData,
           };
 
           try {
             const response = await fetch('/api/contact', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formDataWithTracking),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
             });
 
             const result = await response.json();
 
             if (result.success) {
-              showThankYou();
+              trackFormSubmitted(FORM_ID);
+              const eventId = trackEvent('contact_form_submit', {
+                form_name: FORM_NAME,
+                value: 5000,
+                currency: 'HUF',
+                service: formData.treatments[0] || 'consultation',
+              });
+              void mirrorMetaCapi('contact_form_submit', eventId, {
+                value: 5000,
+                currency: 'HUF',
+              });
+              window.location.href = '/koszonjuk';
             } else {
               showError(result.error || 'Hiba történt, kérjük próbáld újra.');
             }
@@ -835,12 +796,6 @@ const breadcrumbSchema = {
           }
         });
 
-        function showThankYou() {
-          steps.forEach(s => s.classList.add('hidden'));
-          document.getElementById('thank-you')?.classList.remove('hidden');
-          document.getElementById('progress')?.classList.add('hidden');
-        }
-
         function showError(message: string) {
           if (errorText) errorText.textContent = message;
           errorMessage?.classList.remove('hidden');
@@ -850,5 +805,6 @@ const breadcrumbSchema = {
         }
       });
     </script>
+    <TrackingBoot />
   </body>
 </html>

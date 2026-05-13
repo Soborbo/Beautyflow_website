@@ -1,0 +1,42 @@
+---
+/**
+ * Google Tag Manager — <head> snippet.
+ *
+ * Order:
+ *   1. Consent Mode v2 default (everything denied except security_storage)
+ *      — MUST precede GTM so any tag firing before the CMP responds has
+ *      a defined consent context.
+ *   2. GTM bootstrap.
+ *
+ * Load your CMP (CookieYes / Cookiebot / OneTrust) as a GTM tag firing
+ * on the built-in "Consent Initialization - All Pages" trigger.
+ */
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
+---
+
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  window.gtag = window.gtag || gtag;
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    analytics_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    functionality_storage: 'denied',
+    personalization_storage: 'denied',
+    security_storage: 'granted',
+    wait_for_update: 500,
+  });
+</script>
+
+{gtmId && (
+  <script set:html={`
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${gtmId}');
+  `} />
+)}

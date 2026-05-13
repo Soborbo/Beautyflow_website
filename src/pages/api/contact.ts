@@ -1,7 +1,38 @@
+/**
+ * Contact API — handles both:
+ *   - formType: 'consultation'  →  the 4-step calculator on /ingyenes-konzultacio
+ *   - formType: 'location'      →  the per-salon contact form on Buda/Pest pages
+ *
+ * Pipeline:
+ *   1. Parse + honeypot + time check (light validation)
+ *   2. Cloudflare Turnstile (server-verified, fail closed)
+ *   3. Field validation (email, phone, consent, etc.)
+ *   4. Resend → admin notification (info@beautyflow.pro)
+ *   5. Resend → user confirmation (Fanni's voice, HU/EN)
+ *   6. Google Sheets append (best-effort, optional)
+ *
+ * Env vars (set on Cloudflare dashboard or via wrangler secret put):
+ *   RESEND_API_KEY               — required
+ *   TURNSTILE_SECRET_KEY         — required (Turnstile blocks all traffic without it)
+ *   GOOGLE_SHEETS_ID             — optional
+ *   GOOGLE_SERVICE_ACCOUNT_EMAIL — optional
+ *   GOOGLE_PRIVATE_KEY           — optional
+ */
+
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { verifyTurnstile } from '@/lib/forms/turnstile';
+import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 
-// Treatment name mapping - Hungarian
+export const prerender = false;
+
+// ---- Constants ---------------------------------------------------------
+
+const ADMIN_TO = 'info@beautyflow.pro';
+const ADMIN_FROM = 'Beautyflow <info@beautyflow.pro>';
+const USER_FROM_HU = 'Kónya Fanni - Beautyflow <info@beautyflow.pro>';
+const USER_FROM_EN = 'Fanni Kónya - Beautyflow <info@beautyflow.pro>';
+
 const treatmentNamesHu: Record<string, string> = {
   lezer: 'Dióda Lézeres Szőrtelenítés',
   hydra: 'HydraBeauty Arckezelés',
@@ -10,8 +41,6 @@ const treatmentNamesHu: Record<string, string> = {
   tetovalas: 'Lézeres Tetoválás Eltávolítás',
   pigment: 'Pigmentfolt Eltávolítás',
 };
-
-// Treatment name mapping - English
 const treatmentNamesEn: Record<string, string> = {
   lezer: 'Diode Laser Hair Removal',
   hydra: 'HydraBeauty Facial Treatment',
@@ -21,16 +50,21 @@ const treatmentNamesEn: Record<string, string> = {
   pigment: 'Pigmentation Removal',
 };
 
-interface ContactFormData {
-  treatments: string[];
+// ---- Payload types -----------------------------------------------------
+
+type FormType = 'consultation' | 'location';
+
+interface BaseFormData {
+  formType: FormType;
   firstName: string;
   lastName: string;
   phone: string;
   email: string;
   consent: boolean;
-  website: string; // honeypot
-  lang?: 'hu' | 'en'; // language
-  // Tracking data
+  website?: string; // honeypot
+  turnstileToken?: string;
+  lang?: 'hu' | 'en';
+  // tracking
   gclid?: string;
   fbclid?: string;
   utm_source?: string;
@@ -40,25 +74,31 @@ interface ContactFormData {
   utm_term?: string;
 }
 
-// Validate email format
+interface ConsultationFormData extends BaseFormData {
+  formType: 'consultation';
+  treatments: string[];
+}
+
+interface LocationFormData extends BaseFormData {
+  formType: 'location';
+  locationId: 'buda' | 'pest';
+  locationLabel: string;
+  message?: string;
+}
+
+type ContactFormData = ConsultationFormData | LocationFormData;
+
+// ---- Validators --------------------------------------------------------
+
 function isValidEmail(email: string): boolean {
-  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return pattern.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Validate phone format
 function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
-  const patterns = [
-    /^\+36[0-9]{9}$/,
-    /^06[0-9]{9}$/,
-    /^[0-9]{9}$/,
-    /^36[0-9]{9}$/,
-  ];
-  return patterns.some((p) => p.test(cleaned));
+  const cleaned = phone.replace(/[\s\-()]/g, '');
+  return /^(\+36|06|36)?[0-9]{9}$/.test(cleaned);
 }
 
-// Format timestamp in Hungarian
 function formatTimestamp(): string {
   return new Date().toLocaleString('hu-HU', {
     timeZone: 'Europe/Budapest',
@@ -70,141 +110,247 @@ function formatTimestamp(): string {
   });
 }
 
-// Send admin notification email (always in Hungarian for staff)
-async function sendAdminEmail(resend: Resend, data: ContactFormData) {
-  const treatmentList = data.treatments
-    .map((t) => treatmentNamesHu[t] || t)
-    .join(', ');
+// ---- Env access (Workers + Pages compatible) --------------------------
 
-  const langLabel = data.lang === 'en' ? '🇬🇧 English' : '🇭🇺 Magyar';
+interface RuntimeEnv {
+  RESEND_API_KEY?: string;
+  TURNSTILE_SECRET_KEY?: string;
+  GOOGLE_SHEETS_ID?: string;
+  GOOGLE_SERVICE_ACCOUNT_EMAIL?: string;
+  GOOGLE_PRIVATE_KEY?: string;
+}
+
+function readEnv(locals: App.Locals): RuntimeEnv {
+  // Astro 5 + @astrojs/cloudflare exposes Workers bindings on locals.runtime.env
+  const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime;
+  const fromRuntime = runtime?.env || {};
+
+  // Fall back to process.env (Node dev) / import.meta.env (Vite build) so
+  // local `astro dev` works without `wrangler dev`.
+  const pickEnv = (key: keyof RuntimeEnv): string | undefined =>
+    fromRuntime[key] ||
+    (typeof process !== 'undefined' && process.env ? process.env[key] : undefined) ||
+    (import.meta.env as Record<string, string | undefined>)[key];
+
+  return {
+    RESEND_API_KEY: pickEnv('RESEND_API_KEY'),
+    TURNSTILE_SECRET_KEY: pickEnv('TURNSTILE_SECRET_KEY'),
+    GOOGLE_SHEETS_ID: pickEnv('GOOGLE_SHEETS_ID'),
+    GOOGLE_SERVICE_ACCOUNT_EMAIL: pickEnv('GOOGLE_SERVICE_ACCOUNT_EMAIL'),
+    GOOGLE_PRIVATE_KEY: pickEnv('GOOGLE_PRIVATE_KEY'),
+  };
+}
+
+// ---- Email senders -----------------------------------------------------
+
+async function sendAdminEmail(resend: Resend, data: ContactFormData): Promise<void> {
+  const lang = data.lang || 'hu';
+  const langLabel = lang === 'en' ? 'EN' : 'HU';
   const timestamp = formatTimestamp();
 
-  await resend.emails.send({
-    from: 'Beautyflow <hello@beautyflow.pro>',
-    replyTo: data.email,
-    to: 'erdeklodes@beautyflow.pro',
-    subject: `Konzultáció - ${data.lastName} ${data.firstName}`,
-    headers: {
-      'X-Entity-Ref-ID': `admin-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-    },
-    text: `
-Új konzultációs igény érkezett!
+  const fullName = `${data.lastName} ${data.firstName}`;
+  let subject: string;
+  let topic: string;
+
+  if (data.formType === 'consultation') {
+    subject = `Konzultáció - ${fullName}`;
+    topic =
+      data.treatments
+        .map((t) => treatmentNamesHu[t] || t)
+        .join(', ') || '(nincs megadva)';
+  } else {
+    subject = `Kapcsolat (${data.locationLabel}) - ${fullName}`;
+    topic = data.message
+      ? data.message
+      : '(üzenet nélkül)';
+  }
+
+  const safeSubject = escapeSubject(subject);
+
+  const sourcePage =
+    data.formType === 'location' ? data.locationLabel : 'Ingyenes konzultáció kalkulátor';
+
+  const utmString = [data.utm_source, data.utm_medium, data.utm_campaign]
+    .filter(Boolean)
+    .join(' / ');
+
+  const textBody = `
+Új érdeklődés érkezett!
 
 Időpont: ${timestamp}
 Nyelv: ${langLabel}
+Forrás: ${sourcePage}
 
 Érdeklődő adatai:
-- Név: ${data.lastName} ${data.firstName}
+- Név: ${fullName}
 - Telefon: ${data.phone}
 - Email: ${data.email}
 
-Érdeklődés tárgya:
-${treatmentList}
+Tárgy:
+${topic}
 
+${utmString ? `Marketing: ${utmString}\n` : ''}${data.gclid ? `gclid: ${data.gclid}\n` : ''}${data.fbclid ? `fbclid: ${data.fbclid}\n` : ''}
 ---
-Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.
-    `.trim(),
-    html: `
+Automatikus üzenet a beautyflow.pro weboldalról.
+`.trim();
+
+  const htmlBody = `
 <!DOCTYPE html>
 <html lang="hu">
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-  <h2 style="color: #8B6F5E;">Új konzultációs igény érkezett!</h2>
-  <p style="color: #666; font-size: 14px;">Időpont: ${timestamp} | Nyelv: ${langLabel}</p>
+  <h2 style="color: #c53f75;">Új érdeklődés érkezett</h2>
+  <p style="color: #666; font-size: 13px;">${escapeHtml(timestamp)} · ${escapeHtml(langLabel)} · ${escapeHtml(sourcePage)}</p>
   <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
-    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 120px;">Név</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${data.lastName} ${data.firstName}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Telefon</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${data.phone}">${data.phone}</a></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Kezelések</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${treatmentList}</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 120px;">Név</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(fullName)}</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Telefon</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${escapeHtml(data.phone)}">${escapeHtml(data.phone)}</a></td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;vertical-align:top;">Tárgy</td><td style="padding: 8px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(topic)}</td></tr>
+    ${utmString ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Marketing</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(utmString)}</td></tr>` : ''}
+    ${data.gclid ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">gclid</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(data.gclid)}</td></tr>` : ''}
+    ${data.fbclid ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">fbclid</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(data.fbclid)}</td></tr>` : ''}
   </table>
-  <p style="color: #999; font-size: 12px; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">Ez az email automatikusan lett küldve a beautyflow.pro weboldalról.</p>
+  <p style="color: #999; font-size: 12px; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">Automatikus üzenet a beautyflow.pro weboldalról.</p>
 </body>
 </html>
-    `.trim(),
+`.trim();
+
+  await resend.emails.send({
+    from: ADMIN_FROM,
+    replyTo: data.email,
+    to: ADMIN_TO,
+    subject: safeSubject,
+    headers: {
+      'X-Entity-Ref-ID': `admin-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    },
+    text: textBody,
+    html: htmlBody,
   });
 }
 
-// Send user confirmation email (in user's language)
-async function sendUserEmail(resend: Resend, data: ContactFormData) {
+async function sendUserEmail(resend: Resend, data: ContactFormData): Promise<void> {
   const isEnglish = data.lang === 'en';
   const uniqueId = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  const firstNameSafe = escapeHtml(data.firstName);
+
+  // Topic line we echo back so the user sees what we received
+  let topicLine = '';
+  if (data.formType === 'consultation') {
+    const names = isEnglish ? treatmentNamesEn : treatmentNamesHu;
+    const list = data.treatments.map((t) => names[t] || t).join(', ');
+    topicLine = list
+      ? isEnglish
+        ? `Topic of interest: ${list}`
+        : `Érdeklődés tárgya: ${list}`
+      : '';
+  } else {
+    topicLine = isEnglish
+      ? `Location: ${data.locationLabel}`
+      : `Helyszín: ${data.locationLabel}`;
+  }
 
   if (isEnglish) {
     await resend.emails.send({
-      from: 'Fanni Kónya - Beautyflow <hello@beautyflow.pro>',
-      replyTo: 'hello@beautyflow.pro',
+      from: USER_FROM_EN,
+      replyTo: ADMIN_TO,
       to: data.email,
-      subject: 'We received your inquiry',
-      headers: {
-        'X-Entity-Ref-ID': uniqueId,
-      },
+      subject: 'We received your inquiry — Beautyflow',
+      headers: { 'X-Entity-Ref-ID': uniqueId },
       text: `
 Dear ${data.firstName},
 
-Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.
+Thank you for reaching out to Beautyflow. We received your message and we'll get back to you as soon as possible.
+
+${topicLine}
+
+Opening hours (Beautyflow Buda & Pest):
+Mon–Fri: 08:00 – 20:00
+Sat: 10:00 – 20:00
+Sun: 10:00 – 19:00
+
+If your matter is urgent, please call us at +36 1 300 9414.
 
 Best regards,
 Fanni Kónya
 Founder of Beautyflow
-+36 1 300 9414
-      `.trim(),
+`.trim(),
       html: `
 <!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-  <p>Dear ${data.firstName},</p>
-  <p>Thank you for requesting your free consultation. We will contact you shortly via one of your provided contact details.</p>
-  <p style="margin-top: 24px;">
-    Best regards,<br>
-    <strong>Fanni Kónya</strong><br>
-    <span style="color: #8B6F5E;">Founder of Beautyflow</span><br>
-    <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
-  </p>
+  <p>Dear ${firstNameSafe},</p>
+  <p>Thank you for reaching out to Beautyflow. We received your message and we'll get back to you as soon as possible.</p>
+  ${topicLine ? `<p style="color:#666;">${escapeHtml(topicLine)}</p>` : ''}
+  <h3 style="color:#c53f75; margin-top: 24px;">Opening hours</h3>
+  <table style="font-size: 14px;">
+    <tr><td style="padding-right: 12px;">Mon–Fri</td><td>08:00 – 20:00</td></tr>
+    <tr><td style="padding-right: 12px;">Sat</td><td>10:00 – 20:00</td></tr>
+    <tr><td style="padding-right: 12px;">Sun</td><td>10:00 – 19:00</td></tr>
+  </table>
+  <p style="margin-top: 20px;">If your matter is urgent, please call us at <a href="tel:+3613009414" style="color:#c53f75;">+36 1 300 9414</a>.</p>
+  <p style="margin-top: 24px;">Best regards,<br><strong>Fanni Kónya</strong><br><span style="color:#c53f75;">Founder of Beautyflow</span></p>
 </body>
 </html>
-      `.trim(),
+`.trim(),
     });
-  } else {
-    await resend.emails.send({
-      from: 'Kónya Fanni - Beautyflow <hello@beautyflow.pro>',
-      replyTo: 'hello@beautyflow.pro',
-      to: data.email,
-      subject: 'Érdeklődésed megkaptuk',
-      headers: {
-        'X-Entity-Ref-ID': uniqueId,
-      },
-      text: `
+    return;
+  }
+
+  await resend.emails.send({
+    from: USER_FROM_HU,
+    replyTo: ADMIN_TO,
+    to: data.email,
+    subject: 'Köszönjük a megkeresést – Beautyflow',
+    headers: { 'X-Entity-Ref-ID': uniqueId },
+    text: `
 Kedves ${data.firstName}!
 
-Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.
+Köszönjük a megkeresést. Üzenetedet megkaptuk és igyekszünk mielőbb válaszolni.
+
+${topicLine}
+
+Nyitvatartás (Beautyflow Buda és Pest):
+Hétfő–Péntek: 08:00 – 20:00
+Szombat: 10:00 – 20:00
+Vasárnap: 10:00 – 19:00
+
+Sürgős ügyben hívj minket a +36 1 300 9414 számon.
 
 Üdvözlettel,
 Kónya Fanni
 a Beautyflow alapítója
-+36 1 300 9414
-      `.trim(),
-      html: `
+`.trim(),
+    html: `
 <!DOCTYPE html>
 <html lang="hu">
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-  <p>Kedves ${data.firstName}!</p>
-  <p>Köszönöm, hogy igényelted az ingyenes konzultációdat. Hamarosan meg foglak keresni a megadott elérhetőségeid egyikén.</p>
-  <p style="margin-top: 24px;">
-    Üdvözlettel,<br>
-    <strong>Kónya Fanni</strong><br>
-    <span style="color: #8B6F5E;">a Beautyflow alapítója</span><br>
-    <a href="tel:+3613009414" style="color: #8B6F5E;">+36 1 300 9414</a>
-  </p>
+  <p>Kedves ${firstNameSafe}!</p>
+  <p>Köszönjük a megkeresést. Üzenetedet megkaptuk és igyekszünk mielőbb válaszolni.</p>
+  ${topicLine ? `<p style="color:#666;">${escapeHtml(topicLine)}</p>` : ''}
+  <h3 style="color:#c53f75; margin-top: 24px;">Nyitvatartás</h3>
+  <table style="font-size: 14px;">
+    <tr><td style="padding-right: 12px;">Hétfő–Péntek</td><td>08:00 – 20:00</td></tr>
+    <tr><td style="padding-right: 12px;">Szombat</td><td>10:00 – 20:00</td></tr>
+    <tr><td style="padding-right: 12px;">Vasárnap</td><td>10:00 – 19:00</td></tr>
+  </table>
+  <p style="margin-top: 20px;">Sürgős ügyben hívj minket a <a href="tel:+3613009414" style="color:#c53f75;">+36 1 300 9414</a> számon.</p>
+  <p style="margin-top: 24px;">Üdvözlettel,<br><strong>Kónya Fanni</strong><br><span style="color:#c53f75;">a Beautyflow alapítója</span></p>
 </body>
 </html>
-      `.trim(),
-    });
-  }
+`.trim(),
+  });
 }
 
-// Custom base64 encoding (Cloudflare Workers compatible - no btoa)
+// ---- Google Sheets (optional, best-effort) ----------------------------
+
+interface GoogleEnv {
+  sheetId?: string;
+  serviceAccountEmail?: string;
+  privateKey?: string;
+}
+
 function bytesToBase64(bytes: Uint8Array): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   let result = '';
@@ -221,87 +367,60 @@ function bytesToBase64(bytes: Uint8Array): string {
   return result;
 }
 
-// Custom base64 decoding (Cloudflare Workers compatible - no atob)
 function base64ToBytes(base64: string): Uint8Array {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   const lookup = new Uint8Array(256);
-  for (let i = 0; i < chars.length; i++) {
-    lookup[chars.charCodeAt(i)] = i;
-  }
-
-  // Remove padding
+  for (let i = 0; i < chars.length; i++) lookup[chars.charCodeAt(i)] = i;
   let len = base64.length;
   if (base64[len - 1] === '=') len--;
   if (base64[len - 1] === '=') len--;
-
   const bytes = new Uint8Array((len * 3) >> 2);
   let p = 0;
-
   for (let i = 0; i < len; i += 4) {
     const c1 = lookup[base64.charCodeAt(i)];
     const c2 = lookup[base64.charCodeAt(i + 1)];
     const c3 = i + 2 < len ? lookup[base64.charCodeAt(i + 2)] : 0;
     const c4 = i + 3 < len ? lookup[base64.charCodeAt(i + 3)] : 0;
-
     bytes[p++] = (c1 << 2) | (c2 >> 4);
     if (i + 2 < len) bytes[p++] = ((c2 & 15) << 4) | (c3 >> 2);
     if (i + 3 < len) bytes[p++] = ((c3 & 3) << 6) | c4;
   }
-
   return bytes;
 }
 
-// Base64URL encode (Cloudflare Workers compatible - no btoa)
 function base64UrlEncode(str: string): string {
-  const base64 = bytesToBase64(new TextEncoder().encode(str));
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return bytesToBase64(new TextEncoder().encode(str))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
-// Base64URL encode ArrayBuffer (directly encode bytes, don't go through string)
 function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  const base64 = bytesToBase64(bytes);
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return bytesToBase64(new Uint8Array(buffer))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
-// Convert PEM to CryptoKey
 async function importPrivateKey(pemKey: string): Promise<CryptoKey> {
-  // Handle various newline formats from environment variables
-  let normalizedKey = pemKey
-    .replace(/\\n/g, '\n')  // Handle escaped newlines
-    .replace(/\\\\n/g, '\n') // Handle double-escaped newlines
-    .trim();
-
-  // Remove PEM header/footer and all whitespace
+  const normalizedKey = pemKey.replace(/\\n/g, '\n').replace(/\\\\n/g, '\n').trim();
   const pemContents = normalizedKey
     .replace(/-----BEGIN PRIVATE KEY-----/, '')
     .replace(/-----END PRIVATE KEY-----/, '')
     .replace(/[\s\r\n]/g, '');
-
-  // Decode base64 (Cloudflare Workers compatible - no atob)
   const bytes = base64ToBytes(pemContents);
-
-  return await crypto.subtle.importKey(
+  return crypto.subtle.importKey(
     'pkcs8',
     bytes.buffer,
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: 'SHA-256',
-    },
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
     false,
-    ['sign']
+    ['sign'],
   );
 }
 
-// Create JWT for Google API
 async function createGoogleJWT(serviceAccountEmail: string, privateKey: string): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
-
-  const header = {
-    alg: 'RS256',
-    typ: 'JWT',
-  };
-
+  const header = { alg: 'RS256', typ: 'JWT' };
   const payload = {
     iss: serviceAccountEmail,
     scope: 'https://www.googleapis.com/auth/spreadsheets',
@@ -309,147 +428,94 @@ async function createGoogleJWT(serviceAccountEmail: string, privateKey: string):
     iat: now,
     exp: now + 3600,
   };
-
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
   const encodedPayload = base64UrlEncode(JSON.stringify(payload));
   const signatureInput = `${encodedHeader}.${encodedPayload}`;
-
   const key = await importPrivateKey(privateKey);
   const signature = await crypto.subtle.sign(
     'RSASSA-PKCS1-v1_5',
     key,
-    new TextEncoder().encode(signatureInput)
+    new TextEncoder().encode(signatureInput),
   );
-
-  const encodedSignature = arrayBufferToBase64Url(signature);
-
-  return `${signatureInput}.${encodedSignature}`;
+  return `${signatureInput}.${arrayBufferToBase64Url(signature)}`;
 }
 
-// Get Google access token
 async function getGoogleAccessToken(serviceAccountEmail: string, privateKey: string): Promise<string> {
   const jwt = await createGoogleJWT(serviceAccountEmail, privateKey);
-
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: jwt,
     }),
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to get access token: ${error}`);
-  }
-
-  const data = await response.json();
-  return data.access_token;
+  if (!response.ok) throw new Error(`Token failed: ${await response.text()}`);
+  return (await response.json() as { access_token: string }).access_token;
 }
 
-// Append to Google Sheet using REST API
-interface GoogleEnv {
-  sheetId?: string;
-  serviceAccountEmail?: string;
-  privateKey?: string;
-}
-
-async function appendToGoogleSheet(data: ContactFormData, googleEnv: GoogleEnv): Promise<void> {
-  const { sheetId, serviceAccountEmail, privateKey } = googleEnv;
-
-  // Throw error if credentials are missing - don't silently skip!
-  if (!sheetId || !serviceAccountEmail || !privateKey) {
-    const missing = [];
-    if (!sheetId) missing.push('GOOGLE_SHEETS_ID');
-    if (!serviceAccountEmail) missing.push('GOOGLE_SERVICE_ACCOUNT_EMAIL');
-    if (!privateKey) missing.push('GOOGLE_PRIVATE_KEY');
-    throw new Error(`Google Sheets credentials missing: ${missing.join(', ')}`);
+async function appendToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promise<void> {
+  if (!env.sheetId || !env.serviceAccountEmail || !env.privateKey) {
+    return;
   }
-
-  // Don't catch errors here - let them propagate to Promise.allSettled
-  const accessToken = await getGoogleAccessToken(serviceAccountEmail, privateKey);
-
-  const treatmentList = data.treatments
-    .map((t) => treatmentNamesHu[t] || t)
-    .join(', ');
-
+  const accessToken = await getGoogleAccessToken(env.serviceAccountEmail, env.privateKey);
   const langLabel = data.lang === 'en' ? 'EN' : 'HU';
+  const topic =
+    data.formType === 'consultation'
+      ? data.treatments.map((t) => treatmentNamesHu[t] || t).join(', ')
+      : data.message || data.locationLabel;
+  const source =
+    data.formType === 'consultation' ? 'Konzultáció kalkulátor' : data.locationLabel;
+  const utm = [data.utm_source, data.utm_medium, data.utm_campaign].filter(Boolean).join(' / ');
 
-  // Build UTM string (combine source/medium/campaign)
-  const utmParts = [
-    data.utm_source,
-    data.utm_medium,
-    data.utm_campaign,
-  ].filter(Boolean);
-  const utmString = utmParts.length > 0 ? utmParts.join(' / ') : '';
-
-  // Extended range to include tracking columns: A:L
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:L:append?valueInputOption=USER_ENTERED`;
-
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.sheetId}/values/Sheet1!A:M:append?valueInputOption=USER_ENTERED`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      values: [
-        [
-          formatTimestamp(),        // A: Időpont
-          treatmentList,            // B: Kezelések
-          data.lastName,            // C: Vezetéknév
-          data.firstName,           // D: Keresztnév
-          data.phone,               // E: Telefon
-          data.email,               // F: Email
-          langLabel,                // G: Nyelv
-          data.gclid || '',         // H: GCLID
-          data.fbclid || '',        // I: FBCLID
-          utmString,                // J: UTM (source/medium/campaign)
-          data.utm_content || '',   // K: UTM Content
-          data.utm_term || '',      // L: UTM Term
-        ],
-      ],
+      values: [[
+        formatTimestamp(),
+        source,
+        topic,
+        data.lastName,
+        data.firstName,
+        data.phone,
+        data.email,
+        langLabel,
+        data.gclid || '',
+        data.fbclid || '',
+        utm,
+        data.utm_content || '',
+        data.utm_term || '',
+      ]],
     }),
   });
+  if (!response.ok) throw new Error(`Sheets error: ${await response.text()}`);
+}
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Sheets API error: ${error}`);
-  }
+// ---- Handler -----------------------------------------------------------
 
-  console.log('Successfully appended lead to Google Sheet');
+function jsonError(status: number, error: string): Response {
+  return new Response(JSON.stringify({ success: false, error }), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
 export const POST: APIRoute = async (context) => {
   const { request, locals } = context;
-
   try {
     let data: ContactFormData;
     try {
-      data = await request.json();
-    } catch (parseError) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Érvénytelen kérés formátum.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      data = (await request.json()) as ContactFormData;
+    } catch {
+      return jsonError(400, 'Érvénytelen kérés formátum.');
     }
 
-    // Get Cloudflare runtime environment
-    // In Astro 5 + @astrojs/cloudflare 12+, env vars are in locals.runtime.env
-    const runtime = (locals as any).runtime;
-    const env = runtime?.env || {};
-
-    // Debug logging for troubleshooting
-    if (!runtime) {
-      console.error('Cloudflare runtime not available. locals keys:', Object.keys(locals));
-    } else if (!runtime.env) {
-      console.error('Cloudflare runtime.env not available. runtime keys:', Object.keys(runtime));
-    }
-
-    // Honeypot check - if filled, silently succeed
+    // Honeypot — silently succeed
     if (data.website) {
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
@@ -457,157 +523,99 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
-    // Validation
-    if (!data.treatments || data.treatments.length === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Kérjük válassz legalább egy kezelést.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    const env = readEnv(locals);
+
+    // Turnstile — if a secret is configured, enforce verification
+    if (env.TURNSTILE_SECRET_KEY) {
+      const ip = request.headers.get('CF-Connecting-IP') || undefined;
+      const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip);
+      if (!result.success) {
+        console.warn('[contact] Turnstile failed:', result.errors);
+        return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
+      }
+    } else {
+      console.warn('[contact] TURNSTILE_SECRET_KEY not configured — accepting without verification');
     }
 
-    if (!data.firstName || data.firstName.length < 2) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Kérjük add meg a keresztneved.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Type-specific field requirements
+    if (data.formType === 'consultation') {
+      if (!Array.isArray(data.treatments) || data.treatments.length === 0) {
+        return jsonError(400, 'Kérjük válassz legalább egy kezelést.');
+      }
+    } else if (data.formType === 'location') {
+      if (!data.locationId || !['buda', 'pest'].includes(data.locationId)) {
+        return jsonError(400, 'Érvénytelen helyszín.');
+      }
+    } else {
+      return jsonError(400, 'Ismeretlen űrlap típus.');
     }
 
-    if (!data.lastName || data.lastName.length < 2) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Kérjük add meg a vezetékneved.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (!data.firstName || data.firstName.trim().length < 2) {
+      return jsonError(400, 'Kérjük add meg a keresztneved.');
     }
-
+    if (!data.lastName || data.lastName.trim().length < 2) {
+      return jsonError(400, 'Kérjük add meg a vezetékneved.');
+    }
     if (!isValidPhone(data.phone)) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Kérjük adj meg egy érvényes telefonszámot.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError(400, 'Kérjük adj meg egy érvényes telefonszámot.');
     }
-
     if (!isValidEmail(data.email)) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Kérjük adj meg egy érvényes email címet.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError(400, 'Kérjük adj meg egy érvényes email címet.');
     }
-
     if (!data.consent) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Az adatvédelmi szabályzat elfogadása kötelező.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError(400, 'Az adatvédelmi szabályzat elfogadása kötelező.');
     }
 
-    // Initialize Resend - try multiple sources for API key
-    // Priority: Cloudflare runtime env > process.env > import.meta.env
-    const resendApiKey =
-      env.RESEND_API_KEY ||
-      (typeof process !== 'undefined' && process.env?.RESEND_API_KEY) ||
-      import.meta.env.RESEND_API_KEY;
-
-    if (!resendApiKey) {
-      console.error('RESEND_API_KEY not configured.');
-      console.error('Available env keys:', Object.keys(env));
-      console.error('Runtime available:', !!runtime);
-      console.error('Runtime.env available:', !!runtime?.env);
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Email szolgáltatás nem elérhető. Kérjük hívj minket telefonon: +36 1 300 9414'
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (!env.RESEND_API_KEY) {
+      console.error('[contact] RESEND_API_KEY not configured');
+      return jsonError(500, 'Email szolgáltatás nem elérhető. Kérjük hívj minket: +36 1 300 9414');
     }
+    const resend = new Resend(env.RESEND_API_KEY);
 
-    const resend = new Resend(resendApiKey);
-
-    // Get Google Sheets credentials - try multiple sources
-    const googleEnv = {
-      sheetId:
-        env.GOOGLE_SHEETS_ID ||
-        (typeof process !== 'undefined' && process.env?.GOOGLE_SHEETS_ID) ||
-        import.meta.env.GOOGLE_SHEETS_ID,
-      serviceAccountEmail:
-        env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
-        (typeof process !== 'undefined' && process.env?.GOOGLE_SERVICE_ACCOUNT_EMAIL) ||
-        import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      privateKey:
-        env.GOOGLE_PRIVATE_KEY ||
-        (typeof process !== 'undefined' && process.env?.GOOGLE_PRIVATE_KEY) ||
-        import.meta.env.GOOGLE_PRIVATE_KEY,
+    const googleEnv: GoogleEnv = {
+      sheetId: env.GOOGLE_SHEETS_ID,
+      serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      privateKey: env.GOOGLE_PRIVATE_KEY,
     };
 
-    // Send emails and append to sheet in parallel
-    try {
-      const results = await Promise.allSettled([
-        sendAdminEmail(resend, data),
-        sendUserEmail(resend, data),
-        appendToGoogleSheet(data, googleEnv),
-      ]);
+    const results = await Promise.allSettled([
+      sendAdminEmail(resend, data),
+      sendUserEmail(resend, data),
+      appendToGoogleSheet(data, googleEnv),
+    ]);
 
-      // Check for email failures (first two promises)
-      const emailResults = results.slice(0, 2);
-      const failedEmails = emailResults.filter(
-        (r): r is PromiseRejectedResult => r.status === 'rejected'
-      );
+    const adminResult = results[0];
+    const userResult = results[1];
+    const sheetResult = results[2];
 
-      if (failedEmails.length > 0) {
-        const errors = failedEmails.map((r) => r.reason?.message || 'Unknown error');
-        console.error('Email sending failed:', errors);
+    if (adminResult.status === 'rejected') {
+      console.error('[contact] Admin email failed:', adminResult.reason);
+    }
+    if (userResult.status === 'rejected') {
+      console.warn('[contact] User confirmation email failed:', userResult.reason);
+    }
+    if (sheetResult.status === 'rejected') {
+      console.error('[contact] Sheets append failed (lead saved in logs):', sheetResult.reason);
+      console.error('[contact] Lead data:', {
+        name: `${data.lastName} ${data.firstName}`,
+        email: data.email,
+        phone: data.phone,
+        formType: data.formType,
+      });
+    }
 
-        // If both emails failed, return error
-        if (failedEmails.length === 2) {
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: `Email küldési hiba: ${errors[0]}`
-            }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-          );
-        }
-        // If only one failed, log but continue (partial success)
-        console.warn('Partial email failure, but continuing:', errors);
-      }
-
-      // Log Google Sheets result - CRITICAL: This is where leads were being lost silently!
-      if (results[2].status === 'rejected') {
-        const sheetError = (results[2] as PromiseRejectedResult).reason;
-        console.error('🚨 CRITICAL: Google Sheets append FAILED - Lead NOT saved to sheet!');
-        console.error('Lead data that was NOT saved:', {
-          name: `${data.lastName} ${data.firstName}`,
-          email: data.email,
-          phone: data.phone,
-          treatments: data.treatments,
-          timestamp: formatTimestamp(),
-        });
-        console.error('Error details:', sheetError?.message || sheetError);
-      } else {
-        console.log('✅ Lead successfully saved to Google Sheets');
-      }
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown email error';
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: `Email küldési hiba: ${errorMessage}`
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+    // If both emails failed, treat as a real failure
+    if (adminResult.status === 'rejected' && userResult.status === 'rejected') {
+      return jsonError(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
     }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
-    console.error('Contact form error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ success: false, error: `Hiba történt: ${errorMessage}` }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  } catch (err) {
+    console.error('[contact] Unhandled error:', err);
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return jsonError(500, `Hiba történt: ${message}`);
   }
 };

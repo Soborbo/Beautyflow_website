@@ -1,0 +1,20 @@
+---
+/**
+ * Google Tag Manager — <body> noscript fallback.
+ * Place right after <body> on every page.
+ */
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
+---
+
+{gtmId && (
+  <noscript>
+    <iframe
+      src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden"
+      title="GTM"
+    ></iframe>
+  </noscript>
+)}

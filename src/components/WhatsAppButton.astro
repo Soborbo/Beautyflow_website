@@ -64,25 +64,16 @@
 </style>
 
 <script>
-  import { trackEvent } from '@leadgen/conversion-tracking/client';
-
+  // wa.me clicks are auto-tracked by tracking-kit's global click listener
+  // (fires `whatsapp_conversion`). Only the entrance animation is local.
   function initWhatsAppButton() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
-
     if (whatsappBtn) {
       setTimeout(() => {
         whatsappBtn.classList.add('show');
       }, 6000);
-
-      // Track WhatsApp click (conversion event)
-      whatsappBtn.addEventListener('click', () => {
-        trackEvent('whatsapp_click', {
-          click_location: 'floating_button',
-        });
-      });
     }
   }
-
   document.addEventListener('DOMContentLoaded', initWhatsAppButton);
   document.addEventListener('astro:page-load', initWhatsAppButton);
 </script>

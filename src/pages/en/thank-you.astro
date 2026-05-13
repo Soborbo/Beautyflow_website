@@ -1,0 +1,105 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import { FixedImage } from '../../components/images';
+import fanniImg from '../../assets/images/Konya-Fanni-sq.jpg';
+
+const hours = [
+  { day: 'Monday', range: '08:00 – 20:00' },
+  { day: 'Tuesday', range: '08:00 – 20:00' },
+  { day: 'Wednesday', range: '08:00 – 20:00' },
+  { day: 'Thursday', range: '08:00 – 20:00' },
+  { day: 'Friday', range: '08:00 – 20:00' },
+  { day: 'Saturday', range: '10:00 – 20:00' },
+  { day: 'Sunday', range: '10:00 – 19:00' },
+];
+---
+
+<Layout
+  title="Thank you | Beautyflow"
+  description="We received your message and will get back to you soon."
+  lang="en"
+  noindex={true}
+>
+  <section class="min-h-[80vh] flex items-center justify-center py-12 lg:py-20 bg-gradient-to-b from-[#fdf8f6] via-white to-[#fdf8f6]">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+
+          <div class="p-8 lg:p-10 text-center">
+            <div class="inline-block mb-6">
+              <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden ring-4 ring-[#c53f75]/20 shadow-xl mx-auto">
+                <FixedImage
+                  src={fanniImg}
+                  alt="Fanni Kónya - Founder of Beautyflow"
+                  width={160}
+                  height={160}
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-3 uppercase">
+              Thank you for reaching out!
+            </h1>
+            <p class="text-lg text-gray-700 mb-2">
+              We will get back to you as soon as possible.
+            </p>
+            <p class="text-sm text-gray-500 mb-6">
+              We've also sent a confirmation email — check Promotions / Spam if you don't see it.
+            </p>
+
+            <p class="text-gray-600 italic mb-1">– Fanni Kónya</p>
+            <p class="text-xs text-gray-500">Founder of Beautyflow</p>
+          </div>
+
+          <div class="bg-[#fdf8f6] p-8 lg:p-10 border-t border-gray-100">
+            <h2 class="font-heading text-xl lg:text-2xl text-gray-900 mb-4 text-center flex items-center justify-center gap-2">
+              <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Opening hours
+            </h2>
+            <div class="max-w-sm mx-auto">
+              <table class="w-full text-sm">
+                <tbody>
+                  {hours.map((h) => (
+                    <tr class="border-b border-gray-200 last:border-0">
+                      <td class="py-2 font-medium text-gray-700">{h.day}</td>
+                      <td class="py-2 text-right text-gray-600">{h.range}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p class="text-xs text-gray-500 text-center mt-4">
+                Urgent matter? Call us at
+                <a href="tel:+3613009414" class="text-[#c53f75] font-semibold">+36 1 300 9414</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="p-8 lg:p-10 border-t border-gray-100 grid sm:grid-cols-2 gap-3">
+            <a
+              href="/en/"
+              class="block text-center px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300"
+            >
+              Back to homepage
+            </a>
+            <a
+              href="https://www.notino.hu/szalonok/beautyflow"
+              target="_blank"
+              rel="noopener"
+              class="block text-center px-6 py-3 bg-white text-[#c53f75] font-semibold uppercase tracking-wide rounded-full border-2 border-[#c53f75] hover:bg-[#fdf8f6] transition-all duration-300"
+              data-track="booking_click"
+              data-source="thank_you"
+            >
+              Book online
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

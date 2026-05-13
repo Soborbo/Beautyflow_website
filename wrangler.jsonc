@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "beautyflow",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2025-05-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  }
+  /*
+   * Secrets to set via `wrangler secret put <NAME>` or the Cloudflare dashboard:
+   *
+   *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)
+   *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)
+   *   GOOGLE_SHEETS_ID                — existing leadlist sheet id (optional)
+   *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account (optional)
+   *   GOOGLE_PRIVATE_KEY              — Google service account key (optional)
+   *   GA4_API_SECRET                  — GA4 Measurement Protocol API secret (server tracking)
+   *   META_CAPI_ACCESS_TOKEN          — Meta CAPI access token (server tracking)
+   *   META_CAPI_TEST_EVENT_CODE       — TEMP for testing, REMOVE before going live
+   *
+   * Plain env vars (set in dashboard → Settings → Variables and Secrets):
+   *
+   *   PUBLIC_GTM_ID=GTM-W8V3BVGD
+   *   PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAA...
+   *   PUBLIC_GA4_MEASUREMENT_ID=G-774BY4X64P
+   *   PUBLIC_META_PIXEL_ID=915395591548632
+   *   GA4_MEASUREMENT_ID=G-774BY4X64P
+   *   META_PIXEL_ID=915395591548632
+   *   SITE_URL=https://beautyflow.pro
+   */
+}

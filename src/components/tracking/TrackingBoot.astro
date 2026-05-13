@@ -1,0 +1,16 @@
+---
+/**
+ * Boots the tracking-kit on every page-load.
+ * Imports the side-effect module that wires global listeners,
+ * restores PII from localStorage (with TTL), and resumes the
+ * upgrade-window timer.
+ *
+ * Place once in the shared Layout, after the closing </main>.
+ */
+---
+
+<script>
+  import '@/lib/tracking/boot';
+  import { initBeautyflowListeners } from '@/lib/tracking/bf-listeners';
+  initBeautyflowListeners();
+</script>

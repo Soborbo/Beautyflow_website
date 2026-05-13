@@ -5,7 +5,9 @@ import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 import { LCPTracker } from '../components/images';
 import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
-import GTMNoScript from '@leadgen/conversion-tracking/components/GTMNoScript.astro';
+import GTMHead from '../components/tracking/GTMHead.astro';
+import GTMBody from '../components/tracking/GTMBody.astro';
+import TrackingBoot from '../components/tracking/TrackingBoot.astro';
 
 interface Props {
   title: string;
@@ -40,7 +42,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <!-- GTM + tracking injected by @leadgen/conversion-tracking integration -->
+    <GTMHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -78,7 +80,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta name="twitter:image" content={finalOgImage} />
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
-    <GTMNoScript gtmId="GTM-W8V3BVGD" />
+    <GTMBody />
     <Header lang={currentLang} />
     <main class="flex-grow">
       <slot />
@@ -86,5 +88,6 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
     <LCPTracker />
+    <TrackingBoot />
   </body>
 </html>

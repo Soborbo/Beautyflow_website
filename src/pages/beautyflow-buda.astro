@@ -3,6 +3,7 @@ export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
 import { ContentImage, CardImage, FixedImage } from '../components/images';
+import ContactForm from '../components/ContactForm.astro';
 
 // Image imports
 import beautyflowBudaImg from '../assets/images/Beautyflow-buda.jpg';
@@ -598,6 +599,27 @@ const notinoUrl = location.bookingUrl;
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section class="py-12 lg:py-16 bg-white" id="kapcsolat-form">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-3">
+            Írj a budai szalonnak
+          </h2>
+          <p class="text-gray-600">
+            Bármilyen kérdésed van a kezelésekkel, időpontokkal kapcsolatban — küldj üzenetet, és hamarosan visszahívunk.
+          </p>
+        </div>
+        <ContactForm
+          location="buda"
+          title="Üzenj nekünk"
+          subtitle="Töltsd ki az űrlapot, és Fanni csapata jelentkezik."
+        />
       </div>
     </div>
   </section>
