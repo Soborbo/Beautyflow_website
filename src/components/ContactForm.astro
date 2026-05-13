@@ -30,7 +30,8 @@ export interface Props {
 const { location, title = 'Írj nekünk!', subtitle } = Astro.props;
 
 const turnstileSiteKey =
-  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) || '';
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
+  '0x4AAAAAADOTyE9gccGo16os';
 
 const locationLabel = location === 'buda' ? 'Beautyflow Buda' : 'Beautyflow Pest';
 const formId = `contact-form-${location}`;
