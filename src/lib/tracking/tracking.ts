@@ -31,6 +31,19 @@ declare global {
 export type TrackingParams = Record<string, unknown> & { event_id?: string };
 
 /**
+ * Optional behaviour for `trackEvent`. Pass `eventCallback` when the
+ * caller is about to navigate away (e.g. redirect to a thank-you page):
+ * GTM invokes it once every tag triggered by this push has settled, so
+ * the conversion beacons aren't cut off by the page unload.
+ */
+export interface TrackEventOptions {
+  /** Invoked once GTM finishes firing this event's tags (or on timeout). */
+  eventCallback?: () => void;
+  /** Max ms GTM waits before invoking `eventCallback` anyway. Default 1000. */
+  eventTimeout?: number;
+}
+
+/**
  * Keys that must NEVER reach `window.dataLayer` in cleartext. Meta's
  * automatic detection (Events Manager → Blocked parameters) flags any
  * event that ships raw email/phone/name through the pixel and Google's
