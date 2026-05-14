@@ -11,7 +11,11 @@ export default defineConfig({
   output: 'server',
   trailingSlash: 'never',
   build: {
-    format: 'file',
+    // Default 'directory' format: `dist/foo/index.html`. Do NOT switch to
+    // 'file' format — it emits `dist/foo.html` alongside a `dist/foo/`
+    // directory (e.g. `en.html` + `en/`), which collides with Cloudflare's
+    // `html_handling: "drop-trailing-slash"` and causes an infinite redirect
+    // loop. Directory format is the standard, conflict-free pairing.
     inlineStylesheets: 'always',
   },
   integrations: [
