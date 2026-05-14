@@ -771,24 +771,33 @@ const breadcrumbSchema = {
 
             if (result.success) {
               trackFormSubmitted(FORM_ID);
+              let navigated = false;
+              const goThankYou = () => {
+                if (navigated) return;
+                navigated = true;
+                window.location.href = '/en/thank-you';
+              };
               const eventId = trackEvent('contact_form_submit', {
                 form_name: FORM_NAME,
                 value: 5000,
                 currency: 'HUF',
                 service: formData.treatments[0] || 'consultation',
-              });
+              }, { eventCallback: goThankYou, eventTimeout: 1200 });
               void mirrorMetaCapi('contact_form_submit', eventId, {
                 value: 5000,
                 currency: 'HUF',
               });
-              window.location.href = '/en/thank-you';
+              // Leave the page only once GTM has fired the conversion tags;
+              // the timeout is a hard fallback if GTM is slow or blocked.
+              // The loading overlay stays up until the redirect.
+              setTimeout(goThankYou, 1500);
             } else {
+              loadingOverlay?.classList.add('hidden');
               showError(result.error || 'An error occurred, please try again.');
             }
           } catch (error) {
-            showError('An error occurred while submitting. Please try again later.');
-          } finally {
             loadingOverlay?.classList.add('hidden');
+            showError('An error occurred while submitting. Please try again later.');
           }
         });
 

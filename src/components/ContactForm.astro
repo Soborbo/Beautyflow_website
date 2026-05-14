@@ -264,17 +264,26 @@ const formId = `contact-form-${location}`;
 
           if (result.success) {
             trackFormSubmitted(formId);
+            let navigated = false;
+            const goThankYou = () => {
+              if (navigated) return;
+              navigated = true;
+              window.location.href = '/koszonjuk';
+            };
             const eventId = trackEvent('contact_form_submit', {
               form_name: formName,
               value: 5000,
               currency: 'HUF',
               service: String(data.locationId || ''),
-            });
+            }, { eventCallback: goThankYou, eventTimeout: 1200 });
             void mirrorMetaCapi('contact_form_submit', eventId, {
               value: 5000,
               currency: 'HUF',
             });
-            window.location.href = '/koszonjuk';
+            // Leave the page only once GTM has fired the GA4 / Google Ads /
+            // Meta tags for this push; the timeout is a hard fallback for
+            // when GTM is slow or blocked, so the form never hangs.
+            setTimeout(goThankYou, 1500);
           } else {
             if (errEl) {
               errEl.textContent = result.error || 'Hiba történt. Kérjük próbáld újra.';

@@ -27,7 +27,7 @@ const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3
     functionality_storage: 'denied',
     personalization_storage: 'denied',
     security_storage: 'granted',
-    wait_for_update: 500,
+    wait_for_update: 2000, // ≥ CookieYes waitForTime so a returning visitor's stored consent lands before tags run
   });
 </script>
 
