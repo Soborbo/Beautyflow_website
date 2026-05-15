@@ -26,7 +26,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 - **Root directory**: `/`
 - **Branch**: `main`
 
-A `--keep-vars` fontos: e nélkül a dashboardon beállított plaintext env varok minden deploykor törlődnek.
+> ⚠️ **A `--keep-vars` flag kötelező.** E nélkül a `wrangler deploy` minden alkalommal csak a `wrangler.jsonc`-ban definiált `vars` blokkot tekinti igazságforrásnak, és a dashboardon kézzel beállított plaintext env varokat törli (Secrets érintetlenül maradnak). A `package.json` `deploy` scriptje is `--keep-vars`-szal fut, így ha a Cloudflare Workers Build a `npm run deploy`-ra hivatkozik a Deploy command mezőben, az is védve van.
 
 ### 3. Environment variables — Settings → Variables and Secrets
 
