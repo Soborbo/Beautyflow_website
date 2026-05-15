@@ -12,27 +12,34 @@
   },
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
+    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",
+    "PUBLIC_GA4_MEASUREMENT_ID": "G-774BY4X64P",
+    "PUBLIC_META_PIXEL_ID": "915395591548632",
+    "PUBLIC_SITE_URL": "https://beautyflow.pro",
+    "GA4_MEASUREMENT_ID": "G-774BY4X64P",
+    "META_PIXEL_ID": "915395591548632",
+    "SITE_URL": "https://beautyflow.pro"
   }
   /*
-   * Secrets to set via `wrangler secret put <NAME>` or the Cloudflare dashboard:
+   * Plaintext env vars are defined in the `vars` block above — they ship with
+   * every deploy. To override one (e.g. swap the Turnstile site key for a
+   * staging widget), set the same name in the Cloudflare dashboard → Settings
+   * → Variables and Secrets. The deploy command uses `--keep-vars`, so
+   * dashboard overrides survive subsequent deploys.
    *
-   *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)
-   *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)
-   *   GOOGLE_SHEETS_ID                — existing leadlist sheet id (optional)
-   *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account (optional)
-   *   GOOGLE_PRIVATE_KEY              — Google service account key (optional)
-   *   GA4_API_SECRET                  — GA4 Measurement Protocol API secret (server tracking)
-   *   META_CAPI_ACCESS_TOKEN          — Meta CAPI access token (server tracking)
-   *   META_CAPI_TEST_EVENT_CODE       — TEMP for testing, REMOVE before going live
+   * Secrets must be set via `wrangler secret put <NAME>` or the Cloudflare
+   * dashboard (encrypted, never committed):
    *
-   * Plain env vars (set in dashboard → Settings → Variables and Secrets):
-   *
-   *   PUBLIC_GTM_ID=GTM-W8V3BVGD
-   *   PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAA...
-   *   PUBLIC_GA4_MEASUREMENT_ID=G-774BY4X64P
-   *   PUBLIC_META_PIXEL_ID=915395591548632
-   *   GA4_MEASUREMENT_ID=G-774BY4X64P
-   *   META_PIXEL_ID=915395591548632
-   *   SITE_URL=https://beautyflow.pro
+   *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)    [required]
+   *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)    [required]
+   *   GOOGLE_SHEETS_ID                — existing leadlist sheet id              [optional]
+   *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account                  [optional]
+   *   GOOGLE_PRIVATE_KEY              — Google service account key              [optional]
+   *   GA4_API_SECRET                  — GA4 Measurement Protocol API secret     [optional, enables server tracking]
+   *   META_CAPI_ACCESS_TOKEN          — Meta CAPI access token                  [optional, enables server tracking]
+   *   META_CAPI_TEST_EVENT_CODE       — TEMP for testing, REMOVE before live    [optional]
    */
 }

@@ -30,12 +30,12 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 
 ### 3. Environment variables — Settings → Variables and Secrets
 
-**Plain text (build + runtime):**
+**Plain text varok már a [wrangler.jsonc](wrangler.jsonc) `vars` blokkjában élnek** — minden deploy automatikusan beállítja őket, nem kell dashboardon kattintgatni. A dashboardon csak akkor érdemes felülírni egyet, ha staging/dev különböző értéket akarsz használni (pl. másik Turnstile widget): a `--keep-vars` miatt a dashboard érték nyer és a deploy nem törli.
 
-| Név | Érték |
+| Név | Érték (default a wrangler.jsonc-ből) |
 |---|---|
 | `PUBLIC_GTM_ID` | `GTM-W8V3BVGD` |
-| `PUBLIC_TURNSTILE_SITE_KEY` | `0x4AAAAAA...` (Turnstile widget site key) |
+| `PUBLIC_TURNSTILE_SITE_KEY` | `0x4AAAAAADOTyE9gccGo16os` |
 | `PUBLIC_GA4_MEASUREMENT_ID` | `G-774BY4X64P` |
 | `PUBLIC_META_PIXEL_ID` | `915395591548632` |
 | `PUBLIC_SITE_URL` | `https://beautyflow.pro` |
@@ -43,7 +43,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 | `META_PIXEL_ID` | `915395591548632` |
 | `SITE_URL` | `https://beautyflow.pro` |
 
-**Secrets (encrypted):**
+**Secrets (encrypted) — ezeket KÉZZEL kell a dashboardon beállítani:**
 
 | Név | Mire kell | Mikor |
 |---|---|---|
