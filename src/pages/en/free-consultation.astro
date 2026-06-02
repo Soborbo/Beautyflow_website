@@ -38,6 +38,13 @@ const canonicalUrl = 'https://beautyflow.pro/en/free-consultation';
 const huUrl = '/ingyenes-konzultacio';
 const enUrl = '/en/free-consultation';
 
+// Cloudflare Turnstile site key (public). Falls back to the production key so
+// local `astro dev` without env still renders a widget. The /api/contact
+// endpoint fails closed, so this token is required for a submit to succeed.
+const turnstileSiteKey =
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
+  '0x4AAAAAADOTyE9gccGo16os';
+
 const treatments = treatmentImages;
 
 const socialProofs = [
@@ -376,6 +383,14 @@ const breadcrumbSchema = {
               <!-- Honeypot field (hidden) -->
               <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" />
 
+              {turnstileSiteKey && (
+                <div
+                  id="turnstile-container"
+                  data-sitekey={turnstileSiteKey}
+                  class="mb-4 flex justify-center min-h-[65px]"
+                ></div>
+              )}
+
               <div class="flex gap-3">
                 <button
                   type="button"
@@ -510,6 +525,14 @@ const breadcrumbSchema = {
       }
     </style>
 
+    {turnstileSiteKey && (
+      <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        async
+        defer
+      ></script>
+    )}
+
     <script>
       import {
         trackEvent,
@@ -520,6 +543,7 @@ const breadcrumbSchema = {
         normalizeUserData,
         mirrorMetaCapi,
       } from '@/lib/tracking';
+      import { createTurnstile } from '@/lib/forms/turnstile-client';
 
       const FORM_ID = 'consultation-calculator-en';
       const FORM_NAME = 'consultation_calculator';
@@ -591,6 +615,13 @@ const breadcrumbSchema = {
         const consentInput = document.getElementById('consent') as HTMLInputElement;
         const honeypotInput = document.querySelector('input[name="website"]') as HTMLInputElement;
 
+        // Cloudflare Turnstile — the calculator isn't a <form> and step 4 is
+        // hidden until reached, so render explicitly when the user gets there.
+        const turnstileEl = document.getElementById('turnstile-container');
+        const turnstile = turnstileEl
+          ? createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '')
+          : null;
+
         // Show/hide steps
         function showStep(step: number) {
           steps.forEach(s => s.classList.add('hidden'));
@@ -609,6 +640,9 @@ const breadcrumbSchema = {
               dot.classList.remove('bg-[#c53f75]');
             }
           });
+
+          // Render the bot-check the moment its step becomes visible.
+          if (step === 4) turnstile?.ensureRendered();
 
           currentStep = step;
         }
@@ -742,6 +776,14 @@ const breadcrumbSchema = {
             return;
           }
 
+          // Bot-check must be solved before we send — the server fails closed.
+          const turnstileToken = turnstile ? turnstile.getToken() : '';
+          if (turnstile && !turnstileToken) {
+            turnstile.ensureRendered();
+            showError('Please wait for the verification to load, then try again.');
+            return;
+          }
+
           loadingOverlay?.classList.remove('hidden');
           errorMessage?.classList.add('hidden');
 
@@ -757,6 +799,7 @@ const breadcrumbSchema = {
           const payload = {
             ...formData,
             formType: 'consultation' as const,
+            turnstileToken,
             ...trackingData,
           };
 
@@ -793,10 +836,13 @@ const breadcrumbSchema = {
               setTimeout(goThankYou, 1500);
             } else {
               loadingOverlay?.classList.add('hidden');
+              // Token is single-use — reset so the user can retry.
+              turnstile?.reset();
               showError(result.error || 'An error occurred, please try again.');
             }
           } catch (error) {
             loadingOverlay?.classList.add('hidden');
+            turnstile?.reset();
             showError('An error occurred while submitting. Please try again later.');
           }
         });
