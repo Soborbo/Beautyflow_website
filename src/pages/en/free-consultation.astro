@@ -34,9 +34,9 @@ const treatmentImages = await Promise.all([
 const googleLogoOptimized = await getImage({ src: googleLogo, width: 16, height: 16, format: 'webp', quality: 70 });
 
 const lang = 'en';
-const canonicalUrl = 'https://beautyflow.pro/en/free-consultation';
-const huUrl = '/ingyenes-konzultacio';
-const enUrl = '/en/free-consultation';
+const canonicalUrl = 'https://beautyflow.pro/en/free-consultation/';
+const huUrl = '/ingyenes-konzultacio/';
+const enUrl = '/en/free-consultation/';
 
 // Cloudflare Turnstile site key (public). Falls back to the production key so
 // local `astro dev` without env still renders a widget. The /api/contact
@@ -59,7 +59,7 @@ const contactSchema = {
   "@context": "https://schema.org",
   "@type": "BeautySalon",
   "name": "Beautyflow Beauty Salon",
-  "url": "https://beautyflow.pro/en/free-consultation",
+  "url": "https://beautyflow.pro/en/free-consultation/",
   "telephone": "+36 1 300 9414",
   "contactPoint": {
     "@type": "ContactPoint",
@@ -96,13 +96,13 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://beautyflow.pro/en"
+      "item": "https://beautyflow.pro/en/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Free Consultation",
-      "item": "https://beautyflow.pro/en/free-consultation"
+      "item": "https://beautyflow.pro/en/free-consultation/"
     }
   ]
 };
@@ -375,7 +375,7 @@ const breadcrumbSchema = {
                     class="mt-0.5 w-5 h-5 text-[#c53f75] border-gray-300 rounded focus:ring-[#c53f75] cursor-pointer accent-[#c53f75]"
                   />
                   <label for="consent" class="text-sm text-gray-600 cursor-pointer">
-                    I accept the <a href="/en/privacy-policy" target="_blank" class="text-[#c53f75] underline hover:text-[#a33460]">privacy policy</a> *
+                    I accept the <a href="/en/privacy-policy/" target="_blank" class="text-[#c53f75] underline hover:text-[#a33460]">privacy policy</a> *
                   </label>
                 </div>
               </div>
@@ -772,7 +772,7 @@ const breadcrumbSchema = {
         btnSubmit.addEventListener('click', async () => {
           formData.website = honeypotInput?.value || '';
           if (formData.website) {
-            window.location.href = '/en/thank-you';
+            window.location.href = '/en/thank-you/';
             return;
           }
 
@@ -804,7 +804,7 @@ const breadcrumbSchema = {
           };
 
           try {
-            const response = await fetch('/api/contact', {
+            const response = await fetch('/api/contact/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
@@ -818,7 +818,7 @@ const breadcrumbSchema = {
               const goThankYou = () => {
                 if (navigated) return;
                 navigated = true;
-                window.location.href = '/en/thank-you';
+                window.location.href = '/en/thank-you/';
               };
               const eventId = trackEvent('contact_form_submit', {
                 form_name: FORM_NAME,

@@ -11,7 +11,7 @@
  *   1. POST /api/contact with formType: 'location' + location + Turnstile token
  *   2. Server verifies Turnstile, sends emails (info@ + user confirmation),
  *      logs to Google Sheets if configured
- *   3. On success → window.location.href = '/koszonjuk'
+ *   3. On success → window.location.href = '/koszonjuk/'
  *
  * Tracking events fired:
  *   - form_start (on first field focus)
@@ -133,7 +133,7 @@ const formId = `contact-form-${location}`;
         class="mt-1 w-4 h-4 text-[#c53f75] border-gray-300 rounded focus:ring-[#c53f75]"
       />
       <label for={`${formId}-consent`} class="text-sm text-gray-600 leading-relaxed">
-        Elolvastam és elfogadom az <a href="/adatvedelmi-tajekoztato" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>. *
+        Elolvastam és elfogadom az <a href="/adatvedelmi-tajekoztato/" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>. *
       </label>
     </div>
 
@@ -243,7 +243,7 @@ const formId = `contact-form-${location}`;
 
         // Honeypot trip — silently "succeed"
         if (data.website) {
-          window.location.href = '/koszonjuk';
+          window.location.href = '/koszonjuk/';
           return;
         }
 
@@ -255,7 +255,7 @@ const formId = `contact-form-${location}`;
         }, 'HU'));
 
         try {
-          const res = await fetch('/api/contact', {
+          const res = await fetch('/api/contact/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
@@ -268,7 +268,7 @@ const formId = `contact-form-${location}`;
             const goThankYou = () => {
               if (navigated) return;
               navigated = true;
-              window.location.href = '/koszonjuk';
+              window.location.href = '/koszonjuk/';
             };
             const eventId = trackEvent('contact_form_submit', {
               form_name: formName,

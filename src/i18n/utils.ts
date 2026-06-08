@@ -2,16 +2,27 @@ import { ui, defaultLang, type UIKey } from './ui';
 
 export type Locale = keyof typeof ui;
 
-// Canonical form: root stays '/', everything else has no trailing slash and no
-// `.html` suffix. Astro's `Astro.url.pathname` returns `/foo.html` during
-// prerender when `build.format: 'file'` is set, so we strip both here before
-// anything builds a canonical/hreflang/breadcrumb URL.
-// Matches Cloudflare's `drop-trailing-slash` and astro.config `trailingSlash: 'never'`.
+// Bare form: root '/', everything else WITHOUT a trailing slash and without a
+// `.html` suffix. This is the lookup key form — `routeMappings` keys are bare,
+// so anything matched against them must be normalised through here. It is NOT
+// emitted as a public URL (see `ensureTrailingSlash` for that).
 export function stripTrailingSlash(path: string): string {
   if (!path) return '/';
   const noHtml = path.replace(/\.html$/, '');
   if (noHtml === '/' || noHtml === '') return '/';
   return noHtml.replace(/\/+$/, '') || '/';
+}
+
+// Canonical URL form: root stays '/', everything else gets exactly ONE trailing
+// slash and no `.html` suffix. Every public-facing URL (canonical, hreflang,
+// og:url, breadcrumb item, internal link) goes through here so we always emit
+// `/foo/`. Matches Cloudflare `html_handling: "force-trailing-slash"` and
+// astro.config `trailingSlash: 'always'`.
+export function ensureTrailingSlash(path: string): string {
+  if (!path) return '/';
+  const noHtml = path.replace(/\.html$/, '');
+  if (noHtml === '/' || noHtml === '') return '/';
+  return noHtml.replace(/\/+$/, '') + '/';
 }
 
 export function getLangFromUrl(url: URL): Locale {
@@ -40,11 +51,12 @@ export function getRouteFromUrl(url: URL): string {
 }
 
 export function getLocalizedPath(path: string, lang: Locale): string {
-  const normalized = stripTrailingSlash(path);
+  // Match/strip in bare form, emit in trailing-slash form.
+  const bare = stripTrailingSlash(path);
   if (lang === defaultLang) {
-    return normalized;
+    return ensureTrailingSlash(bare);
   }
-  return `/${lang}${normalized === '/' ? '' : normalized}`;
+  return ensureTrailingSlash(`/${lang}${bare === '/' ? '' : bare}`);
 }
 
 // Bidirectional route mappings between Hungarian and English
@@ -74,11 +86,13 @@ export const routeMappings: Array<{ hu: string; en: string }> = [
 
 // Get the equivalent route in another language
 export function getAlternateRoute(currentPath: string, fromLang: Locale, toLang: Locale): string {
+  // routeMappings keys are bare, so match in bare form...
   const normalizedPath = stripTrailingSlash(currentPath);
 
   // Find the mapping for the current path
   const mapping = routeMappings.find(m => m[fromLang] === normalizedPath);
 
+  // ...getLocalizedPath emits the trailing-slash canonical form.
   if (mapping) {
     const targetPath = mapping[toLang];
     return getLocalizedPath(targetPath, toLang);

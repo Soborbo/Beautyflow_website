@@ -1,62 +1,64 @@
 import type { MiddlewareHandler } from 'astro';
 
 // 301 redirects — SEO átirányítások
-// Trailing-slash canonicalisation (`/foo/` -> `/foo`) is handled at the edge
-// by Cloudflare via `assets.html_handling: "drop-trailing-slash"` in
-// wrangler.jsonc. Do NOT add `/foo/` -> `/foo` entries here: Astro runs this
+// Trailing-slash canonicalisation (`/foo` -> `/foo/`) is handled at the edge by
+// Cloudflare via `assets.html_handling: "force-trailing-slash"` in
+// wrangler.jsonc. Do NOT add `/foo/` <-> `/foo` entries here: Astro runs this
 // middleware during prerendering with directory-format URLs (`/foo/`), so a
 // self-redirect causes Astro to write a redirect-stub HTML at
 // `dist/foo/index.html` instead of the real prerendered page — which then
-// gets served to users at `/foo`, breaking the page (and analytics tagging).
+// gets served to users at `/foo/`, breaking the page (and analytics tagging).
+// Redirect TARGETS carry a trailing slash so they land on the canonical form in
+// one hop (no 301 -> 308 chain).
 const redirects: Record<string, string> = {
-  '/fanni': '/rolunk',
-  '/fanni/': '/rolunk',
-  '/janka': '/rolunk',
-  '/janka/': '/rolunk',
-  '/piroska': '/rolunk',
-  '/piroska/': '/rolunk',
-  '/Piroska': '/rolunk',
-  '/Piroska/': '/rolunk',
-  '/andi': '/rolunk',
-  '/andi/': '/rolunk',
-  '/inez': '/rolunk',
-  '/inez/': '/rolunk',
-  '/lili': '/rolunk',
-  '/lili/': '/rolunk',
-  '/rolam': '/rolunk',
-  '/rolam/': '/rolunk',
+  '/fanni': '/rolunk/',
+  '/fanni/': '/rolunk/',
+  '/janka': '/rolunk/',
+  '/janka/': '/rolunk/',
+  '/piroska': '/rolunk/',
+  '/piroska/': '/rolunk/',
+  '/Piroska': '/rolunk/',
+  '/Piroska/': '/rolunk/',
+  '/andi': '/rolunk/',
+  '/andi/': '/rolunk/',
+  '/inez': '/rolunk/',
+  '/inez/': '/rolunk/',
+  '/lili': '/rolunk/',
+  '/lili/': '/rolunk/',
+  '/rolam': '/rolunk/',
+  '/rolam/': '/rolunk/',
 
-  '/szortelenites': '/dioda-lezeres-szortelenites',
-  '/szortelenites/': '/dioda-lezeres-szortelenites',
-  '/cukorpasztas-intimgyanta': '/dioda-lezeres-szortelenites',
-  '/cukorpasztas-intimgyanta/': '/dioda-lezeres-szortelenites',
-  '/gyantazas': '/dioda-lezeres-szortelenites',
-  '/gyantazas/': '/dioda-lezeres-szortelenites',
+  '/szortelenites': '/dioda-lezeres-szortelenites/',
+  '/szortelenites/': '/dioda-lezeres-szortelenites/',
+  '/cukorpasztas-intimgyanta': '/dioda-lezeres-szortelenites/',
+  '/cukorpasztas-intimgyanta/': '/dioda-lezeres-szortelenites/',
+  '/gyantazas': '/dioda-lezeres-szortelenites/',
+  '/gyantazas/': '/dioda-lezeres-szortelenites/',
 
-  '/lezeres-test-es-sminktetovalas-eltavolitas': '/lezeres-tetovalas-eltavolitas',
-  '/lezeres-test-es-sminktetovalas-eltavolitas/': '/lezeres-tetovalas-eltavolitas',
+  '/lezeres-test-es-sminktetovalas-eltavolitas': '/lezeres-tetovalas-eltavolitas/',
+  '/lezeres-test-es-sminktetovalas-eltavolitas/': '/lezeres-tetovalas-eltavolitas/',
 
-  '/szemoldok-styling': '/sminktetovalas',
-  '/szemoldok-styling/': '/sminktetovalas',
-  '/szemoldok': '/sminktetovalas',
-  '/szemoldok/': '/sminktetovalas',
+  '/szemoldok-styling': '/sminktetovalas/',
+  '/szemoldok-styling/': '/sminktetovalas/',
+  '/szemoldok': '/sminktetovalas/',
+  '/szemoldok/': '/sminktetovalas/',
 
-  '/buda': '/beautyflow-buda',
-  '/buda/': '/beautyflow-buda',
-  '/pest': '/beautyflow-pest',
-  '/pest/': '/beautyflow-pest',
-  '/beautyflowpest': '/beautyflow-pest',
-  '/beautyflowpest/': '/beautyflow-pest',
+  '/buda': '/beautyflow-buda/',
+  '/buda/': '/beautyflow-buda/',
+  '/pest': '/beautyflow-pest/',
+  '/pest/': '/beautyflow-pest/',
+  '/beautyflowpest': '/beautyflow-pest/',
+  '/beautyflowpest/': '/beautyflow-pest/',
 
-  '/altalanos-szerzodesi-feltetelek': '/aszf',
-  '/altalanos-szerzodesi-feltetelek/': '/aszf',
-  '/adatvedelem': '/adatvedelmi-tajekoztato',
-  '/adatvedelem/': '/adatvedelmi-tajekoztato',
-  '/adatvedelmi': '/adatvedelmi-tajekoztato',
-  '/adatvedelmi/': '/adatvedelmi-tajekoztato',
+  '/altalanos-szerzodesi-feltetelek': '/aszf/',
+  '/altalanos-szerzodesi-feltetelek/': '/aszf/',
+  '/adatvedelem': '/adatvedelmi-tajekoztato/',
+  '/adatvedelem/': '/adatvedelmi-tajekoztato/',
+  '/adatvedelmi': '/adatvedelmi-tajekoztato/',
+  '/adatvedelmi/': '/adatvedelmi-tajekoztato/',
 
-  '/szalon-etikett': '/gyakran-ismetelt-kerdesek',
-  '/szalon-etikett/': '/gyakran-ismetelt-kerdesek',
+  '/szalon-etikett': '/gyakran-ismetelt-kerdesek/',
+  '/szalon-etikett/': '/gyakran-ismetelt-kerdesek/',
 };
 
 // 410 Gone URLs — véglegesen törölt oldalak

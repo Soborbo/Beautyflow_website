@@ -9,13 +9,18 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://beautyflow.pro',
   output: 'server',
-  trailingSlash: 'never',
+  // Canonical URL form = TRAILING SLASH. Google has long-standing equity on the
+  // trailing-slash URLs (the pre-migration WordPress default), so we align every
+  // signal — canonical, hreflang, sitemap, internal links — to `/foo/` and 301
+  // the bare `/foo` to it via Cloudflare `html_handling: "force-trailing-slash"`.
+  trailingSlash: 'always',
   build: {
     // Default 'directory' format: `dist/foo/index.html`. Do NOT switch to
     // 'file' format — it emits `dist/foo.html` alongside a `dist/foo/`
-    // directory (e.g. `en.html` + `en/`), which collides with Cloudflare's
-    // `html_handling: "drop-trailing-slash"` and causes an infinite redirect
-    // loop. Directory format is the standard, conflict-free pairing.
+    // directory (e.g. `en.html` + `en/`). Directory format is the natural,
+    // conflict-free pairing with `trailingSlash: 'always'` and Cloudflare's
+    // `html_handling: "force-trailing-slash"` (serves `dist/foo/index.html`
+    // at `/foo/`); 'file' format would collide and cause redirect loops.
     inlineStylesheets: 'always',
   },
   integrations: [

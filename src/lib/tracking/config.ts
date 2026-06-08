@@ -71,8 +71,11 @@ export const VIEW_CONTENT_FIRED_KEY = `${STORAGE_PREFIX}_view_content_fired`;
 // Endpoints
 // ---------------------------------------------------------------------------
 
-export const ABANDONMENT_BEACON_URL = '/api/track/abandonment';
-export const META_CAPI_ENDPOINT = '/api/meta/capi';
+// Trailing slash required: astro.config `trailingSlash: 'always'` makes the
+// slash form canonical for endpoints too. sendBeacon() does not follow
+// redirects, so the beacon must hit the final URL directly (no 308 hop).
+export const ABANDONMENT_BEACON_URL = '/api/track/abandonment/';
+export const META_CAPI_ENDPOINT = '/api/meta/capi/';
 
 // ---------------------------------------------------------------------------
 // Internal-event → Meta-event name map

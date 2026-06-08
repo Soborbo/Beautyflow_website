@@ -15,7 +15,7 @@ const posts = [
   {
     title: "Dióda Lézeres Szőrtelenítés: Teljes Útmutató 2025",
     description: "A dióda lézeres szőrtelenítés 80-90%-ban végleges eredményt ad 6-12 kezelés után. Megmutatjuk, hogyan működik, mennyibe kerül, és kinek ajánlott.",
-    href: "/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell",
+    href: "/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell/",
     category: "Szőrtelenítés",
     date: "2025. január 15.",
     readTime: "12 perc",
@@ -39,7 +39,7 @@ const pageSchema = {
   "@type": "CollectionPage",
   "name": meta.title,
   "description": meta.description,
-  "url": "https://beautyflow.pro/tudastar",
+  "url": "https://beautyflow.pro/tudastar/",
   "mainEntity": {
     "@type": "ItemList",
     "itemListElement": posts.map((post, i) => ({
@@ -219,7 +219,7 @@ const gridAvatarImages = await Promise.all(
           foglalj egy ingyenes konzultációt szakértőinkkel.
         </p>
         <a
-          href="/ingyenes-konzultacio"
+          href="/ingyenes-konzultacio/"
           class="inline-block bg-white text-[#c53f75] font-semibold px-8 py-4 rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
         >
           Kérek Ingyenes Konzultációt
