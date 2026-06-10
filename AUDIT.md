@@ -4,6 +4,23 @@
 **Scope:** all application code (`src/`, config, `public/`, `tracking/`), dependency health, build verification, type checking
 **Method:** manual review of all API endpoints, forms, tracking library, pages/i18n/SEO layer; `astro build` (passes); `astro check` (27 type errors); `npm audit`
 
+> **Remediation status (2026-06-10):** All findings below have been fixed in
+> follow-up commits on this branch, except three deliberate deferrals:
+> the Astro 6 / `@astrojs/cloudflare` 13 major upgrade (breaking; resolves the
+> remaining `npm audit` advisories, which sit in dev-time tooling — undici via
+> miniflare/wrangler — not the deployed Worker), a CSP header (needs a
+> report-only rollout so it can't silently break GTM/Turnstile), and the
+> KV-backed rate limiter (per-isolate limiter kept, now also on /api/contact).
+>
+> **Additional bug found during fix verification:** every 301/410 rule in
+> `src/middleware.ts` was dead code — with a prerendered 404 page, Astro
+> serves unmatched URLs via `prerenderedErrorPageFetch` without running
+> middleware, so `/fanni`, `/wp-admin/*`, the gone-URL list etc. all returned
+> 404 instead of redirecting/410ing. Fixed with an SSR catch-all route
+> (`src/pages/[...slug].astro`) that routes unmatched URLs through the normal
+> pipeline; this also makes unknown URLs return a real 404 status. Verified
+> end-to-end under `wrangler dev`.
+
 ---
 
 ## Executive summary

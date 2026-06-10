@@ -24,6 +24,8 @@ import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
+import { checkRateLimit } from '@/lib/tracking/server';
+import { RATE_LIMIT_CONTACT_MAX } from '@/lib/tracking/config';
 
 export const prerender = false;
 
@@ -92,8 +94,22 @@ type ContactFormData = ConsultationFormData | LocationFormData;
 // ---- Validators --------------------------------------------------------
 
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+/** Server-side caps — the client `maxlength` attributes are advisory
+ *  only; a hand-crafted JSON body bypasses them. Oversized fields flow
+ *  into email bodies and the Sheets API, so reject early. */
+const MAX_LENGTHS = {
+  firstName: 100,
+  lastName: 100,
+  phone: 32,
+  message: 2000,
+  locationLabel: 50,
+  treatmentId: 50,
+} as const;
+const MAX_TREATMENTS = 10;
+const MAX_BODY_BYTES = 50_000;
 
 function isValidPhone(phone: string): boolean {
   const cleaned = phone.replace(/[\s\-()]/g, '');
@@ -368,7 +384,7 @@ function bytesToBase64(bytes: Uint8Array): string {
   return result;
 }
 
-function base64ToBytes(base64: string): Uint8Array {
+function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   const lookup = new Uint8Array(256);
   for (let i = 0; i < chars.length; i++) lookup[chars.charCodeAt(i)] = i;
@@ -412,7 +428,7 @@ async function importPrivateKey(pemKey: string): Promise<CryptoKey> {
   const bytes = base64ToBytes(pemContents);
   return crypto.subtle.importKey(
     'pkcs8',
-    bytes.buffer,
+    bytes,
     { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
     false,
     ['sign'],
@@ -569,6 +585,19 @@ function jsonError(status: number, error: string): Response {
 export const POST: APIRoute = async (context) => {
   const { request, locals } = context;
   try {
+    const ip = request.headers.get('CF-Connecting-IP') || '';
+
+    // Per-IP rate limit (in-memory, per-isolate — see lib/tracking/server).
+    // Turnstile is the primary bot gate; this caps raw request floods.
+    if (!checkRateLimit(`contact:${ip}`, RATE_LIMIT_CONTACT_MAX)) {
+      return jsonError(429, 'Túl sok kérés. Kérjük várj egy percet, majd próbáld újra.');
+    }
+
+    const contentLength = Number(request.headers.get('Content-Length') || '0');
+    if (contentLength > MAX_BODY_BYTES) {
+      return jsonError(413, 'A kérés túl nagy.');
+    }
+
     let data: ContactFormData;
     try {
       data = (await request.json()) as ContactFormData;
@@ -586,10 +615,21 @@ export const POST: APIRoute = async (context) => {
 
     const env = readEnv(locals);
 
-    // Turnstile — if a secret is configured, enforce verification
-    if (env.TURNSTILE_SECRET_KEY) {
-      const ip = request.headers.get('CF-Connecting-IP') || undefined;
-      const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip);
+    // Turnstile — fail CLOSED: a missing secret means a misconfigured
+    // deploy, and silently accepting unverified submissions would turn a
+    // config mistake into an open spam channel. Local dev gets a
+    // Turnstile test secret via .dev.vars.
+    if (!env.TURNSTILE_SECRET_KEY) {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_CONFIG_TURNSTILE_MISSING,
+        message: 'TURNSTILE_SECRET_KEY not configured — rejecting all submits (fail closed)',
+        source: '/api/contact',
+        request,
+      });
+      return jsonError(503, 'A küldés átmenetileg nem elérhető. Kérjük hívj minket: +36 1 300 9414');
+    }
+    {
+      const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip || undefined);
       if (!result.success) {
         reportServerError({
           code: ERROR_CODES.CONTACT_TURNSTILE_REJECTED,
@@ -600,13 +640,6 @@ export const POST: APIRoute = async (context) => {
         });
         return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
       }
-    } else {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_CONFIG_TURNSTILE_MISSING,
-        message: 'TURNSTILE_SECRET_KEY not configured — accepting without verification',
-        source: '/api/contact',
-        request,
-      });
     }
 
     // Type-specific field requirements
@@ -614,21 +647,33 @@ export const POST: APIRoute = async (context) => {
       if (!Array.isArray(data.treatments) || data.treatments.length === 0) {
         return jsonError(400, 'Kérjük válassz legalább egy kezelést.');
       }
+      if (
+        data.treatments.length > MAX_TREATMENTS ||
+        data.treatments.some((t) => typeof t !== 'string' || t.length > MAX_LENGTHS.treatmentId)
+      ) {
+        return jsonError(400, 'Érvénytelen kezelés lista.');
+      }
     } else if (data.formType === 'location') {
       if (!data.locationId || !['buda', 'pest'].includes(data.locationId)) {
         return jsonError(400, 'Érvénytelen helyszín.');
+      }
+      if (typeof data.locationLabel !== 'string' || data.locationLabel.length > MAX_LENGTHS.locationLabel) {
+        return jsonError(400, 'Érvénytelen helyszín megnevezés.');
+      }
+      if (data.message && (typeof data.message !== 'string' || data.message.length > MAX_LENGTHS.message)) {
+        return jsonError(400, 'Az üzenet túl hosszú (legfeljebb 2000 karakter).');
       }
     } else {
       return jsonError(400, 'Ismeretlen űrlap típus.');
     }
 
-    if (!data.firstName || data.firstName.trim().length < 2) {
+    if (!data.firstName || data.firstName.trim().length < 2 || data.firstName.length > MAX_LENGTHS.firstName) {
       return jsonError(400, 'Kérjük add meg a keresztneved.');
     }
-    if (!data.lastName || data.lastName.trim().length < 2) {
+    if (!data.lastName || data.lastName.trim().length < 2 || data.lastName.length > MAX_LENGTHS.lastName) {
       return jsonError(400, 'Kérjük add meg a vezetékneved.');
     }
-    if (!isValidPhone(data.phone)) {
+    if (typeof data.phone !== 'string' || data.phone.length > MAX_LENGTHS.phone || !isValidPhone(data.phone)) {
       return jsonError(400, 'Kérjük adj meg egy érvényes telefonszámot.');
     }
     if (!isValidEmail(data.email)) {
@@ -744,7 +789,8 @@ export const POST: APIRoute = async (context) => {
       request,
       cause: err,
     });
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return jsonError(500, `Hiba történt: ${message}`);
+    // Generic message only — internal errors (e.g. Google API responses)
+    // must not leak to the client; the details are in reportServerError.
+    return jsonError(500, 'Hiba történt a küldés közben. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
   }
 };

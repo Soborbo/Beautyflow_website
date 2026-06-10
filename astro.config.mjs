@@ -20,6 +20,21 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // Pages rendered with `noindex` must not be submitted in the
+      // sitemap — Search Console flags the contradiction. Keep in sync
+      // with the pages that pass `noindex={true}` to Layout.
+      filter: (page) => {
+        const noindexPaths = new Set([
+          '/koszonjuk',
+          '/aszf',
+          '/adatvedelmi-tajekoztato',
+          '/en/thank-you',
+          '/en/terms-and-conditions',
+          '/en/privacy-policy',
+        ]);
+        const path = new URL(page).pathname.replace(/\/+$/, '');
+        return !noindexPaths.has(path);
+      },
       i18n: {
         defaultLocale: 'hu',
         locales: {
@@ -55,6 +70,9 @@ export default defineConfig({
     domains: [],
   },
   vite: {
-    plugins: [tailwindcss()]
+    // @tailwindcss/vite ships against a different vite version than the
+    // one bundled with Astro, so the Plugin types don't unify — runtime
+    // is unaffected.
+    plugins: [/** @type {any} */ (tailwindcss())]
   }
 });

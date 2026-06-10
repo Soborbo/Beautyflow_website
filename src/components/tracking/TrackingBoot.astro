@@ -10,7 +10,17 @@
 ---
 
 <script>
-  import '@/lib/tracking/boot';
   import { initBeautyflowListeners } from '@/lib/tracking/bf-listeners';
-  initBeautyflowListeners();
+  // Boot and listener init are isolated so a failure in one never takes
+  // the other (or the rest of the page) down with it.
+  try {
+    await import('@/lib/tracking/boot');
+  } catch (err) {
+    console.error('[tracking] boot module failed', err);
+  }
+  try {
+    initBeautyflowListeners();
+  } catch (err) {
+    console.error('[tracking] Beautyflow listeners failed to init', err);
+  }
 </script>

@@ -4,10 +4,10 @@
  * Abandonment is best-effort. We listen on `pagehide` and
  * `visibilitychange` (the latter for mobile background-tab cases) and
  * fire a `navigator.sendBeacon` to a dedicated endpoint that forwards
- * to GA4 Measurement Protocol server-side. We also push a regular
- * `form_abandonment` to dataLayer for any in-tab GTM consumers — but
- * dataLayer pushes during `pagehide` are not reliably flushed on
- * mobile, which is why the beacon exists.
+ * to GA4 Measurement Protocol server-side. A dataLayer push is used
+ * ONLY as a fallback when sendBeacon is unavailable or refuses to
+ * queue — firing both paths would double-count the abandonment in GA4.
+ * Both paths carry the same `event_id` for downstream dedup.
  *
  * Cleanup: this module assumes a hard-navigation MPA (see notes in
  * global-listeners.ts).
@@ -15,6 +15,7 @@
 
 import { ABANDONMENT_BEACON_URL, ABANDONMENT_MIN_DWELL_MS } from './config';
 import { trackEvent } from './tracking';
+import { generateUUID } from './uuid';
 
 interface FormState {
   formName: string;
@@ -70,6 +71,10 @@ function reportAbandonment(state: FormState): void {
   if (Date.now() - state.startedAt < ABANDONMENT_MIN_DWELL_MS) return;
 
   const payload = {
+    // Shared dedup key: whichever path delivers (beacon → GA4 MP, or the
+    // dataLayer fallback → gtag), the event carries the same id so the
+    // two can never be double-counted as distinct abandonments.
+    event_id: generateUUID(),
     form_name: state.formName,
     last_step: state.lastStep || 'unknown',
     last_field: state.lastField || 'unknown',
@@ -79,15 +84,20 @@ function reportAbandonment(state: FormState): void {
     exit_page_url: location.href,
   };
 
+  // The beacon is the PRIMARY path: it survives pagehide, which a
+  // dataLayer push does not reliably do. The dataLayer push is a
+  // fallback for browsers without sendBeacon (or when queueing fails) —
+  // firing both would double-count the abandonment in GA4.
+  let beaconQueued = false;
   if (typeof navigator.sendBeacon === 'function') {
     try {
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon(ABANDONMENT_BEACON_URL, blob);
+      beaconQueued = navigator.sendBeacon(ABANDONMENT_BEACON_URL, blob);
     } catch {
-      // ignore — the dataLayer push below is the secondary path
+      // fall through to the dataLayer fallback
     }
   }
-  trackEvent('form_abandonment', payload);
+  if (!beaconQueued) trackEvent('form_abandonment', payload);
 }
 
 function flushAbandonments(): void {

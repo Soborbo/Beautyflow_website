@@ -74,7 +74,11 @@ const webSiteSchema = {
 };
 ---
 
-<Layout title="Beautyflow Beauty Salon and Laser Hair Removal Budapest" lang={lang}>
+<Layout
+  title="Beautyflow Beauty Salon and Laser Hair Removal Budapest"
+  description="Laser hair removal, permanent makeup, facial treatments and tattoo removal in Buda and Pest. Book a free consultation at Beautyflow beauty salon!"
+  lang={lang}
+>
   <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(webSiteSchema)} />
   <HeroSection lang={lang} />

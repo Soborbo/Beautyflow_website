@@ -1,0 +1,41 @@
+---
+/**
+ * SSR catch-all for URLs that match no real route.
+ *
+ * Why this exists: with a prerendered 404 page, Astro serves unmatched
+ * requests via `prerenderedErrorPageFetch` WITHOUT running middleware —
+ * which silently disabled every 301/410 rule in src/middleware.ts. This
+ * route makes unmatched URLs match, so the request goes through the
+ * normal pipeline: middleware first (redirects, 410 Gone, security
+ * headers), then this component, which serves the prerendered 404 page
+ * with a real 404 status code.
+ */
+export const prerender = false;
+
+interface AssetsFetcher {
+  fetch: (input: string | URL) => Promise<Response>;
+}
+
+const pathname = Astro.url.pathname;
+const isEnglish = pathname === '/en' || pathname.startsWith('/en/');
+const errorPath = isEnglish ? '/en/404' : '/404';
+
+const runtime = (Astro.locals as { runtime?: { env?: { ASSETS?: AssetsFetcher } } }).runtime;
+const assets = runtime?.env?.ASSETS;
+
+if (assets) {
+  const page = await assets.fetch(new URL(errorPath, Astro.url.origin));
+  if (page.ok) {
+    return new Response(page.body, {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
+}
+
+// ASSETS binding unavailable (plain `astro dev`) — minimal fallback.
+return new Response(
+  isEnglish ? 'Page not found' : 'Az oldal nem található',
+  { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+);
+---
