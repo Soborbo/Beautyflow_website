@@ -74,7 +74,11 @@ const PII_KEYS = new Set<string>([
  * PII keys (see `PII_KEYS`) are silently stripped from the push and
  * warned about in dev. Use `setUserDataOnDOM()` for email/phone/name.
  */
-export function trackEvent(name: string, params: TrackingParams = {}): string {
+export function trackEvent(
+  name: string,
+  params: TrackingParams = {},
+  options: TrackEventOptions = {},
+): string {
   if (typeof window === 'undefined') return '';
 
   const { event_id: providedId, ...rest } = params;
@@ -95,12 +99,22 @@ export function trackEvent(name: string, params: TrackingParams = {}): string {
   }
 
   const event_id = (providedId as string | undefined) || generateUUID();
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
+  const push: Record<string, unknown> = {
     event: name,
     event_id,
     ...safe,
-  });
+  };
+  if (options.eventCallback) {
+    // GTM invokes `eventCallback` once the tags triggered by this push
+    // have settled, or after `eventTimeout` ms — whichever comes first.
+    // If GTM never loads (blocked / consent-denied container), the
+    // callback is NEVER invoked, so callers that navigate away must keep
+    // their own hard setTimeout fallback.
+    push.eventCallback = options.eventCallback;
+    push.eventTimeout = options.eventTimeout ?? 1000;
+  }
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(push);
   return event_id;
 }
 
@@ -203,6 +217,10 @@ export function setUserDataOnDOM(data: UserData): void {
     localStorage.setItem(USER_DATA_STORAGE_KEY, JSON.stringify(blob));
   } catch {
     // localStorage full / disabled — DOM-only is still functional
+    if (isDevEnv()) {
+      // eslint-disable-next-line no-console
+      console.warn('[tracking] localStorage write failed — user data will not survive this tab');
+    }
   }
 }
 

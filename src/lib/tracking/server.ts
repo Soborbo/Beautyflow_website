@@ -72,7 +72,9 @@ const consoleLogger: Logger = {
 
 const enc = new TextEncoder();
 
-function hashEmail(value: string | undefined): string | undefined {
+/** SHA-256 of the trimmed, lowercased value — Meta's normalization rule
+ *  for em/ph/fn/ln/ct fields alike (phone must already be E.164). */
+function sha256Lower(value: string | undefined): string | undefined {
   if (!value) return undefined;
   return bytesToHex(sha256(enc.encode(value.trim().toLowerCase())));
 }
@@ -351,11 +353,11 @@ export async function sendMetaCapi(
     // Hash each field once. The previous form computed each hash twice
     // (once for the truthy check, once for the value) which is both
     // wasteful and easy to read wrong.
-    const em = hashEmail(ud.email);
-    const ph = hashEmail(phone);
-    const fn = hashEmail(ud.first_name);
-    const ln = hashEmail(ud.last_name);
-    const ct = hashEmail(ud.city);
+    const em = sha256Lower(ud.email);
+    const ph = sha256Lower(phone);
+    const fn = sha256Lower(ud.first_name);
+    const ln = sha256Lower(ud.last_name);
+    const ct = sha256Lower(ud.city);
     const zp = hashPostal(ud.postal_code);
     const country = hashCountry(ud.country);
     return {

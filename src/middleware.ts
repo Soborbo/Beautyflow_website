@@ -151,6 +151,31 @@ function getGoneHtml(isEnglish: boolean): string {
 </html>`;
 }
 
+/**
+ * Security headers for SSR responses (API routes and any non-prerendered
+ * page). Prerendered pages are served directly from Cloudflare's asset
+ * layer WITHOUT running this middleware — those get the same headers from
+ * `public/_headers` (copied to `dist/_headers` at build, which Workers
+ * static assets honour). Keep the two lists in sync.
+ *
+ * CSP is intentionally absent: GTM/GA4/Meta/Turnstile inject scripts and
+ * frames dynamically, and a wrong CSP silently breaks tracking and the
+ * robot check. Introduce it via Content-Security-Policy-Report-Only first.
+ */
+const SECURITY_HEADERS: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+};
+
+function withSecurityHeaders(response: Response): Response {
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
+    if (!response.headers.has(k)) response.headers.set(k, v);
+  }
+  return response;
+}
+
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
@@ -165,14 +190,21 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const isWpPattern = wpPatterns.some((pattern) => pattern.test(pathname));
 
   if (isGoneUrl || isWpPattern) {
-    return new Response(getGoneHtml(pathname.startsWith('/en/')), {
+    return withSecurityHeaders(new Response(getGoneHtml(pathname.startsWith('/en/')), {
       status: 410,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=86400',
       },
-    });
+    }));
   }
 
-  return next();
+  const response = await next();
+  try {
+    return withSecurityHeaders(response);
+  } catch {
+    // Immutable headers (e.g. during prerender) — serve as-is; static
+    // output gets its headers from public/_headers instead.
+    return response;
+  }
 };

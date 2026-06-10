@@ -305,7 +305,10 @@ const breadcrumbSchema = {
 };
 ---
 
-<Layout title="Árak - Beautyflow Szépségszalon Budapest">
+<Layout
+  title="Árak - Beautyflow Szépségszalon Budapest"
+  description="A Beautyflow szépségszalon árlistája: lézeres szőrtelenítés, sminktetoválás, carbon peeling, arckezelések és tetoválás eltávolítás árai Budapesten."
+>
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <!-- Hero Section -->
@@ -810,14 +813,14 @@ const breadcrumbSchema = {
 
 <script>
   function initPriceNav() {
-    const navBtns = document.querySelectorAll('.price-nav-btn');
+    const navBtns = document.querySelectorAll<HTMLElement>('.price-nav-btn');
     const sections = document.querySelectorAll('.price-section');
 
     // Click handler for nav buttons
     navBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetId = btn.getAttribute('data-target');
-        const targetSection = document.getElementById(targetId);
+        const targetSection = targetId ? document.getElementById(targetId) : null;
         if (targetSection) {
           targetSection.scrollIntoView({ behavior: 'smooth' });
         }
@@ -835,7 +838,7 @@ const breadcrumbSchema = {
 
             if (isActive) {
               btn.classList.add('active');
-              btn.style.backgroundColor = color;
+              btn.style.backgroundColor = color || '';
               btn.style.color = 'white';
             } else {
               btn.classList.remove('active');

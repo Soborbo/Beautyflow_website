@@ -6,9 +6,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "wrangler dev",
-    "deploy": "astro build && wrangler deploy --keep-vars",
+    "deploy": "astro check && astro build && wrangler deploy --keep-vars",
     "cf-typegen": "wrangler types",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -22,7 +23,9 @@
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@fontsource-variable/cormorant": "^5.2.8",
+    "typescript": "^5.9.3",
     "wrangler": "^4.0.0"
   }
 }

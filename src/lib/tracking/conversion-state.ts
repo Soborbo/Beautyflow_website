@@ -78,6 +78,11 @@ function getChannel(): BroadcastChannel | null {
       });
     } catch {
       channel = null;
+      // Some private-browsing modes refuse BroadcastChannel — cross-tab
+      // conversion sync degrades to per-tab timers. Surface it in dev.
+      if (typeof console !== 'undefined' && import.meta.env?.DEV) {
+        console.warn('[tracking] BroadcastChannel unavailable — cross-tab conversion sync disabled');
+      }
     }
   }
   return channel;

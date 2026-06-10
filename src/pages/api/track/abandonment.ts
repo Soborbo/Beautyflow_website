@@ -25,6 +25,7 @@ const ALLOWED_ORIGINS = new Set<string>([
 ]);
 
 const ALLOWED_KEYS = new Set([
+  'event_id',
   'form_name',
   'last_step',
   'last_field',

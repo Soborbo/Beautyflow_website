@@ -50,6 +50,7 @@ export const USER_DATA_TTL_MS = 24 * 60 * 60 * 1000;
 export const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 export const RATE_LIMIT_ABANDONMENT_MAX = 60;
 export const RATE_LIMIT_CAPI_MAX = 20;
+export const RATE_LIMIT_CONTACT_MAX = 5;
 
 // ---------------------------------------------------------------------------
 // Meta Graph API version
