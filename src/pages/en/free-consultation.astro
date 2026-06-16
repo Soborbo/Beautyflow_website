@@ -542,6 +542,7 @@ const breadcrumbSchema = {
         setUserDataOnDOM,
         normalizeUserData,
         mirrorMetaCapi,
+        getAttribution,
       } from '@/lib/tracking';
       import { createTurnstile } from '@/lib/forms/turnstile-client';
 
@@ -550,21 +551,17 @@ const breadcrumbSchema = {
       const TOTAL_STEPS = 4;
 
       function getTrackingData() {
-        const params = new URLSearchParams(window.location.search);
-        const cookies = Object.fromEntries(
-          document.cookie.split(';').map(c => {
-            const [k, ...rest] = c.trim().split('=');
-            return [k, rest.join('=')];
-          })
-        );
+        // Persisted attribution (URL wins over stored) — survives the hard
+        // navigation from the landing page to this form.
+        const attr = getAttribution();
         return {
-          gclid: params.get('gclid') || cookies.gclid || '',
-          fbclid: params.get('fbclid') || cookies.fbclid || '',
-          utm_source: params.get('utm_source') || '',
-          utm_medium: params.get('utm_medium') || '',
-          utm_campaign: params.get('utm_campaign') || '',
-          utm_content: params.get('utm_content') || '',
-          utm_term: params.get('utm_term') || '',
+          gclid: attr.gclid || '',
+          fbclid: attr.fbclid || '',
+          utm_source: attr.utm_source || '',
+          utm_medium: attr.utm_medium || '',
+          utm_campaign: attr.utm_campaign || '',
+          utm_content: attr.utm_content || '',
+          utm_term: attr.utm_term || '',
         };
       }
 
@@ -654,6 +651,16 @@ const breadcrumbSchema = {
               .filter(cb => cb.checked)
               .map(cb => cb.value);
             btnStep1.disabled = formData.treatments.length === 0;
+            // Restore the per-option engagement signal that the GTM container
+            // still has a trigger/tag for (CE - calculator_option). Fires only
+            // when an option becomes selected, not on de-select.
+            if (checkbox.checked) {
+              trackEvent('calculator_option', {
+                form_name: FORM_NAME,
+                option: checkbox.value,
+                step: 1,
+              });
+            }
           });
         });
 
@@ -827,6 +834,12 @@ const breadcrumbSchema = {
                 service: formData.treatments[0] || 'consultation',
               }, { eventCallback: goThankYou, eventTimeout: 1200 });
               void mirrorMetaCapi('contact_form_submit', eventId, {
+                value: 5000,
+                currency: 'HUF',
+              });
+              // Server-side Meta CAPI Lead, deduped with the browser
+              // 'Meta Pixel - Lead' GTM tag via the shared eventId.
+              void mirrorMetaCapi('primary_conversion', eventId, {
                 value: 5000,
                 currency: 'HUF',
               });

@@ -67,6 +67,36 @@ export function trackFormSubmitted(formId: string): void {
   if (state) state.submitted = true;
 }
 
+/**
+ * Reads the real GA4 client_id (`_ga` cookie) and session_id (`_ga_<id>`
+ * cookie) so the server-side Measurement Protocol abandonment hit can be
+ * attributed to the SAME user/session the browser gtag reports under.
+ * Without this the server derives a synthetic client_id from IP+UA,
+ * which spawns a sourceless phantom session → GA4 "Unassigned" traffic.
+ */
+function readGa4Ids(): { client_id?: string; session_id?: string } {
+  const out: { client_id?: string; session_id?: string } = {};
+  if (typeof document === 'undefined') return out;
+  try {
+    const cookies = document.cookie.split(';').map((c) => c.trim());
+    const ga = cookies.find((c) => c.startsWith('_ga='));
+    if (ga) {
+      // _ga=GA1.1.<client_id> where client_id is "1234567890.1234567890"
+      const m = ga.slice(4).match(/^GA\d+\.\d+\.(\d+\.\d+)$/);
+      if (m) out.client_id = m[1];
+    }
+    // _ga_<streamId>=GS1.1.<session_id>.<...> (also GS2.1 in newer tags)
+    const gaSession = cookies.find((c) => /^_ga_[A-Z0-9]+=/.test(c));
+    if (gaSession) {
+      const parts = gaSession.slice(gaSession.indexOf('=') + 1).split('.');
+      if (/^GS\d+$/.test(parts[0]) && parts[2]) out.session_id = parts[2];
+    }
+  } catch {
+    // cookies unavailable — server falls back to a derived client_id
+  }
+  return out;
+}
+
 function reportAbandonment(state: FormState): void {
   if (Date.now() - state.startedAt < ABANDONMENT_MIN_DWELL_MS) return;
 
@@ -75,6 +105,9 @@ function reportAbandonment(state: FormState): void {
     // dataLayer fallback → gtag), the event carries the same id so the
     // two can never be double-counted as distinct abandonments.
     event_id: generateUUID(),
+    // Real GA4 ids so the MP hit joins the user's existing session
+    // instead of creating a sourceless "Unassigned" one.
+    ...readGa4Ids(),
     form_name: state.formName,
     last_step: state.lastStep || 'unknown',
     last_field: state.lastField || 'unknown',

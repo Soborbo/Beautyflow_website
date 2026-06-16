@@ -16,7 +16,12 @@
 import { resumeConversionTimer } from './conversion-state';
 import { initGlobalListeners } from './global-listeners';
 import { restoreUserDataFromStorage } from './tracking';
+import { captureAttribution } from './attribution';
 
+// Persist UTM / ad click-ids the moment they appear in the URL, so the
+// lead form can still attach them after the visitor navigates away from
+// the landing page (the query string is dropped on hard navigation).
+captureAttribution();
 restoreUserDataFromStorage();
 resumeConversionTimer();
 initGlobalListeners();

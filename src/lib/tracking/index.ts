@@ -42,6 +42,8 @@ export {
 
 export { initGlobalListeners } from './global-listeners';
 
+export { captureAttribution, getAttribution, type Attribution } from './attribution';
+
 export { mirrorMetaCapi } from './meta-mirror';
 
 export { generateUUID } from './uuid';
