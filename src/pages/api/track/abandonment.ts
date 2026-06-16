@@ -26,6 +26,7 @@ const ALLOWED_ORIGINS = new Set<string>([
 
 const ALLOWED_KEYS = new Set([
   'event_id',
+  'session_id',
   'form_name',
   'last_step',
   'last_field',
@@ -34,6 +35,11 @@ const ALLOWED_KEYS = new Set([
   'exit_page_title',
   'exit_page_url',
 ]);
+
+/** GA4 client_id looks like "1234567890.1234567890". */
+function validClientId(v: unknown): v is string {
+  return typeof v === 'string' && /^\d+\.\d+$/.test(v);
+}
 
 interface AbandonmentPayload {
   form_name?: string;
@@ -82,14 +88,23 @@ export const POST: APIRoute = async (context) => {
     const raw = (await request.json()) as unknown;
     const payload = sanitize(raw);
 
+    // Prefer the real GA4 client_id the browser sent (from its _ga cookie)
+    // so this hit joins the user's existing session and keeps its source.
+    // Fall back to an IP+UA-derived id only when the browser couldn't read
+    // the cookie — that path still produces an "Unassigned" phantom session.
+    const rawClientId = (raw as { client_id?: unknown } | null)?.client_id;
     const ua = request.headers.get('User-Agent') || '';
-    const clientId = deriveClientId(`${ip}${ua}`.replace(/[^a-f0-9]/gi, '').padEnd(32, '0'));
+    const clientId = validClientId(rawClientId)
+      ? rawClientId
+      : deriveClientId(`${ip}${ua}`.replace(/[^a-f0-9]/gi, '').padEnd(32, '0'));
 
     const env = readEnv(locals);
     await sendGA4MP(env as Parameters<typeof sendGA4MP>[0], clientId, [
       {
         name: 'form_abandonment',
-        params: payload as Record<string, unknown>,
+        // session_id (in params) ties the event to the browser session;
+        // engagement_time_msec is required for GA4 to register engagement.
+        params: { engagement_time_msec: 1, ...(payload as Record<string, unknown>) },
       },
     ]);
   } catch (err) {
