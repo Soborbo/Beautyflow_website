@@ -280,6 +280,15 @@ const formId = `contact-form-${location}`;
               value: 5000,
               currency: 'HUF',
             });
+            // Server-side Meta CAPI Lead. The browser 'Meta Pixel - Lead'
+            // GTM tag already fires Lead on this push with eventID =
+            // {{DLV - event_id}}, so reusing the same eventId here dedups
+            // the browser + server Lead into one. (CAPI Contact above pairs
+            // with the browser 'Meta Pixel - Contact' tag the same way.)
+            void mirrorMetaCapi('primary_conversion', eventId, {
+              value: 5000,
+              currency: 'HUF',
+            });
             // Leave the page only once GTM has fired the GA4 / Google Ads /
             // Meta tags for this push; the timeout is a hard fallback for
             // when GTM is slow or blocked, so the form never hangs.

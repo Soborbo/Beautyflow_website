@@ -844,6 +844,12 @@ const breadcrumbSchema = {
                 value: 5000,
                 currency: 'HUF',
               });
+              // Server-side Meta CAPI Lead, deduped with the browser
+              // 'Meta Pixel - Lead' GTM tag via the shared eventId.
+              void mirrorMetaCapi('primary_conversion', eventId, {
+                value: 5000,
+                currency: 'HUF',
+              });
               // Leave the page only once GTM has fired the conversion tags;
               // the timeout is a hard fallback if GTM is slow or blocked.
               // The loading overlay stays up until the redirect.
