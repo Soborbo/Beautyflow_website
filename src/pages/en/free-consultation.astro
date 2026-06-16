@@ -654,6 +654,16 @@ const breadcrumbSchema = {
               .filter(cb => cb.checked)
               .map(cb => cb.value);
             btnStep1.disabled = formData.treatments.length === 0;
+            // Restore the per-option engagement signal that the GTM container
+            // still has a trigger/tag for (CE - calculator_option). Fires only
+            // when an option becomes selected, not on de-select.
+            if (checkbox.checked) {
+              trackEvent('calculator_option', {
+                form_name: FORM_NAME,
+                option: checkbox.value,
+                step: 1,
+              });
+            }
           });
         });
 
