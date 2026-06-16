@@ -542,6 +542,7 @@ const breadcrumbSchema = {
         setUserDataOnDOM,
         normalizeUserData,
         mirrorMetaCapi,
+        getAttribution,
       } from '@/lib/tracking';
       import { createTurnstile } from '@/lib/forms/turnstile-client';
 
@@ -551,21 +552,18 @@ const breadcrumbSchema = {
 
       // Read UTM/click ids from URL + cookies for the lead record
       function getTrackingData() {
-        const params = new URLSearchParams(window.location.search);
-        const cookies = Object.fromEntries(
-          document.cookie.split(';').map(c => {
-            const [k, ...rest] = c.trim().split('=');
-            return [k, rest.join('=')];
-          })
-        );
+        // Read persisted attribution (URL params win over the stored set);
+        // captureAttribution() in boot already saved any landing-page UTM/
+        // click-ids, so this survives the hard navigation to the form.
+        const attr = getAttribution();
         return {
-          gclid: params.get('gclid') || cookies.gclid || '',
-          fbclid: params.get('fbclid') || cookies.fbclid || '',
-          utm_source: params.get('utm_source') || '',
-          utm_medium: params.get('utm_medium') || '',
-          utm_campaign: params.get('utm_campaign') || '',
-          utm_content: params.get('utm_content') || '',
-          utm_term: params.get('utm_term') || '',
+          gclid: attr.gclid || '',
+          fbclid: attr.fbclid || '',
+          utm_source: attr.utm_source || '',
+          utm_medium: attr.utm_medium || '',
+          utm_campaign: attr.utm_campaign || '',
+          utm_content: attr.utm_content || '',
+          utm_term: attr.utm_term || '',
         };
       }
 
