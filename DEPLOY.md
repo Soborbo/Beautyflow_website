@@ -179,3 +179,13 @@ A Meta CAPI mirror `contact_form_submit` + `primary_conversion` néven fut (mint
 - **Adatkezelési tájékoztató** egészségügyi-adat záradéka — `/adatvedelmi-tajekoztato`.
 - **Foglaló naptár** — jelenleg kézi visszahívás + tel CTA (`eredmeny/[hash].astro`).
 - **Képes kártya illusztrációk** (Q1, Q20) — `QuizApp.astro` (`// TODO: kép`).
+
+### 5. Miért nincs commitolt `package-lock.json`
+A `sharp`, `@tailwindcss/oxide` és a `rolldown` platform-specifikus natív + wasm
+opcionális függőségeket szállít (`@img/sharp-*`, `@emnapi/*`, `@napi-rs/wasm-runtime`).
+Egy Windows-on generált lock **nem tudja** beletenni a Linux-only ágak beágyazott
+`@emnapi` bejegyzéseit, ezért a Cloudflare Linux buildjén a `npm ci` konzisztencia-
+ellenőrzése elhasal (`Missing @emnapi/runtime@1.11.1 from lock file`). Lock nélkül a
+CF `npm install`-t futtat, ami platformhelyesen old fel — ezért a `package-lock.json`
+szándékosan gitignore-olt. Ha újra szeretnél commitolt lockot + `npm ci`-t, azt
+**Linux** környezetben kell generálni (CI vagy `npm install --package-lock-only`).
