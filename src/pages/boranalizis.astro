@@ -6,7 +6,13 @@
 import QuizLayout from '../layouts/QuizLayout.astro';
 import QuizApp from '../components/quiz/QuizApp.astro';
 
-export const prerender = false;
+// Prerendered (static), like every other content page. The quiz is a client
+// island that POSTs to the SSR /api/boranalizis endpoint — the PAGE itself
+// needs no SSR. With `output: 'server'`, leaving this `false` made the page a
+// worker route with no static asset, so Cloudflare's assets `not_found_handling:
+// "404-page"` intercepted browser navigations (Accept: text/html) and served
+// the 404 page instead of the worker. `true` emits dist/boranalizis/index.html.
+export const prerender = true;
 ---
 
 <QuizLayout title="Ingyenes bőranalízis | Beautyflow">
