@@ -24,6 +24,7 @@ import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
+import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError } from '@/lib/errors/classify';
 import { checkRateLimit } from '@/lib/tracking/server';
 import { RATE_LIMIT_CONTACT_MAX } from '@/lib/tracking/config';
 
@@ -232,7 +233,7 @@ Automatikus üzenet a beautyflow.pro weboldalról.
 </html>
 `.trim();
 
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: ADMIN_FROM,
     replyTo: data.email,
     to: ADMIN_TO,
@@ -267,7 +268,7 @@ async function sendUserEmail(resend: Resend, data: ContactFormData): Promise<voi
   }
 
   if (isEnglish) {
-    await resend.emails.send({
+    await sendEmail(resend, {
       from: USER_FROM_EN,
       replyTo: ADMIN_TO,
       to: data.email,
@@ -314,7 +315,7 @@ Founder of Beautyflow
     return;
   }
 
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: USER_FROM_HU,
     replyTo: ADMIN_TO,
     to: data.email,
@@ -467,7 +468,7 @@ async function getGoogleAccessToken(serviceAccountEmail: string, privateKey: str
       assertion: jwt,
     }),
   });
-  if (!response.ok) throw new Error(`Token failed: ${await response.text()}`);
+  if (!response.ok) throw new SheetsCallError(`Token failed: ${await response.text()}`, 'token', response.status);
   return (await response.json() as { access_token: string }).access_token;
 }
 
@@ -480,13 +481,13 @@ async function getSheetGid(sheetId: string, accessToken: string, tabName: string
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
-  if (!response.ok) throw new Error(`Sheets metadata error: ${await response.text()}`);
+  if (!response.ok) throw new SheetsCallError(`Sheets metadata error: ${await response.text()}`, 'metadata', response.status);
   const body = (await response.json()) as {
     sheets?: { properties?: { sheetId?: number; title?: string } }[];
   };
   const sheet = body.sheets?.find((s) => s.properties?.title === tabName);
   if (!sheet?.properties?.sheetId && sheet?.properties?.sheetId !== 0) {
-    throw new Error(`Sheet tab "${tabName}" not found`);
+    throw new SheetsCallError(`Sheet tab "${tabName}" not found`, 'metadata', 404);
   }
   return sheet.properties.sheetId!;
 }
@@ -570,7 +571,7 @@ async function writeToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promis
       ],
     }),
   });
-  if (!response.ok) throw new Error(`Sheets error: ${await response.text()}`);
+  if (!response.ok) throw new SheetsCallError(`Sheets error: ${await response.text()}`, 'write', response.status);
 }
 
 // ---- Handler -----------------------------------------------------------
@@ -637,6 +638,15 @@ export const POST: APIRoute = async (context) => {
           source: '/api/contact',
           request,
           context: { errors: result.errors, formType: data.formType },
+        });
+        // Granular: network failure to the verify API vs genuine token reject.
+        const turnNetwork = (result.errors || []).includes('network-error');
+        reportServerError({
+          code: turnNetwork ? 'TURN-VERIFY-003' : 'TURN-VERIFY-001',
+          message: turnNetwork ? 'Turnstile verify API unreachable' : 'Turnstile server verification failed',
+          source: '/api/contact',
+          request,
+          context: { errorCodes: result.errors ?? [], errorMessage: (result.errors ?? []).join(', ') },
         });
         return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
       }
@@ -755,6 +765,18 @@ export const POST: APIRoute = async (context) => {
       }
     }
 
+    // Granular provider classification (the "why" behind a channel failure).
+    // Fingerprint defaults to the code, so admin+user failing for the same
+    // root cause dedupe to one pipeline notification.
+    if (adminResult.status === 'rejected') {
+      const c = classifyEmailFailure(adminResult.reason, 'admin');
+      reportServerError({ code: c.code, message: 'Contact admin email — Resend failure', source: '/api/contact', request, cause: adminResult.reason, context: c.context });
+    }
+    if (userResult.status === 'rejected') {
+      const c = classifyEmailFailure(userResult.reason, 'user');
+      reportServerError({ code: c.code, message: 'Contact user email — Resend failure', source: '/api/contact', request, cause: userResult.reason, context: c.context });
+    }
+
     if (sheetResult.status === 'rejected') {
       reportServerError({
         code: ERROR_CODES.CONTACT_SHEETS_APPEND_FAILED,
@@ -771,6 +793,8 @@ export const POST: APIRoute = async (context) => {
           },
         },
       });
+      const c = classifySheetsFailure(sheetResult.reason);
+      reportServerError({ code: c.code, message: 'Contact Sheets — API failure', source: '/api/contact', request, cause: sheetResult.reason, context: c.context });
     }
 
     if (bothEmailsFailed) {
