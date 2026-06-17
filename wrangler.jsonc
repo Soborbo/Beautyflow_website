@@ -11,7 +11,9 @@
     "not_found_handling": "404-page"
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    // 100% head sampling — error/lead-loss events must never be sampled away.
+    "head_sampling_rate": 1
   },
   "vars": {
     "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
@@ -23,6 +25,15 @@
     "META_PIXEL_ID": "915395591548632",
     "SITE_URL": "https://beautyflow.pro"
   }
+  // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
+  //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
+  //   menti és az emailben is elküldjük. A KV csak a más eszközről nyitott
+  //   eredmény-linkhez kell. Bekötés:
+  //     1) npx wrangler kv namespace create QUIZ_RESULTS
+  //     2) másold az id-t ide és vedd ki a kommentből:
+  //   "kv_namespaces": [
+  //     { "binding": "QUIZ_RESULTS", "id": "<KV_NAMESPACE_ID>" }
+  //   ],
   /*
    * Plaintext env vars are defined in the `vars` block above — they ship with
    * every deploy. To override one (e.g. swap the Turnstile site key for a

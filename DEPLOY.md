@@ -140,3 +140,42 @@ npm run dev
 # Töltsd ki a kapcsolat formot, submit
 # Konzol: tracking events, /api/contact 200 OK, redirect /koszonjuk-ra
 ```
+
+## Ingyenes bőranalízis kvíz (`/boranalizis`)
+
+Önálló lead-magnet kvíz (HU-only, noindex). Folyamat: ~20 kérdés 6 szakaszban →
+kontakt KAPU → szerveroldali ajánló-motor (`src/quiz/lib/recommendation.ts`) →
+eredményoldal `/eredmeny/[hash]`.
+
+**Nem igényel új secretet** — a meglévő `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`,
+`GOOGLE_SHEETS_*` bindingokat használja. A kvíz e nélkül is működik:
+az eredmény a kliens localStorage-ben + a vendég emailjében is megvan.
+
+### 1. Google Sheets — „Boranalizis" fül (opcionális)
+Hozz létre a meglévő `GOOGLE_SHEETS_ID` táblában egy **`Boranalizis`** nevű fület,
+és tedd be az **1. sorba** a fejlécet (A→U oszlop):
+
+```
+Időbélyeg | Eredmény-hash | Keresztnév | Telefon | Email | Szalon | Bőrprofil | Javasolt irány | Becsült ársáv | Útvonal | Kozmetikus flagek | Fő panasz | Cél | Sürgősség | Életkor | Allergia részletek | Hozzájárulás időbélyeg | gclid | fbclid | utm | Nyers válaszok (JSON)
+```
+Az új sorok a 2. sorba kerülnek (legújabb felül), `stringValue` (RAW, képlet-injekció ellen).
+
+### 2. KV — cross-device eredmény-link (opcionális)
+Csak ahhoz kell, hogy az emailben küldött eredmény-link **más eszközön** is megnyíljon.
+```bash
+npx wrangler kv namespace create QUIZ_RESULTS
+```
+Másold az id-t a `wrangler.jsonc`-ba (lásd az ottani TODO blokkot), és vedd ki a kommentből.
+
+### 3. GTM eventek (a kit követéséhez)
+`calculator_step`, `calculator_option`, `calculator_submit` (quoteId = hash),
+`calculator_value` (becsült ársáv, HUF), `calculator_result_view`, `lead_submit`.
+A Meta CAPI mirror `contact_form_submit` + `primary_conversion` néven fut (mint a kapcsolat formnál).
+
+### 4. Operátori pótlandók (`// TODO` a kódban, a kvíz nélkülük is megy)
+- **Tényleges szalonárak** — `src/quiz/config/treatments.ts` (placeholder ársávok, ~30 000 Ft+).
+- **CoreaPil / Fusion Plasma / Hack** részletes copy — `treatments.ts` (`copyTodo`).
+- **Fanni záróvideó** — `src/pages/eredmeny/[hash].astro` (placeholder blokk).
+- **Adatkezelési tájékoztató** egészségügyi-adat záradéka — `/adatvedelmi-tajekoztato`.
+- **Foglaló naptár** — jelenleg kézi visszahívás + tel CTA (`eredmeny/[hash].astro`).
+- **Képes kártya illusztrációk** (Q1, Q20) — `QuizApp.astro` (`// TODO: kép`).

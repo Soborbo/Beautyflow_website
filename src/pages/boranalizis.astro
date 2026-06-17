@@ -1,0 +1,14 @@
+---
+/**
+ * /boranalizis — az ingyenes online bőranalízis kvíz.
+ * Landing nélkül, rögtön az első kérdéssel indul (minimális chrome).
+ */
+import QuizLayout from '../layouts/QuizLayout.astro';
+import QuizApp from '../components/quiz/QuizApp.astro';
+
+export const prerender = false;
+---
+
+<QuizLayout title="Ingyenes bőranalízis | Beautyflow">
+  <QuizApp />
+</QuizLayout>
