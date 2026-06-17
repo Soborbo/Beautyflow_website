@@ -32,3 +32,11 @@ pnpm-debug.log*
 # tooling / scratch artifacts
 .playwright-mcp/
 references/
+
+# npm lockfile is intentionally NOT committed.
+# sharp / @tailwindcss/oxide / rolldown ship platform-specific native+wasm
+# optional deps whose nested @emnapi/@napi-rs entries a Windows-generated lock
+# cannot include for Linux. With a committed lock, Cloudflare's Linux build
+# runs `npm ci` and fails the consistency check; with no lock it runs
+# `npm install` and resolves correctly per-platform. See DEPLOY.md.
+package-lock.json
