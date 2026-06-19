@@ -14,6 +14,7 @@ import QuizLayout from '../../layouts/QuizLayout.astro';
 import { isValidResultHash } from '../../quiz/lib/hash';
 import { t } from '../../quiz/lib/i18n';
 import type { Recommendation } from '../../quiz/lib/types';
+import { env as cfEnv } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -21,10 +22,11 @@ const { hash } = Astro.params;
 const validHash = typeof hash === 'string' && isValidResultHash(hash);
 
 // KV olvasás, ha a binding be van kötve (lásd wrangler.jsonc TODO).
+// Astro 6 / @astrojs/cloudflare v13: a binding a `cloudflare:workers`
+// env modulból jön (a régi Astro.locals.runtime.env már dob).
 let serverResult: Recommendation | null = null;
 if (validHash) {
-  const env = (Astro.locals as { runtime?: { env?: Record<string, unknown> } }).runtime?.env;
-  const kv = env?.QUIZ_RESULTS as { get?: (k: string, t: 'json') => Promise<unknown> } | undefined;
+  const kv = (cfEnv as Record<string, unknown>).QUIZ_RESULTS as { get?: (k: string, t: 'json') => Promise<unknown> } | undefined;
   if (kv?.get) {
     try {
       serverResult = (await kv.get(hash as string, 'json')) as Recommendation | null;

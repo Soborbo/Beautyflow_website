@@ -25,7 +25,7 @@
 
 ## Executive summary
 
-The codebase is in good shape overall: a clean Astro 5 + Cloudflare Workers setup with thoughtful security work already in place (PII hashing for Meta CAPI, consent gating, honeypot + time-gate + Turnstile, origin allowlists, Sheets formula-injection protection, escaped email templates). The build is green and the sitemap/hreflang/i18n architecture is solid.
+The codebase is in good shape overall: a clean Astro 6 + Cloudflare Workers setup with thoughtful security work already in place (PII hashing for Meta CAPI, consent gating, honeypot + time-gate + Turnstile, origin allowlists, Sheets formula-injection protection, escaped email templates). The build is green and the sitemap/hreflang/i18n architecture is solid.
 
 The audit found **no critical vulnerabilities**, but **2 high-severity issues** (a real functional bug in conversion tracking, and server error details leaking to clients), several medium issues, and 2 high-severity dependency advisories.
 

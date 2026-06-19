@@ -1,7 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "beautyflow-website",
-  "main": "./dist/_worker.js/index.js",
+  // @astrojs/cloudflare v13 ships a single stable Worker entrypoint that wraps
+  // the Astro SSR build. `astro build` wires the generated manifest into it, so
+  // `main` no longer points at the build output (./dist/_worker.js/index.js).
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2025-05-13",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {

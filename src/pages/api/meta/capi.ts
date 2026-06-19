@@ -4,6 +4,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { env as cfEnv } from 'cloudflare:workers';
 import {
   checkRateLimit,
   corsPreflightResponse,
@@ -69,9 +70,9 @@ function sanitizeCustomData(input: Record<string, unknown>): Record<string, unkn
   return out;
 }
 
-function readEnv(locals: App.Locals) {
-  const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime;
-  return runtime?.env || {};
+function readEnv(): Record<string, string | undefined> {
+  // Astro 6 / @astrojs/cloudflare v13: Worker env via `cloudflare:workers`.
+  return cfEnv as Record<string, string | undefined>;
 }
 
 export const OPTIONS: APIRoute = async ({ request }) => {
@@ -79,7 +80,7 @@ export const OPTIONS: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async (context) => {
-  const { request, locals } = context;
+  const { request } = context;
   const origin = request.headers.get('Origin');
 
   if (!isAllowedOrigin(origin, ALLOWED_ORIGINS)) {
@@ -154,7 +155,7 @@ export const POST: APIRoute = async (context) => {
     );
     if (sourceUrl) event.event_source_url = sourceUrl;
 
-    const env = readEnv(locals);
+    const env = readEnv();
     await sendMetaCapi(env as Parameters<typeof sendMetaCapi>[0], [event], { countryCode: DEFAULT_COUNTRY });
   } catch (err) {
     reportServerError({

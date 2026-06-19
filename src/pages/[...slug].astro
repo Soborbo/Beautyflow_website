@@ -12,6 +12,8 @@
  */
 export const prerender = false;
 
+import { env } from 'cloudflare:workers';
+
 interface AssetsFetcher {
   fetch: (input: string | URL) => Promise<Response>;
 }
@@ -20,8 +22,9 @@ const pathname = Astro.url.pathname;
 const isEnglish = pathname === '/en' || pathname.startsWith('/en/');
 const errorPath = isEnglish ? '/en/404' : '/404';
 
-const runtime = (Astro.locals as { runtime?: { env?: { ASSETS?: AssetsFetcher } } }).runtime;
-const assets = runtime?.env?.ASSETS;
+// Astro 6 / @astrojs/cloudflare v13: the ASSETS binding moved from
+// Astro.locals.runtime.env to the `cloudflare:workers` env module.
+const assets = (env as { ASSETS?: AssetsFetcher }).ASSETS;
 
 if (assets) {
   const page = await assets.fetch(new URL(errorPath, Astro.url.origin));

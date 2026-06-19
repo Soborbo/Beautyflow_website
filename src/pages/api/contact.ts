@@ -20,6 +20,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { env as cfEnv } from 'cloudflare:workers';
 import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
@@ -138,10 +139,10 @@ interface RuntimeEnv {
   GOOGLE_PRIVATE_KEY?: string;
 }
 
-function readEnv(locals: App.Locals): RuntimeEnv {
-  // Astro 5 + @astrojs/cloudflare exposes Workers bindings on locals.runtime.env
-  const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime;
-  const fromRuntime = runtime?.env || {};
+function readEnv(): RuntimeEnv {
+  // Astro 6 + @astrojs/cloudflare v13 expose Workers bindings/vars/secrets via
+  // the `cloudflare:workers` module (the old locals.runtime.env throws now).
+  const fromRuntime = cfEnv as Record<string, string | undefined>;
 
   // Fall back to process.env (Node dev) / import.meta.env (Vite build) so
   // local `astro dev` works without `wrangler dev`.
@@ -584,7 +585,7 @@ function jsonError(status: number, error: string): Response {
 }
 
 export const POST: APIRoute = async (context) => {
-  const { request, locals } = context;
+  const { request } = context;
   try {
     const ip = request.headers.get('CF-Connecting-IP') || '';
 
@@ -614,7 +615,7 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
-    const env = readEnv(locals);
+    const env = readEnv();
 
     // Turnstile — fail CLOSED: a missing secret means a misconfigured
     // deploy, and silently accepting unverified submissions would turn a

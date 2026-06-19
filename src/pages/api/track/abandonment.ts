@@ -4,6 +4,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { env as cfEnv } from 'cloudflare:workers';
 import {
   checkRateLimit,
   corsPreflightResponse,
@@ -62,9 +63,9 @@ function sanitize(input: unknown): AbandonmentPayload {
   return out as AbandonmentPayload;
 }
 
-function readEnv(locals: App.Locals) {
-  const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime;
-  return runtime?.env || {};
+function readEnv(): Record<string, string | undefined> {
+  // Astro 6 / @astrojs/cloudflare v13: Worker env via `cloudflare:workers`.
+  return cfEnv as Record<string, string | undefined>;
 }
 
 export const OPTIONS: APIRoute = async ({ request }) => {
@@ -72,7 +73,7 @@ export const OPTIONS: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async (context) => {
-  const { request, locals } = context;
+  const { request } = context;
   const origin = request.headers.get('Origin');
 
   if (!isAllowedOrigin(origin, ALLOWED_ORIGINS)) {
@@ -98,7 +99,7 @@ export const POST: APIRoute = async (context) => {
       ? rawClientId
       : deriveClientId(`${ip}${ua}`.replace(/[^a-f0-9]/gi, '').padEnd(32, '0'));
 
-    const env = readEnv(locals);
+    const env = readEnv();
     await sendGA4MP(env as Parameters<typeof sendGA4MP>[0], clientId, [
       {
         name: 'form_abandonment',

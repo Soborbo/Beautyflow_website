@@ -62,9 +62,6 @@ export default defineConfig({
   },
   adapter: cloudflare({
     imageService: 'compile',
-    platformProxy: {
-      enabled: true,
-    },
   }),
   image: {
     domains: [],
