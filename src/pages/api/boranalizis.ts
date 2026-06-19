@@ -18,6 +18,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { env as cfEnv } from 'cloudflare:workers';
 import { z } from 'zod';
 import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
@@ -126,9 +127,9 @@ interface QuizEnv {
   QUIZ_RESULTS?: QuizKV;
 }
 
-function readEnv(locals: App.Locals): QuizEnv {
-  const runtime = (locals as { runtime?: { env?: Record<string, unknown> } }).runtime;
-  const fromRuntime = (runtime?.env || {}) as Record<string, unknown>;
+function readEnv(): QuizEnv {
+  // Astro 6 / @astrojs/cloudflare v13: Worker env via `cloudflare:workers`.
+  const fromRuntime = cfEnv as Record<string, unknown>;
   const pick = (key: string): string | undefined =>
     (fromRuntime[key] as string | undefined) ||
     (typeof process !== 'undefined' && process.env ? process.env[key] : undefined) ||
@@ -302,7 +303,7 @@ export const POST: APIRoute = async (context) => {
     }
     const data = parsed.data;
 
-    const env = readEnv(locals);
+    const env = readEnv();
 
     // Turnstile — fail closed
     if (!env.TURNSTILE_SECRET_KEY) {
@@ -339,12 +340,14 @@ export const POST: APIRoute = async (context) => {
 
     // --- KV mentés (best-effort, cross-device eredmény) ---
     if (env.QUIZ_RESULTS) {
-      const waitUntil = (locals as { runtime?: { ctx?: { waitUntil?: (p: Promise<unknown>) => void } } }).runtime?.ctx?.waitUntil;
+      // Astro 6 / @astrojs/cloudflare v13: the ExecutionContext moved from
+      // locals.runtime.ctx to locals.cfContext.
+      const cfCtx = (locals as { cfContext?: { waitUntil?: (p: Promise<unknown>) => void } }).cfContext;
       const put = env.QUIZ_RESULTS.put(hash, JSON.stringify(rec), { expirationTtl: KV_TTL_SECONDS }).catch((e) => {
         reportServerError({ code: ERROR_CODES.QUIZ_KV_STORE_FAILED, message: 'KV result store failed', source: '/api/boranalizis', request, cause: e });
         reportServerError({ code: 'KV-WRITE-001', message: 'KV.put() threw', source: '/api/boranalizis', request, cause: e, context: { key: hash, errorMessage: e instanceof Error ? e.message : String(e) } });
       });
-      if (waitUntil) waitUntil(put); else await put;
+      if (cfCtx?.waitUntil) cfCtx.waitUntil(put); else await put;
     }
 
     const resend = new Resend(env.RESEND_API_KEY);

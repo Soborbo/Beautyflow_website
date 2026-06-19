@@ -1,6 +1,11 @@
 # Beautyflow — Cloudflare Workers deploy
 
-A repo Astro 5 + Cloudflare Workers Static Assets módban fut. A korábbi Pages mode (`functions/_middleware.js`) le lett bontva — a redirect / 410 logika most az [Astro middleware](src/middleware.ts)-ben él.
+A repo Astro 6 + `@astrojs/cloudflare` v13 + Cloudflare Workers Static Assets módban fut. A korábbi Pages mode (`functions/_middleware.js`) le lett bontva — a redirect / 410 logika most az [Astro middleware](src/middleware.ts)-ben él.
+
+> **Astro 6 / @astrojs/cloudflare v13 megjegyzések:**
+> - A `astro build` a Worker deploy-configot a [wrangler.jsonc](wrangler.jsonc)-ból generálja (`dist/server/wrangler.json` + `.wrangler/deploy/config.json`), a `wrangler deploy` ezt használja — a `main` és `assets.directory` mezőket az adapter automatikusan a build kimenetre állítja (`entry.mjs`, `../client`).
+> - `astro dev`/build/check a valódi Workers runtime-ot (workerd) futtatja a `@cloudflare/vite-plugin`-en keresztül. A `@tailwindcss/vite` Vite 8-at húzna fel; a `package.json` `overrides: { "vite": "^7" }` ezt Vite 7-re kényszeríti (különben `require_dist is not a function` build hiba).
+> - Az Astro 6 alapból engedi a Sessions API-t és egy `SESSION` KV bindinget vár; a kód nem használ sessiont, így a Wrangler deploy-kor auto-provisionálja (nincs teendő).
 
 ## Helyi fejlesztés
 
