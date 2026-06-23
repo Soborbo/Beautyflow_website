@@ -125,6 +125,8 @@ interface QuizEnv {
   GOOGLE_PRIVATE_KEY?: string;
   SITE_URL?: string;
   QUIZ_RESULTS?: QuizKV;
+  CRM_WEBHOOK_URL?: string;
+  CRM_WEBHOOK_SECRET?: string;
 }
 
 function readEnv(): QuizEnv {
@@ -142,7 +144,46 @@ function readEnv(): QuizEnv {
     GOOGLE_PRIVATE_KEY: pick('GOOGLE_PRIVATE_KEY'),
     SITE_URL: pick('SITE_URL') || pick('PUBLIC_SITE_URL') || 'https://beautyflow.pro',
     QUIZ_RESULTS: fromRuntime['QUIZ_RESULTS'] as QuizKV | undefined,
+    CRM_WEBHOOK_URL: pick('CRM_WEBHOOK_URL'),
+    CRM_WEBHOOK_SECRET: pick('CRM_WEBHOOK_SECRET'),
   };
+}
+
+/**
+ * Best-effort forward of the bőranalízis quiz lead to the CRM (/api/webhook/lead).
+ * The quiz is a genuine lead source (firstName + phone/email + health consent).
+ */
+async function forwardToCrm(data: QuizData, rec: Recommendation, env: QuizEnv): Promise<void> {
+  const url = env.CRM_WEBHOOK_URL;
+  const secret = env.CRM_WEBHOOK_SECRET;
+  if (!url || !secret) return;
+
+  const body = {
+    name: data.firstName,
+    phone: data.phone || undefined,
+    email: data.email || undefined,
+    need_type: `Bőranalízis: ${treatmentsLine(rec)}`.slice(0, 100),
+    message: `Bőrprofil: ${rec.profile.label}; javasolt: ${treatmentsLine(rec)}`,
+    source_type: 'form' as const,
+    consent_given: true,
+    marketing_consent: false,
+    attribution: {
+      utm_source: data.utm_source || undefined,
+      utm_medium: data.utm_medium || undefined,
+      utm_campaign: data.utm_campaign || undefined,
+      utm_content: data.utm_content || undefined,
+      utm_term: data.utm_term || undefined,
+      gclid: data.gclid || undefined,
+      fbclid: data.fbclid || undefined,
+    },
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
 }
 
 // ---- Emailek -----------------------------------------------------------
@@ -355,6 +396,7 @@ export const POST: APIRoute = async (context) => {
       sendSalonEmail(resend, data, rec, salon, resultUrl),
       sendUserEmail(resend, data, rec, resultUrl),
       writeToSheet(env, data, rec, salon, hash),
+      forwardToCrm(data, rec, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
     ]);
 
     const [adminR, userR, sheetR] = results;
