@@ -24,11 +24,12 @@ const TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days — matches a typical ad coo
 
 const PARAMS = [
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
-  'gclid', 'fbclid', 'gbraid', 'wbraid',
+  'gclid', 'fbclid', 'gbraid', 'wbraid', 'msclkid',
 ] as const;
 
 type AttributionField = (typeof PARAMS)[number];
-export type Attribution = Partial<Record<AttributionField, string>>;
+// fbc/fbp are Meta pixel COOKIES (not URL params) — merged in at read time.
+export type Attribution = Partial<Record<AttributionField, string>> & { fbc?: string; fbp?: string };
 
 interface StoredAttribution {
   data: Attribution;
@@ -82,10 +83,26 @@ export function captureAttribution(): Attribution {
   return url;
 }
 
+/** Meta pixel cookies (_fbc/_fbp) — live-read at submit time. */
+function readMetaCookies(): Attribution {
+  if (typeof document === 'undefined') return {};
+  const get = (n: string): string | undefined => {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + n.replace(/[.$?*|{}()[\]\\/+^]/g, '\\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : undefined;
+  };
+  const out: Attribution = {};
+  const fbc = get('_fbc');
+  const fbp = get('_fbp');
+  if (fbc) out.fbc = fbc;
+  if (fbp) out.fbp = fbp;
+  return out;
+}
+
 /**
  * Attribution to attach to a lead at submit time. URL params win over
  * stored, so a direct landing on the form with fresh params is honoured.
+ * Meta _fbc/_fbp cookies are merged in (live-read).
  */
 export function getAttribution(): Attribution {
-  return { ...readStored(), ...fromUrl() };
+  return { ...readStored(), ...fromUrl(), ...readMetaCookies() };
 }

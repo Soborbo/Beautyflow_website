@@ -72,6 +72,11 @@ interface BaseFormData {
   // tracking
   gclid?: string;
   fbclid?: string;
+  gbraid?: string;
+  wbraid?: string;
+  msclkid?: string;
+  fbc?: string;
+  fbp?: string;
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
@@ -201,6 +206,11 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<voi
       utm_term: data.utm_term,
       gclid: data.gclid,
       fbclid: data.fbclid,
+      gbraid: data.gbraid,
+      wbraid: data.wbraid,
+      msclkid: data.msclkid,
+      fbc: data.fbc,
+      fbp: data.fbp,
     },
   };
 

@@ -61,6 +61,11 @@ const QuizSchema = z
     turnstileToken: z.string().max(4000).optional().default(''),
     gclid: z.string().max(200).optional().default(''),
     fbclid: z.string().max(200).optional().default(''),
+    gbraid: z.string().max(200).optional().default(''),
+    wbraid: z.string().max(200).optional().default(''),
+    msclkid: z.string().max(200).optional().default(''),
+    fbc: z.string().max(200).optional().default(''),
+    fbp: z.string().max(200).optional().default(''),
     utm_source: z.string().max(200).optional().default(''),
     utm_medium: z.string().max(200).optional().default(''),
     utm_campaign: z.string().max(200).optional().default(''),
@@ -175,6 +180,11 @@ async function forwardToCrm(data: QuizData, rec: Recommendation, env: QuizEnv): 
       utm_term: data.utm_term || undefined,
       gclid: data.gclid || undefined,
       fbclid: data.fbclid || undefined,
+      gbraid: data.gbraid || undefined,
+      wbraid: data.wbraid || undefined,
+      msclkid: data.msclkid || undefined,
+      fbc: data.fbc || undefined,
+      fbp: data.fbp || undefined,
     },
   };
 
