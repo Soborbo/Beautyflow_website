@@ -137,6 +137,9 @@ interface RuntimeEnv {
   GOOGLE_SHEETS_ID?: string;
   GOOGLE_SERVICE_ACCOUNT_EMAIL?: string;
   GOOGLE_PRIVATE_KEY?: string;
+  // CRM lead-webhook (crm.beautyflow.pro/api/webhook/lead) — server-side only.
+  CRM_WEBHOOK_URL?: string;
+  CRM_WEBHOOK_SECRET?: string;
 }
 
 function readEnv(): RuntimeEnv {
@@ -157,7 +160,56 @@ function readEnv(): RuntimeEnv {
     GOOGLE_SHEETS_ID: pickEnv('GOOGLE_SHEETS_ID'),
     GOOGLE_SERVICE_ACCOUNT_EMAIL: pickEnv('GOOGLE_SERVICE_ACCOUNT_EMAIL'),
     GOOGLE_PRIVATE_KEY: pickEnv('GOOGLE_PRIVATE_KEY'),
+    CRM_WEBHOOK_URL: pickEnv('CRM_WEBHOOK_URL'),
+    CRM_WEBHOOK_SECRET: pickEnv('CRM_WEBHOOK_SECRET'),
   };
+}
+
+// ---- CRM lead webhook --------------------------------------------------
+
+/**
+ * Best-effort forward of the lead to the CRM (`/api/webhook/lead`, Bearer-auth).
+ * Maps the contact form to the CRM's snake_case lead schema. Runs inside the
+ * submit pipeline's Promise.allSettled, so a CRM failure NEVER fails the form
+ * (email + Sheets still capture the lead). Skips silently if not configured.
+ */
+async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<void> {
+  const url = env.CRM_WEBHOOK_URL;
+  const secret = env.CRM_WEBHOOK_SECRET;
+  if (!url || !secret) return; // not configured → skip
+
+  const needType =
+    data.formType === 'consultation'
+      ? data.treatments.map((t) => treatmentNamesHu[t] || t).join(', ')
+      : data.locationLabel;
+  const message = data.formType === 'location' ? data.message || undefined : undefined;
+
+  const body = {
+    name: `${data.lastName} ${data.firstName}`.trim(),
+    phone: data.phone,
+    email: data.email || undefined,
+    need_type: needType ? needType.slice(0, 100) : undefined,
+    message,
+    source_type: 'form' as const,
+    consent_given: true, // a form csak elfogadott adatkezeléssel küldhető (data.consent)
+    marketing_consent: false, // ezen az űrlapon nincs külön marketing-opt-in
+    attribution: {
+      utm_source: data.utm_source,
+      utm_medium: data.utm_medium,
+      utm_campaign: data.utm_campaign,
+      utm_content: data.utm_content,
+      utm_term: data.utm_term,
+      gclid: data.gclid,
+      fbclid: data.fbclid,
+    },
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
 }
 
 // ---- Email senders -----------------------------------------------------
@@ -715,6 +767,7 @@ export const POST: APIRoute = async (context) => {
       sendAdminEmail(resend, data),
       sendUserEmail(resend, data),
       writeToGoogleSheet(data, googleEnv),
+      forwardToCrm(data, env), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
     ]);
 
     const adminResult = results[0];
