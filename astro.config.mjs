@@ -77,8 +77,10 @@ export default defineConfig({
       // which would otherwise leak the localhost always-pass TEST key into the
       // production bundle. This literal define wins for the static
       // `import.meta.env.PUBLIC_TURNSTILE_SITE_KEY` access in the tracking kit.
+      // NODE_ENV is not yet 'production' when this config loads, so key off the
+      // CLI command instead: `astro build` → production widget, `astro dev` → test key.
       'import.meta.env.PUBLIC_TURNSTILE_SITE_KEY': JSON.stringify(
-        process.env.NODE_ENV === 'production'
+        process.argv.includes('build')
           ? '0x4AAAAAADOTyE9gccGo16os' // beautyflow.pro production Turnstile widget
           : '1x00000000000000000000AA' // Cloudflare always-pass test key (localhost dev)
       )
