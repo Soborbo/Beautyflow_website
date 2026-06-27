@@ -180,6 +180,23 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
 
+  // Same-origin tracking gateway: forward /api/event/* to the Soborbo event-gateway
+  // worker via the GATEWAY service binding. beautyflow.pro is a Cloudflare Custom
+  // Domain for THIS worker, which owns the whole hostname — so a zone Worker Route
+  // to the gateway is wiped on every site redeploy. Proxying here keeps the server-
+  // side dispatch (Meta CAPI + Google Ads) durable. The gateway resolves the site
+  // from the request hostname (beautyflow.pro) → its SITE_CONFIG KV entry.
+  if (pathname.startsWith('/api/event/')) {
+    const env = (context.locals as { runtime?: { env?: Record<string, unknown> } })?.runtime?.env;
+    const gateway = env?.GATEWAY as { fetch?: (req: Request) => Promise<Response> } | undefined;
+    if (gateway && typeof gateway.fetch === 'function') {
+      return gateway.fetch(context.request);
+    }
+    // Binding missing → fail loud (503), never serve the site's 404 page for a
+    // tracking beacon (that would look like a silent conversion drop).
+    return new Response('event-gateway binding unavailable', { status: 503 });
+  }
+
   if (redirects[pathname]) {
     return Response.redirect(new URL(redirects[pathname], url.origin), 301);
   }

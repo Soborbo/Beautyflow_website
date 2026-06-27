@@ -70,6 +70,18 @@ export default defineConfig({
     // @tailwindcss/vite ships against a different vite version than the
     // one bundled with Astro, so the Plugin types don't unify — runtime
     // is unaffected.
-    plugins: [/** @type {any} */ (tailwindcss())]
+    plugins: [/** @type {any} */ (tailwindcss())],
+    define: {
+      // Force the PUBLIC Turnstile sitekey per build mode. The @astrojs/cloudflare
+      // adapter inlines .dev.vars into import.meta.env even during `astro build`,
+      // which would otherwise leak the localhost always-pass TEST key into the
+      // production bundle. This literal define wins for the static
+      // `import.meta.env.PUBLIC_TURNSTILE_SITE_KEY` access in the tracking kit.
+      'import.meta.env.PUBLIC_TURNSTILE_SITE_KEY': JSON.stringify(
+        process.env.NODE_ENV === 'production'
+          ? '0x4AAAAAADOTyE9gccGo16os' // beautyflow.pro production Turnstile widget
+          : '1x00000000000000000000AA' // Cloudflare always-pass test key (localhost dev)
+      )
+    }
   }
 });

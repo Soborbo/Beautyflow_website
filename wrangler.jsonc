@@ -18,6 +18,12 @@
     // 100% head sampling — error/lead-loss events must never be sampled away.
     "head_sampling_rate": 1
   },
+  // Service binding to the Soborbo event-gateway worker. The middleware forwards
+  // /api/event/* to it (same-origin tracking dispatch) — durable across redeploys,
+  // unlike a zone Worker Route which the Custom Domain wipes on each site deploy.
+  "services": [
+    { "binding": "GATEWAY", "service": "event-gateway" }
+  ],
   "vars": {
     "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
     "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",
