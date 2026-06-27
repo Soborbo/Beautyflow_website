@@ -1,0 +1,42 @@
+---
+/**
+ * Turnstile invisible widget — for the event-gateway worker's REQUIRED turnstile_token.
+ *
+ * gateway.ts getTurnstileToken() renders/executes this #cf-turnstile-invisible
+ * container, taking the sitekey from the PUBLIC_TURNSTILE_SITE_KEY env.
+ *
+ * Put it in the layout <body> (once per page). Astro env required:
+ *   PUBLIC_TURNSTILE_SITE_KEY=0x4AAAA...
+ */
+---
+
+<div id="cf-turnstile-invisible" style="display:none"></div>
+{/*
+  beautyflow integration note: api.js is loaded WITHOUT `?render=explicit` so the
+  lead/contact forms' own VISIBLE `.cf-turnstile` widgets still auto-render from
+  this single, page-global api.js load. The invisible gateway widget below
+  (#cf-turnstile-invisible) is always rendered EXPLICITLY by gateway.ts, so it is
+  unaffected by auto-render mode. Two widgets mint independent, single-use tokens:
+  the visible ones for /api/contact + /api/boranalizis, the invisible one for the
+  event-gateway dispatch.
+*/}
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+  import { prewarmTurnstile } from '../lib';
+
+  // Pre-warm: obtain a Turnstile token on load so it's cached (4 min) before the
+  // first conversion dispatch. api.js loads async → poll briefly for window.turnstile.
+  function whenTurnstileReady(attempt = 0) {
+    if (typeof (window as unknown as { turnstile?: unknown }).turnstile !== 'undefined') {
+      prewarmTurnstile();
+      return;
+    }
+    if (attempt > 40) return; // give up after ~10s
+    setTimeout(() => whenTurnstileReady(attempt + 1), 250);
+  }
+
+  function start() { whenTurnstileReady(); }
+  document.addEventListener('astro:page-load', start);
+  if (document.readyState !== 'loading') start();
+</script>

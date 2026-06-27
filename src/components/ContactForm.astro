@@ -13,9 +13,10 @@
  *      logs to Google Sheets if configured
  *   3. On success → window.location.href = '/koszonjuk'
  *
- * Tracking events fired:
- *   - form_start (on first field focus)
- *   - contact_form_submit (on success) → mirrored to Meta CAPI as `Contact`
+ * Tracking (Soborbo canonical v5):
+ *   - form_abandon (analytics) via initFormAbandonTracking
+ *   - on success → trackLeadSubmit(): dataLayer `lead_submit` (browser GTM) +
+ *     gateway `contact_form_submit` (Meta CAPI + Google Ads), SAME event_id.
  */
 
 export interface Props {
@@ -153,58 +154,50 @@ const formId = `contact-form-${location}`;
   </form>
 </section>
 
-{turnstileSiteKey && (
-  <script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-    async
-    defer
-  ></script>
-)}
-
 <script>
   import {
-    trackEvent,
-    trackFormStart,
-    trackFormSubmitted,
-    setUserDataOnDOM,
-    normalizeUserData,
-    mirrorMetaCapi,
-    getAttribution,
-  } from '@/lib/tracking';
+    trackLeadSubmit,
+    initFormAbandonTracking,
+    waitForTracking,
+    getAllTrackingData,
+    getFbc,
+    getFbp,
+    collectAttribution,
+  } from '@tracking/lib';
 
+  // Attribution for the /api/contact POST body (CRM + Google Sheets sink). Sourced
+  // from the canonical lib: getAllTrackingData() covers gclid/gbraid/wbraid/fbclid/utm_*,
+  // collectAttribution() adds msclkid (and persists the merged superset), getFbc/getFbp
+  // read the Meta cookies. Click IDs are marketing-consent gated inside the lib (GDPR).
   function getTrackingData() {
-    // Persisted attribution (URL wins over stored) — survives the hard
-    // navigation from the landing page to whichever page hosts this form.
-    const attr = getAttribution();
+    const t = getAllTrackingData();
+    const a = collectAttribution();
     return {
-      gclid: attr.gclid || '',
-      fbclid: attr.fbclid || '',
-      utm_source: attr.utm_source || '',
-      utm_medium: attr.utm_medium || '',
-      utm_campaign: attr.utm_campaign || '',
-      utm_content: attr.utm_content || '',
-      utm_term: attr.utm_term || '',
-      gbraid: attr.gbraid || '',
-      wbraid: attr.wbraid || '',
-      msclkid: attr.msclkid || '',
-      fbc: attr.fbc || '',
-      fbp: attr.fbp || '',
+      gclid: t.gclid || a.gclid || '',
+      fbclid: t.fbclid || a.fbclid || '',
+      utm_source: t.utm_source || '',
+      utm_medium: t.utm_medium || '',
+      utm_campaign: t.utm_campaign || '',
+      utm_content: t.utm_content || '',
+      utm_term: t.utm_term || '',
+      gbraid: t.gbraid || a.gbraid || '',
+      wbraid: t.wbraid || a.wbraid || '',
+      msclkid: a.msclkid || '',
+      fbc: getFbc() || '',
+      fbp: getFbp() || '',
     };
   }
 
   function init() {
     document.querySelectorAll<HTMLFormElement>('.contact-form').forEach(form => {
-      const formId = form.id;
+      if (form.dataset.trackBound) return;
+      form.dataset.trackBound = '1';
       const formName = `contact_form_${form.dataset.location || 'location'}`;
       const startedAt = Date.now();
-      let formStarted = false;
 
-      form.addEventListener('focusin', () => {
-        if (!formStarted) {
-          formStarted = true;
-          trackFormStart(formId, formName);
-        }
-      }, { once: true });
+      // Analytics-consented form-abandon tracking (fires `form_abandon` after 60s idle).
+      const cleanupAbandon = initFormAbandonTracking(form, formName, 60_000);
+      document.addEventListener('astro:before-swap', cleanupAbandon, { once: true });
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -249,13 +242,6 @@ const formId = `contact-form-${location}`;
           return;
         }
 
-        setUserDataOnDOM(normalizeUserData({
-          email: data.email,
-          phone_number: data.phone,
-          first_name: data.firstName,
-          last_name: data.lastName,
-        }, 'HU'));
-
         try {
           const res = await fetch('/api/contact', {
             method: 'POST',
@@ -265,36 +251,24 @@ const formId = `contact-form-${location}`;
           const result = await res.json();
 
           if (result.success) {
-            trackFormSubmitted(formId);
-            let navigated = false;
-            const goThankYou = () => {
-              if (navigated) return;
-              navigated = true;
-              window.location.href = '/koszonjuk';
-            };
-            const eventId = trackEvent('contact_form_submit', {
-              form_name: formName,
-              value: 5000,
-              currency: 'HUF',
-              service: String(data.locationId || ''),
-            }, { eventCallback: goThankYou, eventTimeout: 1200 });
-            void mirrorMetaCapi('contact_form_submit', eventId, {
-              value: 5000,
-              currency: 'HUF',
+            // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
+            // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
+            // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
+            // PII goes to the Enhanced-Conversions side-channel inside the lib, never
+            // the dataLayer. Navigation is independent of tracking consent.
+            trackLeadSubmit({
+              email: data.email,
+              phone: data.phone,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
+              contentName: formName,
+              eventName: 'contact_form_submit',
             });
-            // Server-side Meta CAPI Lead. The browser 'Meta Pixel - Lead'
-            // GTM tag already fires Lead on this push with eventID =
-            // {{DLV - event_id}}, so reusing the same eventId here dedups
-            // the browser + server Lead into one. (CAPI Contact above pairs
-            // with the browser 'Meta Pixel - Contact' tag the same way.)
-            void mirrorMetaCapi('primary_conversion', eventId, {
-              value: 5000,
-              currency: 'HUF',
-            });
-            // Leave the page only once GTM has fired the GA4 / Google Ads /
-            // Meta tags for this push; the timeout is a hard fallback for
-            // when GTM is slow or blocked, so the form never hangs.
-            setTimeout(goThankYou, 1500);
+            // Give GTM a beat to fire its browser tags before the hard navigation;
+            // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
+            await waitForTracking(600);
+            window.location.href = '/koszonjuk';
           } else {
             if (errEl) {
               errEl.textContent = result.error || 'Hiba történt. Kérjük próbáld újra.';

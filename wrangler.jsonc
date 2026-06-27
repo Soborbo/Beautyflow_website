@@ -21,11 +21,13 @@
   "vars": {
     "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
     "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",
-    "PUBLIC_GA4_MEASUREMENT_ID": "G-774BY4X64P",
-    "PUBLIC_META_PIXEL_ID": "915395591548632",
     "PUBLIC_SITE_URL": "https://beautyflow.pro",
-    "GA4_MEASUREMENT_ID": "G-774BY4X64P",
-    "META_PIXEL_ID": "915395591548632",
+    // Soborbo canonical tracking market config. Keep in sync with the event-gateway
+    // KV site-config (country_code / currency). Also committed in .env.production so the
+    // values are inlined into the client bundle at build (import.meta.env.PUBLIC_*).
+    "PUBLIC_TRACKING_COUNTRY": "HU",
+    "PUBLIC_TRACKING_CURRENCY": "HUF",
+    "PUBLIC_TRACKING_LOCALE": "hu",
     "SITE_URL": "https://beautyflow.pro"
   }
   // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
@@ -52,8 +54,10 @@
    *   GOOGLE_SHEETS_ID                — existing leadlist sheet id              [optional]
    *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account                  [optional]
    *   GOOGLE_PRIVATE_KEY              — Google service account key              [optional]
-   *   GA4_API_SECRET                  — GA4 Measurement Protocol API secret     [optional, enables server tracking]
-   *   META_CAPI_ACCESS_TOKEN          — Meta CAPI access token                  [optional, enables server tracking]
-   *   META_CAPI_TEST_EVENT_CODE       — TEMP for testing, REMOVE before live    [optional]
+   *
+   * Server-side conversion tracking (Meta CAPI + GA4 MP + Google Ads) is no longer
+   * handled in this Worker. It now lives in the Soborbo/Serverside event-gateway
+   * worker, served same-origin at /api/event/*. The Meta/GA4/Ads secrets live in the
+   * gateway's SITE_CONFIG KV (per hostname), NOT here. See tracking-kit/server/SETUP-SERVER.md.
    */
 }

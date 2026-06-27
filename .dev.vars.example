@@ -2,11 +2,14 @@
 # .dev.vars is gitignored. Production secrets live in the Cloudflare dashboard.
 
 # ---- Public (build-time, exposed to client) ----
+# NOTE: public market config lives in .env / .env.production (Astro inlines PUBLIC_*
+# into the client bundle at build). These mirror them for `wrangler dev`.
 PUBLIC_GTM_ID=GTM-W8V3BVGD
 PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
-PUBLIC_GA4_MEASUREMENT_ID=G-774BY4X64P
-PUBLIC_META_PIXEL_ID=915395591548632
 PUBLIC_SITE_URL=https://beautyflow.pro
+PUBLIC_TRACKING_COUNTRY=HU
+PUBLIC_TRACKING_CURRENCY=HUF
+PUBLIC_TRACKING_LOCALE=hu
 
 # ---- Server-only secrets ----
 # Cloudflare Turnstile test secret — always passes. Replace before production.
@@ -20,12 +23,8 @@ GOOGLE_SHEETS_ID=
 GOOGLE_SERVICE_ACCOUNT_EMAIL=
 GOOGLE_PRIVATE_KEY=
 
-# Server tracking — leave blank to no-op gracefully
-GA4_MEASUREMENT_ID=G-774BY4X64P
-GA4_API_SECRET=
-META_PIXEL_ID=915395591548632
-META_CAPI_ACCESS_TOKEN=
-# REMOVE before going live; when set, all Meta CAPI hits land in Test Events
-META_CAPI_TEST_EVENT_CODE=
+# Server-side conversion tracking (Meta CAPI + GA4 MP + Google Ads) now lives in the
+# Soborbo/Serverside event-gateway worker (same-origin /api/event/*). Its Meta/GA4/Ads
+# secrets live in the gateway's SITE_CONFIG KV, NOT here. See tracking-kit/server/SETUP-SERVER.md.
 
 SITE_URL=https://beautyflow.pro
