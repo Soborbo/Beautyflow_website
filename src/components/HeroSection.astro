@@ -1,4 +1,5 @@
 ---
+import { getImage } from 'astro:assets';
 import { ContentImage, HeroImage, FixedImage } from './images';
 import heroImage from '../assets/images/breautyflow-fokep.jpg';
 import googleLogo from '../assets/images/google-logo.jpg';
@@ -64,17 +65,61 @@ const content = {
 
 const t = content[lang];
 const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
+
+// LCP optimisation. The hero renders as TWO separate <Picture> elements — a
+// desktop left-column image (hidden on mobile) and a mobile banner (hidden on
+// desktop). Both stay loading="lazy" so the breakpoint that is display:none is
+// never fetched (an eager image downloads even when hidden, which previously
+// made mobile eagerly pull the invisible desktop image while the real mobile
+// LCP image waited at low priority). These media-scoped preloads instead give
+// the *visible* image an early, high-priority fetch on each breakpoint — fixing
+// LCP with no double-download. Widths/format/quality mirror <HeroImage> and
+// <ContentImage> exactly so the preloaded files are the same hashed assets the
+// rendered <picture> srcsets request (cache hit, not a second download).
+const heroMobilePreload = await getImage({
+  src: heroImage,
+  widths: [480, 640, 750, 828, 1080, 1200, 1920, 2048, 2560],
+  format: 'avif',
+  quality: 60,
+});
+const heroDesktopPreload = await getImage({
+  src: heroImage,
+  widths: [320, 480, 640, 960, 1280, 1600],
+  format: 'avif',
+  quality: 60,
+});
 ---
+
+<link
+  rel="preload"
+  as="image"
+  type="image/avif"
+  imagesrcset={heroMobilePreload.srcSet.attribute}
+  imagesizes="100vw"
+  media="(max-width: 1023px)"
+  fetchpriority="high"
+/>
+<link
+  rel="preload"
+  as="image"
+  type="image/avif"
+  imagesrcset={heroDesktopPreload.srcSet.attribute}
+  imagesizes="(min-width: 1024px) 50vw, 100vw"
+  media="(min-width: 1024px)"
+  fetchpriority="high"
+/>
 
 <section class="relative flex flex-col lg:-mt-[60px] lg:h-[100dvh]">
   <div class="flex flex-col lg:flex-row lg:flex-1 lg:min-h-0">
     <!-- Left side - Image with Google rating badge -->
     <div class="hidden lg:flex lg:w-1/2 relative">
+      <!-- loading="lazy" (priority removed): on mobile this image is display:none,
+           so it must NOT be eager (eager fetches even when hidden). Its
+           high-priority fetch on desktop comes from the media-scoped preload above. -->
       <ContentImage
         src={heroImage}
         alt={t.imageAlt}
         class="absolute inset-0 w-full h-full object-cover"
-        priority={true}
       />
       <!-- Google Rating Badge - bottom right corner -->
       <div class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-4 google-rating-badge">
