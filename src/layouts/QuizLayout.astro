@@ -6,9 +6,12 @@
  *  - noindex alapból (lead-magnet oldalak, nem SEO-célok).
  */
 import '../styles/global.css';
-import GTMHead from '../components/tracking/GTMHead.astro';
-import GTMBody from '../components/tracking/GTMBody.astro';
-import TrackingBoot from '../components/tracking/TrackingBoot.astro';
+import Tracking from '../../tracking-kit/components/Tracking.astro';
+import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.astro';
+import Turnstile from '../../tracking-kit/components/Turnstile.astro';
+import BookingClick from '../components/tracking/BookingClick.astro';
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
 
 interface Props {
   title: string;
@@ -26,7 +29,7 @@ const {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
-    <GTMHead />
+    <Tracking gtmId={gtmId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -38,10 +41,11 @@ const {
     <link rel="preload" href="/fonts/cormorant-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body class="min-h-screen bg-[#faf7f8] text-gray-900 antialiased overflow-x-hidden">
-    <GTMBody />
+    <TrackingNoscript gtmId={gtmId} />
+    <Turnstile />
+    <BookingClick />
     <main class="min-h-screen">
       <slot />
     </main>
-    <TrackingBoot />
   </body>
 </html>

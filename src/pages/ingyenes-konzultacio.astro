@@ -3,9 +3,10 @@ export const prerender = true;
 
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
-import GTMHead from '../components/tracking/GTMHead.astro';
-import GTMBody from '../components/tracking/GTMBody.astro';
-import TrackingBoot from '../components/tracking/TrackingBoot.astro';
+import Tracking from '../../tracking-kit/components/Tracking.astro';
+import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.astro';
+import Turnstile from '../../tracking-kit/components/Turnstile.astro';
+import BookingClick from '../components/tracking/BookingClick.astro';
 
 // Image imports
 import lezeresImg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
@@ -44,6 +45,8 @@ const enUrl = '/en/free-consultation';
 const turnstileSiteKey =
   (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
   '0x4AAAAAADOTyE9gccGo16os';
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
 
 const treatments = treatmentImages;
 
@@ -111,7 +114,7 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
-    <GTMHead />
+    <Tracking gtmId={gtmId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />
@@ -125,7 +128,8 @@ const breadcrumbSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   </head>
   <body class="bg-[#fdf8f6] min-h-[100dvh] md:h-screen md:overflow-hidden">
-    <GTMBody />
+    <TrackingNoscript gtmId={gtmId} />
+    <Turnstile />
     <main class="min-h-[100dvh] md:h-full py-4 md:py-0">
       <!-- Form Container -->
       <div id="form-container" class="min-h-[100dvh] md:h-full flex items-center justify-center px-4">
@@ -525,56 +529,56 @@ const breadcrumbSchema = {
       }
     </style>
 
-    {turnstileSiteKey && (
-      <script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        async
-        defer
-      ></script>
-    )}
+    {/* Turnstile api.js is loaded once, page-globally, by <Turnstile/> in the Layout
+        (auto-render mode). This calculator renders its own widget explicitly on the
+        id-div #turnstile-container (createTurnstile → no .cf-turnstile class → no
+        double-render), so no per-page api.js is needed here. */}
 
     <script>
       import {
-        trackEvent,
-        trackFormStart,
-        trackFormStep,
-        trackFormSubmitted,
-        setUserDataOnDOM,
-        normalizeUserData,
-        mirrorMetaCapi,
-        getAttribution,
-      } from '@/lib/tracking';
+        trackCalculatorStart,
+        trackCalculatorStep,
+        trackCalculatorOption,
+        trackCalculatorComplete,
+        trackLeadSubmit,
+        waitForTracking,
+        getAllTrackingData,
+        getFbc,
+        getFbp,
+        collectAttribution,
+      } from '@tracking/lib';
       import { createTurnstile } from '@/lib/forms/turnstile-client';
 
       const FORM_ID = 'consultation-calculator';
       const FORM_NAME = 'consultation_calculator';
       const TOTAL_STEPS = 4;
 
-      // Read UTM/click ids from URL + cookies for the lead record
+      // UTM/click ids for the lead record (CRM + Sheets). Sourced from the canonical
+      // lib: getAllTrackingData() (gclid/gbraid/wbraid/fbclid/utm_*) + collectAttribution()
+      // (adds msclkid, persists the superset) + getFbc/getFbp. Click IDs are
+      // marketing-consent gated inside the lib (GDPR). Survives the hard navigation.
       function getTrackingData() {
-        // Read persisted attribution (URL params win over the stored set);
-        // captureAttribution() in boot already saved any landing-page UTM/
-        // click-ids, so this survives the hard navigation to the form.
-        const attr = getAttribution();
+        const t = getAllTrackingData();
+        const a = collectAttribution();
         return {
-          gclid: attr.gclid || '',
-          fbclid: attr.fbclid || '',
-          utm_source: attr.utm_source || '',
-          utm_medium: attr.utm_medium || '',
-          utm_campaign: attr.utm_campaign || '',
-          utm_content: attr.utm_content || '',
-          utm_term: attr.utm_term || '',
-          gbraid: attr.gbraid || '',
-          wbraid: attr.wbraid || '',
-          msclkid: attr.msclkid || '',
-          fbc: attr.fbc || '',
-          fbp: attr.fbp || '',
+          gclid: t.gclid || a.gclid || '',
+          fbclid: t.fbclid || a.fbclid || '',
+          utm_source: t.utm_source || '',
+          utm_medium: t.utm_medium || '',
+          utm_campaign: t.utm_campaign || '',
+          utm_content: t.utm_content || '',
+          utm_term: t.utm_term || '',
+          gbraid: t.gbraid || a.gbraid || '',
+          wbraid: t.wbraid || a.wbraid || '',
+          msclkid: a.msclkid || '',
+          fbc: getFbc() || '',
+          fbp: getFbp() || '',
         };
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        // fires once per page-load
-        trackFormStart(FORM_ID, FORM_NAME);
+        // fires once per page-load (analytics-consented calculator funnel start)
+        trackCalculatorStart(FORM_NAME);
 
         let currentStep = 1;
 
@@ -663,18 +667,14 @@ const breadcrumbSchema = {
             // still has a trigger/tag for (CE - calculator_option). Fires only
             // when an option becomes selected, not on de-select.
             if (checkbox.checked) {
-              trackEvent('calculator_option', {
-                form_name: FORM_NAME,
-                option: checkbox.value,
-                step: 1,
-              });
+              trackCalculatorOption('treatments', checkbox.value);
             }
           });
         });
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
-            trackFormStep(FORM_ID, 'treatments', 1, TOTAL_STEPS);
+            trackCalculatorStep('treatments', 1, TOTAL_STEPS);
             showStep(2);
           }
         });
@@ -698,7 +698,7 @@ const breadcrumbSchema = {
 
         btnStep2.addEventListener('click', () => {
           if (formData.firstName.length >= 2 && formData.lastName.length >= 2) {
-            trackFormStep(FORM_ID, 'name', 2, TOTAL_STEPS);
+            trackCalculatorStep('name', 2, TOTAL_STEPS);
             showStep(3);
           }
         });
@@ -722,7 +722,7 @@ const breadcrumbSchema = {
 
         btnStep3.addEventListener('click', () => {
           if (validatePhone(formData.phone)) {
-            trackFormStep(FORM_ID, 'phone', 3, TOTAL_STEPS);
+            trackCalculatorStep('phone', 3, TOTAL_STEPS);
             showStep(4);
           }
         });
@@ -804,15 +804,6 @@ const breadcrumbSchema = {
 
           const trackingData = getTrackingData();
 
-          // Stage PII on the side-channel DOM element (NOT dataLayer) so
-          // GTM tags + the Meta CAPI mirror can read it after success.
-          setUserDataOnDOM(normalizeUserData({
-            email: formData.email,
-            phone_number: formData.phone,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          }, 'HU'));
-
           const payload = {
             ...formData,
             formType: 'consultation' as const,
@@ -830,33 +821,23 @@ const breadcrumbSchema = {
             const result = await response.json();
 
             if (result.success) {
-              trackFormSubmitted(FORM_ID);
-              let navigated = false;
-              const goThankYou = () => {
-                if (navigated) return;
-                navigated = true;
-                window.location.href = '/koszonjuk';
-              };
-              const eventId = trackEvent('contact_form_submit', {
-                form_name: FORM_NAME,
-                value: 5000,
-                currency: 'HUF',
-                service: formData.treatments[0] || 'consultation',
-              }, { eventCallback: goThankYou, eventTimeout: 1200 });
-              void mirrorMetaCapi('contact_form_submit', eventId, {
-                value: 5000,
-                currency: 'HUF',
+              trackCalculatorComplete(FORM_NAME);
+              // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
+              // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
+              // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
+              trackLeadSubmit({
+                email: formData.email,
+                phone: formData.phone,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
+                contentName: FORM_NAME,
+                eventName: 'contact_form_submit',
               });
-              // Server-side Meta CAPI Lead, deduped with the browser
-              // 'Meta Pixel - Lead' GTM tag via the shared eventId.
-              void mirrorMetaCapi('primary_conversion', eventId, {
-                value: 5000,
-                currency: 'HUF',
-              });
-              // Leave the page only once GTM has fired the conversion tags;
-              // the timeout is a hard fallback if GTM is slow or blocked.
-              // The loading overlay stays up until the redirect.
-              setTimeout(goThankYou, 1500);
+              // Hold the loading overlay up, give GTM a beat to fire, then redirect;
+              // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
+              await waitForTracking(600);
+              window.location.href = '/koszonjuk';
             } else {
               loadingOverlay?.classList.add('hidden');
               // Token is single-use — reset so the user can retry.
@@ -879,6 +860,6 @@ const breadcrumbSchema = {
         }
       });
     </script>
-    <TrackingBoot />
+    <BookingClick />
   </body>
 </html>

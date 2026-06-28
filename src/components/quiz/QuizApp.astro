@@ -214,20 +214,22 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
   </button>
 </div>
 
-{turnstileSiteKey && (
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-)}
+{/* Turnstile api.js is loaded once, page-globally, by <Turnstile/> in the Layout
+    (auto-render mode), which auto-renders the gate's visible .cf-turnstile widget. */}
 
 <script>
   import {
-    trackEvent,
-    trackFormStart,
-    trackFormSubmitted,
-    setUserDataOnDOM,
-    normalizeUserData,
-    mirrorMetaCapi,
-    getAttribution,
-  } from '@/lib/tracking';
+    trackCalculatorStart,
+    trackCalculatorStep,
+    trackCalculatorOption,
+    trackCalculatorComplete,
+    trackLeadSubmit,
+    waitForTracking,
+    getAllTrackingData,
+    getFbc,
+    getFbp,
+    collectAttribution,
+  } from '@tracking/lib';
   import { generateResultHash, resultStorageKey, resultPath } from '@/quiz/lib/hash';
 
   const STATE_KEY = 'bf_quiz_state';
@@ -268,7 +270,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     function markStarted() {
       if (started) return;
       started = true;
-      trackFormStart(FORM_ID, 'boranalizis_kviz');
+      trackCalculatorStart('boranalizis_kviz');
     }
 
     function restoreAnswers(stepEl: HTMLElement) {
@@ -313,10 +315,10 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
       window.scrollTo({ top: 0, behavior: 'smooth' });
       const el = steps[idx];
       if (el?.dataset.qtype === 'gate') {
-        trackEvent('calculator_step', { step: 'kontakt', stepIndex: idx });
+        trackCalculatorStep('kontakt', idx);
         ensureTurnstile();
       } else if (el?.dataset.qid) {
-        trackEvent('calculator_step', { step: el.dataset.qid, stepIndex: idx });
+        trackCalculatorStep(el.dataset.qid, idx);
       }
     }
 
@@ -374,7 +376,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         recordAnswer(stepEl);
         const qid = stepEl.dataset.qid || '';
         const val = state.answers[qid];
-        trackEvent('calculator_option', { step: qid, value: Array.isArray(val) ? val.join(',') : String(val ?? '') });
+        trackCalculatorOption(qid, Array.isArray(val) ? val.join(',') : String(val ?? ''));
 
         if (stepEl.dataset.qtype === 'radio' && target.type === 'radio') {
           const delay = Number(stepEl.dataset.autoAdvance || '200');
@@ -447,7 +449,15 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
 
         btn.disabled = true; label?.classList.add('hidden'); spinner?.classList.remove('hidden');
 
-        const attr = getAttribution();
+        const t = getAllTrackingData();
+        const c = collectAttribution();
+        const attr = {
+          gclid: t.gclid || c.gclid || '', fbclid: t.fbclid || c.fbclid || '',
+          gbraid: t.gbraid || c.gbraid || '', wbraid: t.wbraid || c.wbraid || '', msclkid: c.msclkid || '',
+          fbc: getFbc() || '', fbp: getFbp() || '',
+          utm_source: t.utm_source || '', utm_medium: t.utm_medium || '', utm_campaign: t.utm_campaign || '',
+          utm_content: t.utm_content || '', utm_term: t.utm_term || '',
+        };
         const hash = generateResultHash();
         const payload = {
           hash,
@@ -466,10 +476,6 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           utm_campaign: attr.utm_campaign || '', utm_content: attr.utm_content || '', utm_term: attr.utm_term || '',
         };
 
-        if (email || phone) {
-          setUserDataOnDOM(normalizeUserData({ email, phone_number: phone, first_name: firstName }, 'HU'));
-        }
-
         try {
           const res = await fetch('/api/boranalizis', {
             method: 'POST',
@@ -479,17 +485,22 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; error?: string };
 
           if (result.success && result.hash) {
-            trackFormSubmitted(FORM_ID);
             try { localStorage.setItem(resultStorageKey(result.hash), JSON.stringify(result.result)); } catch { /* ignore */ }
             clearState();
             const value = result.arSav ? Math.round((result.arSav.min + result.arSav.max) / 2) : 5000;
-            const eventId = trackEvent('calculator_submit', { quoteId: result.hash, form_name: 'boranalizis_kviz', value, currency: 'HUF' });
-            if (result.arSav) trackEvent('calculator_value', { value, currency: 'HUF' });
-            void mirrorMetaCapi('contact_form_submit', eventId, { value, currency: 'HUF' });
-            void mirrorMetaCapi('primary_conversion', eventId, { value, currency: 'HUF' });
-            const go = () => { window.location.href = resultPath(result.hash!); };
-            trackEvent('lead_submit', { form_name: 'boranalizis_kviz', value, currency: 'HUF' }, { eventCallback: go, eventTimeout: 1200 });
-            setTimeout(go, 1400);
+            trackCalculatorComplete('boranalizis_kviz');
+            // Canonical conversion — dataLayer `lead_submit` (browser GTM) + gateway
+            // `contact_form_submit` (Meta CAPI + Google Ads), sharing one event_id.
+            trackLeadSubmit({
+              email: email || '',
+              phone,
+              firstName,
+              value,
+              contentName: 'boranalizis_kviz',
+              eventName: 'contact_form_submit',
+            });
+            await waitForTracking(600);
+            window.location.href = resultPath(result.hash);
           } else {
             showErr(result.error || 'Hiba történt. Kérjük próbáld újra.');
             const w = window as unknown as { turnstile?: { reset: (el?: HTMLElement) => void } };

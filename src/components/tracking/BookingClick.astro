@@ -1,0 +1,67 @@
+---
+/**
+ * Beautyflow-specific conversion: booking_click (Notino "Időpontfoglalás" CTA).
+ *
+ * The soborbo-tracking kit covers tel:/mailto:/WhatsApp + the lead forms. This
+ * project-specific listener fires on any anchor pointing to Notino's salon booking
+ * page (or marked data-track="booking_click"):
+ *   • browser dataLayer `booking_click` (GTM → GA4 + Meta Pixel InitiateCheckout) — analytics consent
+ *   • gateway `booking_click` (Meta CAPI InitiateCheckout) — marketing consent, SAME event_id
+ *
+ * NOTE: the event-gateway worker must allow `booking_click` (ALLOWED_EVENT_NAMES +
+ * EVENT_NAME_MAP → InitiateCheckout) for the server-side leg to deliver; until then
+ * the dispatch is a harmless no-op on the gateway. Per LEAD-FLOW-INCIDENT.md this is
+ * the site's dominant high-intent signal, so it must never regress.
+ */
+---
+
+<script>
+  import { hasAnalyticsConsent, hasMarketingConsent, generateEventId, trackServerEvent } from '@tracking/lib';
+
+  function findBookingLink(target: EventTarget | null): HTMLAnchorElement | null {
+    if (!(target instanceof Element)) return null;
+    const link = target.closest('a');
+    if (!link) return null;
+    const href = link.getAttribute('href') || '';
+    if (/notino\.hu\/szalonok\/beautyflow/i.test(href)) return link;
+    if (link.dataset.track === 'booking_click') return link;
+    return null;
+  }
+
+  function inferSource(link: HTMLAnchorElement): string {
+    if (link.dataset.source) return link.dataset.source;
+    const section = link.closest('section, header, footer');
+    if (section?.id) return section.id;
+    if (link.closest('header')) return 'header';
+    if (link.closest('footer')) return 'footer';
+    return 'unknown';
+  }
+
+  let installed = false;
+  function setup() {
+    if (installed) return;
+    installed = true;
+    document.addEventListener('click', (e) => {
+      const link = findBookingLink(e.target);
+      if (!link) return;
+      const analytics = hasAnalyticsConsent();
+      const marketing = hasMarketingConsent();
+      if (!analytics && !marketing) return;
+
+      const eventId = generateEventId();
+      const source = inferSource(link);
+
+      // Browser channel (dataLayer) — analytics consent. PII-free.
+      if (analytics) {
+        const w = window as unknown as { dataLayer: Record<string, unknown>[] };
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({ event: 'booking_click', event_id: eventId, source, page_path: location.pathname });
+      }
+      // Server channel (gateway) — marketing consent. Self-gates internally too.
+      if (marketing) trackServerEvent('booking_click', { eventId });
+    }, true);
+  }
+
+  document.addEventListener('astro:page-load', setup);
+  if (document.readyState !== 'loading') setup();
+</script>

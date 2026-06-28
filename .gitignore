@@ -19,6 +19,10 @@ pnpm-debug.log*
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+# .env.production holds ONLY public, non-secret market config (PUBLIC_TRACKING_*,
+# PUBLIC_TURNSTILE_SITE_KEY, GTM id) inlined into the client bundle at build —
+# committed on purpose so production builds are reproducible. NEVER put secrets here.
+!.env.production
 
 # cloudflare
 .wrangler/

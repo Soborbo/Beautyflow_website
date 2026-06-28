@@ -60,7 +60,7 @@ const PHONE_HREF = 'tel:+3613009414';
 
 <script>
   import { resultStorageKey } from '@/quiz/lib/hash';
-  import { trackEvent } from '@/lib/tracking';
+  import { hasAnalyticsConsent } from '@tracking/lib';
   import type { Recommendation } from '@/quiz/lib/types';
 
   const PHONE = '+36 1 300 9414';
@@ -157,7 +157,12 @@ const PHONE_HREF = 'tel:+3613009414';
       </section>
     `;
     body.classList.remove('hidden');
-    trackEvent('calculator_result_view', { route: r.utvonal, safe: r.safe });
+    // Analytics-consented view event (browser dataLayer → GTM/GA4). PII-free.
+    if (hasAnalyticsConsent()) {
+      const w = window as unknown as { dataLayer: Record<string, unknown>[] };
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({ event: 'calculator_result_view', route: r.utvonal, safe: r.safe });
+    }
   }
 
   function init() {

@@ -26,8 +26,7 @@ import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError } from '@/lib/errors/classify';
-import { checkRateLimit } from '@/lib/tracking/server';
-import { RATE_LIMIT_CONTACT_MAX } from '@/lib/tracking/config';
+import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
 
 export const prerender = false;
 
@@ -651,7 +650,7 @@ export const POST: APIRoute = async (context) => {
   try {
     const ip = request.headers.get('CF-Connecting-IP') || '';
 
-    // Per-IP rate limit (in-memory, per-isolate — see lib/tracking/server).
+    // Per-IP rate limit (in-memory, per-isolate — see lib/forms/rate-limit).
     // Turnstile is the primary bot gate; this caps raw request floods.
     if (!checkRateLimit(`contact:${ip}`, RATE_LIMIT_CONTACT_MAX)) {
       return jsonError(429, 'Túl sok kérés. Kérjük várj egy percet, majd próbáld újra.');
