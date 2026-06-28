@@ -138,8 +138,11 @@ const formId = `contact-form-${location}`;
       </label>
     </div>
 
+    {/* Turnstile widget — rendered EXPLICITLY by createTurnstile (api.js is loaded
+        page-globally with ?render=explicit by <Turnstile/> in the Layout, so this
+        plain container is NOT auto-scanned). No `.cf-turnstile` class on purpose. */}
     {turnstileSiteKey && (
-      <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" data-size="flexible"></div>
+      <div id={`${formId}-turnstile`} data-sitekey={turnstileSiteKey} class="min-h-[65px]"></div>
     )}
 
     <button
@@ -164,6 +167,7 @@ const formId = `contact-form-${location}`;
     getFbp,
     collectAttribution,
   } from '@tracking/lib';
+  import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
 
   // Attribution for the /api/contact POST body (CRM + Google Sheets sink). Sourced
   // from the canonical lib: getAllTrackingData() covers gclid/gbraid/wbraid/fbclid/utm_*,
@@ -194,6 +198,16 @@ const formId = `contact-form-${location}`;
       form.dataset.trackBound = '1';
       const formName = `contact_form_${form.dataset.location || 'location'}`;
       const startedAt = Date.now();
+
+      // Cloudflare Turnstile — rendered explicitly (api.js is loaded with
+      // ?render=explicit page-globally). Render now so the token is ready by the
+      // time the user submits; the client polls up to 10s for window.turnstile.
+      const turnstileEl = form.querySelector<HTMLElement>('[id$="-turnstile"][data-sitekey]');
+      let turnstile: TurnstileHandle | null = null;
+      if (turnstileEl) {
+        turnstile = createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '');
+        turnstile.ensureRendered();
+      }
 
       // Analytics-consented form-abandon tracking (fires `form_abandon` after 60s idle).
       const cleanupAbandon = initFormAbandonTracking(form, formName, 60_000);
@@ -232,9 +246,24 @@ const formId = `contact-form-${location}`;
           message: String(fd.get('message') || '').trim(),
           consent: fd.get('consent') === 'on',
           website: String(fd.get('website') || ''),
-          turnstileToken: String(fd.get('cf-turnstile-response') || ''),
+          turnstileToken: turnstile ? turnstile.getToken() : '',
           ...getTrackingData(),
         };
+
+        // No Turnstile token yet (widget still solving / not rendered) — nudge it
+        // and ask the user to retry rather than POST a token-less body that the
+        // server would reject with a 400 robot-check.
+        if (turnstileEl && !data.turnstileToken) {
+          turnstile?.ensureRendered();
+          if (errEl) {
+            errEl.textContent = 'A robot-ellenőrzés még tölt. Kérjük várj egy pillanatot, majd próbáld újra.';
+            errEl.classList.remove('hidden');
+          }
+          if (submitBtn) submitBtn.disabled = false;
+          labelEl?.classList.remove('hidden');
+          spinnerEl?.classList.add('hidden');
+          return;
+        }
 
         // Honeypot trip — silently "succeed"
         if (data.website) {
@@ -274,12 +303,8 @@ const formId = `contact-form-${location}`;
               errEl.textContent = result.error || 'Hiba történt. Kérjük próbáld újra.';
               errEl.classList.remove('hidden');
             }
-            // Reset Turnstile so user can retry
-            const w = window as unknown as { turnstile?: { reset: (el?: HTMLElement) => void } };
-            const ts = form.querySelector('.cf-turnstile');
-            if (w.turnstile && ts instanceof HTMLElement) {
-              w.turnstile.reset(ts);
-            }
+            // Reset Turnstile so user can retry (single-use token was consumed)
+            turnstile?.reset();
           }
         } catch {
           if (errEl) {

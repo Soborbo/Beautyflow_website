@@ -12,15 +12,17 @@
 
 <div id="cf-turnstile-invisible" style="display:none"></div>
 {/*
-  beautyflow integration note: api.js is loaded WITHOUT `?render=explicit` so the
-  lead/contact forms' own VISIBLE `.cf-turnstile` widgets still auto-render from
-  this single, page-global api.js load. The invisible gateway widget below
-  (#cf-turnstile-invisible) is always rendered EXPLICITLY by gateway.ts, so it is
-  unaffected by auto-render mode. Two widgets mint independent, single-use tokens:
-  the visible ones for /api/contact + /api/boranalizis, the invisible one for the
-  event-gateway dispatch.
+  api.js is loaded WITH `?render=explicit` (canonical): NOTHING auto-renders from a
+  `.cf-turnstile` class scan. Every widget on the page is rendered programmatically:
+    - the invisible gateway widget (#cf-turnstile-invisible) by gateway.ts, and
+    - each lead/contact form's own VISIBLE widget by createTurnstile()
+      (src/lib/forms/turnstile-client.ts).
+  Each widget mints independent, single-use tokens — the visible ones for
+  /api/contact + /api/boranalizis, the invisible one for the event-gateway dispatch.
+  Do NOT drop `?render=explicit`: in auto-render mode the explicit widgets and the
+  form widgets contend, and the invisible prewarm widget times out (TRK-2003).
 */}
-<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
 <script>
   import { prewarmTurnstile } from '../lib';

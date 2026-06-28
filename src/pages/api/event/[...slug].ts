@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env as cfEnv } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -6,18 +7,18 @@ export const prerender = false;
  * Same-origin tracking gateway. Forwards every /api/event/* request to the Soborbo
  * event-gateway worker via the GATEWAY service binding (declared in wrangler.jsonc).
  *
- * Why a real Astro route (not just middleware): beautyflow.pro is a Cloudflare
- * Custom Domain for THIS worker, and `assets.not_found_handling: "404-page"` makes
- * the asset layer answer unknown paths with the 404 page WITHOUT invoking the
- * worker — so middleware never sees /api/event/*. Declaring this catch-all route
- * puts /api/event/* into the worker's route manifest, so the request reaches here
- * and we proxy it to the gateway. This is durable across site redeploys (unlike a
- * zone Worker Route, which the Custom Domain wipes on every deploy). The gateway
- * resolves the site from the request hostname → its SITE_CONFIG KV entry.
+ * Reaching the worker takes TWO things, both required:
+ *   1. `assets.run_worker_first: ["/api/event/*"]` in wrangler.jsonc — otherwise the
+ *      asset layer answers /api/event/* with the 404 page (not_found_handling:
+ *      "404-page") WITHOUT ever invoking the worker.
+ *   2. This route reads the GATEWAY binding from the `cloudflare:workers` env module.
+ *      Astro 6 / @astrojs/cloudflare v13+ REMOVED `Astro.locals.runtime.env` (it now
+ *      throws), so the old `locals.runtime.env` access crashed this route with a 500.
+ *
+ * The gateway resolves the site from the request hostname → its SITE_CONFIG KV entry.
  */
-const handler: APIRoute = async ({ request, locals }) => {
-  const env = (locals as { runtime?: { env?: Record<string, unknown> } })?.runtime?.env;
-  const gateway = env?.GATEWAY as { fetch?: (req: Request) => Promise<Response> } | undefined;
+const handler: APIRoute = async ({ request }) => {
+  const gateway = (cfEnv as { GATEWAY?: { fetch?: (req: Request) => Promise<Response> } }).GATEWAY;
   if (gateway && typeof gateway.fetch === 'function') {
     return gateway.fetch(request);
   }
