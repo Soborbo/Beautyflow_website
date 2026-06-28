@@ -1,31 +1,16 @@
-import type { APIRoute } from 'astro';
-import { env as cfEnv } from 'cloudflare:workers';
+import { gatewayProxy } from '@/lib/tracking/gateway-proxy';
 
 export const prerender = false;
 
 /**
- * Same-origin tracking gateway. Forwards every /api/event/* request to the Soborbo
- * event-gateway worker via the GATEWAY service binding (declared in wrangler.jsonc).
- *
- * Reaching the worker takes TWO things, both required:
- *   1. `assets.run_worker_first: ["/api/event/*"]` in wrangler.jsonc — otherwise the
- *      asset layer answers /api/event/* with the 404 page (not_found_handling:
- *      "404-page") WITHOUT ever invoking the worker.
- *   2. This route reads the GATEWAY binding from the `cloudflare:workers` env module.
- *      Astro 6 / @astrojs/cloudflare v13+ REMOVED `Astro.locals.runtime.env` (it now
- *      throws), so the old `locals.runtime.env` access crashed this route with a 500.
- *
- * The gateway resolves the site from the request hostname → its SITE_CONFIG KV entry.
+ * Catch-all fallback for any /api/event/* path not covered by an explicit static
+ * route (conversion.ts, lead-status.ts, oauth-init.ts). NOTE: as a DYNAMIC route it
+ * is NOT reached on the production custom domain (the asset layer's 404-page handling
+ * answers unmatched paths before the Worker runs, and run_worker_first can't be used
+ * — it regresses the lead routes to 405). The explicit static routes are what actually
+ * serve the gateway in production; this stays for local/workers.dev parity and so a
+ * new gateway endpoint degrades to a loud 503 rather than the silent site 404 page.
  */
-const handler: APIRoute = async ({ request }) => {
-  const gateway = (cfEnv as { GATEWAY?: { fetch?: (req: Request) => Promise<Response> } }).GATEWAY;
-  if (gateway && typeof gateway.fetch === 'function') {
-    return gateway.fetch(request);
-  }
-  // Fail loud — never let a tracking beacon fall through to the site's 404 page.
-  return new Response('event-gateway binding unavailable', { status: 503 });
-};
-
-export const GET = handler;
-export const POST = handler;
-export const OPTIONS = handler;
+export const GET = gatewayProxy;
+export const POST = gatewayProxy;
+export const OPTIONS = gatewayProxy;

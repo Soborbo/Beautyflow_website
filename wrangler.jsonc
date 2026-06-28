@@ -11,17 +11,14 @@
     "binding": "ASSETS",
     "directory": "./dist",
     "html_handling": "drop-trailing-slash",
-    "not_found_handling": "404-page",
-    // Run the Worker BEFORE static-asset matching for the tracking gateway path.
-    // /api/event/[...slug] is a DYNAMIC catch-all that the @astrojs/cloudflare routing
-    // manifest does NOT register as Worker-bound, so on the production custom domain
-    // the asset layer answers it with the 404 page (not_found_handling: "404-page")
-    // WITHOUT invoking the Worker. Forcing /api/event/* Worker-first lets the route
-    // proxy to the GATEWAY binding. Path-scoped: does NOT touch /api/contact or
-    // /api/boranalizis (static routes already reachable). Do NOT broaden to "/api/*"
-    // — that makes the adapter serve the static API routes assets-first (POST → 405).
-    // Requires wrangler >= 4.20 (repo uses 4.105).
-    "run_worker_first": ["/api/event/*"]
+    "not_found_handling": "404-page"
+    // NOTE: do NOT add `run_worker_first` here. Even path-scoped to ["/api/event/*"],
+    // setting it flips the @astrojs/cloudflare adapter to serve the STATIC API routes
+    // (/api/contact, /api/boranalizis) assets-first on the production custom domain,
+    // so their POST comes back 405 and every lead is lost (verified + rolled back
+    // 2026-06-28). The tracking gateway is instead reached via STATIC routes under
+    // src/pages/api/event/* (conversion.ts etc.), which the routing manifest registers
+    // as Worker-bound exactly like /api/contact — no run_worker_first needed.
   },
   "observability": {
     "enabled": true,
