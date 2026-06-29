@@ -561,13 +561,14 @@ async function writeToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promis
   const accessToken = await getGoogleAccessToken(env.serviceAccountEmail, env.privateKey);
   const langLabel = data.lang === 'en' ? 'EN' : 'HU';
 
-  // Column B aligns with the booking system's "treatment" column:
-  //   - consultation form → list of selected treatments
-  //   - location form     → "Kapcsolat – <Helyszín>"  (e.g. "Kapcsolat – Beautyflow Buda")
+  // Each form type writes to its own tab (see `tabName` below), so column B is
+  // simply the topic for that tab:
+  //   - consultation form (tab "Konzultáció") → list of selected treatments
+  //   - location form     (tab "Kapcsolat")   → the salon label (e.g. "Beautyflow Buda")
   const treatmentCol =
     data.formType === 'consultation'
       ? data.treatments.map((t) => treatmentNamesHu[t] || t).join(', ')
-      : `Kapcsolat – ${data.locationLabel}`;
+      : data.locationLabel;
 
   const message = data.formType === 'location' ? data.message || '' : '';
   const utm = [data.utm_source, data.utm_medium, data.utm_campaign].filter(Boolean).join(' / ');
@@ -588,7 +589,10 @@ async function writeToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promis
     data.utm_term || '',   // M
   ];
 
-  const gid = await getSheetGid(env.sheetId, accessToken, 'Sheet1');
+  // Route each form type to its own tab. Tab titles must match the Google
+  // Sheet exactly (incl. accents), or getSheetGid throws SHEETS-API-003 (404).
+  const tabName = data.formType === 'consultation' ? 'Konzultáció' : 'Kapcsolat';
+  const gid = await getSheetGid(env.sheetId, accessToken, tabName);
 
   // Single atomic batchUpdate:
   //   1. insertDimension — shift everything down to make room at row 2
