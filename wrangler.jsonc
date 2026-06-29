@@ -41,7 +41,14 @@
     "PUBLIC_TRACKING_COUNTRY": "HU",
     "PUBLIC_TRACKING_CURRENCY": "HUF",
     "PUBLIC_TRACKING_LOCALE": "hu",
-    "SITE_URL": "https://beautyflow.pro"
+    "SITE_URL": "https://beautyflow.pro",
+    // Google Sheets lead-export. NON-secret config — committed here so it ships
+    // with every deploy and can never be wiped (a dashboard plaintext var that is
+    // NOT in this block was the bug: a `wrangler deploy` without --keep-vars, or any
+    // deploy at all for a name not declared here, dropped it silently → Sheets writes
+    // no-op'd). Only the private key is secret (set via `wrangler secret put`).
+    "GOOGLE_SHEETS_ID": "1gDFG6wpLDLgUNIqicNwLL9QMNC9OuIgoKBMB3lLF810",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com"
   }
   // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
   //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
@@ -54,10 +61,18 @@
   //   ],
   /*
    * Plaintext env vars are defined in the `vars` block above — they ship with
-   * every deploy. To override one (e.g. swap the Turnstile site key for a
-   * staging widget), set the same name in the Cloudflare dashboard → Settings
-   * → Variables and Secrets. The deploy command uses `--keep-vars`, so
-   * dashboard overrides survive subsequent deploys.
+   * every deploy and are the source of truth. Put ALL non-secret config here,
+   * NOT on the dashboard.
+   *
+   * IMPORTANT — what `--keep-vars` actually does (and does NOT do):
+   *   `--keep-vars` only stops the deploy from pre-deleting dashboard vars whose
+   *   name is NOT in this block. Any var name that IS in this block is re-applied
+   *   from this committed value on every deploy — the dashboard value is overwritten.
+   *   And a dashboard-only plaintext var (a name absent here) is wiped the moment
+   *   ANY deploy runs without --keep-vars. So a value that lives ONLY on the
+   *   dashboard is fragile. This is exactly what dropped GOOGLE_SHEETS_ID and
+   *   GOOGLE_SERVICE_ACCOUNT_EMAIL (June 2026) → Sheets writes silently no-op'd.
+   *   Fix: keep non-secret values committed here; keep secrets as Worker secrets.
    *
    * Secrets must be set via `wrangler secret put <NAME>` or the Cloudflare
    * dashboard (encrypted, never committed):
