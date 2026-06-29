@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -nE 'env|dev.vars' .gitignore)",
+      "Bash(ls -la .env* .dev.vars*)",
+      "Bash(sed -E 's/=.*/=<hidden>/' .dev.vars)",
+      "Bash(sed -E 's/=.*/=<hidden>/' .env)",
+      "Read(//tmp/**)",
+      "Bash(grep -iE 'error|exception|throw|binding|gateway|restart|cannot|undefined' /tmp/wdev.log | head -25)"
+    ]
+  }
+}
