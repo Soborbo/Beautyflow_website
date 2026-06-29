@@ -229,8 +229,11 @@ const content = {
     storyP2: 'Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 7 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.',
     storyP3: 'Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.',
     storyImageAlt: 'Beautyflow - Notino Hónap Szalonja díj',
+    videoTitle: 'Beautyflow bemutatkozó videó',
     milestonesTitle: 'Mérföldkövek',
     teamTitle: 'Ismerd meg csapatunkat',
+    awardsTitle: 'Elismeréseink',
+    awardsText: 'Az évek során sok elismerésben részesültünk, amire nagyon büszkék vagyunk. És folyamatosan dolgozunk azon, hogy minél jobb legyen a szolgáltatás minősége, amit nyújtani tudunk.',
     valuesTitle: 'Értékeink',
     ctaTitle: 'Ismerjük meg egymást személyesen!',
     ctaSubtitle: 'Gyere el egy ingyenes konzultációra és ismerd meg csapatunkat, mielőtt döntesz!',
@@ -246,8 +249,11 @@ const content = {
     storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
     storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
     storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
+    videoTitle: 'Beautyflow introduction video',
     milestonesTitle: 'Milestones',
     teamTitle: 'Meet Our Team',
+    awardsTitle: 'Our Recognition',
+    awardsText: 'Over the years we have received a lot of recognition, which we are very proud of. And we continuously work to make the quality of the service we provide even better.',
     valuesTitle: 'Our Values',
     ctaTitle: "Let's meet in person!",
     ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
@@ -305,12 +311,18 @@ const teamMemberImages = await Promise.all(
           </div>
         </div>
         <div class="order-1 lg:order-2">
-          <ContentImage
-            src={beautyflowDijak}
-            alt={t.storyImageAlt}
-            class="w-full rounded-2xl shadow-lg"
-            priority={true}
-          />
+          <div class="aspect-video w-full overflow-hidden rounded-2xl shadow-lg">
+            <iframe
+              class="h-full w-full"
+              src="https://www.youtube-nocookie.com/embed/HlimbrSk9WY"
+              title={t.videoTitle}
+              loading="lazy"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -381,6 +393,29 @@ const teamMemberImages = await Promise.all(
             </div>
           </div>
         )})}
+      </div>
+    </div>
+  </section>
+
+  <!-- Awards / Recognition Section -->
+  <section class="py-16 lg:py-20 bg-white">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+        <div>
+          <ContentImage
+            src={beautyflowDijak}
+            alt={t.storyImageAlt}
+            class="w-full rounded-2xl shadow-lg"
+          />
+        </div>
+        <div>
+          <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-6">
+            {t.awardsTitle}
+          </h2>
+          <div class="space-y-4 text-gray-600">
+            <p>{t.awardsText}</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
