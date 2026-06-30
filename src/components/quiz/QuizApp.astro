@@ -192,8 +192,11 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         </label>
       </div>
 
+      {/* Turnstile — EXPLICIT renderelés (createTurnstile). Az api.js page-globálisan
+          ?render=explicit-tel töltődik (<Turnstile/> a Layoutban), ezért NINCS
+          .cf-turnstile class: a sima konténert a createTurnstile rendereli. */}
       {turnstileSiteKey && (
-        <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" data-size="flexible"></div>
+        <div id="gate-turnstile" data-sitekey={turnstileSiteKey} class="min-h-[65px]"></div>
       )}
 
       <button type="submit"
@@ -224,7 +227,8 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
 </div>
 
 {/* Turnstile api.js is loaded once, page-globally, by <Turnstile/> in the Layout
-    (auto-render mode), which auto-renders the gate's visible .cf-turnstile widget. */}
+    with ?render=explicit — NOTHING auto-renders. The gate widget is rendered
+    programmatically by createTurnstile() (see ensureTurnstile below). */}
 
 <script>
   import {
@@ -240,6 +244,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     collectAttribution,
   } from '@tracking/lib';
   import { generateResultHash, resultStorageKey, resultPath } from '@/quiz/lib/hash';
+  import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
 
   const STATE_KEY = 'bf_quiz_state';
   const FORM_ID = 'boranalizis';
@@ -415,16 +420,19 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
       else show(Math.max(0, state.idx - 1), false);
     });
 
-    // ---- Turnstile a kapuban ----
-    let turnstileReady = false;
+    // ---- Turnstile a kapuban (EXPLICIT renderelés) ----
+    // Az api.js ?render=explicit-tel töltődik, ezért a widgetet MAGUNK rendereljük
+    // a createTurnstile helperrel (mint a ContactForm / konzultációs kalkulátor).
+    // A korábbi „auto-render” feltételezés miatt a widget sosem renderelt → üres
+    // token → minden beküldés a Turnstile-nél bukott (LEAD-FLOW-INCIDENT).
+    const turnstileEl = document.querySelector<HTMLElement>('#gate-turnstile[data-sitekey]');
+    let turnstile: TurnstileHandle | null = null;
+    if (turnstileEl) {
+      turnstile = createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '');
+    }
     function ensureTurnstile() {
-      if (turnstileReady) return;
-      const w = window as unknown as { turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => void } };
-      const el = document.querySelector<HTMLElement>('#quiz-gate .cf-turnstile');
-      if (el && w.turnstile && !el.querySelector('iframe')) {
-        // auto-render általában megtörténik; csak biztosíték
-        turnstileReady = true;
-      }
+      // A végső lépés láthatóvá válásakor rendereljük, hogy a token a beküldésre kész legyen.
+      turnstile?.ensureRendered();
     }
 
     // ---- Kapu beküldés ----
@@ -479,13 +487,22 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           consentMarketing,
           consentAt: new Date().toISOString(),
           website,
-          turnstileToken: String(fd.get('cf-turnstile-response') || ''),
+          turnstileToken: turnstile ? turnstile.getToken() : '',
           gclid: attr.gclid || '', fbclid: attr.fbclid || '',
           gbraid: attr.gbraid || '', wbraid: attr.wbraid || '', msclkid: attr.msclkid || '',
           fbc: attr.fbc || '', fbp: attr.fbp || '',
           utm_source: attr.utm_source || '', utm_medium: attr.utm_medium || '',
           utm_campaign: attr.utm_campaign || '', utm_content: attr.utm_content || '', utm_term: attr.utm_term || '',
         };
+
+        // Még nincs Turnstile-token (a widget tölt / lejárt) — ne küldjünk token nélküli
+        // body-t, amit a szerver 400-zal dobna. Megbökjük a widgetet és újrapróbálásra kérünk.
+        if (turnstileEl && !payload.turnstileToken) {
+          turnstile?.ensureRendered();
+          showErr('A robot-ellenőrzés még tölt. Kérjük várj egy pillanatot, majd próbáld újra.');
+          btn.disabled = false; label?.classList.remove('hidden'); spinner?.classList.add('hidden');
+          return;
+        }
 
         try {
           const res = await fetch('/api/boranalizis', {
@@ -521,9 +538,8 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
             }
           } else {
             showErr(result.error || 'Hiba történt. Kérjük próbáld újra.');
-            const w = window as unknown as { turnstile?: { reset: (el?: HTMLElement) => void } };
-            const ts = form.querySelector('.cf-turnstile');
-            if (w.turnstile && ts instanceof HTMLElement) w.turnstile.reset(ts);
+            // Egyszer-használatos token elfogyott — reset, hogy a vendég újra tudja küldeni.
+            turnstile?.reset();
           }
         } catch {
           showErr('Hálózati hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
