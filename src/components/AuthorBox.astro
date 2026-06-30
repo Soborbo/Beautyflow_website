@@ -1,0 +1,41 @@
+---
+/**
+ * AuthorBox — szerzői / szakmai-lektor doboz (E-E-A-T jel).
+ * Minden bőrtípus-oldal és a hub alján megjelenik.
+ *
+ * A `bio` szöveget Kónya Fanni bővíti/erősíti (évek száma, vendégszám,
+ * koreai képzések néven, szakmai hitvallás) — lásd references/*.md `【FANNI — bio】`.
+ * `variant="full"` a hubon (bővebb), `variant="compact"` a típusoldalakon.
+ */
+import { FixedImage } from './images';
+import fanni from '../assets/images/Konya-Fanni-sq.jpg';
+
+interface Props {
+  variant?: 'full' | 'compact';
+}
+const { variant = 'compact' }: Props = Astro.props;
+
+const bio =
+  variant === 'full'
+    ? 'Kozmetikus, a BeautyFlow szalonok (Zalaegerszeg és Budapest XIII.) szakmai vezetője. A koreai arckezelésekre specializálódott, és minden bőrtípus-leírás mögött a kezelőágyon szerzett tapasztalat áll. Hitvallása, hogy nem ígér csodát — őszinte elvárásokat és a bőrtípushoz illő, türelmes utat ad.'
+    : 'Kozmetikus, a BeautyFlow szalonok szakmai vezetője. A koreai arckezelésekre specializálódott, és a bőrtípus-leírások mögött a kezelőágyon szerzett tapasztalat áll.';
+---
+
+<aside class="mt-12 rounded-2xl border border-[#e7d8df] bg-[#fff9f7] p-6 sm:p-8">
+  <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+    <FixedImage
+      src={fanni}
+      alt="Kónya Fanni kozmetikus"
+      width={88}
+      height={88}
+      class="w-22 h-22 rounded-full object-cover flex-shrink-0 ring-2 ring-[#c53f75]/20"
+    />
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-[#c53f75] mb-1">
+        Szerző · szakmai lektor
+      </p>
+      <h3 class="font-heading text-xl text-[#1e293b] mb-2">Kónya Fanni</h3>
+      <p class="text-[#334155] leading-relaxed">{bio}</p>
+    </div>
+  </div>
+</aside>

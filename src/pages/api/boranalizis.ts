@@ -31,6 +31,8 @@ import { recommend } from '@/quiz/lib/recommendation';
 import { SECTIONS } from '@/quiz/config/questions';
 import { salonLabel, type SalonId } from '@/quiz/config/treatments';
 import { generateResultHash, resultEmailUrl } from '@/quiz/lib/hash';
+import { computeBaumannCode, type BaumannResult } from '@/quiz/lib/baumann';
+import { baumannByCode } from '@/data/baumannTypes';
 import type { Recommendation } from '@/quiz/lib/types';
 
 export const prerender = false;
@@ -55,6 +57,7 @@ const QuizSchema = z
     consentHealth: z.literal(true, {
       message: 'Az egészségügyi adatok kezeléséhez való hozzájárulás kötelező.',
     }),
+    consentMarketing: z.boolean().optional().default(false), // hírlevél — OPCIONÁLIS
     consentAt: z.string().max(40).optional().default(''),
     website: z.string().max(200).optional().default(''), // honeypot
     turnstileToken: z.string().max(4000).optional().default(''),
@@ -157,7 +160,25 @@ function readEnv(): QuizEnv {
  * Best-effort forward of the bőranalízis quiz lead to the CRM (/api/webhook/lead).
  * The quiz is a genuine lead source (firstName + phone/email + health consent).
  */
-async function forwardToCrm(data: QuizData, rec: Recommendation, env: QuizEnv): Promise<void> {
+/** Olvasható „Baumann-kód — magyar név" (vagy csak a kód, ha ismeretlen). */
+function baumannLabel(b: BaumannResult): string {
+  const t = baumannByCode[b.code];
+  return t ? `${b.code} — ${t.displayName}` : b.code;
+}
+
+/** Az összes ismert kvíz-válasz humanizálva, soronként „Kérdés: válasz". */
+function answersSummary(answers: QuizData['answers']): string {
+  const lines = Object.entries(answers)
+    .filter(([qid]) => Q_LABEL[qid])
+    .map(([qid, val]) => `${Q_LABEL[qid]}: ${answerText(qid, val)}`);
+  const allergia = answers['allergia-reszletek'];
+  if (allergia) lines.push(`Allergia részletek: ${String(allergia)}`);
+  return lines.join('\n');
+}
+
+async function forwardToCrm(
+  data: QuizData, rec: Recommendation, baumann: BaumannResult, env: QuizEnv,
+): Promise<void> {
   const url = env.CRM_WEBHOOK_URL;
   const secret = env.CRM_WEBHOOK_SECRET;
   if (!url || !secret) return;
@@ -166,11 +187,15 @@ async function forwardToCrm(data: QuizData, rec: Recommendation, env: QuizEnv): 
     name: data.firstName,
     phone: data.phone || undefined,
     email: data.email || undefined,
-    need_type: `Bőranalízis: ${treatmentsLine(rec)}`.slice(0, 100),
-    message: `Bőrprofil: ${rec.profile.label}; javasolt: ${treatmentsLine(rec)}`,
+    need_type: `Bőranalízis ${baumann.code}: ${treatmentsLine(rec)}`.slice(0, 100),
+    message:
+      `Baumann-bőrtípus: ${baumannLabel(baumann)}\n` +
+      `Bőrprofil: ${rec.profile.label}\n` +
+      `Javasolt irány: ${treatmentsLine(rec)}\n\n` +
+      `Kvíz-válaszok:\n${answersSummary(data.answers)}`,
     source_type: 'form' as const,
     consent_given: true,
-    marketing_consent: false,
+    marketing_consent: data.consentMarketing,
     attribution: {
       utm_source: data.utm_source || undefined,
       utm_medium: data.utm_medium || undefined,
@@ -202,7 +227,7 @@ function treatmentsLine(rec: Recommendation): string {
 }
 
 async function sendSalonEmail(
-  resend: Resend, data: QuizData, rec: Recommendation, salon: SalonId, resultUrl: string,
+  resend: Resend, data: QuizData, rec: Recommendation, baumann: BaumannResult, salon: SalonId, resultUrl: string,
 ): Promise<void> {
   const ts = formatTimestamp();
   const contact = [data.phone, data.email].filter(Boolean).join(' · ');
@@ -221,10 +246,12 @@ async function sendSalonEmail(
   <table style="width:100%;border-collapse:collapse;margin:12px 0;">
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;width:140px;">Név</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(data.firstName)}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Elérhetőség</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(contact)}</td></tr>
+    <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Baumann-bőrtípus</td><td style="padding:6px 8px;border-bottom:1px solid #eee;"><strong>${escapeHtml(baumann.code)}</strong> — ${escapeHtml(baumannByCode[baumann.code]?.displayName || '')}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Bőrprofil</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.profile.label)}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Javasolt irány</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(treatmentsLine(rec))}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Becsült ársáv</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.arSav?.formatted || '—')}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Útvonal</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.utvonal)}${rec.safe ? '' : ' (biztonsági felülbírálás)'}</td></tr>
+    <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Hírlevél</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${data.consentMarketing ? '✅ feliratkozott' : '— nem'}</td></tr>
   </table>
   <h3 style="color:#c53f75;margin-top:18px;">⚠️ Kozmetikusnak (felkészüléshez)</h3>
   <ul style="font-size:14px;">${flags}</ul>
@@ -239,7 +266,7 @@ async function sendSalonEmail(
     from: ADMIN_FROM,
     replyTo: data.email || undefined,
     to: ADMIN_TO,
-    subject: escapeSubject(`Bőranalízis kvíz – ${data.firstName} (${salonLabel(salon)})`),
+    subject: escapeSubject(`Bőranalízis kvíz – ${data.firstName} · ${baumann.code} (${salonLabel(salon)})`),
     headers: { 'X-Entity-Ref-ID': `quiz-admin-${Date.now()}-${Math.random().toString(36).slice(2, 9)}` },
     html,
   });
@@ -287,7 +314,7 @@ async function sendUserEmail(resend: Resend, data: QuizData, rec: Recommendation
 // ---- Sheets ------------------------------------------------------------
 
 async function writeToSheet(
-  env: QuizEnv, data: QuizData, rec: Recommendation, salon: SalonId, hash: string,
+  env: QuizEnv, data: QuizData, rec: Recommendation, baumann: BaumannResult, salon: SalonId, hash: string,
 ): Promise<void> {
   if (!env.GOOGLE_SHEETS_ID || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return;
   const token = await getGoogleAccessToken(env.GOOGLE_SERVICE_ACCOUNT_EMAIL, env.GOOGLE_PRIVATE_KEY);
@@ -317,6 +344,8 @@ async function writeToSheet(
     data.fbclid,                                        // S fbclid
     utm,                                                // T utm
     JSON.stringify(data.answers),                       // U összes nyers válasz (audit)
+    baumannLabel(baumann),                              // V Baumann-bőrtípus (kód — név)
+    data.consentMarketing ? 'igen' : 'nem',             // W hírlevél feliratkozás
   ];
   await insertRowAtTop(env.GOOGLE_SHEETS_ID, token, gid, row);
 }
@@ -384,6 +413,7 @@ export const POST: APIRoute = async (context) => {
 
     // --- Ajánló-motor (tiszta függvény) ---
     const rec = recommend(data.answers);
+    const baumann = computeBaumannCode(data.answers); // 16 publikus oldal célpontja
     const salon = salonFromAnswers(data.answers);
     const hash = generateResultHash();
     const resultUrl = resultEmailUrl(hash, env.SITE_URL || 'https://beautyflow.pro');
@@ -402,10 +432,10 @@ export const POST: APIRoute = async (context) => {
 
     const resend = new Resend(env.RESEND_API_KEY);
     const results = await Promise.allSettled([
-      sendSalonEmail(resend, data, rec, salon, resultUrl),
+      sendSalonEmail(resend, data, rec, baumann, salon, resultUrl),
       sendUserEmail(resend, data, rec, resultUrl),
-      writeToSheet(env, data, rec, salon, hash),
-      forwardToCrm(data, rec, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
+      writeToSheet(env, data, rec, baumann, salon, hash),
+      forwardToCrm(data, rec, baumann, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
     ]);
 
     const [adminR, userR, sheetR] = results;
@@ -445,7 +475,7 @@ export const POST: APIRoute = async (context) => {
 
     // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott
     // (a kliens localStorage-be is menti a result objektumot).
-    return new Response(JSON.stringify({ success: true, hash, result: rec, arSav: rec.arSav }), {
+    return new Response(JSON.stringify({ success: true, hash, result: rec, arSav: rec.arSav, baumann }), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {

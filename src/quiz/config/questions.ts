@@ -64,6 +64,17 @@ export const SECTIONS: Section[] = [
         ],
       },
       {
+        id: 'bortipus-zsir-3',
+        type: 'radio',
+        question: 'Milyennek látod a pórusaidat?',
+        options: [
+          { value: 'od3-0', label: 'Alig láthatók' },
+          { value: 'od3-1', label: 'Apró pórusok a T-zónában' },
+          { value: 'od3-2', label: 'Jól látható pórusok a T-zónában' },
+          { value: 'od3-3', label: 'Nagy, látható pórusok az arc nagy részén' },
+        ],
+      },
+      {
         id: 'bortipus-erzekeny-1',
         type: 'radio',
         question: 'Hogyan reagál a bőröd új arcápoló termékre?',
@@ -85,6 +96,17 @@ export const SECTIONS: Section[] = [
         ],
       },
       {
+        id: 'bortipus-erzekeny-3',
+        type: 'radio',
+        question: 'Hajlamos vagy apró kiütésekre, pattanásokra vagy viszketésre?',
+        options: [
+          { value: 'sr3-0', label: 'Soha' },
+          { value: 'sr3-1', label: 'Nagyon ritkán' },
+          { value: 'sr3-2', label: 'Időnként előfordul' },
+          { value: 'sr3-3', label: 'Visszatérően jelen van' },
+        ],
+      },
+      {
         id: 'bortipus-pigment',
         type: 'radio',
         question: 'Vannak-e barna foltok, egyenetlen elszíneződések az arcodon?',
@@ -93,6 +115,28 @@ export const SECTIONS: Section[] = [
           { value: 'pig-1', label: '1–2 kisebb folt' },
           { value: 'pig-2', label: 'Több folt / napfoltok' },
           { value: 'pih-2', label: 'Pattanás vagy gyulladás után sötét foltok maradnak' },
+        ],
+      },
+      {
+        id: 'bortipus-pigment-2',
+        type: 'radio',
+        question: 'Egy pattanás vagy kiütés után marad-e sötét folt a helyén?',
+        options: [
+          { value: 'pn2-0', label: 'Soha' },
+          { value: 'pn2-1', label: 'Ritkán, és hamar elhalványul' },
+          { value: 'pn2-2', label: 'Gyakran, és sokáig megmarad' },
+          { value: 'pn2-3', label: 'Szinte mindig, és makacsul' },
+        ],
+      },
+      {
+        id: 'bortipus-pigment-3',
+        type: 'radio',
+        question: 'Mennyire egységes a bőröd tónusa összességében?',
+        options: [
+          { value: 'pn3-0', label: 'Teljesen egyenletes' },
+          { value: 'pn3-1', label: 'Nagyjából egyenletes' },
+          { value: 'pn3-2', label: 'Helyenként egyenetlen' },
+          { value: 'pn3-3', label: 'Kifejezetten foltos, egyenetlen' },
         ],
       },
       {

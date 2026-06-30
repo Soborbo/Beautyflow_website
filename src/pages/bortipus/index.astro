@@ -1,0 +1,229 @@
+---
+/**
+ * /bortipus — a HUB: „Mi az a 16 bőrtípus?"
+ *
+ * Ez a fő SEO-belépő (organikus kulcsszavak: „milyen a bőröm", „bőrtípus teszt",
+ * „Baumann bőrtípus"). Itt él a 4 tengely MÉLY magyarázata (#a-4-tulajdonsag) — a 16
+ * típusoldal ide linkel és NEM ismétli meg. A legnehezebb E-E-A-T-munka helye:
+ * Baumann-rendszer + 2016-os validációs tanulmány + Kónya Fanni szakmai hitelesítése.
+ *
+ * Fanni-bővítés: a tengely-magyarázatokhoz az ő kezelőágyról vett megfigyelései
+ * jönnek (references/mintaoldal-hub.md `【FANNI — …】`).
+ */
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { baumannTypes } from '../../data/baumannTypes';
+
+const url = 'https://beautyflow.pro/bortipus';
+
+const axes = [
+  {
+    n: '1',
+    title: 'Zsíros vagy száraz?',
+    code: 'O / D',
+    body: 'Mennyi természetes olajat termel a bőröd. A zsíros bőr (O) délutánra fénylik, tágabbak a pórusok; a száraz (D) inkább feszül, fakóbb. Fontos csapda: a dehidratált bőr (kevés víz) nem ugyanaz, mint a száraz (kevés olaj) — sokan emiatt sorolják be rosszul magukat.',
+  },
+  {
+    n: '2',
+    title: 'Érzékeny vagy ellenálló?',
+    code: 'S / R',
+    body: 'Mennyire reagál a bőröd ingerekre. Az érzékeny (S) hajlamos a kipirulásra, csípésre, apró kiütésekre; az ellenálló (R) szinte mindent jól tűr, ritkán reagál. Ez dönti el, milyen erős hatóanyagoknak van helye a rutinodban.',
+  },
+  {
+    n: '3',
+    title: 'Foltra hajlamos vagy egyenletes tónusú?',
+    code: 'P / N',
+    body: 'Mennyire hajlamos a bőröd egyenetlen tónusra, foltokra, elszíneződésre — nap, hormonális hatás vagy egy korábbi kiütés nyomán. A P-típusnál a tónus egyenletessége a fő téma, az N-típusnál nem.',
+  },
+  {
+    n: '4',
+    title: 'Ránchajlamos vagy feszes?',
+    code: 'W / T',
+    body: 'Mennyire hajlamos a bőröd a finom vonalak, ráncok korai megjelenésére. Ebben szerepet játszik az életkor, de legalább annyira az életmód is — a nap, a dohányzás, az alvás.',
+  },
+];
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'Milyen a bőröd valójában? A 16 bőrtípus',
+  description:
+    'A Baumann-rendszer 4 tulajdonság mentén 16 bőrtípusba sorol. Mit jelentenek a tengelyek, és mit kapsz, ha kitöltöd a tesztet.',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  author: { '@type': 'Person', name: 'Kónya Fanni', jobTitle: 'Kozmetikus' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'BeautyFlow',
+    logo: { '@type': 'ImageObject', url: 'https://beautyflow.pro/images/Beautyflow-favicon.png' },
+  },
+  inLanguage: 'hu',
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Főoldal', item: 'https://beautyflow.pro/' },
+    { '@type': 'ListItem', position: 2, name: 'Bőrtípusok', item: url },
+  ],
+};
+---
+
+<Layout
+  title="Milyen a bőröd valójában? A 16 bőrtípus és az ingyenes teszt | BeautyFlow"
+  description="A legtöbben rosszul tippelik meg a bőrtípusukat — és emiatt évekig rossz terméket használnak. A Baumann-rendszer 16 típusba sorol 4 kérdés mentén. Töltsd ki a tesztet, és tudd meg, melyik a tiéd."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <article class="max-w-3xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+    <header class="mb-8">
+      <p class="text-sm font-semibold uppercase tracking-wider text-[#c53f75] mb-2">Bőrtípus-útmutató</p>
+      <h1 class="font-heading text-3xl sm:text-4xl text-[#1e293b] leading-tight mb-5">
+        Milyen a bőröd valójában? — A 16 bőrtípus
+      </h1>
+      <p class="text-lg text-[#334155] leading-relaxed mb-3">
+        A legtöbben tudni vélik, milyen a bőrük: „zsíros", „száraz", „érzékeny". A baj, hogy ez a
+        három szó töredéke a képnek — és a fele gyakran téves. Aki dehidratált bőrt szárazként
+        kezel, vagy érzékenyet ellenállóként, az évekig a rossz terméket használja, és nem érti,
+        miért nem javul semmi.
+      </p>
+      <p class="text-lg text-[#334155] leading-relaxed">
+        Pont ezt oldja meg az a rendszer, amit itt használunk: a bőrt nem egy szóval, hanem
+        <strong>négy tulajdonsággal</strong> írja le — és ebből áll össze <strong>16 különböző
+        bőrtípus</strong>. A tesztünk ezt méri fel, és megmutatja, melyik vagy te.
+      </p>
+      <div class="mt-6">
+        <a href="/boranalizis" class="inline-block px-7 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors">
+          Kitöltöm a tesztet (kb. 3 perc)
+        </a>
+      </div>
+    </header>
+
+    <section class="mb-10">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-3">Miért nem mindegy, hogy melyik a te típusod?</h2>
+      <p class="text-[#334155] leading-relaxed mb-3">
+        Mert minden típusnak más a logikája — más, amitől szebb lesz, és más, amitől romlik. Ami az
+        egyik bőrnek a legjobb hatóanyag, a másiknak kipirulást és feszülő érzést hoz. Ha tudod a
+        típusodat:
+      </p>
+      <ul class="list-disc pl-5 space-y-1.5 text-[#334155]">
+        <li><strong>megérted, miért</strong> úgy viselkedik a bőröd, ahogy — sok éves rejtély oldódik meg egy perc alatt;</li>
+        <li><strong>abbahagyod a rossz szokásokat</strong>, amik épp rontják, amin javítani akarsz;</li>
+        <li><strong>célzottan választasz</strong> — otthoni rutint és szalonkezelést is.</li>
+      </ul>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-3">Mi az a Baumann-rendszer?</h2>
+      <p class="text-[#334155] leading-relaxed mb-3">
+        A 16 típusú besorolás nem a mi találmányunk — egy nemzetközileg elismert bőrgyógyász,
+        <strong>Dr. Leslie Baumann</strong> dolgozta ki. A módszer lényege, hogy a bőrt négy,
+        egymástól független tulajdonság-pár mentén írja le, és a kombinációjukból jön ki a 16 típus.
+      </p>
+      <p class="text-[#334155] leading-relaxed mb-3">
+        Ami miatt komolyan vehető: a kérdőív mögött valódi kutatás áll. Egy 2016-os validációs
+        vizsgálat <strong>52 862 ember</strong> adatán mérte be — és többek között azt találta, hogy
+        a zsíros vs. száraz hajlam előfordulása nem tér el jelentősen az ázsiai és a kaukázusi bőr
+        között. Ez számunkra különösen fontos, mert nálunk <strong>koreai kozmetikai kezelések</strong>
+        állnak a középpontban.
+      </p>
+      <div class="rounded-xl bg-[#fff9f7] border border-[#e7d8df] p-4 text-sm text-[#334155] leading-relaxed">
+        Ahol a legtöbbet és legegyszerűbben tájékozódhatsz magáról a rendszerről, az Dr. Baumann
+        saját, laikusoknak írt összefoglalója:
+        <a href="https://skintypesolutions.com/blogs/skincare/16-baumann-skin-types" target="_blank" rel="noopener nofollow" class="text-[#c53f75] font-semibold">skintypesolutions.com – 16 Baumann Skin Types</a>.
+        A kvíz hitelességét adó validációs tanulmány:
+        <a href="https://www.scirp.org/journal/paperinformation?paperid=64499" target="_blank" rel="noopener nofollow" class="text-[#c53f75] font-semibold">Baumann L. (2016)</a>,
+        <em>Validation of a Questionnaire to Diagnose the Baumann Skin Type…</em>, JCDSA / SCIRP (open access).
+      </div>
+    </section>
+
+    <section id="a-4-tulajdonsag" class="mb-10 scroll-mt-24">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-2">A 4 tulajdonság, amiből a bőröd összeáll</h2>
+      <p class="text-[#334155] leading-relaxed mb-5">
+        Ez a rendszer szíve. Mind a négy egy-egy „skála", aminek a két vége egy-egy betűt ad — a te
+        négy betűd együtt a kódod (pl. <strong>DSPW</strong> vagy <strong>ORNT</strong>).
+      </p>
+      <div class="space-y-5">
+        {axes.map((a) => (
+          <div class="rounded-xl border border-[#e7d8df] p-5">
+            <div class="flex items-baseline gap-3 mb-2">
+              <span class="font-heading text-xl text-[#c53f75]">{a.code}</span>
+              <h3 class="font-heading text-lg text-[#1e293b]">{a.n}. {a.title}</h3>
+            </div>
+            <p class="text-[#334155] leading-relaxed">{a.body}</p>
+          </div>
+        ))}
+      </div>
+      <p class="text-[#334155] leading-relaxed mt-5">
+        A te négy betűd e négy skála végpontjaiból áll össze.
+        <strong>{'{O/D}'} × {'{S/R}'} × {'{P/N}'} × {'{W/T}'} = pontosan 16</strong> lehetséges
+        kombináció. Ezért van 16 bőrtípus.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-3">Mit kapsz, ha kitöltöd a tesztet?</h2>
+      <p class="text-[#334155] leading-relaxed mb-3">
+        Kb. 3 perc, néhány egyszerű kérdés a bőröd viselkedéséről. A végén megkapod:
+      </p>
+      <ol class="list-decimal pl-5 space-y-1.5 text-[#334155]">
+        <li><strong>A négybetűs típusodat</strong> és a saját oldaladat — leírva, milyen ezzel a bőrrel élni.</li>
+        <li><strong>Otthoni alapelveket</strong> — mit érdemes csinálni, és mit jobb elkerülni épp a te típusodnál.</li>
+        <li><strong>Irányt a szalonban</strong> — mely kezeléskategóriák illenek a bőrödhöz (a pontos terv a konzultáción dől el).</li>
+      </ol>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-3">Mennyire pontos ez?</h2>
+      <p class="text-[#334155] leading-relaxed mb-3">
+        Legyünk őszinték abban, hogy mi ez és mi nem. A tesztünk a Baumann-rendszer rövidített,
+        gyakorlati változata — arra jó, hogy a helyes irányba állítson, és hogy megértsd a bőröd
+        logikáját. Amit nem helyettesít, az a személyes bőranalízis: a bőröd állapota hónapról
+        hónapra változhat, és élőben olyasmi is látszik, amit egy online kérdőív nem tud felmérni.
+      </p>
+      <p class="text-[#334155] leading-relaxed">
+        Ezért a teszt után a természetes következő lépés, hogy élőben is megnézzük. A szalonban a
+        professzionális bőranalízis díja <strong>5000 Ft, amit a kezelés árából levonunk</strong> —
+        így gyakorlatilag ingyenes.
+      </p>
+    </section>
+
+    <!-- A 16 típus rácsa -->
+    <section class="mb-10">
+      <h2 class="font-heading text-2xl text-[#1e293b] mb-4">A 16 típus — nézd meg mindet</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {baumannTypes.map((t) => (
+          <a
+            href={`/bortipus/${t.slug}`}
+            class="block rounded-xl border border-[#e7d8df] p-4 hover:border-[#c53f75] hover:shadow-sm transition-all no-underline"
+          >
+            <span class="font-heading text-lg text-[#c53f75]">{t.code}</span>
+            <span class="block text-sm text-[#334155] mt-1 leading-snug">{t.displayName}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <AuthorBox variant="full" />
+
+    <!-- Források -->
+    <section class="mt-10 text-sm text-[#6f676e] leading-relaxed">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-[#334155] mb-2">Források</h2>
+      <ul class="space-y-1.5">
+        <li>
+          Dr. Leslie Baumann – 16 Baumann Skin Types:
+          <a href="https://skintypesolutions.com/blogs/skincare/16-baumann-skin-types" target="_blank" rel="noopener nofollow" class="text-[#c53f75]">skintypesolutions.com</a>
+        </li>
+        <li>
+          Baumann L. (2016): <em>Validation of a Questionnaire to Diagnose the Baumann Skin Type in
+          All Ethnicities and in Various Geographic Locations.</em> JCDSA, 6(1), 34–40. DOI:
+          10.4236/jcdsa.2016.61005 ·
+          <a href="https://www.scirp.org/journal/paperinformation?paperid=64499" target="_blank" rel="noopener nofollow" class="text-[#c53f75]">open access</a>
+        </li>
+      </ul>
+    </section>
+  </article>
+</Layout>

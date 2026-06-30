@@ -32,6 +32,8 @@ const strings = {
   'gate.consentHealth':
     'Hozzájárulok, hogy a megadott, egészségemmel kapcsolatos adataimat a szalon a személyre szabott kezelési javaslat elkészítése céljából kezelje.',
   'gate.consentRequired': 'Az egészségügyi adatok kezeléséhez való hozzájárulás kötelező.',
+  'gate.consentMarketing':
+    'Szeretnék feliratkozni a BeautyFlow hírlevelére, és bőrápolási tippeket, ajánlatokat kapni e-mailben. (nem kötelező, bármikor leiratkozhatsz)',
   'gate.privacyLink': 'Adatkezelési tájékoztató',
   'gate.error': 'Hiba történt. Kérjük próbáld újra, vagy hívj minket: +36 1 300 9414',
   'gate.tooFast': 'Túl gyors küldés. Kérjük próbáld újra pár másodperc múlva.',
