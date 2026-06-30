@@ -183,6 +183,15 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         </label>
       </div>
 
+      {/* Hírlevél — OPCIONÁLIS, külön a kötelező egészségügyi consenttől (nincs bundle) */}
+      <div class="flex items-start gap-2 px-3">
+        <input id="gate-marketing" name="consentMarketing" type="checkbox"
+          class="mt-1 h-4 w-4 rounded border-gray-300 text-[#c53f75] focus:ring-[#c53f75]" />
+        <label for="gate-marketing" class="text-xs leading-relaxed text-gray-600">
+          {t('gate.consentMarketing')}
+        </label>
+      </div>
+
       {turnstileSiteKey && (
         <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" data-size="flexible"></div>
       )}
@@ -438,6 +447,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         const phone = String(fd.get('phone') || '').trim();
         const email = String(fd.get('email') || '').trim();
         const consentHealth = fd.get('consentHealth') === 'on';
+        const consentMarketing = fd.get('consentMarketing') === 'on';
         const website = String(fd.get('website') || '');
 
         errEl.classList.add('hidden');
@@ -466,6 +476,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           phone,
           email,
           consentHealth,
+          consentMarketing,
           consentAt: new Date().toISOString(),
           website,
           turnstileToken: String(fd.get('cf-turnstile-response') || ''),
@@ -482,7 +493,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
-          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; error?: string };
+          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string }; error?: string };
 
           if (result.success && result.hash) {
             try { localStorage.setItem(resultStorageKey(result.hash), JSON.stringify(result.result)); } catch { /* ignore */ }
@@ -500,7 +511,14 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
               eventName: 'contact_form_submit',
             });
             await waitForTracking(600);
-            window.location.href = resultPath(result.hash);
+            // A kvíz kitöltőjét a saját publikus bőrtípus-oldalára érkeztetjük
+            // (a 16 Baumann-oldal a becsapódási pont). Ha a kód valamiért
+            // hiányzik, a régi privát eredményoldalra esünk vissza.
+            if (result.baumann?.slug) {
+              window.location.href = `/bortipus/${result.baumann.slug}`;
+            } else {
+              window.location.href = resultPath(result.hash);
+            }
           } else {
             showErr(result.error || 'Hiba történt. Kérjük próbáld újra.');
             const w = window as unknown as { turnstile?: { reset: (el?: HTMLElement) => void } };
