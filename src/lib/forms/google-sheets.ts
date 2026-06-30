@@ -116,26 +116,47 @@ export async function insertRowAtTop(
 ): Promise<void> {
   const INSERT_ROW_INDEX_ZERO_BASED = 1;
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`;
+
+  // updateCells a rácshatáron BELÜL ír — ha a sor szélesebb, mint a fül
+  // oszlopszáma, a teljes batchUpdate atomikusan elbukik (és a sor SEM íródik be).
+  // Ezért előbb megnézzük az oszlopszámot, és ha kell, a végére bővítünk (a
+  // keskenyebb soroknál — pl. kontakt-űrlap — ez sosem fut le). Best-effort: ha
+  // a meta-lekérés hibázik, a beírás akkor is megpróbálódik.
+  const requests: unknown[] = [];
+  try {
+    const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets(properties(sheetId,gridProperties(columnCount)))`;
+    const metaRes = await fetch(metaUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (metaRes.ok) {
+      const meta = (await metaRes.json()) as {
+        sheets?: { properties?: { sheetId?: number; gridProperties?: { columnCount?: number } } }[];
+      };
+      const cols = meta.sheets?.find((s) => s.properties?.sheetId === gid)?.properties?.gridProperties?.columnCount ?? 0;
+      if (cols > 0 && values.length > cols) {
+        requests.push({ appendDimension: { sheetId: gid, dimension: 'COLUMNS', length: values.length - cols } });
+      }
+    }
+  } catch { /* best-effort oszlopbővítés — a beírás alább így is lefut */ }
+
+  requests.push(
+    {
+      insertDimension: {
+        range: { sheetId: gid, dimension: 'ROWS', startIndex: INSERT_ROW_INDEX_ZERO_BASED, endIndex: INSERT_ROW_INDEX_ZERO_BASED + 1 },
+        inheritFromBefore: false,
+      },
+    },
+    {
+      updateCells: {
+        rows: [{ values: values.map((v) => ({ userEnteredValue: { stringValue: String(v) } })) }],
+        fields: 'userEnteredValue',
+        start: { sheetId: gid, rowIndex: INSERT_ROW_INDEX_ZERO_BASED, columnIndex: 0 },
+      },
+    },
+  );
+
   const response = await fetch(url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      requests: [
-        {
-          insertDimension: {
-            range: { sheetId: gid, dimension: 'ROWS', startIndex: INSERT_ROW_INDEX_ZERO_BASED, endIndex: INSERT_ROW_INDEX_ZERO_BASED + 1 },
-            inheritFromBefore: false,
-          },
-        },
-        {
-          updateCells: {
-            rows: [{ values: values.map((v) => ({ userEnteredValue: { stringValue: String(v) } })) }],
-            fields: 'userEnteredValue',
-            start: { sheetId: gid, rowIndex: INSERT_ROW_INDEX_ZERO_BASED, columnIndex: 0 },
-          },
-        },
-      ],
-    }),
+    body: JSON.stringify({ requests }),
   });
   if (!response.ok) throw new SheetsCallError(`Sheets error: ${await response.text()}`, 'write', response.status);
 }
