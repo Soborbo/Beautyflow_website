@@ -48,7 +48,10 @@
     // deploy at all for a name not declared here, dropped it silently → Sheets writes
     // no-op'd). Only the private key is secret (set via `wrangler secret put`).
     "GOOGLE_SHEETS_ID": "1gDFG6wpLDLgUNIqicNwLL9QMNC9OuIgoKBMB3lLF810",
-    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com"
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com",
+    // EmailOctopus hírlevél lista azonosítója (NEM titok — a lista URL-je / Settings adja).
+    // Az ehhez tartozó API kulcs SECRET: `wrangler secret put EMAILOCTOPUS_API_KEY` (lásd lent).
+    "EMAILOCTOPUS_LIST_ID": "76d28252-7664-11f1-8850-59b9407f9225"
   }
   // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
   //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
@@ -79,6 +82,7 @@
    *
    *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)    [required]
    *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)    [required]
+   *   EMAILOCTOPUS_API_KEY            — EmailOctopus v2 API key (hírlevél)      [required a hírlevélhez]
    *   GOOGLE_SHEETS_ID                — existing leadlist sheet id              [optional]
    *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account                  [optional]
    *   GOOGLE_PRIVATE_KEY              — Google service account key              [optional]

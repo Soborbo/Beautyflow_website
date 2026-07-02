@@ -47,6 +47,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 | `GA4_MEASUREMENT_ID` | `G-774BY4X64P` |
 | `META_PIXEL_ID` | `915395591548632` |
 | `SITE_URL` | `https://beautyflow.pro` |
+| `EMAILOCTOPUS_LIST_ID` | `76d28252-7664-11f1-8850-59b9407f9225` |
 
 **Secrets (encrypted) — ezeket KÉZZEL kell a dashboardon beállítani:**
 
@@ -54,6 +55,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 |---|---|---|
 | `TURNSTILE_SECRET_KEY` | Turnstile server-side verification | **kötelező** |
 | `RESEND_API_KEY` | Email küldés (info@beautyflow.pro) | **kötelező** |
+| `EMAILOCTOPUS_API_KEY` | Hírlevél feliratkozás (NewsletterModal) | **kötelező a hírlevélhez** |
 | `GOOGLE_SHEETS_ID` | Lead log Google Sheets-be | opcionális |
 | `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Sheets service account | opcionális |
 | `GOOGLE_PRIVATE_KEY` | Sheets service account key | opcionális |
@@ -77,6 +79,28 @@ A reply-to a user email címe (admin levél).
 
 ### 6. Custom domain
 Dashboard → a worker beállításai → Custom Domains → Add → `beautyflow.pro` és `www.beautyflow.pro`.
+
+### 7. EmailOctopus hírlevél (NewsletterModal)
+
+A főoldalon (és minden magyar oldalon) 18 mp után felugró hírlevél-modal a
+[`/api/newsletter`](src/pages/api/newsletter.ts) végponton át az EmailOctopus **v2** API-ba
+ír (`POST https://api.emailoctopus.com/lists/{list_id}/contacts`, `Authorization: Bearer <API_KEY>`).
+Csak keresztnév + email kell; a keresztnév a lista **FirstName** mezőjébe kerül.
+
+A működéshez az EmailOctopus dashboardról kell két dolog:
+
+1. **Lista (audience) létrehozása / kiválasztása.** Ha új lista, hagyd rajta az alapértelmezett
+   `FirstName` mezőt (ezt küldjük). A lista **ID**-jét (UUID) a lista URL-jéből vagy a lista
+   Settings oldaláról másold ki → tedd a [wrangler.jsonc](wrangler.jsonc) `vars` blokkjában lévő
+   `EMAILOCTOPUS_LIST_ID` mezőbe (nem titok, deployjal szállítjuk).
+2. **API kulcs (v2).** Account → **Integrations & API** → API keys → *Create a new key*.
+   Ez SECRET → `wrangler secret put EMAILOCTOPUS_API_KEY` (vagy CF dashboard → Secrets).
+
+Opcionális: a listán a **double opt-in** kapcsoló dönti el, hogy a feliratkozó kap-e
+megerősítő emailt (ilyenkor `pending` státusszal kerül be, amíg meg nem erősíti).
+
+Amíg a lista ID vagy az API kulcs hiányzik, a végpont `503`-at ad és a modal barátságos
+hibaüzenetet mutat — a többi form (kapcsolat, kvíz) ettől független, változatlanul megy.
 
 ## Tracking — mi van be drótozva, mi nincs
 
