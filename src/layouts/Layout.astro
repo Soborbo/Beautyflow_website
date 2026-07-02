@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+import NewsletterModal from '../components/NewsletterModal.astro';
 import { LCPTracker } from '../components/images';
 import { getLangFromUrl, useTranslations, getAlternateRoute, stripTrailingSlash, type Locale } from '../i18n';
 // Soborbo canonical tracking (v5): browser (GTM dataLayer) + server (event-gateway
@@ -98,6 +99,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     </main>
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
+    {currentLang === 'hu' && <NewsletterModal />}
     <LCPTracker />
   </body>
 </html>
