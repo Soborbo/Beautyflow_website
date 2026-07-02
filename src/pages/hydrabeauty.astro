@@ -29,7 +29,7 @@ const stats = [
 
 const testimonials = [
   {
-    text: 'A HydraBeauty kezelés után a bőröm annyira puha és ragyogó lett, hogy smink nélkül mentem el dolgozni másnap. Imádom!',
+    text: 'A Hydratouch kezelés után a bőröm annyira puha és ragyogó lett, hogy smink nélkül mentem el dolgozni másnap. Imádom!',
     author: 'Eszter',
   },
   {
@@ -42,18 +42,18 @@ const testimonials = [
   }
 ];
 
-// HydroFacial prices
+// Hydratouch prices
 const hydrofacialAreas = [
-  { id: 'arc', name: 'Arc', duration: '60 perc', price: 20000 },
-  { id: 'hat', name: 'Hát', duration: '90 perc', price: 25000 },
-  { id: 'arc-nyak-dekoltazs', name: 'Arc + nyak + dekoltázs', duration: '100 perc', price: 30000 },
+  { id: 'arc', name: 'Arc', duration: '75 perc', price: 30000 },
+  { id: 'hat', name: 'Hát', duration: '90 perc', price: 35000 },
+  { id: 'arc-nyak-dekoltazs', name: 'Arc + nyak + dekoltázs', duration: '105 perc', price: 40000 },
 ];
 
-// HydroFacial + Carbon Peeling prices
+// Hydratouch + Carbon Peeling prices
 const hydrofacialCarbonAreas = [
-  { id: 'arc', name: 'Arc', duration: '100 perc', price: 40000 },
-  { id: 'arc-dekoltazs', name: 'Arc + dekoltázs', duration: '120 perc', price: 45000 },
-  { id: 'hat', name: 'Hát', duration: '120 perc', price: 45000 },
+  { id: 'arc', name: 'Arc', duration: '105 perc', price: 45000 },
+  { id: 'arc-dekoltazs', name: 'Arc + dekoltázs', duration: '120 perc', price: 50000 },
+  { id: 'hat', name: 'Hát', duration: '120 perc', price: 55000 },
 ];
 
 const howItWorks = [
@@ -80,22 +80,22 @@ const howItWorks = [
 ];
 
 const faqs = [
-  { question: 'Mennyire fájdalmas a HydraBeauty kezelés?', answer: 'A kezelés teljesen fájdalommentes! Sokan kellemes, relaxáló élménynek tartják. A vákuumos tisztítás enyhe szívó érzéssel jár, de ez egyáltalán nem kellemetlen.' },
-  { question: 'Kinek ajánlott a HydraBeauty?', answer: 'Mindenkinek! Zsíros, aknés, száraz, érzékeny vagy érett bőrre egyaránt alkalmas. A kezelést mindig személyre szabjuk a bőrtípusodnak megfelelően.' },
+  { question: 'Mennyire fájdalmas a Hydratouch kezelés?', answer: 'A kezelés teljesen fájdalommentes! Sokan kellemes, relaxáló élménynek tartják. A vákuumos tisztítás enyhe szívó érzéssel jár, de ez egyáltalán nem kellemetlen.' },
+  { question: 'Kinek ajánlott a Hydratouch?', answer: 'Mindenkinek! Zsíros, aknés, száraz, érzékeny vagy érett bőrre egyaránt alkalmas. A kezelést mindig személyre szabjuk a bőrtípusodnak megfelelően.' },
   { question: 'Milyen gyakran érdemes ismételni?', answer: 'Optimális eredményért havonta 1-2 alkalommal javasolt. Speciális bőrproblémák esetén kezdetben sűrűbben, majd fenntartó kezelésként ritkábban.' },
-  { question: 'Van-e leállási idő a kezelés után?', answer: 'Nincs! A HydraBeauty után azonnal visszatérhetsz a mindennapokhoz. Sőt, a bőröd olyan szép lesz, hogy akár smink nélkül is mehetsz bárhova.' },
+  { question: 'Van-e leállási idő a kezelés után?', answer: 'Nincs! A Hydratouch után azonnal visszatérhetsz a mindennapokhoz. Sőt, a bőröd olyan szép lesz, hogy akár smink nélkül is mehetsz bárhova.' },
   { question: 'Sminkelhetek a kezelés után?', answer: 'Igen, de javasoljuk, hogy hagyd pihenni a bőröd legalább pár órán át. A tiszta, ragyogó bőrnek amúgy sem lesz szüksége sok sminkre!' },
-  { question: 'Miben különbözik más arckezelésektől?', answer: 'A HydraBeauty egyedülálló módon kombinálja a mélytisztítást, hámlasztást és hidratálást egyetlen kezelésben. Nincs bőrirritáció, nincs pirosság, csak azonnali eredmény.' },
-  { question: 'Terhesség alatt végezhető a kezelés?', answer: 'Igen, a HydraBeauty terhesség alatt is biztonságos, mivel kíméletes és nem tartalmaz agresszív vegyszereket. Természetesen egyeztesd kezelőorvosodddal.' },
+  { question: 'Miben különbözik más arckezelésektől?', answer: 'A Hydratouch egyedülálló módon kombinálja a mélytisztítást, hámlasztást és hidratálást egyetlen kezelésben. Nincs bőrirritáció, nincs pirosság, csak azonnali eredmény.' },
+  { question: 'Terhesség alatt végezhető a kezelés?', answer: 'Igen, a Hydratouch terhesség alatt is biztonságos, mivel kíméletes és nem tartalmaz agresszív vegyszereket. Természetesen egyeztesd kezelőorvosodddal.' },
   { question: 'Mennyire tartós az eredmény?', answer: 'Az azonnali ragyogás 1-2 hétig látványos. Rendszeres kezeléssel a bőr állapota folyamatosan javul, és hosszú távon is megőrizheted az eredményt.' },
-  { question: 'Mi történik, ha érzékeny a bőröm?', answer: 'A HydraBeauty kifejezetten kíméletes, érzékeny bőrre is tökéletes! A kezelést mindig a bőrtípusodhoz igazítjuk, és kizárólag prémium, bőrbarát termékeket használunk.' },
-  { question: 'Kombinálható más kezelésekkel?', answer: 'Igen! A HydraBeauty kiválóan kombinálható Carbon Peelinggel a még látványosabb eredményért. Kérdezd meg szakemberünket az optimális kombinációról.' },
+  { question: 'Mi történik, ha érzékeny a bőröm?', answer: 'A Hydratouch kifejezetten kíméletes, érzékeny bőrre is tökéletes! A kezelést mindig a bőrtípusodhoz igazítjuk, és kizárólag prémium, bőrbarát termékeket használunk.' },
+  { question: 'Kombinálható más kezelésekkel?', answer: 'Igen! A Hydratouch kiválóan kombinálható Carbon Peelinggel a még látványosabb eredményért. Kérdezd meg szakemberünket az optimális kombinációról.' },
 ];
 ---
 
 <Layout
-  title="HydraBeauty Arckezelés Budapest - Mélytisztítás és Hidratálás | Beautyflow"
-  description="Professzionális HydraBeauty arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás egyetlen kezelés során. Azonnali eredmény! Kérj ingyenes konzultációt!"
+  title="Hydratouch Arckezelés Budapest - Mélytisztítás és Hidratálás | Beautyflow"
+  description="Professzionális Hydratouch arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás egyetlen kezelés során. Azonnali eredmény! Kérj ingyenes konzultációt!"
   ogImage="/images/hydrabeauty-arckezeles.jpg"
 >
   <!-- FAQ Schema -->
@@ -126,7 +126,7 @@ const faqs = [
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "HydraBeauty Arckezelés",
+        "name": "Hydratouch Arckezelés",
         "item": "https://beautyflow.pro/hydrabeauty"
       }
     ]
@@ -136,9 +136,9 @@ const faqs = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": "HydraBeauty Arckezelés",
-    "name": "HydraBeauty Arckezelés Budapest",
-    "description": "Professzionális HydraBeauty arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás.",
+    "serviceType": "Hydratouch Arckezelés",
+    "name": "Hydratouch Arckezelés Budapest",
+    "description": "Professzionális Hydratouch arckezelés Budapesten. Fájdalommentes mélytisztítás, hidratálás és bőrmegújítás.",
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Szépségszalon",
@@ -168,12 +168,12 @@ const faqs = [
     },
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "HydraBeauty szolgáltatások",
+      "name": "Hydratouch szolgáltatások",
       "itemListElement": hydrofacialAreas.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": `HydraBeauty - ${item.name}`
+          "name": `Hydratouch - ${item.name}`
         },
         "price": item.price.toString(),
         "priceCurrency": "HUF"
@@ -207,13 +207,13 @@ const faqs = [
           </div>
 
           <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2">
-            HydraBeauty arckezelés Budapesten
+            Hydratouch arckezelés Budapesten
           </h1>
           <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight">
             Legyen fiatalos és ragyogó az arcbőröd fájdalom és tűszúrás nélkül
           </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Unod, hogy a smink csak elrejti a fáradtságot? A HydraBeauty kezelés mélyen tisztít, hidratál és feltölti a bőröd – már az első alkalom után látványos változást hoz.
+            Unod, hogy a smink csak elrejti a fáradtságot? A Hydratouch kezelés mélyen tisztít, hidratál és feltölti a bőröd – már az első alkalom után látványos változást hoz.
           </p>
 
           <!-- CTA row -->
@@ -241,7 +241,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
         <ContentImage
           src={hydrabeautyArckezeles}
-          alt="HydraBeauty arckezelés Budapest"
+          alt="Hydratouch arckezelés Budapest"
           class="w-full h-full object-cover"
           priority={true}
         />
@@ -294,7 +294,7 @@ const faqs = [
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
             <ContentImage
               src={konyaFanniSzepsegszalonja}
-              alt="Kónya Fanni HydraBeauty szakértő"
+              alt="Kónya Fanni Hydratouch szakértő"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
             />
             <!-- Mobile signature - right below image -->
@@ -316,10 +316,10 @@ const faqs = [
               Ha reggelente úgy érzed, hogy hiába kened fel a legjobb krémet vagy alapozót, a bőröd fakónak, fáradtnak tűnik, akkor pontosan tudod, milyen bosszantó, amikor semmi nem hozza meg azt az üdeséget, amit szeretnél. <strong>A mitesszerek, tág pórusok vagy apró ráncok még inkább elvehetik az önbizalmad.</strong>
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              A HydraBeauty kezelés pont erre nyújt megoldást: fájdalom nélkül tisztítja ki a pórusokat, hidratálja a bőrt és speciális hatóanyagokkal tölti fel, hogy <strong>azonnal frissebb, ragyogóbb és feszesebb legyen az arcod</strong>. Már az első alkalom után látni és érezni fogod a különbséget – a bőröd simább, puhább, fiatalosabb lesz.
+              A Hydratouch kezelés pont erre nyújt megoldást: fájdalom nélkül tisztítja ki a pórusokat, hidratálja a bőrt és speciális hatóanyagokkal tölti fel, hogy <strong>azonnal frissebb, ragyogóbb és feszesebb legyen az arcod</strong>. Már az első alkalom után látni és érezni fogod a különbséget – a bőröd simább, puhább, fiatalosabb lesz.
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>Ha zsíros az arcbőröd, folyamatosan harcolsz a mitesszerekkel, a tág pórusokkal, vagy csak szeretnéd megőrizni bőröd fiatalságát és egészségét, a HydraBeauty kezelést neked találták ki!</strong>
+              <strong>Ha zsíros az arcbőröd, folyamatosan harcolsz a mitesszerekkel, a tág pórusokkal, vagy csak szeretnéd megőrizni bőröd fiatalságát és egészségét, a Hydratouch kezelést neked találták ki!</strong>
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -345,7 +345,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
-          alt="Fiatalabb arcbőr HydraBeauty kezeléssel"
+          alt="Fiatalabb arcbőr Hydratouch kezeléssel"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -355,7 +355,7 @@ const faqs = [
             Fiatalabb arcbőr tűszúrás nélkül
           </h2>
           <p class="text-gray-700 mb-6">
-            A HydraBeauty kezelés a modern bőrápolás egyik legnépszerűbb arckezelése, amely <strong>mélytisztítást, hidratálást és bőrmegújítást kínál egyetlen, kíméletes kezelés során</strong>. Ez a fájdalommentes, relaxáló eljárás minden bőrtípusra ajánlott, és már az első alkalom után látványos eredményt nyújt.
+            A Hydratouch kezelés a modern bőrápolás egyik legnépszerűbb arckezelése, amely <strong>mélytisztítást, hidratálást és bőrmegújítást kínál egyetlen, kíméletes kezelés során</strong>. Ez a fájdalommentes, relaxáló eljárás minden bőrtípusra ajánlott, és már az első alkalom után látványos eredményt nyújt.
           </p>
         </div>
       </div>
@@ -386,7 +386,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <ContentImage
           src={szemhejTetovalasSmink}
-          alt="HydraBeauty mélytisztítás"
+          alt="Hydratouch mélytisztítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -399,7 +399,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
-          alt="HydraBeauty ránctalanítás"
+          alt="Hydratouch ránctalanítás"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -432,7 +432,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
-          alt="HydraBeauty vitaminok"
+          alt="Hydratouch vitaminok"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -445,7 +445,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeauty}
-          alt="HydraBeauty azonnali eredmény"
+          alt="Hydratouch azonnali eredmény"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -474,7 +474,7 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        HydraBeauty Árak
+        Hydratouch Árak
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
         Válaszd ki a számodra megfelelő kezelést és területet
@@ -539,7 +539,7 @@ const faqs = [
     <div class="lg:hidden">
       <ContentImage
         src={hydrabeautyArckezeles}
-        alt="HydraBeauty kezelés folyamata"
+        alt="Hydratouch kezelés folyamata"
         class="w-full h-64 object-cover object-top"
       />
     </div>
@@ -627,7 +627,7 @@ const faqs = [
             </h2>
 
             <p class="text-gray-700 mb-2 text-sm">
-              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a HydraBeauty kezelésbe!</span>
+              <span class="font-semibold">Beszéljünk, mielőtt belevágnál a Hydratouch kezelésbe!</span>
             </p>
             <p class="text-gray-600 mb-3 text-sm">
               Egy kb. 15 perc hosszú INGYENES alkalom során megbeszéljük, hogy
@@ -635,7 +635,7 @@ const faqs = [
 
             <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
               <li>milyen bőrproblémákat szeretnél kezelni</li>
-              <li>melyik HydraBeauty csomag a legjobb neked</li>
+              <li>melyik Hydratouch csomag a legjobb neked</li>
               <li>érdemes-e kombinálni más kezelésekkel</li>
               <li>milyen azonnali és hosszú távú eredményre számíthatsz</li>
             </ul>
@@ -721,7 +721,7 @@ const faqs = [
   <section class="py-16 bg-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Miért a Beautyflow HydraBeauty kezelést válaszd?
+        Miért a Beautyflow Hydratouch kezelést válaszd?
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
         Több mint egy évtizedes tapasztalattal és prémium technológiával garantáljuk a ragyogó eredményt.
@@ -733,14 +733,14 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={mestersegesIntelligencia}
-              alt="HydraBeauty prémium technológia"
+              alt="Hydratouch prémium technológia"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Prémium technológia</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              A legújabb generációs HydraBeauty géppel dolgozunk, amely kíméletesen, de hatékonyan tisztítja és hidratálja a bőröd.
+              A legújabb generációs Hydratouch géppel dolgozunk, amely kíméletesen, de hatékonyan tisztítja és hidratálja a bőröd.
             </p>
           </div>
         </div>
@@ -750,14 +750,14 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={testmeret}
-              alt="Személyre szabott HydraBeauty"
+              alt="Személyre szabott Hydratouch"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Személyre szabott kezelés</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Minden HydraBeauty kezelést a te bőrtípusodhoz és igényeidhez igazítunk. Nincs két egyforma kezelés!
+              Minden Hydratouch kezelést a te bőrtípusodhoz és igényeidhez igazítunk. Nincs két egyforma kezelés!
             </p>
           </div>
         </div>
@@ -774,7 +774,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Relaxáló élmény</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              A HydraBeauty nálunk nem csak kezelés, hanem igazi wellness élmény. Kávéval és teljes figyelemmel várunk.
+              A Hydratouch nálunk nem csak kezelés, hanem igazi wellness élmény. Kávéval és teljes figyelemmel várunk.
             </p>
           </div>
         </div>
@@ -784,7 +784,7 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={higienia}
-              alt="Steril HydraBeauty környezet"
+              alt="Steril Hydratouch környezet"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -801,7 +801,7 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={hydrabeautyArckezeles}
-              alt="HydraBeauty azonnali eredmény"
+              alt="Hydratouch azonnali eredmény"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -825,7 +825,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Heti 7 napos nyitvatartás</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              Hétvégén is várunk! Tudjuk, hogy a hétköznapok zsúfoltak – ezért HydraBeauty kezelésre hétvégén is foglalhatsz.
+              Hétvégén is várunk! Tudjuk, hogy a hétköznapok zsúfoltak – ezért Hydratouch kezelésre hétvégén is foglalhatsz.
             </p>
           </div>
         </div>
@@ -872,7 +872,7 @@ const faqs = [
         Készen állsz a ragyogó bőrre?
       </h2>
       <p class="text-white/90 mb-8 text-lg">
-        Foglalj időpontot ingyenes konzultációra és tapasztald meg a HydraBeauty varázsát!
+        Foglalj időpontot ingyenes konzultációra és tapasztald meg a Hydratouch varázsát!
       </p>
       <a
         href="/ingyenes-konzultacio"

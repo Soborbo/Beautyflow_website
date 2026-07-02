@@ -1,0 +1,44 @@
+---
+/**
+ * SSR catch-all for URLs that match no real route.
+ *
+ * Why this exists: with a prerendered 404 page, Astro serves unmatched
+ * requests via `prerenderedErrorPageFetch` WITHOUT running middleware —
+ * which silently disabled every 301/410 rule in src/middleware.ts. This
+ * route makes unmatched URLs match, so the request goes through the
+ * normal pipeline: middleware first (redirects, 410 Gone, security
+ * headers), then this component, which serves the prerendered 404 page
+ * with a real 404 status code.
+ */
+export const prerender = false;
+
+import { env } from 'cloudflare:workers';
+
+interface AssetsFetcher {
+  fetch: (input: string | URL) => Promise<Response>;
+}
+
+const pathname = Astro.url.pathname;
+const isEnglish = pathname === '/en' || pathname.startsWith('/en/');
+const errorPath = isEnglish ? '/en/404' : '/404';
+
+// Astro 6 / @astrojs/cloudflare v13: the ASSETS binding moved from
+// Astro.locals.runtime.env to the `cloudflare:workers` env module.
+const assets = (env as { ASSETS?: AssetsFetcher }).ASSETS;
+
+if (assets) {
+  const page = await assets.fetch(new URL(errorPath, Astro.url.origin));
+  if (page.ok) {
+    return new Response(page.body, {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
+}
+
+// ASSETS binding unavailable (plain `astro dev`) — minimal fallback.
+return new Response(
+  isEnglish ? 'Page not found' : 'Az oldal nem található',
+  { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+);
+---

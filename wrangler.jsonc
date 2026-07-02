@@ -1,0 +1,95 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "beautyflow-website",
+  // @astrojs/cloudflare v13 ships a single stable Worker entrypoint that wraps
+  // the Astro SSR build. `astro build` wires the generated manifest into it, so
+  // `main` no longer points at the build output (./dist/_worker.js/index.js).
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2025-05-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+    // NOTE: do NOT add `run_worker_first` here. Even path-scoped to ["/api/event/*"],
+    // setting it flips the @astrojs/cloudflare adapter to serve the STATIC API routes
+    // (/api/contact, /api/boranalizis) assets-first on the production custom domain,
+    // so their POST comes back 405 and every lead is lost (verified + rolled back
+    // 2026-06-28). The tracking gateway is instead reached via STATIC routes under
+    // src/pages/api/event/* (conversion.ts etc.), which the routing manifest registers
+    // as Worker-bound exactly like /api/contact — no run_worker_first needed.
+  },
+  "observability": {
+    "enabled": true,
+    // 100% head sampling — error/lead-loss events must never be sampled away.
+    "head_sampling_rate": 1
+  },
+  // Service binding to the Soborbo event-gateway worker. The middleware forwards
+  // /api/event/* to it (same-origin tracking dispatch) — durable across redeploys,
+  // unlike a zone Worker Route which the Custom Domain wipes on each site deploy.
+  "services": [
+    { "binding": "GATEWAY", "service": "event-gateway" }
+  ],
+  "vars": {
+    "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
+    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",
+    "PUBLIC_SITE_URL": "https://beautyflow.pro",
+    // Soborbo canonical tracking market config. Keep in sync with the event-gateway
+    // KV site-config (country_code / currency). Also committed in .env.production so the
+    // values are inlined into the client bundle at build (import.meta.env.PUBLIC_*).
+    "PUBLIC_TRACKING_COUNTRY": "HU",
+    "PUBLIC_TRACKING_CURRENCY": "HUF",
+    "PUBLIC_TRACKING_LOCALE": "hu",
+    "SITE_URL": "https://beautyflow.pro",
+    // Google Sheets lead-export. NON-secret config — committed here so it ships
+    // with every deploy and can never be wiped (a dashboard plaintext var that is
+    // NOT in this block was the bug: a `wrangler deploy` without --keep-vars, or any
+    // deploy at all for a name not declared here, dropped it silently → Sheets writes
+    // no-op'd). Only the private key is secret (set via `wrangler secret put`).
+    "GOOGLE_SHEETS_ID": "1gDFG6wpLDLgUNIqicNwLL9QMNC9OuIgoKBMB3lLF810",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com",
+    // EmailOctopus hírlevél lista azonosítója (NEM titok — a lista URL-je / Settings adja).
+    // Az ehhez tartozó API kulcs SECRET: `wrangler secret put EMAILOCTOPUS_API_KEY` (lásd lent).
+    "EMAILOCTOPUS_LIST_ID": "76d28252-7664-11f1-8850-59b9407f9225"
+  }
+  // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
+  //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
+  //   menti és az emailben is elküldjük. A KV csak a más eszközről nyitott
+  //   eredmény-linkhez kell. Bekötés:
+  //     1) npx wrangler kv namespace create QUIZ_RESULTS
+  //     2) másold az id-t ide és vedd ki a kommentből:
+  //   "kv_namespaces": [
+  //     { "binding": "QUIZ_RESULTS", "id": "<KV_NAMESPACE_ID>" }
+  //   ],
+  /*
+   * Plaintext env vars are defined in the `vars` block above — they ship with
+   * every deploy and are the source of truth. Put ALL non-secret config here,
+   * NOT on the dashboard.
+   *
+   * IMPORTANT — what `--keep-vars` actually does (and does NOT do):
+   *   `--keep-vars` only stops the deploy from pre-deleting dashboard vars whose
+   *   name is NOT in this block. Any var name that IS in this block is re-applied
+   *   from this committed value on every deploy — the dashboard value is overwritten.
+   *   And a dashboard-only plaintext var (a name absent here) is wiped the moment
+   *   ANY deploy runs without --keep-vars. So a value that lives ONLY on the
+   *   dashboard is fragile. This is exactly what dropped GOOGLE_SHEETS_ID and
+   *   GOOGLE_SERVICE_ACCOUNT_EMAIL (June 2026) → Sheets writes silently no-op'd.
+   *   Fix: keep non-secret values committed here; keep secrets as Worker secrets.
+   *
+   * Secrets must be set via `wrangler secret put <NAME>` or the Cloudflare
+   * dashboard (encrypted, never committed):
+   *
+   *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)    [required]
+   *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)    [required]
+   *   EMAILOCTOPUS_API_KEY            — EmailOctopus v2 API key (hírlevél)      [required a hírlevélhez]
+   *   GOOGLE_SHEETS_ID                — existing leadlist sheet id              [optional]
+   *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account                  [optional]
+   *   GOOGLE_PRIVATE_KEY              — Google service account key              [optional]
+   *
+   * Server-side conversion tracking (Meta CAPI + GA4 MP + Google Ads) is no longer
+   * handled in this Worker. It now lives in the Soborbo/Serverside event-gateway
+   * worker, served same-origin at /api/event/*. The Meta/GA4/Ads secrets live in the
+   * gateway's SITE_CONFIG KV (per hostname), NOT here. See tracking-kit/server/SETUP-SERVER.md.
+   */
+}

@@ -1,0 +1,584 @@
+---
+/**
+ * QuizApp — a bőranalízis kvíz egylapos lépés-motorja.
+ *
+ * Minden kérdés egy „lépés"; a kliens állapotgép váltogatja őket
+ * (localStorage állapot, auto-advance, haladásjelző, böngésző-vissza).
+ * Az utolsó lépés a kontakt KAPU: csak beküldés után jön az eredmény.
+ *
+ * A lépéseket a config/questions.ts SECTIONS-ből rendereljük; a kliens
+ * a DOM data-* attribútumaiból dolgozik (egyetlen forrás: a renderelt HTML).
+ */
+import { SECTIONS, TOTAL_QUESTIONS } from '../../quiz/config/questions';
+import { t } from '../../quiz/lib/i18n';
+
+// Lapított lépéslista globális indexszel + szakaszcímmel.
+type Flat = {
+  globalIndex: number; // 1-alapú
+  sectionTitle: string;
+  sectionIntro?: string;
+  firstInSection: boolean;
+};
+const flat: Flat[] = [];
+let gi = 0;
+for (const section of SECTIONS) {
+  let first = true;
+  for (const _q of section.questions) {
+    gi += 1;
+    flat.push({
+      globalIndex: gi,
+      sectionTitle: section.title,
+      sectionIntro: first ? section.intro : undefined,
+      firstInSection: first,
+    });
+    first = false;
+  }
+}
+const total = TOTAL_QUESTIONS;
+const allQuestions = SECTIONS.flatMap((s) => s.questions);
+
+const turnstileSiteKey =
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
+  '0x4AAAAAADOTyE9gccGo16os';
+
+// TODO: adatkezelési tájékoztató — a meglévő oldal; egészségügyi adat
+// külön kezelési záradékát az operátor egészítse ki ezen az oldalon.
+const PRIVACY_URL = '/adatvedelmi-tajekoztato';
+---
+
+<div
+  id="quiz"
+  class="mx-auto w-full max-w-xl px-4 pb-28 pt-5 sm:pt-8"
+  data-total={total}
+>
+  {/* ---- Haladásjelző ---- */}
+  <div class="mb-6">
+    <div class="mb-2 flex items-center justify-between text-xs font-medium text-gray-500">
+      <span id="quiz-section-title">{flat[0].sectionTitle}</span>
+      <span><span id="quiz-progress-num">1</span> {t('quiz.of')} {total}</span>
+    </div>
+    <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+      <div
+        id="quiz-progress-bar"
+        class="h-full rounded-full bg-[#c53f75] transition-all duration-300 ease-out"
+        style={`width:${(1 / total) * 100}%`}
+      ></div>
+    </div>
+  </div>
+
+  {/* ---- Kérdés-lépések ---- */}
+  {allQuestions.map((q, i) => {
+    const meta = flat[i];
+    const isPicture = q.pictureCards === true;
+    return (
+      <section
+        class="quiz-step hidden"
+        data-step={i}
+        data-qid={q.id}
+        data-qtype={q.type}
+        data-section-title={meta.sectionTitle}
+        data-min-select={q.minSelect ?? 1}
+        data-auto-advance={q.type === 'radio' ? '200' : ''}
+      >
+        {meta.sectionIntro && (
+          <p class="mb-2 text-sm text-[#c53f75]">{meta.sectionIntro}</p>
+        )}
+        <h1 class="font-heading mb-1 text-2xl leading-snug text-gray-900 sm:text-3xl">
+          {q.question}
+        </h1>
+        {q.help && <p class="mb-4 text-sm text-gray-500">{q.help}</p>}
+
+        <div
+          class={
+            isPicture
+              ? 'mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3'
+              : 'mt-4 flex flex-col gap-2.5'
+          }
+        >
+          {q.options.map((opt) => (
+            <label
+              class={[
+                'quiz-card group relative flex cursor-pointer select-none items-center transition-all',
+                isPicture
+                  ? 'aspect-square flex-col justify-center rounded-2xl border-2 border-transparent bg-[#c53f75] p-3 text-center text-white shadow-sm hover:brightness-105'
+                  : 'gap-3 rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 text-gray-800 hover:border-[#c53f75]/50',
+              ].join(' ')}
+            >
+              {/* TODO: kép — képes kártyákhoz opcionális 1:1 illusztráció (opt.image) */}
+              <input
+                type={q.type === 'checkbox' ? 'checkbox' : 'radio'}
+                name={q.id}
+                value={opt.value}
+                class="peer sr-only"
+                data-exclusive={opt.exclusive ? 'true' : undefined}
+              />
+              {q.type === 'checkbox' && (
+                <span
+                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 border-gray-300 text-white peer-checked:border-[#c53f75] peer-checked:bg-[#c53f75]"
+                  aria-hidden="true"
+                >
+                  <svg class="hidden h-3 w-3 peer-checked:block" viewBox="0 0 12 10" fill="none">
+                    <path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              )}
+              <span class={isPicture ? 'text-sm font-medium leading-tight' : 'text-[15px] font-medium'}>
+                {opt.label}
+              </span>
+
+              {opt.revealText && (
+                <input
+                  type="text"
+                  name={opt.revealText.name}
+                  placeholder={opt.revealText.placeholder}
+                  aria-label={opt.revealText.label}
+                  maxlength="200"
+                  class="reveal-text mt-2 hidden w-full rounded-lg border-2 border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-[#c53f75] focus:outline-none"
+                />
+              )}
+            </label>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+
+  {/* ---- Kontakt KAPU (utolsó lépés) ---- */}
+  <section class="quiz-step hidden" data-step={total} data-qtype="gate" data-section-title="Eredményed">
+    <h1 class="font-heading mb-1 text-2xl leading-snug text-gray-900 sm:text-3xl">{t('gate.title')}</h1>
+    <p class="mb-5 text-sm text-gray-600">{t('gate.subtitle')}</p>
+
+    <form id="quiz-gate" class="space-y-4" novalidate>
+      {/* Honeypot */}
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;">
+        <label>Website (do not fill)<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+
+      <div>
+        <label for="gate-firstName" class="mb-1 block text-sm font-medium text-gray-700">{t('gate.firstName')} *</label>
+        <input id="gate-firstName" name="firstName" type="text" required minlength="2" maxlength="100" autocomplete="given-name"
+          class="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 focus:border-[#c53f75] focus:outline-none" placeholder="Anna" />
+      </div>
+
+      <div>
+        <label for="gate-phone" class="mb-1 block text-sm font-medium text-gray-700">{t('gate.phone')}</label>
+        <input id="gate-phone" name="phone" type="tel" maxlength="32" autocomplete="tel"
+          class="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 focus:border-[#c53f75] focus:outline-none" placeholder="+36 30 123 4567" />
+      </div>
+
+      <div>
+        <label for="gate-email" class="mb-1 block text-sm font-medium text-gray-700">{t('gate.email')}</label>
+        <input id="gate-email" name="email" type="email" maxlength="320" autocomplete="email"
+          class="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 focus:border-[#c53f75] focus:outline-none" placeholder="pelda@email.com" />
+        <p class="mt-1 text-xs text-gray-500">{t('gate.contactHint')}</p>
+      </div>
+
+      {/* GDPR — egészségügyi adat hozzájárulás (KÖTELEZŐ) */}
+      <div class="flex items-start gap-2 rounded-xl bg-[#c53f75]/5 p-3">
+        <input id="gate-consent" name="consentHealth" type="checkbox" required
+          class="mt-1 h-4 w-4 rounded border-gray-300 text-[#c53f75] focus:ring-[#c53f75]" />
+        <label for="gate-consent" class="text-xs leading-relaxed text-gray-600">
+          {t('gate.consentHealth')}{' '}
+          <a href={PRIVACY_URL} target="_blank" rel="noopener" class="text-[#c53f75] underline">{t('gate.privacyLink')}</a> *
+        </label>
+      </div>
+
+      {/* Hírlevél — OPCIONÁLIS, külön a kötelező egészségügyi consenttől (nincs bundle) */}
+      <div class="flex items-start gap-2 px-3">
+        <input id="gate-marketing" name="consentMarketing" type="checkbox"
+          class="mt-1 h-4 w-4 rounded border-gray-300 text-[#c53f75] focus:ring-[#c53f75]" />
+        <label for="gate-marketing" class="text-xs leading-relaxed text-gray-600">
+          {t('gate.consentMarketing')}
+        </label>
+      </div>
+
+      {/* Turnstile — EXPLICIT renderelés (createTurnstile). Az api.js page-globálisan
+          ?render=explicit-tel töltődik (<Turnstile/> a Layoutban), ezért NINCS
+          .cf-turnstile class: a sima konténert a createTurnstile rendereli. */}
+      {turnstileSiteKey && (
+        <div id="gate-turnstile" data-sitekey={turnstileSiteKey} class="min-h-[65px]"></div>
+      )}
+
+      <button type="submit"
+        class="w-full rounded-full bg-[#c53f75] py-3.5 font-semibold uppercase tracking-wide text-white transition hover:bg-[#a33460] disabled:cursor-not-allowed disabled:opacity-50">
+        <span class="gate-label">{t('gate.submit')}</span>
+        <span class="gate-spinner hidden">{t('gate.submitting')}</span>
+      </button>
+
+      <p class="gate-error hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></p>
+    </form>
+  </section>
+
+  {/* ---- Navigáció (Vissza + checkbox Tovább) ---- */}
+  <div class="mt-6 flex items-center justify-between">
+    <button id="quiz-back" type="button" class="hidden text-sm font-medium text-gray-500 hover:text-gray-800">
+      ← {t('quiz.back')}
+    </button>
+    <span></span>
+  </div>
+</div>
+
+{/* Sticky mobil CTA — checkbox lépéseknél jelenik meg (Tovább) */}
+<div id="quiz-sticky-cta" class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-gray-200 bg-white p-3 shadow-lg">
+  <button id="quiz-next" type="button"
+    class="mx-auto block w-full max-w-xl rounded-full bg-[#c53f75] py-3.5 font-semibold text-white transition hover:bg-[#a33460] disabled:opacity-40">
+    {t('quiz.next')} →
+  </button>
+</div>
+
+{/* Turnstile api.js is loaded once, page-globally, by <Turnstile/> in the Layout
+    with ?render=explicit — NOTHING auto-renders. The gate widget is rendered
+    programmatically by createTurnstile() (see ensureTurnstile below). */}
+
+<script>
+  import {
+    trackCalculatorStart,
+    trackCalculatorStep,
+    trackCalculatorOption,
+    trackCalculatorComplete,
+    trackLeadSubmit,
+    waitForTracking,
+    getAllTrackingData,
+    getFbc,
+    getFbp,
+    collectAttribution,
+  } from '@tracking/lib';
+  import { generateResultHash, resultStorageKey, resultPath } from '@/quiz/lib/hash';
+  import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
+
+  const STATE_KEY = 'bf_quiz_state';
+  const FORM_ID = 'boranalizis';
+
+  type QuizState = { idx: number; answers: Record<string, string | string[]>; startedAt: number };
+
+  function loadState(): QuizState {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (raw) return JSON.parse(raw) as QuizState;
+    } catch { /* ignore */ }
+    return { idx: 0, answers: {}, startedAt: Date.now() };
+  }
+  function saveState(s: QuizState) {
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(s)); } catch { /* ignore */ }
+  }
+  function clearState() {
+    try { localStorage.removeItem(STATE_KEY); } catch { /* ignore */ }
+  }
+
+  function init() {
+    const root = document.getElementById('quiz');
+    if (!root) return;
+    const total = Number(root.dataset.total || '0');
+    const steps = Array.from(document.querySelectorAll<HTMLElement>('.quiz-step'));
+    const lastIdx = steps.length - 1; // a kapu indexe
+    const progressBar = document.getElementById('quiz-progress-bar') as HTMLElement;
+    const progressNum = document.getElementById('quiz-progress-num') as HTMLElement;
+    const sectionTitle = document.getElementById('quiz-section-title') as HTMLElement;
+    const backBtn = document.getElementById('quiz-back') as HTMLButtonElement;
+    const stickyCta = document.getElementById('quiz-sticky-cta') as HTMLElement;
+    const nextBtn = document.getElementById('quiz-next') as HTMLButtonElement;
+
+    let state = loadState();
+    let started = false;
+
+    function markStarted() {
+      if (started) return;
+      started = true;
+      trackCalculatorStart('boranalizis_kviz');
+    }
+
+    function restoreAnswers(stepEl: HTMLElement) {
+      const qid = stepEl.dataset.qid;
+      if (!qid) return;
+      const saved = state.answers[qid];
+      const inputs = stepEl.querySelectorAll<HTMLInputElement>(`input[name="${qid}"]`);
+      inputs.forEach((inp) => {
+        if (Array.isArray(saved)) inp.checked = saved.includes(inp.value);
+        else inp.checked = saved === inp.value;
+        // szabad szöveg mező megjelenítése, ha az opció aktív
+        const reveal = inp.closest('label')?.querySelector<HTMLInputElement>('.reveal-text');
+        if (reveal) {
+          reveal.classList.toggle('hidden', !inp.checked);
+          const rsaved = state.answers[reveal.name];
+          if (typeof rsaved === 'string') reveal.value = rsaved;
+        }
+      });
+    }
+
+    function updateChrome(idx: number) {
+      const num = Math.min(idx + 1, total);
+      const pct = ((Math.min(idx, total) + (idx >= total ? 0 : 1)) / total) * 100;
+      progressBar.style.width = `${Math.min(pct, 100)}%`;
+      progressNum.textContent = String(num);
+      const el = steps[idx];
+      sectionTitle.textContent = el?.dataset.sectionTitle || '';
+      backBtn.classList.toggle('hidden', idx === 0);
+      // checkbox lépésnél sticky Tovább; egyébként rejtett
+      const isCheckbox = el?.dataset.qtype === 'checkbox';
+      stickyCta.classList.toggle('hidden', !isCheckbox);
+      if (isCheckbox) updateNextEnabled(el);
+    }
+
+    function show(idx: number, pushHistory = true) {
+      if (idx < 0 || idx >= steps.length) return;
+      steps.forEach((s, i) => s.classList.toggle('hidden', i !== idx));
+      state.idx = idx;
+      saveState(state);
+      updateChrome(idx);
+      if (pushHistory) history.pushState({ quizStep: idx }, '', '');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const el = steps[idx];
+      if (el?.dataset.qtype === 'gate') {
+        trackCalculatorStep('kontakt', idx);
+        ensureTurnstile();
+      } else if (el?.dataset.qid) {
+        trackCalculatorStep(el.dataset.qid, idx);
+      }
+    }
+
+    function updateNextEnabled(stepEl: HTMLElement) {
+      const min = Number(stepEl.dataset.minSelect || '1');
+      const checked = stepEl.querySelectorAll('input:checked').length;
+      nextBtn.disabled = checked < min;
+    }
+
+    function recordAnswer(stepEl: HTMLElement) {
+      const qid = stepEl.dataset.qid;
+      if (!qid) return;
+      const type = stepEl.dataset.qtype;
+      if (type === 'checkbox') {
+        const vals = Array.from(stepEl.querySelectorAll<HTMLInputElement>('input:checked')).map((i) => i.value);
+        state.answers[qid] = vals;
+      } else {
+        const sel = stepEl.querySelector<HTMLInputElement>('input:checked');
+        if (sel) state.answers[qid] = sel.value;
+      }
+      // szabad szöveg mezők mentése
+      stepEl.querySelectorAll<HTMLInputElement>('.reveal-text').forEach((rt) => {
+        const parentInput = rt.closest('label')?.querySelector<HTMLInputElement>('input[type="radio"],input[type="checkbox"]');
+        if (parentInput?.checked && rt.value.trim()) state.answers[rt.name] = rt.value.trim();
+        else delete state.answers[rt.name];
+      });
+      saveState(state);
+    }
+
+    // ---- Esemény-delegálás a lépéskonténerre ----
+    steps.forEach((stepEl, idx) => {
+      stepEl.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement;
+        if (!(target instanceof HTMLInputElement)) return;
+        markStarted();
+
+        // „Egyik sem" exkluzív logika
+        if (target.type === 'checkbox') {
+          if (target.dataset.exclusive === 'true' && target.checked) {
+            stepEl.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((cb) => {
+              if (cb !== target) cb.checked = false;
+            });
+          } else if (target.checked) {
+            const excl = stepEl.querySelector<HTMLInputElement>('input[data-exclusive="true"]');
+            if (excl) excl.checked = false;
+          }
+        }
+
+        // szabad szöveg megjelenítés radio/checkbox váltáskor
+        stepEl.querySelectorAll<HTMLInputElement>('input[type="radio"],input[type="checkbox"]').forEach((inp) => {
+          const reveal = inp.closest('label')?.querySelector<HTMLElement>('.reveal-text');
+          if (reveal) reveal.classList.toggle('hidden', !inp.checked);
+        });
+
+        recordAnswer(stepEl);
+        const qid = stepEl.dataset.qid || '';
+        const val = state.answers[qid];
+        trackCalculatorOption(qid, Array.isArray(val) ? val.join(',') : String(val ?? ''));
+
+        if (stepEl.dataset.qtype === 'radio' && target.type === 'radio') {
+          const delay = Number(stepEl.dataset.autoAdvance || '200');
+          setTimeout(() => goNext(idx), delay);
+        } else if (stepEl.dataset.qtype === 'checkbox') {
+          updateNextEnabled(stepEl);
+        }
+      });
+
+      // szabad szöveg input mentése gépeléskor
+      stepEl.querySelectorAll<HTMLInputElement>('.reveal-text').forEach((rt) => {
+        rt.addEventListener('input', () => recordAnswer(stepEl));
+      });
+    });
+
+    function goNext(fromIdx: number) {
+      if (state.idx !== fromIdx) return; // időközben elnavigált
+      show(Math.min(fromIdx + 1, lastIdx));
+    }
+
+    nextBtn.addEventListener('click', () => goNext(state.idx));
+    backBtn.addEventListener('click', () => { if (state.idx > 0) history.back(); });
+
+    window.addEventListener('popstate', (e) => {
+      const s = (e.state && (e.state as { quizStep?: number }).quizStep);
+      if (typeof s === 'number') show(s, false);
+      else show(Math.max(0, state.idx - 1), false);
+    });
+
+    // ---- Turnstile a kapuban (EXPLICIT renderelés) ----
+    // Az api.js ?render=explicit-tel töltődik, ezért a widgetet MAGUNK rendereljük
+    // a createTurnstile helperrel (mint a ContactForm / konzultációs kalkulátor).
+    // A korábbi „auto-render” feltételezés miatt a widget sosem renderelt → üres
+    // token → minden beküldés a Turnstile-nél bukott (LEAD-FLOW-INCIDENT).
+    const turnstileEl = document.querySelector<HTMLElement>('#gate-turnstile[data-sitekey]');
+    let turnstile: TurnstileHandle | null = null;
+    if (turnstileEl) {
+      turnstile = createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '');
+    }
+    function ensureTurnstile() {
+      // A végső lépés láthatóvá válásakor rendereljük, hogy a token a beküldésre kész legyen.
+      turnstile?.ensureRendered();
+    }
+
+    // ---- Kapu beküldés ----
+    setupGate();
+    function setupGate() {
+      const form = document.getElementById('quiz-gate') as HTMLFormElement;
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = form.querySelector<HTMLElement>('.gate-error')!;
+        const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+        const label = form.querySelector<HTMLElement>('.gate-label');
+        const spinner = form.querySelector<HTMLElement>('.gate-spinner');
+        const showErr = (m: string) => { errEl.textContent = m; errEl.classList.remove('hidden'); };
+
+        if (Date.now() - state.startedAt < 3000) { showErr('Túl gyors küldés. Kérjük próbáld újra pár másodperc múlva.'); return; }
+
+        const fd = new FormData(form);
+        const firstName = String(fd.get('firstName') || '').trim();
+        const phone = String(fd.get('phone') || '').trim();
+        const email = String(fd.get('email') || '').trim();
+        const consentHealth = fd.get('consentHealth') === 'on';
+        const consentMarketing = fd.get('consentMarketing') === 'on';
+        const website = String(fd.get('website') || '');
+
+        errEl.classList.add('hidden');
+        if (website) { clearState(); window.location.href = '/koszonjuk'; return; }
+        if (firstName.length < 2) { showErr('Kérjük add meg a keresztneved.'); return; }
+        if (!phone && !email) { showErr('Kérjük adj meg telefonszámot vagy email címet.'); return; }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Kérjük adj meg egy érvényes email címet.'); return; }
+        if (!consentHealth) { showErr('Az egészségügyi adatok kezeléséhez való hozzájárulás kötelező.'); return; }
+
+        btn.disabled = true; label?.classList.add('hidden'); spinner?.classList.remove('hidden');
+
+        const t = getAllTrackingData();
+        const c = collectAttribution();
+        const attr = {
+          gclid: t.gclid || c.gclid || '', fbclid: t.fbclid || c.fbclid || '',
+          gbraid: t.gbraid || c.gbraid || '', wbraid: t.wbraid || c.wbraid || '', msclkid: c.msclkid || '',
+          fbc: getFbc() || '', fbp: getFbp() || '',
+          utm_source: t.utm_source || '', utm_medium: t.utm_medium || '', utm_campaign: t.utm_campaign || '',
+          utm_content: t.utm_content || '', utm_term: t.utm_term || '',
+        };
+        const hash = generateResultHash();
+        const payload = {
+          hash,
+          answers: state.answers,
+          firstName,
+          phone,
+          email,
+          consentHealth,
+          consentMarketing,
+          consentAt: new Date().toISOString(),
+          website,
+          turnstileToken: turnstile ? turnstile.getToken() : '',
+          gclid: attr.gclid || '', fbclid: attr.fbclid || '',
+          gbraid: attr.gbraid || '', wbraid: attr.wbraid || '', msclkid: attr.msclkid || '',
+          fbc: attr.fbc || '', fbp: attr.fbp || '',
+          utm_source: attr.utm_source || '', utm_medium: attr.utm_medium || '',
+          utm_campaign: attr.utm_campaign || '', utm_content: attr.utm_content || '', utm_term: attr.utm_term || '',
+        };
+
+        // Még nincs Turnstile-token (a widget tölt / lejárt) — ne küldjünk token nélküli
+        // body-t, amit a szerver 400-zal dobna. Megbökjük a widgetet és újrapróbálásra kérünk.
+        if (turnstileEl && !payload.turnstileToken) {
+          turnstile?.ensureRendered();
+          showErr('A robot-ellenőrzés még tölt. Kérjük várj egy pillanatot, majd próbáld újra.');
+          btn.disabled = false; label?.classList.remove('hidden'); spinner?.classList.add('hidden');
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/boranalizis', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string }; error?: string };
+
+          if (result.success && result.hash) {
+            try { localStorage.setItem(resultStorageKey(result.hash), JSON.stringify(result.result)); } catch { /* ignore */ }
+            clearState();
+            const value = result.arSav ? Math.round((result.arSav.min + result.arSav.max) / 2) : 5000;
+            trackCalculatorComplete('boranalizis_kviz');
+            // Canonical conversion — dataLayer `lead_submit` (browser GTM) + gateway
+            // `contact_form_submit` (Meta CAPI + Google Ads), sharing one event_id.
+            trackLeadSubmit({
+              email: email || '',
+              phone,
+              firstName,
+              value,
+              contentName: 'boranalizis_kviz',
+              eventName: 'contact_form_submit',
+            });
+            await waitForTracking(600);
+            // A kvíz kitöltőjét a saját publikus bőrtípus-oldalára érkeztetjük
+            // (a 16 Baumann-oldal a becsapódási pont). Ha a kód valamiért
+            // hiányzik, a régi privát eredményoldalra esünk vissza.
+            if (result.baumann?.slug) {
+              window.location.href = `/bortipus/${result.baumann.slug}`;
+            } else {
+              window.location.href = resultPath(result.hash);
+            }
+          } else {
+            showErr(result.error || 'Hiba történt. Kérjük próbáld újra.');
+            // Egyszer-használatos token elfogyott — reset, hogy a vendég újra tudja küldeni.
+            turnstile?.reset();
+          }
+        } catch {
+          showErr('Hálózati hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
+        } finally {
+          btn.disabled = false; label?.classList.remove('hidden'); spinner?.classList.add('hidden');
+        }
+      });
+    }
+
+    // ---- Indítás: visszaállítás localStorage-ből ----
+    steps.forEach((s) => restoreAnswers(s));
+    const startIdx = Math.min(Math.max(state.idx, 0), lastIdx);
+    history.replaceState({ quizStep: startIdx }, '', '');
+    show(startIdx, false);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  /* Kiválasztott radio-kártya (nem képes) */
+  .quiz-card:has(input[type="radio"]:checked) {
+    border-color: #c53f75;
+    background-color: rgba(197, 63, 117, 0.06);
+  }
+  /* Kiválasztott képes kártya: kiemelt keret */
+  .quiz-card.aspect-square:has(input:checked) {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px #c53f75, 0 8px 20px -8px rgba(197, 63, 117, 0.6);
+  }
+  /* Checkbox pipa megjelenítése (peer-checked Tailwind helyett robusztus CSS) */
+  .quiz-card:has(input[type="checkbox"]:checked) {
+    border-color: #c53f75;
+    background-color: rgba(197, 63, 117, 0.06);
+  }
+  .quiz-card input[type="checkbox"]:checked ~ span svg { display: block; }
+  .quiz-card input[type="checkbox"]:checked ~ span {
+    border-color: #c53f75;
+    background-color: #c53f75;
+  }
+</style>

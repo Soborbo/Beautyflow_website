@@ -19,7 +19,6 @@ import nyitva from '../../assets/images/nyitva.jpg';
 import notinoLogoSm from '../../assets/images/logok/notino-logo-sm.jpg';
 import skinlabLogo from '../../assets/images/logok/skinlab.webp';
 import testmeret from '../../assets/images/testmeret.jpg';
-import aiVezreltGepek from '../../assets/images/ai-vezrelt-gepek.jpg';
 
 const stats = [
   { value: '10+ years', label: 'experience' },
@@ -30,7 +29,7 @@ const stats = [
 
 const testimonials = [
   {
-    text: 'After the HydraBeauty treatment, my skin became so soft and radiant that I went to work without makeup the next day. I love it!',
+    text: 'After the Hydratouch treatment, my skin became so soft and radiant that I went to work without makeup the next day. I love it!',
     author: 'Eszter',
   },
   {
@@ -43,18 +42,18 @@ const testimonials = [
   }
 ];
 
-// HydroFacial prices
+// Hydratouch prices
 const hydrofacialAreas = [
-  { id: 'face', name: 'Face', duration: '60 min', price: 20000 },
-  { id: 'back', name: 'Back', duration: '90 min', price: 25000 },
-  { id: 'face-neck-decolletage', name: 'Face + neck + decolletage', duration: '100 min', price: 30000 },
+  { id: 'face', name: 'Face', duration: '75 min', price: 30000 },
+  { id: 'back', name: 'Back', duration: '90 min', price: 35000 },
+  { id: 'face-neck-decolletage', name: 'Face + neck + decolletage', duration: '105 min', price: 40000 },
 ];
 
-// HydroFacial + Carbon Peeling prices
+// Hydratouch + Carbon Peeling prices
 const hydrofacialCarbonAreas = [
-  { id: 'face', name: 'Face', duration: '100 min', price: 40000 },
-  { id: 'face-decolletage', name: 'Face + decolletage', duration: '120 min', price: 45000 },
-  { id: 'back', name: 'Back', duration: '120 min', price: 45000 },
+  { id: 'face', name: 'Face', duration: '105 min', price: 45000 },
+  { id: 'face-decolletage', name: 'Face + decolletage', duration: '120 min', price: 50000 },
+  { id: 'back', name: 'Back', duration: '120 min', price: 55000 },
 ];
 
 const howItWorks = [
@@ -81,22 +80,22 @@ const howItWorks = [
 ];
 
 const faqs = [
-  { question: 'How painful is the HydraBeauty treatment?', answer: 'The treatment is completely painless! Many people find it a pleasant, relaxing experience. The vacuum cleansing involves a mild suction sensation, but it is not uncomfortable at all.' },
-  { question: 'Who is HydraBeauty recommended for?', answer: 'Everyone! It is suitable for oily, acne-prone, dry, sensitive, or mature skin alike. We always customize the treatment according to your skin type.' },
+  { question: 'How painful is the Hydratouch treatment?', answer: 'The treatment is completely painless! Many people find it a pleasant, relaxing experience. The vacuum cleansing involves a mild suction sensation, but it is not uncomfortable at all.' },
+  { question: 'Who is Hydratouch recommended for?', answer: 'Everyone! It is suitable for oily, acne-prone, dry, sensitive, or mature skin alike. We always customize the treatment according to your skin type.' },
   { question: 'How often should it be repeated?', answer: 'For optimal results, we recommend 1-2 sessions per month. For special skin problems, more frequently at first, then less often for maintenance treatments.' },
-  { question: 'Is there any downtime after the treatment?', answer: 'None! After HydraBeauty, you can immediately return to your daily activities. In fact, your skin will be so beautiful that you can go anywhere without makeup.' },
+  { question: 'Is there any downtime after the treatment?', answer: 'None! After Hydratouch, you can immediately return to your daily activities. In fact, your skin will be so beautiful that you can go anywhere without makeup.' },
   { question: 'Can I apply makeup after the treatment?', answer: 'Yes, but we recommend letting your skin rest for at least a few hours. Besides, your clean, radiant skin won\'t need much makeup anyway!' },
-  { question: 'How is it different from other facial treatments?', answer: 'HydraBeauty uniquely combines deep cleansing, exfoliation, and hydration in a single treatment. No skin irritation, no redness, just immediate results.' },
-  { question: 'Can the treatment be done during pregnancy?', answer: 'Yes, HydraBeauty is safe during pregnancy as it is gentle and does not contain aggressive chemicals. Of course, please consult with your doctor.' },
+  { question: 'How is it different from other facial treatments?', answer: 'Hydratouch uniquely combines deep cleansing, exfoliation, and hydration in a single treatment. No skin irritation, no redness, just immediate results.' },
+  { question: 'Can the treatment be done during pregnancy?', answer: 'Yes, Hydratouch is safe during pregnancy as it is gentle and does not contain aggressive chemicals. Of course, please consult with your doctor.' },
   { question: 'How long-lasting are the results?', answer: 'The immediate glow is visible for 1-2 weeks. With regular treatments, the skin condition continuously improves, and you can maintain the results long-term.' },
-  { question: 'What if I have sensitive skin?', answer: 'HydraBeauty is especially gentle and perfect for sensitive skin! We always adjust the treatment to your skin type and use only premium, skin-friendly products.' },
-  { question: 'Can it be combined with other treatments?', answer: 'Yes! HydraBeauty combines excellently with Carbon Peeling for even more impressive results. Ask our specialist about the optimal combination.' },
+  { question: 'What if I have sensitive skin?', answer: 'Hydratouch is especially gentle and perfect for sensitive skin! We always adjust the treatment to your skin type and use only premium, skin-friendly products.' },
+  { question: 'Can it be combined with other treatments?', answer: 'Yes! Hydratouch combines excellently with Carbon Peeling for even more impressive results. Ask our specialist about the optimal combination.' },
 ];
 ---
 
 <Layout
-  title="HydraBeauty Facial Treatment Budapest - Deep Cleansing and Hydration | Beautyflow"
-  description="Professional HydraBeauty facial treatment in Budapest. Painless deep cleansing, hydration, and skin rejuvenation in a single treatment. Immediate results! Request a free consultation!"
+  title="Hydratouch Facial Treatment Budapest - Deep Cleansing and Hydration | Beautyflow"
+  description="Professional Hydratouch facial treatment in Budapest. Painless deep cleansing, hydration, and skin rejuvenation in a single treatment. Immediate results! Request a free consultation!"
   lang="en"
 >
   <!-- FAQ Schema -->
@@ -122,12 +121,12 @@ const faqs = [
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://beautyflow.pro/en/"
+        "item": "https://beautyflow.pro/en"
       },
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "HydraBeauty Facial Treatment",
+        "name": "Hydratouch Facial Treatment",
         "item": "https://beautyflow.pro/en/hydrabeauty"
       }
     ]
@@ -137,9 +136,9 @@ const faqs = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": "HydraBeauty Facial Treatment",
-    "name": "HydraBeauty Facial Treatment Budapest",
-    "description": "Professional HydraBeauty facial treatment in Budapest. Painless deep cleansing, hydration, and skin rejuvenation.",
+    "serviceType": "Hydratouch Facial Treatment",
+    "name": "Hydratouch Facial Treatment Budapest",
+    "description": "Professional Hydratouch facial treatment in Budapest. Painless deep cleansing, hydration, and skin rejuvenation.",
     "provider": {
       "@type": "LocalBusiness",
       "name": "Beautyflow Beauty Salon",
@@ -169,12 +168,12 @@ const faqs = [
     },
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "HydraBeauty services",
+      "name": "Hydratouch services",
       "itemListElement": hydrofacialAreas.map(item => ({
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": `HydraBeauty - ${item.name}`
+          "name": `Hydratouch - ${item.name}`
         },
         "price": item.price.toString(),
         "priceCurrency": "HUF"
@@ -208,13 +207,13 @@ const faqs = [
           </div>
 
           <h1 class="text-[#c53f75] font-semibold uppercase tracking-wider text-sm lg:text-base mb-2">
-            HydraBeauty Facial Treatment in Budapest
+            Hydratouch Facial Treatment in Budapest
           </h1>
           <h2 class="font-heading text-[1.75rem] lg:text-[2.25rem] text-gray-900 mb-3 uppercase leading-tight">
             Get youthful and radiant skin without pain or needles
           </h2>
           <p class="text-gray-600 mb-6 text-base lg:text-lg max-w-lg mx-auto">
-            Tired of makeup just hiding your fatigue? The HydraBeauty treatment deeply cleanses, hydrates, and rejuvenates your skin - with visible changes from the very first session.
+            Tired of makeup just hiding your fatigue? The Hydratouch treatment deeply cleanses, hydrates, and rejuvenates your skin - with visible changes from the very first session.
           </p>
 
           <!-- CTA row -->
@@ -242,7 +241,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 order-1 lg:order-2 relative overflow-hidden min-h-[300px] lg:min-h-0">
         <ContentImage
           src={hydrabeautyArckezeles}
-          alt="HydraBeauty facial treatment Budapest"
+          alt="Hydratouch facial treatment Budapest"
           class="w-full h-full object-cover"
           priority={true}
         />
@@ -295,7 +294,7 @@ const faqs = [
           <div class="w-full lg:w-2/5 flex-shrink-0 relative">
             <ContentImage
               src={konyaFanniSzepsegszalonja}
-              alt="Fanni Konya HydraBeauty specialist"
+              alt="Fanni Konya Hydratouch specialist"
               class="w-full h-auto lg:absolute lg:inset-0 lg:h-full object-cover object-top"
             />
             <!-- Mobile signature - right below image -->
@@ -317,10 +316,10 @@ const faqs = [
               If you feel in the morning that no matter how good the cream or foundation you apply, your skin looks dull and tired, then you know exactly how frustrating it is when nothing brings that freshness you want. <strong>Blackheads, enlarged pores, or fine lines can further diminish your confidence.</strong>
             </p>
             <p class="text-gray-700 mb-5 text-base leading-relaxed">
-              The HydraBeauty treatment offers a solution for exactly this: it painlessly cleanses the pores, hydrates the skin, and fills it with special active ingredients so that <strong>your face immediately becomes fresher, more radiant, and firmer</strong>. You will see and feel the difference after the very first session - your skin will be smoother, softer, and more youthful.
+              The Hydratouch treatment offers a solution for exactly this: it painlessly cleanses the pores, hydrates the skin, and fills it with special active ingredients so that <strong>your face immediately becomes fresher, more radiant, and firmer</strong>. You will see and feel the difference after the very first session - your skin will be smoother, softer, and more youthful.
             </p>
             <p class="text-gray-700 mb-6 text-base leading-relaxed">
-              <strong>If you have oily skin, constantly struggle with blackheads and enlarged pores, or just want to preserve your skin's youthfulness and health, the HydraBeauty treatment was made for you!</strong>
+              <strong>If you have oily skin, constantly struggle with blackheads and enlarged pores, or just want to preserve your skin's youthfulness and health, the Hydratouch treatment was made for you!</strong>
             </p>
             <!-- Desktop signature -->
             <div class="hidden lg:flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -346,7 +345,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
-          alt="Younger skin with HydraBeauty treatment"
+          alt="Younger skin with Hydratouch treatment"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -356,7 +355,7 @@ const faqs = [
             Younger skin without needles
           </h2>
           <p class="text-gray-700 mb-6">
-            The HydraBeauty treatment is one of the most popular facial treatments in modern skincare, offering <strong>deep cleansing, hydration, and skin rejuvenation in a single, gentle treatment</strong>. This painless, relaxing procedure is recommended for all skin types and provides visible results from the very first session.
+            The Hydratouch treatment is one of the most popular facial treatments in modern skincare, offering <strong>deep cleansing, hydration, and skin rejuvenation in a single, gentle treatment</strong>. This painless, relaxing procedure is recommended for all skin types and provides visible results from the very first session.
           </p>
         </div>
       </div>
@@ -387,7 +386,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <ContentImage
           src={hydrabeauty}
-          alt="HydraBeauty deep cleansing"
+          alt="Hydratouch deep cleansing"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -400,7 +399,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeautyArckezeles}
-          alt="HydraBeauty hydration"
+          alt="Hydratouch hydration"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -433,7 +432,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden order-1 lg:order-2">
         <ContentImage
           src={hydrabeautyArckezelesBeautyflow}
-          alt="HydraBeauty vitamins"
+          alt="Hydratouch vitamins"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -446,7 +445,7 @@ const faqs = [
       <div class="w-full lg:w-1/2 relative overflow-hidden">
         <ContentImage
           src={hydrabeauty}
-          alt="HydraBeauty immediate results"
+          alt="Hydratouch immediate results"
           class="w-full h-64 lg:h-full object-cover transition-transform duration-700 hover:scale-105"
         />
       </div>
@@ -475,7 +474,7 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        HydraBeauty Prices
+        Hydratouch Prices
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
         Choose the treatment and area that suits you best
@@ -540,7 +539,7 @@ const faqs = [
     <div class="lg:hidden">
       <ContentImage
         src={hydrabeautyArckezeles}
-        alt="HydraBeauty treatment process"
+        alt="Hydratouch treatment process"
         class="w-full h-64 object-cover object-top"
       />
     </div>
@@ -611,8 +610,7 @@ const faqs = [
             <ContentImage
               src={konyaFanniSzepsegszalonja}
               alt="Fanni Konya consultation"
-              class="w-full h-full object-cover object-top"
-              style="min-height: 350px;"
+              class="w-full h-full min-h-[350px] object-cover object-top"
             />
             <div class="absolute bottom-6 left-0 right-0 text-center">
               <p class="font-semibold text-gray-900 bg-white/90 inline-block px-4 py-2 leading-tight">
@@ -629,7 +627,7 @@ const faqs = [
             </h2>
 
             <p class="text-gray-700 mb-2 text-sm">
-              <span class="font-semibold">Let's talk before you start your HydraBeauty treatment!</span>
+              <span class="font-semibold">Let's talk before you start your Hydratouch treatment!</span>
             </p>
             <p class="text-gray-600 mb-3 text-sm">
               During a FREE session of about 15 minutes, we will discuss:
@@ -637,7 +635,7 @@ const faqs = [
 
             <ul class="text-gray-600 mb-4 space-y-1 list-disc pl-5 text-sm">
               <li>what skin problems you want to address</li>
-              <li>which HydraBeauty package is best for you</li>
+              <li>which Hydratouch package is best for you</li>
               <li>whether it should be combined with other treatments</li>
               <li>what immediate and long-term results you can expect</li>
             </ul>
@@ -723,7 +721,7 @@ const faqs = [
   <section class="py-16 bg-white">
     <div class="max-w-[1100px] mx-auto px-4">
       <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-4 text-center uppercase">
-        Why choose Beautyflow HydraBeauty treatment?
+        Why choose Beautyflow Hydratouch treatment?
       </h2>
       <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
         With over a decade of experience and premium technology, we guarantee radiant results.
@@ -734,15 +732,15 @@ const faqs = [
         <div class="bg-[#fdf8f6] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
-              src={aiVezreltGepek}
-              alt="HydraBeauty premium technology"
+              src={mestersegesIntelligencia}
+              alt="Hydratouch premium technology"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Premium technology</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              We work with the latest generation HydraBeauty machine, which gently yet effectively cleanses and hydrates your skin.
+              We work with the latest generation Hydratouch machine, which gently yet effectively cleanses and hydrates your skin.
             </p>
           </div>
         </div>
@@ -752,14 +750,14 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={testmeret}
-              alt="Personalized HydraBeauty"
+              alt="Personalized Hydratouch"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Personalized treatment</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              We customize every HydraBeauty treatment to your skin type and needs. No two treatments are alike!
+              We customize every Hydratouch treatment to your skin type and needs. No two treatments are alike!
             </p>
           </div>
         </div>
@@ -776,7 +774,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Relaxing experience</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              HydraBeauty with us is not just a treatment, but a true wellness experience. We welcome you with coffee and full attention.
+              Hydratouch with us is not just a treatment, but a true wellness experience. We welcome you with coffee and full attention.
             </p>
           </div>
         </div>
@@ -786,7 +784,7 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={higienia}
-              alt="Sterile HydraBeauty environment"
+              alt="Sterile Hydratouch environment"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -803,7 +801,7 @@ const faqs = [
           <div class="aspect-[4/3] overflow-hidden">
             <CardImage
               src={hydrabeautyArckezeles}
-              alt="HydraBeauty immediate results"
+              alt="Hydratouch immediate results"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
@@ -827,7 +825,7 @@ const faqs = [
           <div class="p-5">
             <h3 class="font-heading text-lg text-gray-900 mb-2 uppercase">Open 7 days a week</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
-              We are open on weekends too! We know weekdays are busy - that's why you can book a HydraBeauty treatment on weekends as well.
+              We are open on weekends too! We know weekdays are busy - that's why you can book a Hydratouch treatment on weekends as well.
             </p>
           </div>
         </div>
@@ -874,7 +872,7 @@ const faqs = [
         Ready for radiant skin?
       </h2>
       <p class="text-white/90 mb-8 text-lg">
-        Book a free consultation appointment and experience the magic of HydraBeauty!
+        Book a free consultation appointment and experience the magic of Hydratouch!
       </p>
       <a
         href="/en/free-consultation"

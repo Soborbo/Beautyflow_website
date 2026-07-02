@@ -3,6 +3,7 @@ export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
 import { ContentImage, CardImage, FixedImage } from '../components/images';
+import ContactForm from '../components/ContactForm.astro';
 
 // Image imports
 import beautyflowPestImg from '../assets/images/Beautyflow-Pest.jpg';
@@ -54,7 +55,7 @@ const location = {
     'Carbon peeling',
     'Pigmentfolt eltávolítás',
   ],
-  parking: 'Ingyenes utcai parkolás közvetlenül a szalon előtt. A Duna Plaza parkolóháza 10 perc sétára.',
+  parking: 'Fizetős utcai parkolás a Reitter Ferenc utcánál (300 Ft/óra). Ingyenes parkolási lehetőség a környéken nincs.',
   publicTransport: 'A 3-as metró Dózsa György út vagy Gyöngyösi utca megállójából 8-10 perc séta. A 14-es villamos és több autóbuszjárat (26, 32) is megáll a közelben.',
   accessibility: 'Akadálymentes bejárat és mosdó.',
 };
@@ -623,6 +624,27 @@ const notinoUrl = location.bookingUrl;
     </div>
   </section>
 
+  <!-- Contact Form Section -->
+  <section class="py-12 lg:py-16 bg-white" id="kapcsolat-form">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-3">
+            Írj a pesti szalonnak
+          </h2>
+          <p class="text-gray-600">
+            Bármilyen kérdésed van a kezelésekkel, időpontokkal kapcsolatban — küldj üzenetet, és hamarosan visszahívunk.
+          </p>
+        </div>
+        <ContactForm
+          location="pest"
+          title="Üzenj nekünk"
+          subtitle="Töltsd ki az űrlapot, és Fanni csapata jelentkezik."
+        />
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ Section specific to location -->
   <section class="py-12 lg:py-16 bg-[#fdf8f6]">
     <div class="container mx-auto px-4">
@@ -648,7 +670,7 @@ const notinoUrl = location.bookingUrl;
 
           <div class="faq-item bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
             <button class="faq-question w-full flex items-center justify-between p-6 cursor-pointer text-left" aria-expanded="false">
-              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">Van ingyenes parkolási lehetőség?</span>
+              <span class="faq-question-text font-semibold text-gray-900 transition-colors duration-300">Van parkolási lehetőség a szalon közelében?</span>
               <svg class="faq-icon w-5 h-5 text-[#c53f75] transition-transform duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>

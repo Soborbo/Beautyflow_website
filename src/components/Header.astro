@@ -1,5 +1,5 @@
 ---
-import { type Locale, defaultLang, getLocalizedPath, getAlternateRoute } from '../i18n';
+import { type Locale, defaultLang, getLocalizedPath, getAlternateRoute, stripTrailingSlash } from '../i18n';
 
 interface Props {
   lang?: Locale;
@@ -27,6 +27,9 @@ const menuItems: Record<Locale, MenuItem[]> = {
         { label: 'Carbon Peeling', href: '/carbon-peeling' },
         { label: 'Hydrabeauty', href: '/hydrabeauty' },
         { label: 'Pigmentfolt eltávolítás', href: '/pigmentfolt-eltavolitas' },
+        { label: 'Green Sea Peel', href: '/green-sea-peel' },
+        { label: 'Biopen Q2', href: '/biopen-q2' },
+        { label: 'Anti Aging', href: '/anti-aging' },
       ]
     },
     {
@@ -60,6 +63,9 @@ const menuItems: Record<Locale, MenuItem[]> = {
         { label: 'Carbon Peeling', href: '/carbon-peeling' },
         { label: 'Hydrabeauty', href: '/hydrabeauty' },
         { label: 'Pigment Removal', href: '/pigment-removal' },
+        { label: 'Green Sea Peel', href: '/green-sea-peel' },
+        { label: 'Biopen Q2', href: '/biopen-q2' },
+        { label: 'Anti Aging', href: '/anti-aging' },
       ]
     },
     {
@@ -101,8 +107,8 @@ const callNowLabel = lang === 'hu' ? 'Hívj minket' : 'Call us';
 const closeMenuLabel = lang === 'hu' ? 'Menü bezárása' : 'Close menu';
 
 // Language switcher - get the path without language prefix for route mapping
-const currentPath = Astro.url.pathname;
-const pathWithoutLang = currentPath.replace(/^\/(en)/, '') || '/';
+const currentPath = stripTrailingSlash(Astro.url.pathname);
+const pathWithoutLang = stripTrailingSlash(currentPath.replace(/^\/en(?=\/|$)/, '') || '/');
 const huPath = getAlternateRoute(pathWithoutLang, lang, 'hu');
 const enPath = getAlternateRoute(pathWithoutLang, lang, 'en');
 

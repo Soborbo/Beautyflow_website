@@ -1,0 +1,194 @@
+---
+/**
+ * /eredmeny/[hash] — a személyre szabott bőrprofil + javasolt IRÁNY.
+ *
+ * Csak a kontakt beküldése után érhető el értelmesen (kapu).
+ * Az eredmény forrása sorrendben:
+ *   1. KV (QUIZ_RESULTS) — ha be van kötve (cross-device, email-link).
+ *   2. localStorage (ugyanazon az eszközön) — kliensoldali fallback.
+ *   3. „Elküldtük emailben" üzenet.
+ *
+ * Az eredmény IRÁNY, NEM diagnózis (kötelező figyelmeztetés a UI-ban).
+ */
+import QuizLayout from '../../layouts/QuizLayout.astro';
+import { isValidResultHash } from '../../quiz/lib/hash';
+import { t } from '../../quiz/lib/i18n';
+import type { Recommendation } from '../../quiz/lib/types';
+import { env as cfEnv } from 'cloudflare:workers';
+
+export const prerender = false;
+
+const { hash } = Astro.params;
+const validHash = typeof hash === 'string' && isValidResultHash(hash);
+
+// KV olvasás, ha a binding be van kötve (lásd wrangler.jsonc TODO).
+// Astro 6 / @astrojs/cloudflare v13: a binding a `cloudflare:workers`
+// env modulból jön (a régi Astro.locals.runtime.env már dob).
+let serverResult: Recommendation | null = null;
+if (validHash) {
+  const kv = (cfEnv as Record<string, unknown>).QUIZ_RESULTS as { get?: (k: string, t: 'json') => Promise<unknown> } | undefined;
+  if (kv?.get) {
+    try {
+      serverResult = (await kv.get(hash as string, 'json')) as Recommendation | null;
+    } catch { /* best-effort — fallback localStorage-ra */ }
+  }
+}
+
+const PHONE = '+36 1 300 9414';
+const PHONE_HREF = 'tel:+3613009414';
+---
+
+<QuizLayout title="A bőrprofilod | Beautyflow">
+  <div id="result-root" class="mx-auto w-full max-w-2xl px-4 py-8" data-hash={validHash ? hash : ''}>
+    {serverResult && (
+      <script id="quiz-result-data" type="application/json" set:html={JSON.stringify(serverResult)} is:inline />
+    )}
+
+    <!-- Tartalom ide renderelődik kliensoldalon (#result-body) -->
+    <div id="result-body"></div>
+
+    <!-- Fallback: nincs adat ezen az eszközön -->
+    <div id="result-fallback" class="hidden rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
+      <h1 class="font-heading mb-3 text-2xl text-gray-900">A bőrprofilod úton van ✨</h1>
+      <p class="text-gray-600">{t('result.notFound')}</p>
+      <a href={PHONE_HREF} class="mt-5 inline-block rounded-full bg-[#c53f75] px-6 py-3 font-semibold text-white hover:bg-[#a33460]">
+        Hívj minket: {PHONE}
+      </a>
+    </div>
+  </div>
+</QuizLayout>
+
+<script>
+  import { resultStorageKey } from '@/quiz/lib/hash';
+  import { hasAnalyticsConsent } from '@tracking/lib';
+  import type { Recommendation } from '@/quiz/lib/types';
+
+  const PHONE = '+36 1 300 9414';
+  const PHONE_HREF = 'tel:+3613009414';
+  const NOT_DIAGNOSIS =
+    'A pontos kezelési tervet csak személyesen, fényben és tapintással végzett vizsgálat után tudjuk megadni. Ez az eredmény kozmetikai konzultációs irány, nem orvosi diagnózis.';
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  }
+
+  function priceLabel(r: Recommendation): string {
+    if (r.arSav) return r.arSav.formatted;
+    return 'A személyes analízis után pontosítjuk';
+  }
+
+  function render(r: Recommendation) {
+    const body = document.getElementById('result-body')!;
+    const isSafeRoute = r.safe;
+    const treatmentsHtml = r.treatments
+      .map(
+        (tr, i) => `
+        <div class="rounded-xl border border-gray-200 bg-white p-5 ${i === 0 ? 'ring-1 ring-[#c53f75]/30' : ''}">
+          <h3 class="font-heading text-xl text-gray-900">${esc(tr.name)}</h3>
+          <p class="mt-1 text-sm leading-relaxed text-gray-600">${esc(tr.blurb)}</p>
+          ${tr.locationNote ? `<p class="mt-2 text-xs font-medium text-[#c53f75]">${esc(tr.locationNote)}</p>` : ''}
+        </div>`,
+      )
+      .join('');
+
+    const kontra = (r.kontraindikaciok || [])
+      .map((k) => `<li class="flex gap-2"><span class="text-[#c53f75]">•</span><span>${esc(k)}</span></li>`)
+      .join('');
+
+    body.innerHTML = `
+      <header class="mb-6 text-center">
+        <p class="text-sm font-medium uppercase tracking-wide text-[#c53f75]">Beautyflow bőranalízis</p>
+        <h1 class="font-heading mt-1 text-3xl text-gray-900">A személyre szabott bőrprofilod</h1>
+      </header>
+
+      <section class="mb-6 rounded-2xl bg-[#c53f75]/5 p-5 text-center">
+        <p class="text-sm text-gray-500">A bőröd profilja:</p>
+        <p class="font-heading mt-1 text-2xl capitalize text-gray-900">${esc(r.profile.label)}</p>
+      </section>
+
+      ${
+        isSafeRoute
+          ? `<section class="mb-6">
+              <h2 class="font-heading mb-3 text-xl text-gray-900">A te problémádra valószínűleg ez az irány:</h2>
+              <div class="space-y-3">${treatmentsHtml}</div>
+            </section>`
+          : `<section class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+              <h2 class="font-heading mb-2 text-xl text-gray-900">Fontos a biztonságod miatt</h2>
+              <p class="text-sm leading-relaxed text-gray-700">${esc(r.routeMessage || '')}</p>
+              <div class="mt-4 space-y-3">${treatmentsHtml}</div>
+            </section>`
+      }
+
+      ${
+        kontra
+          ? `<section class="mb-6 rounded-xl border border-gray-200 bg-white p-5">
+              <h2 class="font-heading mb-2 text-lg text-gray-900">Amire a kezelés előtt figyelünk</h2>
+              <ul class="space-y-1.5 text-sm text-gray-600">${kontra}</ul>
+            </section>`
+          : ''
+      }
+
+      <section class="mb-6 rounded-xl border border-gray-200 bg-white p-5">
+        <h2 class="font-heading mb-1 text-lg text-gray-900">Becsült ársáv</h2>
+        <p class="text-2xl font-semibold text-[#c53f75]">${esc(priceLabel(r))}</p>
+        <p class="mt-1 text-xs text-gray-500">Tájékoztató ársáv — a pontos árat a személyes analízis után tudjuk megadni.</p>
+      </section>
+
+      <section class="mb-6 rounded-xl border-l-4 border-[#c53f75] bg-[#c53f75]/5 p-4">
+        <p class="text-sm leading-relaxed text-gray-700">${esc(NOT_DIAGNOSIS)}</p>
+      </section>
+
+      <!-- TODO: Fanni záróvideó — ide kerül a beágyazás -->
+      <section class="mb-6 flex aspect-video w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 text-center text-sm text-gray-400">
+        Fanni videóüzenete hamarosan ✨
+      </section>
+
+      <section class="rounded-2xl bg-gradient-to-br from-[#c53f75] to-[#a33460] p-6 text-center text-white shadow-lg">
+        <h2 class="font-heading text-2xl">5 000 Ft-os szakmai bőranalízis</h2>
+        <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/90">
+          A következő lépés egy alapos, személyes bőranalízis a szalonban. Az 5 000 Ft
+          <strong>teljes egészében levásárolható</strong>, ha nálunk folytatod a kezelést.
+        </p>
+        <a href="${PHONE_HREF}" class="mt-5 inline-block rounded-full bg-white px-7 py-3.5 font-semibold text-[#c53f75] shadow hover:bg-gray-50">
+          Időpontot kérek a bőranalízisre
+        </a>
+        <p class="mt-3 text-xs text-white/80">Vagy hívj minket: ${PHONE} — hamarosan vissza is hívunk a megadott elérhetőségen.</p>
+        <!-- TODO: foglaló naptár — későbbi körben naptár-integráció ide -->
+      </section>
+    `;
+    body.classList.remove('hidden');
+    // Analytics-consented view event (browser dataLayer → GTM/GA4). PII-free.
+    if (hasAnalyticsConsent()) {
+      const w = window as unknown as { dataLayer: Record<string, unknown>[] };
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({ event: 'calculator_result_view', route: r.utvonal, safe: r.safe });
+    }
+  }
+
+  function init() {
+    const root = document.getElementById('result-root');
+    if (!root) return;
+    const hash = root.dataset.hash || '';
+
+    let data: Recommendation | null = null;
+    const embedded = document.getElementById('quiz-result-data');
+    if (embedded?.textContent) {
+      try { data = JSON.parse(embedded.textContent) as Recommendation; } catch { /* ignore */ }
+    }
+    if (!data && hash) {
+      try {
+        const raw = localStorage.getItem(resultStorageKey(hash));
+        if (raw) data = JSON.parse(raw) as Recommendation;
+      } catch { /* ignore */ }
+    }
+
+    if (data && data.profile) {
+      render(data);
+    } else {
+      document.getElementById('result-fallback')?.classList.remove('hidden');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('astro:page-load', init);
+</script>

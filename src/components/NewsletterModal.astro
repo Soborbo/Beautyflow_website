@@ -1,0 +1,310 @@
+---
+/**
+ * Hírlevél feliratkozó modal (EmailOctopus v2).
+ *
+ * Viselkedés:
+ *   - A látogatás kezdetétől számított 18 mp után ugrik fel (a mérés
+ *     sessionStorage-ban él, így oldalak közti navigáció után sem indul újra
+ *     a számláló — 18 mp a teljes látogatásra értendő).
+ *   - Egyszer jelenik meg: feliratkozás után SOHA, bezárás után 14 napig nem
+ *     mutatjuk újra (localStorage `bf_newsletter`).
+ *   - Bezárható: X gomb, háttérre kattintás, Esc.
+ *
+ * Elrendezés: bal oldalon a szöveg, jobbra mellette a form (mobilon egymás alatt).
+ * A beküldés a /api/newsletter végpontra megy → EmailOctopus. Csak keresztnév +
+ * email kell. Honeypot (`website`) véd a botok ellen.
+ */
+const brand = '#c53f75';
+---
+
+<div
+  id="bf-newsletter-modal"
+  class="bf-nl fixed inset-0 z-[120] hidden items-center justify-center p-4"
+  aria-hidden="true"
+>
+  {/* Háttér */}
+  <div class="bf-nl-backdrop absolute inset-0 bg-black/50 backdrop-blur-[2px]" data-nl-close></div>
+
+  {/* Kártya */}
+  <div
+    class="bf-nl-card relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="bf-nl-title"
+  >
+    <button
+      type="button"
+      class="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+      aria-label="Bezárás"
+      data-nl-close
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      {/* BAL — szöveg */}
+      <div
+        class="flex flex-col justify-center gap-3 p-7 text-white md:p-8"
+        style={`background: linear-gradient(150deg, ${brand} 0%, #a33460 100%);`}
+      >
+        <h2 id="bf-nl-title" class="font-heading text-2xl leading-tight md:text-3xl">
+          Szeretnél értesülni akcióinkról? Iratkozz fel a hírlevelünkre!
+        </h2>
+        <p class="text-sm text-white/90">
+          Ígérem, nem küldünk spamet.
+        </p>
+      </div>
+
+      {/* JOBB — form */}
+      <div class="p-7 md:p-8">
+        <form id="bf-nl-form" class="space-y-4" novalidate>
+          {/* Honeypot — emberek elől rejtve, naiv botok kitöltik */}
+          <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;overflow:hidden;height:0;width:0;">
+            <label>
+              Website (do not fill)
+              <input type="text" name="website" tabindex="-1" autocomplete="off" />
+            </label>
+          </div>
+
+          <div>
+            <label for="bf-nl-firstName" class="mb-1 block text-sm font-medium text-gray-700">Keresztnév</label>
+            <input
+              type="text"
+              id="bf-nl-firstName"
+              name="firstName"
+              required
+              autocomplete="given-name"
+              minlength="2"
+              class="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 transition-colors focus:border-[#c53f75] focus:outline-none"
+              placeholder="Anna"
+            />
+          </div>
+
+          <div>
+            <label for="bf-nl-email" class="mb-1 block text-sm font-medium text-gray-700">Email cím</label>
+            <input
+              type="email"
+              id="bf-nl-email"
+              name="email"
+              required
+              autocomplete="email"
+              class="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 transition-colors focus:border-[#c53f75] focus:outline-none"
+              placeholder="pelda@email.com"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full rounded-full bg-[#c53f75] py-3 font-semibold uppercase tracking-wide text-white transition-all duration-300 hover:bg-[#a33460] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span class="bf-nl-label">Feliratkozom</span>
+            <span class="bf-nl-spinner hidden">Küldés folyamatban…</span>
+          </button>
+
+          <p class="text-xs leading-relaxed text-gray-500">
+            A feliratkozással elfogadod az
+            <a href="/adatvedelmi-tajekoztato" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>.
+          </p>
+
+          <p class="bf-nl-error hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></p>
+        </form>
+
+        {/* Sikeres feliratkozás állapot */}
+        <div class="bf-nl-success hidden py-8 text-center">
+          <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h3 class="font-heading text-xl text-gray-900">Köszönjük a feliratkozást!</h3>
+          <p class="mt-1 text-sm text-gray-600">Mostantól elsőként értesülsz az akcióinkról.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #bf-newsletter-modal.bf-nl-open { display: flex; }
+  #bf-newsletter-modal .bf-nl-card {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  #bf-newsletter-modal.bf-nl-open .bf-nl-card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bf-newsletter-modal .bf-nl-card { transition: none; }
+  }
+</style>
+
+<script>
+  const MODAL_ID = 'bf-newsletter-modal';
+  const STORAGE_KEY = 'bf_newsletter';       // 'subscribed' | 'dismissed:<ms>'
+  const SESSION_KEY = 'bf_nl_start';          // látogatás kezdete (ms)
+  const DELAY_MS = 18_000;                     // 18 mp az oldalon
+  const DISMISS_MS = 14 * 24 * 60 * 60 * 1000; // bezárás után 14 napig nem mutatjuk
+
+  function shouldShow(): boolean {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return true;
+      if (raw === 'subscribed') return false;
+      if (raw.startsWith('dismissed:')) {
+        const ts = Number(raw.slice('dismissed:'.length));
+        if (!Number.isFinite(ts)) return true;
+        return Date.now() - ts > DISMISS_MS;
+      }
+      return true;
+    } catch {
+      return true;
+    }
+  }
+
+  function sessionElapsed(): number {
+    try {
+      let start = Number(sessionStorage.getItem(SESSION_KEY));
+      if (!Number.isFinite(start) || !start) {
+        start = Date.now();
+        sessionStorage.setItem(SESSION_KEY, String(start));
+      }
+      return Date.now() - start;
+    } catch {
+      return 0;
+    }
+  }
+
+  function remember(value: string): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, value);
+    } catch {
+      /* privát mód / kikapcsolt storage — nem baj */
+    }
+  }
+
+  function openModal(): void {
+    const modal = document.getElementById(MODAL_ID);
+    if (!modal || modal.classList.contains('bf-nl-open')) return;
+    modal.classList.add('bf-nl-open');
+    modal.setAttribute('aria-hidden', 'false');
+    // fókusz az első mezőre
+    window.setTimeout(() => document.getElementById('bf-nl-firstName')?.focus(), 60);
+  }
+
+  function closeModal(persistDismiss: boolean): void {
+    const modal = document.getElementById(MODAL_ID);
+    if (!modal) return;
+    modal.classList.remove('bf-nl-open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (persistDismiss) remember('dismissed:' + Date.now());
+  }
+
+  function bindHandlers(): void {
+    const modal = document.getElementById(MODAL_ID);
+    if (!modal || modal.dataset.nlBound === '1') return;
+    modal.dataset.nlBound = '1';
+
+    // Bezárás: X gomb / háttér
+    modal.querySelectorAll('[data-nl-close]').forEach((el) => {
+      el.addEventListener('click', () => closeModal(true));
+    });
+
+    const form = modal.querySelector<HTMLFormElement>('#bf-nl-form');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = modal.querySelector<HTMLElement>('.bf-nl-error');
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const label = form.querySelector<HTMLElement>('.bf-nl-label');
+      const spinner = form.querySelector<HTMLElement>('.bf-nl-spinner');
+      const successEl = modal.querySelector<HTMLElement>('.bf-nl-success');
+
+      errEl?.classList.add('hidden');
+      const fd = new FormData(form);
+      const firstName = String(fd.get('firstName') || '').trim();
+      const email = String(fd.get('email') || '').trim();
+      const website = String(fd.get('website') || '');
+
+      if (firstName.length < 2) {
+        if (errEl) { errEl.textContent = 'Kérjük add meg a keresztneved.'; errEl.classList.remove('hidden'); }
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (errEl) { errEl.textContent = 'Kérjük adj meg egy érvényes email címet.'; errEl.classList.remove('hidden'); }
+        return;
+      }
+
+      // Honeypot kitöltve — némán „sikerül", ne POST-oljunk.
+      if (website) { remember('subscribed'); closeModal(false); return; }
+
+      if (btn) btn.disabled = true;
+      label?.classList.add('hidden');
+      spinner?.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, email, website }),
+        });
+        const result = await res.json().catch(() => ({ success: false }));
+
+        if (result.success) {
+          remember('subscribed');
+          // Soft-konverzió jelzése a GTM dataLayer felé (PII nélkül).
+          try {
+            (window as unknown as { dataLayer?: unknown[] }).dataLayer?.push({ event: 'newsletter_signup' });
+          } catch { /* nincs dataLayer — nem baj */ }
+          form.classList.add('hidden');
+          successEl?.classList.remove('hidden');
+          window.setTimeout(() => closeModal(false), 2800);
+        } else {
+          if (errEl) {
+            errEl.textContent = result.error || 'Hiba történt. Kérjük próbáld újra.';
+            errEl.classList.remove('hidden');
+          }
+        }
+      } catch {
+        if (errEl) {
+          errEl.textContent = 'Hálózati hiba. Kérjük próbáld újra később.';
+          errEl.classList.remove('hidden');
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+        label?.classList.remove('hidden');
+        spinner?.classList.add('hidden');
+      }
+    });
+  }
+
+  function scheduleShow(): void {
+    const w = window as unknown as { __bfNlScheduled?: boolean };
+    if (w.__bfNlScheduled) return;
+    if (!shouldShow()) return;
+    w.__bfNlScheduled = true;
+    const remaining = Math.max(0, DELAY_MS - sessionElapsed());
+    window.setTimeout(() => {
+      if (shouldShow()) openModal();
+    }, remaining);
+  }
+
+  function bindGlobalOnce(): void {
+    const w = window as unknown as { __bfNlGlobal?: boolean };
+    if (w.__bfNlGlobal) return;
+    w.__bfNlGlobal = true;
+    // Esc — egyszer kötjük a document-re, a live modalt lekérdezve (nem szivárog
+    // navigációnként, mert a modal DOM cserélődik, de a document megmarad).
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById(MODAL_ID);
+      if (e.key === 'Escape' && modal?.classList.contains('bf-nl-open')) closeModal(true);
+    });
+  }
+
+  function init(): void {
+    bindGlobalOnce();
+    bindHandlers();
+    scheduleShow();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('astro:page-load', init);
+</script>

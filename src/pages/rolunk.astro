@@ -5,6 +5,7 @@ import { getImage } from 'astro:assets';
 import ContentImage from '../components/images/ContentImage.astro';
 import Layout from '../layouts/Layout.astro';
 import MilestonesCarousel from '../components/MilestonesCarousel.astro';
+import YouTubeFacade from '../components/YouTubeFacade.astro';
 import LocationsSection from '../components/LocationsSection.astro';
 import { type Locale, defaultLang, getLocalizedPath } from '../i18n';
 
@@ -28,7 +29,7 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Beautyflow Szépségszalon",
-  "url": "https://beautyflow.pro",
+  "url": "https://beautyflow.pro/",
   "logo": "https://beautyflow.pro/images/Beautyflow-favicon.png",
   "description": "Többszörösen díjnyertes szépségszalon Budapesten. Lézeres szőrtelenítés, sminktetoválás, arckezelések.",
   "foundingDate": "2014",
@@ -74,7 +75,7 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Főoldal",
-      "item": "https://beautyflow.pro"
+      "item": "https://beautyflow.pro/"
     },
     {
       "@type": "ListItem",
@@ -233,8 +234,11 @@ const content = {
     storyP2: 'Az évek során két modern szalonná bővültünk - egyet Budán, egyet Pesten - és ma már 7 fős csapattal dolgozunk. A Notino "Hónap Szépségszalonja" díjat is elnyertük, ami visszaigazolja munkánk minőségét.',
     storyP3: 'Hitvallásunk egyszerű: minden vendég egyedi, és megérdemli a legjobb kezelést. Ezért szentelünk időt az ingyenes konzultációkra és a személyre szabott tanácsadásra.',
     storyImageAlt: 'Beautyflow - Notino Hónap Szalonja díj',
+    videoTitle: 'Beautyflow bemutatkozó videó',
     milestonesTitle: 'Mérföldkövek',
     teamTitle: 'Ismerd meg csapatunkat',
+    awardsTitle: 'Elismeréseink',
+    awardsText: 'Az évek során sok elismerésben részesültünk, amire nagyon büszkék vagyunk. És folyamatosan dolgozunk azon, hogy minél jobb legyen a szolgáltatás minősége, amit nyújtani tudunk.',
     valuesTitle: 'Értékeink',
     ctaTitle: 'Ismerjük meg egymást személyesen!',
     ctaSubtitle: 'Gyere el egy ingyenes konzultációra és ismerd meg csapatunkat, mielőtt döntesz!',
@@ -250,8 +254,11 @@ const content = {
     storyP2: 'Over the years, we have grown into two modern salons - one in Buda, one in Pest - and now we work with a team of 7. We also won the Notino "Salon of the Month" award, which confirms the quality of our work.',
     storyP3: 'Our philosophy is simple: every guest is unique and deserves the best treatment. That is why we dedicate time to free consultations and personalized advice.',
     storyImageAlt: 'Beautyflow - Notino Salon of the Month award',
+    videoTitle: 'Beautyflow introduction video',
     milestonesTitle: 'Milestones',
     teamTitle: 'Meet Our Team',
+    awardsTitle: 'Our Recognition',
+    awardsText: 'Over the years we have received a lot of recognition, which we are very proud of. And we continuously work to make the quality of the service we provide even better.',
     valuesTitle: 'Our Values',
     ctaTitle: "Let's meet in person!",
     ctaSubtitle: 'Come for a free consultation and meet our team before you decide!',
@@ -308,11 +315,10 @@ const teamMemberImages = await Promise.all(
           </div>
         </div>
         <div class="order-1 lg:order-2">
-          <ContentImage
-            src={beautyflowDijak}
-            alt={t.storyImageAlt}
-            class="w-full rounded-2xl shadow-lg"
-            priority
+          <YouTubeFacade
+            videoId="HlimbrSk9WY"
+            title={t.videoTitle}
+            class="rounded-[3px]"
           />
         </div>
       </div>
@@ -359,7 +365,7 @@ const teamMemberImages = await Promise.all(
                 </button>
               ) : (
                 <div class="w-32 h-32 rounded-full bg-[#c53f75]/10 flex items-center justify-center shadow-md">
-                  <span class="font-heading text-3xl text-[#c53f75]">{member.initials}</span>
+                  <span class="font-heading text-3xl text-[#c53f75]">{member.name.split(' ').map(n => n[0]).join('')}</span>
                 </div>
               )}
             </div>
@@ -374,7 +380,7 @@ const teamMemberImages = await Promise.all(
               <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-auto">
                 {member.treatments.map((treatment) => (
                   <a
-                    href={treatment.url}
+                    href={getLocalizedPath(treatment.url, lang)}
                     class="inline-block px-4 py-2 text-xs text-[#c53f75] bg-[#c53f75]/10 rounded-full hover:bg-[#c53f75]/20 transition-colors"
                   >
                     {treatment.name}
@@ -384,6 +390,29 @@ const teamMemberImages = await Promise.all(
             </div>
           </div>
         )})}
+      </div>
+    </div>
+  </section>
+
+  <!-- Awards / Recognition Section -->
+  <section class="py-16 lg:py-20 bg-white">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+        <div>
+          <ContentImage
+            src={beautyflowDijak}
+            alt={t.storyImageAlt}
+            class="w-full rounded-2xl shadow-lg"
+          />
+        </div>
+        <div>
+          <h2 class="font-heading text-3xl lg:text-4xl text-gray-900 mb-6">
+            {t.awardsTitle}
+          </h2>
+          <div class="space-y-4 text-gray-600">
+            <p>{t.awardsText}</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>

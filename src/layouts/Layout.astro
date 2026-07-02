@@ -3,9 +3,19 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
-import WhatsAppButton from '../components/WhatsAppButton.astro';
+import NewsletterModal from '../components/NewsletterModal.astro';
 import { LCPTracker } from '../components/images';
-import { getLangFromUrl, useTranslations, getAlternateRoute, type Locale } from '../i18n';
+import { getLangFromUrl, useTranslations, getAlternateRoute, stripTrailingSlash, type Locale } from '../i18n';
+// Soborbo canonical tracking (v5): browser (GTM dataLayer) + server (event-gateway
+// worker) with a shared event_id. The kit lives verbatim under /tracking-kit.
+import Tracking from '../../tracking-kit/components/Tracking.astro';
+import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.astro';
+import Turnstile from '../../tracking-kit/components/Turnstile.astro';
+import BookingClick from '../components/tracking/BookingClick.astro';
+
+// CookieYes is loaded as a GTM tag (Consent Initialization), so we do NOT pass
+// cookieYesId to <Tracking/> — that would double-load the CMP. GTM id stays GTM-W8V3BVGD.
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
 
 interface Props {
   title: string;
@@ -27,10 +37,12 @@ const defaultOgImage = 'https://beautyflow.pro/images/beautyflow-fb.jpg';
 const finalOgImage = ogImage ? `https://beautyflow.pro${ogImage}` : defaultOgImage;
 
 const ogLocale = currentLang === 'hu' ? 'hu_HU' : 'en_US';
-const currentUrl = Astro.url.pathname;
+// Normalize: never emit `/foo/` — root stays `/`, everything else loses the trailing slash.
+// Matches Cloudflare `drop-trailing-slash` + astro.config `trailingSlash: 'never'`.
+const currentUrl = stripTrailingSlash(Astro.url.pathname);
 
 // Generate proper hreflang URLs using route mappings
-const pathWithoutLang = currentUrl.replace(/^\/(en)/, '') || '/';
+const pathWithoutLang = stripTrailingSlash(currentUrl.replace(/^\/en(?=\/|$)/, '') || '/');
 const huUrl = getAlternateRoute(pathWithoutLang, currentLang, 'hu');
 const enUrl = getAlternateRoute(pathWithoutLang, currentLang, 'en');
 const canonicalUrl = `https://beautyflow.pro${currentUrl}`;
@@ -40,6 +52,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
+    <Tracking gtmId={gtmId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -77,13 +90,16 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     <meta name="twitter:image" content={finalOgImage} />
   </head>
   <body class="min-h-screen flex flex-col overflow-x-hidden">
+    <TrackingNoscript gtmId={gtmId} />
+    <Turnstile />
+    <BookingClick />
     <Header lang={currentLang} />
     <main class="flex-grow">
       <slot />
     </main>
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
-    <WhatsAppButton />
+    {currentLang === 'hu' && <NewsletterModal />}
     <LCPTracker />
   </body>
 </html>

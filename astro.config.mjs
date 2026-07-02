@@ -4,22 +4,37 @@ import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import critters from 'astro-critters';
 import sitemap from '@astrojs/sitemap';
-import tracking from '@leadgen/conversion-tracking';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://beautyflow.pro',
   output: 'server',
+  trailingSlash: 'never',
+  build: {
+    // Default 'directory' format: `dist/foo/index.html`. Do NOT switch to
+    // 'file' format — it emits `dist/foo.html` alongside a `dist/foo/`
+    // directory (e.g. `en.html` + `en/`), which collides with Cloudflare's
+    // `html_handling: "drop-trailing-slash"` and causes an infinite redirect
+    // loop. Directory format is the standard, conflict-free pairing.
+    inlineStylesheets: 'always',
+  },
   integrations: [
-    tracking({
-      // GTM ID optional - Zaraz handles server-side tracking via Cloudflare
-      // gtmId: 'GTM-XXXXXXX', // Uncomment if you want client-side GTM as well
-      currency: 'HUF',
-      sessionTimeoutMinutes: 30,
-      debug: import.meta.env.DEV, // Debug overlay in dev mode
-      enableOfflineQueue: true,
-    }),
     sitemap({
+      // Pages rendered with `noindex` must not be submitted in the
+      // sitemap — Search Console flags the contradiction. Keep in sync
+      // with the pages that pass `noindex={true}` to Layout.
+      filter: (page) => {
+        const noindexPaths = new Set([
+          '/koszonjuk',
+          '/aszf',
+          '/adatvedelmi-tajekoztato',
+          '/en/thank-you',
+          '/en/terms-and-conditions',
+          '/en/privacy-policy',
+        ]);
+        const path = new URL(page).pathname.replace(/\/+$/, '');
+        return !noindexPaths.has(path);
+      },
       i18n: {
         defaultLocale: 'hu',
         locales: {
@@ -30,18 +45,14 @@ export default defineConfig({
     }),
     critters({
       Critters: {
-        // Inline critical CSS for above-the-fold content
-        preload: 'media', // Preload non-critical CSS with media query trick
-        inlineFonts: false, // Don't inline fonts (we use preload instead)
-        preloadFonts: false, // Don't preload fonts (we handle it manually)
-        pruneSource: true, // Remove inlined CSS from external stylesheets
-        mergeStylesheets: false, // Keep stylesheets separate for better caching
+        preload: 'media',
+        inlineFonts: false,
+        preloadFonts: false,
+        pruneSource: true,
+        mergeStylesheets: false,
       }
     })
   ],
-  build: {
-    inlineStylesheets: 'always', // Inline all CSS for maximum performance
-  },
   i18n: {
     defaultLocale: 'hu',
     locales: ['hu', 'en'],
@@ -51,18 +62,28 @@ export default defineConfig({
   },
   adapter: cloudflare({
     imageService: 'compile',
-    routes: {
-      strategy: 'include',
-      include: ['/*'],
-      exclude: ['/_astro/*', '/images/*', '/favicon.svg']
-    }
   }),
   image: {
-    // With imageService: 'compile', images are processed at build time
-    // No need for sharp service - Cloudflare adapter handles it
     domains: [],
   },
   vite: {
-    plugins: [tailwindcss()]
+    // @tailwindcss/vite ships against a different vite version than the
+    // one bundled with Astro, so the Plugin types don't unify — runtime
+    // is unaffected.
+    plugins: [/** @type {any} */ (tailwindcss())],
+    define: {
+      // Force the PUBLIC Turnstile sitekey per build mode. The @astrojs/cloudflare
+      // adapter inlines .dev.vars into import.meta.env even during `astro build`,
+      // which would otherwise leak the localhost always-pass TEST key into the
+      // production bundle. This literal define wins for the static
+      // `import.meta.env.PUBLIC_TURNSTILE_SITE_KEY` access in the tracking kit.
+      // NODE_ENV is not yet 'production' when this config loads, so key off the
+      // CLI command instead: `astro build` → production widget, `astro dev` → test key.
+      'import.meta.env.PUBLIC_TURNSTILE_SITE_KEY': JSON.stringify(
+        process.argv.includes('build')
+          ? '0x4AAAAAADOTyE9gccGo16os' // beautyflow.pro production Turnstile widget
+          : '1x00000000000000000000AA' // Cloudflare always-pass test key (localhost dev)
+      )
+    }
   }
 });

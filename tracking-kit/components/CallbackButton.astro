@@ -1,0 +1,22 @@
+---
+/** <CallbackButton /> — CTA with callback_click tracking. */
+interface Props { class?: string; type?: 'button' | 'submit'; [key: string]: unknown; }
+const { class: cls, type = 'button', ...rest } = Astro.props;
+---
+<button type={type} class={cls} data-tracking-callback {...rest}>
+  <slot>Request a callback</slot>
+</button>
+
+<script>
+  import { trackCallbackConversion } from '../lib';
+  function bind() {
+    document.querySelectorAll<HTMLButtonElement>('[data-tracking-callback]').forEach(btn => {
+      if (btn.dataset.trackBound) return;
+      btn.dataset.trackBound = '1';
+      // Fires BOTH channels (dataLayer callback_click + gateway callback_conversion).
+      btn.addEventListener('click', () => trackCallbackConversion());
+    });
+  }
+  document.addEventListener('astro:page-load', bind);
+  if (document.readyState !== 'loading') bind();
+</script>

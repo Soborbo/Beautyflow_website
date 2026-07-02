@@ -51,7 +51,7 @@ const articleSchema = {
       "@type": "Organization",
       "@id": "https://beautyflow.pro/#organization",
       "name": "Beautyflow Szépségszalon",
-      "url": "https://beautyflow.pro"
+      "url": "https://beautyflow.pro/"
     },
     {
       "@type": "Person",
@@ -765,14 +765,16 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
     const article = document.querySelector('article');
 
     if (progressBar && article) {
+      const bar = progressBar;
+      const art = article;
       function updateProgress() {
-        const articleRect = article.getBoundingClientRect();
+        const articleRect = art.getBoundingClientRect();
         const articleTop = articleRect.top + window.scrollY;
-        const articleHeight = article.offsetHeight;
+        const articleHeight = art.offsetHeight;
         const windowHeight = window.innerHeight;
         const scrolled = window.scrollY - articleTop + windowHeight;
         const progress = Math.min(Math.max((scrolled / articleHeight) * 100, 0), 100);
-        progressBar.style.width = progress + '%';
+        bar.style.width = progress + '%';
       }
 
       window.addEventListener('scroll', updateProgress, { passive: true });
@@ -781,7 +783,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
 
     // Active TOC Link Highlighting
     const tocLinks = document.querySelectorAll('.toc-link');
-    const sections = document.querySelectorAll('section[id]');
+    const sections = document.querySelectorAll<HTMLElement>('section[id]');
 
     if (tocLinks.length && sections.length) {
       function updateActiveLink() {
@@ -790,7 +792,7 @@ const authorAvatar2x = await getImage({ src: konyaFanniKozmetikus, width: 140, h
         sections.forEach(section => {
           const sectionTop = section.offsetTop - 150;
           if (window.scrollY >= sectionTop) {
-            currentSection = section.getAttribute('id');
+            currentSection = section.getAttribute('id') || '';
           }
         });
 

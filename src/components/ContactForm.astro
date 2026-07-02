@@ -1,0 +1,325 @@
+---
+/**
+ * Contact form for a salon location (Buda / Pest).
+ *
+ * Spam protection:
+ *   1. Honeypot field (hidden `website` input)
+ *   2. Cloudflare Turnstile widget (server-verified)
+ *   3. Time-on-page check (≥3s) on submit
+ *
+ * Submission flow:
+ *   1. POST /api/contact with formType: 'location' + location + Turnstile token
+ *   2. Server verifies Turnstile, sends emails (info@ + user confirmation),
+ *      logs to Google Sheets if configured
+ *   3. On success → window.location.href = '/koszonjuk'
+ *
+ * Tracking (Soborbo canonical v5):
+ *   - form_abandon (analytics) via initFormAbandonTracking
+ *   - on success → trackLeadSubmit(): dataLayer `lead_submit` (browser GTM) +
+ *     gateway `contact_form_submit` (Meta CAPI + Google Ads), SAME event_id.
+ */
+
+export interface Props {
+  /** Which Beautyflow location: shown in admin notification subject. */
+  location: 'buda' | 'pest';
+  /** Heading displayed above the form. */
+  title?: string;
+  /** Optional intro paragraph. */
+  subtitle?: string;
+}
+
+const { location, title = 'Írj nekünk!', subtitle } = Astro.props;
+
+const turnstileSiteKey =
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
+  '0x4AAAAAADOTyE9gccGo16os';
+
+const locationLabel = location === 'buda' ? 'Beautyflow Buda' : 'Beautyflow Pest';
+const formId = `contact-form-${location}`;
+---
+
+<section class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+  <div class="p-6 lg:p-8 border-b border-gray-100">
+    <h3 class="font-heading text-2xl text-gray-900 mb-1">{title}</h3>
+    {subtitle && <p class="text-gray-600 text-sm">{subtitle}</p>}
+    <p class="text-gray-500 text-xs mt-2">Hamarosan visszahívunk a megadott elérhetőségen.</p>
+  </div>
+
+  <form id={formId} class="contact-form p-6 lg:p-8 space-y-4" novalidate data-location={location}>
+    <input type="hidden" name="formType" value="location" />
+    <input type="hidden" name="locationId" value={location} />
+    <input type="hidden" name="locationLabel" value={locationLabel} />
+
+    {/* Honeypot — invisible to humans, attractive to naive bots */}
+    <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;overflow:hidden;height:0;width:0;">
+      <label>
+        Website (do not fill)
+        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for={`${formId}-lastName`} class="block text-sm font-medium text-gray-700 mb-1">Vezetéknév *</label>
+        <input
+          type="text"
+          id={`${formId}-lastName`}
+          name="lastName"
+          required
+          autocomplete="family-name"
+          minlength="2"
+          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors"
+          placeholder="Kovács"
+        />
+      </div>
+      <div>
+        <label for={`${formId}-firstName`} class="block text-sm font-medium text-gray-700 mb-1">Keresztnév *</label>
+        <input
+          type="text"
+          id={`${formId}-firstName`}
+          name="firstName"
+          required
+          autocomplete="given-name"
+          minlength="2"
+          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors"
+          placeholder="Anna"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label for={`${formId}-email`} class="block text-sm font-medium text-gray-700 mb-1">Email cím *</label>
+      <input
+        type="email"
+        id={`${formId}-email`}
+        name="email"
+        required
+        autocomplete="email"
+        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors"
+        placeholder="pelda@email.com"
+      />
+    </div>
+
+    <div>
+      <label for={`${formId}-phone`} class="block text-sm font-medium text-gray-700 mb-1">Telefonszám *</label>
+      <input
+        type="tel"
+        id={`${formId}-phone`}
+        name="phone"
+        required
+        autocomplete="tel"
+        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors"
+        placeholder="+36 30 123 4567"
+      />
+    </div>
+
+    <div>
+      <label for={`${formId}-message`} class="block text-sm font-medium text-gray-700 mb-1">Üzenet</label>
+      <textarea
+        id={`${formId}-message`}
+        name="message"
+        rows="4"
+        maxlength="2000"
+        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors resize-y"
+        placeholder="Milyen kezelés iránt érdeklődsz, mikor szeretnél jönni?"
+      ></textarea>
+    </div>
+
+    <div class="flex items-start gap-2 pt-1">
+      <input
+        type="checkbox"
+        id={`${formId}-consent`}
+        name="consent"
+        required
+        class="mt-1 w-4 h-4 text-[#c53f75] border-gray-300 rounded focus:ring-[#c53f75]"
+      />
+      <label for={`${formId}-consent`} class="text-sm text-gray-600 leading-relaxed">
+        Elolvastam és elfogadom az <a href="/adatvedelmi-tajekoztato" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>. *
+      </label>
+    </div>
+
+    {/* Turnstile widget — rendered EXPLICITLY by createTurnstile (api.js is loaded
+        page-globally with ?render=explicit by <Turnstile/> in the Layout, so this
+        plain container is NOT auto-scanned). No `.cf-turnstile` class on purpose. */}
+    {turnstileSiteKey && (
+      <div id={`${formId}-turnstile`} data-sitekey={turnstileSiteKey} class="min-h-[65px]"></div>
+    )}
+
+    <button
+      type="submit"
+      class="w-full py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span class="submit-label">Küldés</span>
+      <span class="submit-spinner hidden">Küldés folyamatban…</span>
+    </button>
+
+    <p class="form-error hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3" role="alert"></p>
+  </form>
+</section>
+
+<script>
+  import {
+    trackLeadSubmit,
+    initFormAbandonTracking,
+    waitForTracking,
+    getAllTrackingData,
+    getFbc,
+    getFbp,
+    collectAttribution,
+  } from '@tracking/lib';
+  import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
+
+  // Attribution for the /api/contact POST body (CRM + Google Sheets sink). Sourced
+  // from the canonical lib: getAllTrackingData() covers gclid/gbraid/wbraid/fbclid/utm_*,
+  // collectAttribution() adds msclkid (and persists the merged superset), getFbc/getFbp
+  // read the Meta cookies. Click IDs are marketing-consent gated inside the lib (GDPR).
+  function getTrackingData() {
+    const t = getAllTrackingData();
+    const a = collectAttribution();
+    return {
+      gclid: t.gclid || a.gclid || '',
+      fbclid: t.fbclid || a.fbclid || '',
+      utm_source: t.utm_source || '',
+      utm_medium: t.utm_medium || '',
+      utm_campaign: t.utm_campaign || '',
+      utm_content: t.utm_content || '',
+      utm_term: t.utm_term || '',
+      gbraid: t.gbraid || a.gbraid || '',
+      wbraid: t.wbraid || a.wbraid || '',
+      msclkid: a.msclkid || '',
+      fbc: getFbc() || '',
+      fbp: getFbp() || '',
+    };
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLFormElement>('.contact-form').forEach(form => {
+      if (form.dataset.trackBound) return;
+      form.dataset.trackBound = '1';
+      const formName = `contact_form_${form.dataset.location || 'location'}`;
+      const startedAt = Date.now();
+
+      // Cloudflare Turnstile — rendered explicitly (api.js is loaded with
+      // ?render=explicit page-globally). Render now so the token is ready by the
+      // time the user submits; the client polls up to 10s for window.turnstile.
+      const turnstileEl = form.querySelector<HTMLElement>('[id$="-turnstile"][data-sitekey]');
+      let turnstile: TurnstileHandle | null = null;
+      if (turnstileEl) {
+        turnstile = createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '');
+        turnstile.ensureRendered();
+      }
+
+      // Analytics-consented form-abandon tracking (fires `form_abandon` after 60s idle).
+      const cleanupAbandon = initFormAbandonTracking(form, formName, 60_000);
+      document.addEventListener('astro:before-swap', cleanupAbandon, { once: true });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = form.querySelector<HTMLElement>('.form-error');
+        const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+        const labelEl = form.querySelector<HTMLElement>('.submit-label');
+        const spinnerEl = form.querySelector<HTMLElement>('.submit-spinner');
+
+        // Time check — reject if <3s after page-load (likely bot)
+        if (Date.now() - startedAt < 3000) {
+          if (errEl) {
+            errEl.textContent = 'Túl gyors küldés. Próbáld újra pár másodperc múlva.';
+            errEl.classList.remove('hidden');
+          }
+          return;
+        }
+
+        if (errEl) errEl.classList.add('hidden');
+        if (submitBtn) submitBtn.disabled = true;
+        labelEl?.classList.add('hidden');
+        spinnerEl?.classList.remove('hidden');
+
+        const fd = new FormData(form);
+        const data = {
+          formType: 'location' as const,
+          locationId: fd.get('locationId'),
+          locationLabel: fd.get('locationLabel'),
+          firstName: String(fd.get('firstName') || '').trim(),
+          lastName: String(fd.get('lastName') || '').trim(),
+          email: String(fd.get('email') || '').trim(),
+          phone: String(fd.get('phone') || '').trim(),
+          message: String(fd.get('message') || '').trim(),
+          consent: fd.get('consent') === 'on',
+          website: String(fd.get('website') || ''),
+          turnstileToken: turnstile ? turnstile.getToken() : '',
+          ...getTrackingData(),
+        };
+
+        // No Turnstile token yet (widget still solving / not rendered) — nudge it
+        // and ask the user to retry rather than POST a token-less body that the
+        // server would reject with a 400 robot-check.
+        if (turnstileEl && !data.turnstileToken) {
+          turnstile?.ensureRendered();
+          if (errEl) {
+            errEl.textContent = 'A robot-ellenőrzés még tölt. Kérjük várj egy pillanatot, majd próbáld újra.';
+            errEl.classList.remove('hidden');
+          }
+          if (submitBtn) submitBtn.disabled = false;
+          labelEl?.classList.remove('hidden');
+          spinnerEl?.classList.add('hidden');
+          return;
+        }
+
+        // Honeypot trip — silently "succeed"
+        if (data.website) {
+          window.location.href = '/koszonjuk';
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+
+          if (result.success) {
+            // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
+            // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
+            // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
+            // PII goes to the Enhanced-Conversions side-channel inside the lib, never
+            // the dataLayer. Navigation is independent of tracking consent.
+            trackLeadSubmit({
+              email: data.email,
+              phone: data.phone,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
+              contentName: formName,
+              eventName: 'contact_form_submit',
+            });
+            // Give GTM a beat to fire its browser tags before the hard navigation;
+            // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
+            await waitForTracking(600);
+            window.location.href = '/koszonjuk';
+          } else {
+            if (errEl) {
+              errEl.textContent = result.error || 'Hiba történt. Kérjük próbáld újra.';
+              errEl.classList.remove('hidden');
+            }
+            // Reset Turnstile so user can retry (single-use token was consumed)
+            turnstile?.reset();
+          }
+        } catch {
+          if (errEl) {
+            errEl.textContent = 'Hálózati hiba. Kérjük próbáld újra később.';
+            errEl.classList.remove('hidden');
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+          labelEl?.classList.remove('hidden');
+          spinnerEl?.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('astro:page-load', init);
+</script>

@@ -1,11 +1,9 @@
 ---
 export const prerender = true;
 
-import { Image, getImage } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
-import ContentImage from '../../components/images/ContentImage.astro';
-import CardImage from '../../components/images/CardImage.astro';
+import { ContentImage, CardImage, HeroImage, FixedImage } from '../../components/images';
 
 // Import images
 import carbonPeelingFo from '../../assets/images/carbon-peeling-fo.jpg';
@@ -56,7 +54,7 @@ const singlePrices = [
   { area: 'Pigment spot removal', price: '10,000 Ft' },
   { area: 'Back of hands (both)', price: '15,000 Ft' },
   { area: 'Armpit lightening (both)', price: '15,000 Ft' },
-  { area: 'Eyebrows', price: '15,000 Ft' },
+  { area: 'Eyebrow lightening', price: '15,000 Ft' },
   { area: 'Full face', price: '25,000 Ft' },
   { area: 'Decolletage', price: '25,000 Ft' },
   { area: 'Full back', price: '35,000 Ft' },
@@ -136,7 +134,7 @@ const faqs = [
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://beautyflow.pro/en/"
+        "item": "https://beautyflow.pro/en"
       },
       {
         "@type": "ListItem",
@@ -208,7 +206,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
+                  <FixedImage src={notinoIkon} alt="Notino" width={32} class="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -265,7 +263,7 @@ const faqs = [
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
+            <FixedImage src={googleLogo} alt="Google" width={36} class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -679,15 +677,7 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <Image
-                src={googleLogo}
-                alt="Google"
-                class="w-7 h-7 object-contain flex-shrink-0"
-                width={28}
-                height={28}
-                quality={60}
-                loading="lazy"
-              />
+              <FixedImage src={googleLogo} alt="Google" width={28} class="w-7 h-7 object-contain flex-shrink-0" />
             </div>
           </div>
         ))}
@@ -703,10 +693,10 @@ const faqs = [
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <Image src={notinoLogoSm} alt="Notino Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
+          <FixedImage src={notinoLogoSm} alt="Notino Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
         <div class="flex flex-col items-center">
-          <Image src={skinlab} alt="Skinlab Partner" class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" width={96} height={48} quality={60} loading="lazy" />
+          <FixedImage src={skinlab} alt="Skinlab Partner" width={48} class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
       </div>
     </div>

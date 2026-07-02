@@ -10,6 +10,9 @@ const categoryColors = {
   'sminktetovalas': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff' },
   'tetovalas-eltavolitas': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2' },
   'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff' },
+  'green-sea-peel': { primary: '#059669', light: '#6ee7b7', bg: '#ecfdf5' },
+  'biopen-q2': { primary: '#d97706', light: '#fcd34d', bg: '#fffbeb' },
+  'anti-aging': { primary: '#ec4899', light: '#f9a8d4', bg: '#fdf2f8' },
 };
 
 // Lézeres Szőrtelenítés Csomagok
@@ -19,6 +22,7 @@ const lezerCsomagok = [
   { name: 'Silver', zones: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '40 000' },
   { name: 'Bronze', zones: 'Teljes láb + Hónalj', price: '38 000' },
   { name: 'Platinum - PCOS', zones: 'Mellbimbó körül + Mellek között + Pajesz + Bajusz + Arc + Áll + Nyak + Hascsík', price: '34 000' },
+  { name: 'Crystal', zones: 'Teljes láb + Teljes kar', price: '45 000' },
   { name: 'White', zones: 'Teljes intim + Popsi belső + Hónalj + Hascsík', price: '26 000' },
   { name: 'Pearl', zones: 'Hónalj + Lábszár térdig', price: '24 000' },
   { name: 'Shine', zones: 'Hónalj + Bikinivonal', price: '18 000' },
@@ -85,24 +89,24 @@ const lezerBerletekGrouped = [
   },
 ];
 
-// HydraBeauty Árak
-const hydrabeautyArak = [
-  { service: 'Hydrafacial (arc)', duration: '60 perc', price: '20 000' },
-  { service: 'Hydrafacial (hát)', duration: '90 perc', price: '25 000' },
-  { service: 'Hydrafacial (arc + nyak + dekoltázs)', duration: '100 perc', price: '30 000' },
-  { service: 'Hydrafacial + Carbon peeling (arc)', duration: '100 perc', price: '40 000' },
-  { service: 'Hydrafacial + Carbon peeling (arc + dekoltázs)', duration: '120 perc', price: '45 000' },
-  { service: 'Hydrafacial + Carbon peeling (hát)', duration: '120 perc', price: '45 000' },
+// Hydratouch Árak
+const hydratouchArak = [
+  { service: 'Hydratouch – arc', duration: '75 perc', price: '30 000' },
+  { service: 'Hydratouch – hát', duration: '90 perc', price: '35 000' },
+  { service: 'Hydratouch – arc, nyak, dekoltázs', duration: '105 perc', price: '40 000' },
+  { service: 'Hydratouch + Carbon peeling arcon', duration: '105 perc', price: '45 000' },
+  { service: 'Hydratouch + Carbon peeling arc, dekoltázs', duration: '120 perc', price: '50 000' },
+  { service: 'Hydratouch + Carbon peeling háton', duration: '120 perc', price: '55 000' },
 ];
 
 // Sminktetoválás Árak
 const sminktetovalasArak = [
   { service: 'Szemöldök tetoválás (púderes)', price: '75 000' },
   { service: 'Szemöldök tetoválás (ombre)', price: '75 000' },
-  { service: 'Rontott szemöldök tetoválás javítása', price: '80 000' },
-  { service: 'Szemhéj tetoválás (pillató sűrítő)', price: '35 000' },
-  { service: 'Fél ajaksatír', price: '55 000' },
-  { service: 'Teljes ajaksatír', price: '65 000' },
+  { service: 'Rontott szemöldök tetoválás javítása, fedése, színfrissítése', price: '80 000' },
+  { service: 'Szemhéj tetoválás (pillató sűrítő)', price: '55 000' },
+  { service: 'Fél ajaksatír', price: '65 000' },
+  { service: 'Teljes ajaksatír', price: '75 000' },
 ];
 
 // Tetoválás eltávolítás Árak
@@ -121,7 +125,7 @@ const carbonPeelingAlkalom = [
   { service: 'Pigmentfolt eltávolítás', price: '10 000' },
   { service: 'Kézfej (mindkettő)', price: '15 000' },
   { service: 'Hónalj világosítás (mindkettő)', price: '15 000' },
-  { service: 'Szemöldök', price: '15 000' },
+  { service: 'Szemöldök halványítás', price: '15 000' },
   { service: 'Teljes arc', price: '25 000' },
   { service: 'Dekoltázs', price: '25 000' },
   { service: 'Teljes hát', price: '35 000' },
@@ -129,12 +133,35 @@ const carbonPeelingAlkalom = [
 ];
 
 const carbonPeelingBerlet = [
-  { service: 'Teljes arc (5 alkalom)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
-  { service: 'Dekoltázs (5 alkalom)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
-  { service: 'Teljes arc + nyak + dekoltázs (5 alkalom)', price: '160 000', originalPrice: '200 000', discount: '-20%' },
-  { service: 'Teljes hát (5 alkalom)', price: '140 000', originalPrice: '175 000', discount: '-20%' },
-  { service: 'Kézfej (mindkettő, 5 alkalom)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
-  { service: 'Hónalj világosítás (mindkettő, 5 alkalom)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
+  { service: 'Teljes arc (4+1 ingyen)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
+  { service: 'Dekoltázs (4+1 ingyen)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
+  { service: 'Teljes arc + nyak + dekoltázs (4+1 ingyen)', price: '160 000', originalPrice: '200 000', discount: '-20%' },
+  { service: 'Teljes hát (4+1 ingyen)', price: '140 000', originalPrice: '175 000', discount: '-20%' },
+  { service: 'Kézfej (mindkettő, 4+1 ingyen)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
+  { service: 'Hónalj világosítás (mindkettő, 4+1 ingyen)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
+];
+
+// Green Sea Peel Árak
+const greenSeaPeelArak = [
+  { service: 'Green Sea Peel – alkalom', duration: '75 perc', price: '30 000' },
+];
+
+const greenSeaPeelBerlet = [
+  { service: 'Green Sea Peel – 4 alkalmas bérlet', price: '96 000', originalPrice: '120 000', discount: '-20%' },
+];
+
+// Biopen Q2 Árak
+const biopenQ2Arak = [
+  { service: 'Biopen Q2 – alkalom', duration: '75 perc', price: '35 000' },
+];
+
+const biopenQ2Berlet = [
+  { service: 'Biopen Q2 – 4 alkalmas bérlet', price: '112 000', originalPrice: '140 000', discount: '-20%' },
+];
+
+// Anti Aging Kezelés Árak
+const antiAgingArak = [
+  { service: 'Anti Aging Kezelés', duration: '90 perc', description: 'Komplex bőrfiatalító kezelés ultrahanggal és rádiófrekvenciával', price: '35 000' },
 ];
 
 const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
@@ -142,10 +169,13 @@ const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&sh
 const categories = [
   { id: 'lezeres-csomagok', label: 'Lézeres Csomagok', color: categoryColors['lezeres'] },
   { id: 'lezeres-berletek', label: 'Lézeres Bérletek', color: categoryColors['lezeres'] },
-  { id: 'hydrabeauty', label: 'HydraBeauty', color: categoryColors['hydrabeauty'] },
+  { id: 'hydratouch', label: 'Hydratouch', color: categoryColors['hydrabeauty'] },
   { id: 'sminktetovalas', label: 'Sminktetoválás', color: categoryColors['sminktetovalas'] },
   { id: 'tetovalas-eltavolitas', label: 'Tetoválás eltávolítás', color: categoryColors['tetovalas-eltavolitas'] },
   { id: 'carbon-peeling', label: 'Carbon Peeling', color: categoryColors['carbon-peeling'] },
+  { id: 'green-sea-peel', label: 'Green Sea Peel', color: categoryColors['green-sea-peel'] },
+  { id: 'biopen-q2', label: 'Biopen Q2', color: categoryColors['biopen-q2'] },
+  { id: 'anti-aging', label: 'Anti Aging', color: categoryColors['anti-aging'] },
 ];
 
 // Schema.org - Service Catalog with Offers (all services + both locations)
@@ -189,12 +219,12 @@ const serviceSchema = {
       },
       {
         "@type": "OfferCatalog",
-        "name": "HydraBeauty Arckezelések",
+        "name": "Hydratouch Arckezelések",
         "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (arc)", "description": "60 perces professzionális arckezelés" }, "price": "20000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (hát)", "description": "90 perces hátkezelés" }, "price": "25000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial (arc + nyak + dekoltázs)", "description": "100 perces komplex kezelés" }, "price": "30000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydrafacial + Carbon peeling (arc)", "description": "100 perces kombinált kezelés" }, "price": "40000", "priceCurrency": "HUF" }
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – arc", "description": "75 perces professzionális arckezelés" }, "price": "30000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – hát", "description": "90 perces hátkezelés" }, "price": "35000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – arc, nyak, dekoltázs", "description": "105 perces komplex kezelés" }, "price": "40000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch + Carbon peeling arcon", "description": "105 perces kombinált kezelés" }, "price": "45000", "priceCurrency": "HUF" }
         ]
       },
       {
@@ -203,9 +233,9 @@ const serviceSchema = {
         "itemListElement": [
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemöldök tetoválás (púderes/ombre)", "description": "Tartós szemöldök sminktetoválás" }, "price": "75000", "priceCurrency": "HUF" },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Rontott szemöldök tetoválás javítása", "description": "Korrekciós sminktetoválás" }, "price": "80000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemhéj tetoválás (pillató sűrítő)", "description": "Tartós szemhéj sminktetoválás" }, "price": "35000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fél ajaksatír", "description": "Részleges ajak sminktetoválás" }, "price": "55000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Teljes ajaksatír", "description": "Tartós ajak sminktetoválás" }, "price": "65000", "priceCurrency": "HUF" }
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szemhéj tetoválás (pillató sűrítő)", "description": "Tartós szemhéj sminktetoválás" }, "price": "55000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fél ajaksatír", "description": "Részleges ajak sminktetoválás" }, "price": "65000", "priceCurrency": "HUF" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Teljes ajaksatír", "description": "Tartós ajak sminktetoválás" }, "price": "75000", "priceCurrency": "HUF" }
         ]
       },
       {
@@ -228,6 +258,27 @@ const serviceSchema = {
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (teljes hát)", "description": "Hát kezelés" }, "price": "35000", "priceCurrency": "HUF" },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (arc + nyak + dekoltázs)", "description": "Komplex kezelés" }, "price": "40000", "priceCurrency": "HUF" }
         ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Green Sea Peel",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Green Sea Peel", "description": "75 perces bőrmegújító kezelés" }, "price": "30000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Biopen Q2",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Biopen Q2", "description": "75 perces bőrfiatalító kezelés" }, "price": "35000", "priceCurrency": "HUF" }
+        ]
+      },
+      {
+        "@type": "OfferCatalog",
+        "name": "Anti Aging Kezelés",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Anti Aging Kezelés", "description": "90 perces komplex bőrfiatalító kezelés ultrahanggal és rádiófrekvenciával" }, "price": "35000", "priceCurrency": "HUF" }
+        ]
       }
     ]
   }
@@ -242,7 +293,7 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Főoldal",
-      "item": "https://beautyflow.pro"
+      "item": "https://beautyflow.pro/"
     },
     {
       "@type": "ListItem",
@@ -254,7 +305,10 @@ const breadcrumbSchema = {
 };
 ---
 
-<Layout title="Árak - Beautyflow Szépségszalon Budapest">
+<Layout
+  title="Árak - Beautyflow Szépségszalon Budapest"
+  description="A Beautyflow szépségszalon árlistája: lézeres szőrtelenítés, sminktetoválás, carbon peeling, arckezelések és tetoválás eltávolítás árai Budapesten."
+>
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <!-- Hero Section -->
@@ -266,6 +320,22 @@ const breadcrumbSchema = {
       <p class="text-gray-600 max-w-2xl mx-auto text-sm lg:text-base">
         Átlátható árazás, minőségi szolgáltatások. Válassz a kezelések közül és foglalj időpontot online!
       </p>
+    </div>
+  </section>
+
+  <!-- VIP Loyalty Banner -->
+  <section class="bg-gradient-to-r from-[#c53f75] to-[#a33460] py-5">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">&#11088;</span>
+          <span class="text-white font-heading text-lg sm:text-xl font-bold uppercase">Törzsvásárlói VIP Program</span>
+        </div>
+        <span class="hidden sm:block w-px h-6 bg-white/30"></span>
+        <p class="text-white/90 text-sm sm:text-base">
+          Gyűjts pecsétet minden kezelés után! <strong class="text-white">15 pecsét = örökös 10% kedvezmény</strong> minden kezelésre.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -391,11 +461,11 @@ const breadcrumbSchema = {
         </div>
       </section>
 
-      <!-- HydraBeauty Árak -->
-      <section id="hydrabeauty" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-teal-50/50 via-white to-teal-50/30">
+      <!-- Hydratouch Árak -->
+      <section id="hydratouch" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-teal-50/50 via-white to-teal-50/30">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['hydrabeauty'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">HydraBeauty Árak</h2>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Hydratouch Árak</h2>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -409,7 +479,7 @@ const breadcrumbSchema = {
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">
-                {hydrabeautyArak.map((item) => (
+                {hydratouchArak.map((item) => (
                   <tr class="hover:bg-gray-50">
                     <td class="py-4 px-4 font-medium text-gray-900">{item.service}</td>
                     <td class="py-4 px-3 text-center text-gray-600">{item.duration}</td>
@@ -556,6 +626,142 @@ const breadcrumbSchema = {
         </div>
       </section>
 
+      <!-- Green Sea Peel -->
+      <section id="green-sea-peel" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-emerald-50/50 via-white to-emerald-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['green-sea-peel'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Green Sea Peel Árak</h2>
+        </div>
+
+        <!-- Alkalmi ár -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Alkalmi kezelés</h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {greenSeaPeelArak.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">
+                    {item.service}
+                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration}</span>
+                  </td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Bérlet -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Bérlet <span class="text-emerald-600">(-20% kedvezmény)</span></h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {greenSeaPeelBerlet.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
+                    <span class="text-lg font-bold text-emerald-600 whitespace-nowrap">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- Biopen Q2 -->
+      <section id="biopen-q2" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-amber-50/50 via-white to-amber-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['biopen-q2'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Biopen Q2 Árak</h2>
+        </div>
+
+        <!-- Alkalmi ár -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Alkalmi kezelés</h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {biopenQ2Arak.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">
+                    {item.service}
+                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration}</span>
+                  </td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Bérlet -->
+        <h3 class="font-semibold text-lg text-gray-800 mb-3">Bérlet <span class="text-amber-600">(-20% kedvezmény)</span></h3>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {biopenQ2Berlet.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
+                    <span class="text-lg font-bold text-amber-600 whitespace-nowrap">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
+      <!-- Anti Aging Kezelés -->
+      <section id="anti-aging" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-pink-50/50 via-white to-pink-50/30">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['anti-aging'].primary};`}></div>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Anti Aging Kezelés Árak</h2>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {antiAgingArak.map((item) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 px-5 font-medium text-gray-900">
+                    {item.service}
+                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration} – {item.description}</span>
+                  </td>
+                  <td class="py-3 px-5 text-right">
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 text-center">
+          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+            Időpontfoglalás
+          </a>
+        </div>
+      </section>
+
       <!-- CTA Section -->
       <section class="bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-lg p-8 text-center text-white">
         <h2 class="font-heading text-2xl lg:text-3xl mb-3">Kérdésed van az árakkal kapcsolatban?</h2>
@@ -607,14 +813,14 @@ const breadcrumbSchema = {
 
 <script>
   function initPriceNav() {
-    const navBtns = document.querySelectorAll('.price-nav-btn');
+    const navBtns = document.querySelectorAll<HTMLElement>('.price-nav-btn');
     const sections = document.querySelectorAll('.price-section');
 
     // Click handler for nav buttons
     navBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetId = btn.getAttribute('data-target');
-        const targetSection = document.getElementById(targetId);
+        const targetSection = targetId ? document.getElementById(targetId) : null;
         if (targetSection) {
           targetSection.scrollIntoView({ behavior: 'smooth' });
         }
@@ -632,7 +838,7 @@ const breadcrumbSchema = {
 
             if (isActive) {
               btn.classList.add('active');
-              btn.style.backgroundColor = color;
+              btn.style.backgroundColor = color || '';
               btn.style.color = 'white';
             } else {
               btn.classList.remove('active');

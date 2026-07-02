@@ -3,10 +3,7 @@ export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
 import LocationsSection from '../components/LocationsSection.astro';
-import { getImage } from 'astro:assets';
-import ContentImage from '../components/images/ContentImage.astro';
-import CardImage from '../components/images/CardImage.astro';
-import FixedImage from '../components/images/FixedImage.astro';
+import { ContentImage, CardImage, FixedImage } from '../components/images';
 
 // Image imports
 import beautyflowBuda from '../assets/images/Beautyflow-buda.jpg';
@@ -42,22 +39,6 @@ import szepsegszalonRuzs from '../assets/images/szepsegszalon-ruzs.jpg';
 import szepsegszalonTrofea from '../assets/images/szepsegszalon-trofea.jpg';
 import szepsegszalonUgyfel from '../assets/images/szepsegszalon-ugyfelvelemeny.jpg';
 
-// Small fixed-size images - using getImage for 1x + 2x srcset
-const notinoIkonOptimized = await getImage({ src: notinoIkon, width: 32, height: 32, format: 'webp', quality: 60 });
-const notinoIkon2x = await getImage({ src: notinoIkon, width: 64, height: 64, format: 'webp', quality: 60 });
-
-const googleLogoOptimized = await getImage({ src: googleLogo, width: 36, height: 36, format: 'webp', quality: 60 });
-const googleLogo2x = await getImage({ src: googleLogo, width: 72, height: 72, format: 'webp', quality: 60 });
-
-const notinoLogoSmOptimized = await getImage({ src: notinoLogoSm, width: 48, height: 48, format: 'webp', quality: 60 });
-const notinoLogoSm2x = await getImage({ src: notinoLogoSm, width: 96, height: 96, format: 'webp', quality: 60 });
-
-const skinlabOptimized = await getImage({ src: skinlab, width: 48, height: 48, format: 'webp', quality: 60 });
-const skinlab2x = await getImage({ src: skinlab, width: 96, height: 96, format: 'webp', quality: 60 });
-
-const hajduOptimized = await getImage({ src: hajdu, width: 48, height: 48, format: 'webp', quality: 60 });
-const hajdu2x = await getImage({ src: hajdu, width: 96, height: 96, format: 'webp', quality: 60 });
-
 const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
@@ -70,7 +51,7 @@ const locations = [
     hours: [
       { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
       { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: '10:00 – 19:00' },
     ]
   },
   {
@@ -79,9 +60,9 @@ const locations = [
     image: beautyflowPest,
     bookingUrl: notinoUrlPest,
     hours: [
-      { days: 'Hétfő – Péntek', time: '08:00 – 20:00' },
+      { days: 'Hétfő – Péntek', time: '08:00 – 18:00' },
       { days: 'Szombat', time: '10:00 – 20:00' },
-      { days: 'Vasárnap', time: '10:00 – 20:00' },
+      { days: 'Vasárnap', time: 'Zárva' },
     ]
   }
 ];
@@ -140,6 +121,7 @@ const packages = [
   { name: 'Silver', content: 'Teljes intim + Popsi belső + Hónalj + Lábszár térdig', price: '40 000', popular: false },
   { name: 'Bronze', content: 'Teljes láb + Hónalj', price: '38 000', popular: false },
   { name: 'Platinum - PCOS', content: 'Mellbimbó körül + Mellek között + Pajesz + Bajusz + Arc + Áll + Nyak + Hascsík', price: '34 000', popular: false },
+  { name: 'Crystal', content: 'Teljes láb + Teljes kar', price: '45 000', popular: false },
   { name: 'White', content: 'Teljes intim + Popsi belső + Hónalj + Hascsík', price: '26 000', popular: false },
   { name: 'Pearl', content: 'Hónalj + Lábszár térdig', price: '24 000', popular: false },
   { name: 'Shine', content: 'Hónalj + Bikinivonal', price: '18 000', popular: false },
@@ -254,7 +236,7 @@ const serviceSchema = {
   "provider": {
     "@type": "BeautySalon",
     "name": "Beautyflow Szépségszalon",
-    "url": "https://beautyflow.pro"
+    "url": "https://beautyflow.pro/"
   },
   "areaServed": "Budapest",
   "serviceType": "Lézeres szőrtelenítés",
@@ -308,14 +290,12 @@ const serviceSchema = {
                 <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
                 <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                   <div class="bg-white rounded-full p-1">
-                    <img
-                      src={notinoIkonOptimized.src}
-                      srcset={`${notinoIkonOptimized.src} 1x, ${notinoIkon2x.src} 2x`}
+                    <FixedImage
+                      src={notinoIkon}
                       alt="Notino"
+                      width={32}
+                      height={32}
                       class="w-8 h-8"
-                      width="32"
-                      height="32"
-                      loading="eager"
                     />
                   </div>
                 </div>
@@ -371,14 +351,12 @@ const serviceSchema = {
           <!-- Google Rating Badge - On image, left side -->
           <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3 google-rating-badge">
             <div class="flex items-center gap-2">
-              <img
-                src={googleLogoOptimized.src}
-                srcset={`${googleLogoOptimized.src} 1x, ${googleLogo2x.src} 2x`}
+              <FixedImage
+                src={googleLogo}
                 alt="Google"
+                width={36}
+                height={36}
                 class="w-7 h-7 lg:w-9 lg:h-9 rounded-full"
-                width="36"
-                height="36"
-                loading="lazy"
               />
               <div>
                 <div class="flex items-center gap-1">
@@ -613,14 +591,12 @@ const serviceSchema = {
                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
               />
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <img
-                src={googleLogoOptimized.src}
-                srcset={`${googleLogoOptimized.src} 1x, ${googleLogo2x.src} 2x`}
+              <FixedImage
+                src={googleLogo}
                 alt="Google"
+                width={28}
+                height={28}
                 class="w-7 h-7 object-contain flex-shrink-0"
-                width="28"
-                height="28"
-                loading="lazy"
               />
             </div>
           </div>
@@ -883,14 +859,12 @@ const serviceSchema = {
               <th class="py-4 px-6 text-left font-semibold">Szempont</th>
               <th class="py-4 px-6 text-center font-semibold">
                 <div class="flex items-center justify-center gap-2">
-                  <img
-                    src={notinoIkonOptimized.src}
-                    srcset={`${notinoIkonOptimized.src} 1x, ${notinoIkon2x.src} 2x`}
+                  <FixedImage
+                    src={notinoIkon}
                     alt="Beautyflow"
+                    width={24}
+                    height={24}
                     class="w-6 h-6"
-                    width="24"
-                    height="24"
-                    loading="lazy"
                   />
                   Beautyflow
                 </div>
@@ -1157,14 +1131,12 @@ const serviceSchema = {
           A legjobb hely a dióda lézeres szőrtelenítéshez. Fanni és Piroska elképesztő, alapos munkát végeznek, és mindig gondoskodnak arról, hogy a lehető legkényelmesebb legyen. Az eljáráshoz használt gép fenomenális, és az első kezelés után lenyűgöző eredményeket fog látni.
         </p>
         <div class="flex items-center justify-center gap-3">
-          <img
-            src={hajduOptimized.src}
-            srcset={`${hajduOptimized.src} 1x, ${hajdu2x.src} 2x`}
+          <FixedImage
+            src={hajdu}
             alt="László Eszter"
+            width={48}
+            height={48}
             class="w-12 h-12 rounded-full object-cover"
-            width="48"
-            height="48"
-            loading="lazy"
           />
           <p class="font-semibold text-gray-900">László Eszter</p>
         </div>
@@ -1220,23 +1192,21 @@ const serviceSchema = {
       </h2>
       <div class="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
         <div class="flex flex-col items-center">
-          <img
-            src={notinoLogoSmOptimized.src}
-            srcset={`${notinoLogoSmOptimized.src} 1x, ${notinoLogoSm2x.src} 2x`}
+          <FixedImage
+            src={notinoLogoSm}
             alt="Notino Partner"
+            width={48}
+            height={48}
             class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
-            height="48"
-            loading="lazy"
           />
         </div>
         <div class="flex flex-col items-center">
-          <img
-            src={skinlabOptimized.src}
-            srcset={`${skinlabOptimized.src} 1x, ${skinlab2x.src} 2x`}
+          <FixedImage
+            src={skinlab}
             alt="Skinlab Partner"
+            width={48}
+            height={48}
             class="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300"
-            height="48"
-            loading="lazy"
           />
         </div>
       </div>

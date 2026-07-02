@@ -32,11 +32,11 @@ const faqCategories = [
       },
       {
         q: "Is there parking available?",
-        a: "There is parking available near both of our salons. At the Buda salon, street parking and a nearby parking garage are available. At the Pest salon, street parking is also possible. You can find detailed directions on the location page."
+        a: "Paid street parking is available near both of our salons. At the Buda salon, parking at Vegyész utca costs 200 HUF/hour. At the Pest salon, parking at Reitter Ferenc utca costs 300 HUF/hour. No free parking is available nearby. Allee Shopping Center is approx. 15 minutes from the Buda salon by tram."
       },
       {
         q: "Can I cancel or reschedule my appointment?",
-        a: "Yes, you can cancel or reschedule your appointment free of charge up to 24 hours before the treatment. Please notify us by phone or online. Cancellations within 24 hours may incur a cancellation fee."
+        a: "Yes, you can cancel or reschedule your appointment free of charge up to 48 hours before the treatment. Please notify us by phone or online. Cancellations within 48 hours will incur a cancellation fee of 5,000 HUF per hour."
       },
       {
         q: "Can I purchase gift vouchers?",
@@ -300,6 +300,104 @@ const faqCategories = [
     ]
   },
   {
+    id: 'green-sea-peel',
+    title: 'Green Sea Peel',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>`,
+    questions: [
+      {
+        q: "What is Green Sea Peel?",
+        a: "Green Sea Peel is a natural, liquid microneedling treatment. It works similarly to BioPen microneedling, but uses natural sea sponge extract containing approximately 800,000 stimulating micro-needles per dose. This means 800,000 micro-needles penetrate the skin per treatment, triggering deep peeling and skin renewal."
+      },
+      {
+        q: "How painful is the Green Sea Peel treatment?",
+        a: "The treatment involves some discomfort – many compare it to being scrubbed with glass fragments. The 800,000 micro-needles of the sea sponge cause this sensation during the massage, but the treatment only lasts 7-10 minutes in total."
+      },
+      {
+        q: "Who is Green Sea Peel recommended for?",
+        a: "It is excellent for pigmented skin, scarred skin (acne scars, chickenpox scars), oily skin, enlarged pores, and as an anti-aging treatment. It can be performed regardless of age."
+      },
+      {
+        q: "Who should NOT get this treatment?",
+        a: "It is not suitable for rosacea, very sensitive skin, active acne, herpes, or shellfish/seaweed allergies. Moles must be avoided, and it is not recommended for skin with too many moles."
+      },
+      {
+        q: "How many treatments are needed?",
+        a: "A complete skin renewal is noticeable after just one treatment. For scar treatment, a course of 4 sessions is recommended, every 28 days. After that, 1 maintenance treatment per year is sufficient."
+      },
+      {
+        q: "What is the peeling like?",
+        a: "Peeling starts after 3-4 days and lasts about a week. Light treatment results in powder-like peeling, medium in moderate peeling, and deep treatment in sheet-like peeling – large pieces of old skin come off, revealing fresh, renewed skin underneath."
+      },
+      {
+        q: "What should I do after the treatment?",
+        a: "Only lukewarm water and sunscreen are allowed. Moisturizer, cleanser, retinol, and any skincare products are prohibited during the peeling period. The skin's self-healing mechanism must be trusted to handle the process."
+      },
+      {
+        q: "When can the treatment be performed?",
+        a: "Only during winter months, from November to May. It cannot be performed in summer due to increased UV radiation."
+      },
+      {
+        q: "Is there any downtime?",
+        a: "Yes, peeling is expected for 3-7 days after treatment, during which redness may also appear. It is not recommended to have this done before important events during this period."
+      },
+      {
+        q: "Can it be combined with other treatments?",
+        a: "Green Sea Peel is a comprehensive treatment on its own. We complement it with LED light therapy, included in the price. It cannot be combined with other treatments simultaneously."
+      },
+      {
+        q: "What does the treatment price include?",
+        a: "You get a 75-minute treatment with premium Korean and German products, complemented with LED light therapy. At the end of the treatment, we carefully soothe the skin with sensitive products."
+      }
+    ]
+  },
+  {
+    id: 'biopen-q2',
+    title: 'BioPen Q2',
+    icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>`,
+    questions: [
+      {
+        q: "What is BioPen Q2?",
+        a: "BioPen Q2 is a 3-in-1 cosmetic device that combines microneedling mesotherapy, electroporation, and LED light therapy in a single treatment. It delivers medical-grade active ingredients deep into the skin, stimulating collagen and elastin production."
+      },
+      {
+        q: "Is the treatment painful?",
+        a: "No. We apply lidocaine numbing cream before the treatment, making the microneedling painless. Electroporation may give a mild electrical sensation, but it can be turned off if uncomfortable."
+      },
+      {
+        q: "Who is BioPen Q2 recommended for?",
+        a: "We recommend it for ages 25 and above, when natural collagen production slows down. It is excellent for wrinkles, scars, pigmentation spots, dehydrated skin, enlarged pores, and under-eye concerns."
+      },
+      {
+        q: "What active ingredients do you use?",
+        a: "We work with 20 medical-grade ampoules: collagen, hyaluronic acid, vitamin C, peptides, lifting agents, and special blends for dehydrated, pigmented, or acne-prone skin."
+      },
+      {
+        q: "How many treatments are needed?",
+        a: "Visible improvement is noticeable after the first treatment. For optimal results, a course of 4 sessions is recommended, every 3-4 weeks. After that, 1-2 maintenance treatments per year are sufficient."
+      },
+      {
+        q: "When can the treatment be performed?",
+        a: "In winter, we work with microneedles (deeper layers); in summer, with nano-needles (surface treatment). This way, it can be performed year-round, adjusting intensity to the season."
+      },
+      {
+        q: "What is the difference between micro-needles and nano-needles?",
+        a: "Micro-needles penetrate deeper layers for more intensive results – we use these in winter. Nano-needles work on surface layers, are gentler, and are safe for summer use."
+      },
+      {
+        q: "Can it be combined with other treatments?",
+        a: "BioPen Q2 is a comprehensive treatment on its own, and we do not combine it with other electro-cosmetic procedures. The device's 3 functions (microneedling, electroporation, LED) complement each other."
+      },
+      {
+        q: "Is there any downtime?",
+        a: "Minimal. Mild redness may appear after the treatment, which subsides within a few hours. You can resume your normal routine the next day."
+      },
+      {
+        q: "Why choose Beautyflow?",
+        a: "We provide a 75-minute treatment with numbing, work with 20 medical-grade active ingredients, and include LED light therapy in the price. At our award-winning salon, you get the premium of premiums."
+      }
+    ]
+  },
+  {
     id: 'pigmentation-removal',
     title: 'Pigmentation Removal',
     icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`,
@@ -356,6 +454,8 @@ const categoryColors: Record<string, { primary: string; light: string; bg: strin
   'tattoo-removal': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2', shadow: 'rgba(239, 68, 68, 0.15)' },
   'permanent-makeup': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff', shadow: 'rgba(99, 102, 241, 0.15)' },
   'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff', shadow: 'rgba(139, 92, 246, 0.15)' },
+  'green-sea-peel': { primary: '#059669', light: '#6ee7b7', bg: '#ecfdf5', shadow: 'rgba(5, 150, 105, 0.15)' },
+  'biopen-q2': { primary: '#0891b2', light: '#67e8f9', bg: '#ecfeff', shadow: 'rgba(8, 145, 178, 0.15)' },
   'pigmentation-removal': { primary: '#f59e0b', light: '#fcd34d', bg: '#fffbeb', shadow: 'rgba(245, 158, 11, 0.15)' },
 };
 
@@ -422,7 +522,7 @@ const breadcrumbSchema = {
   <!-- Category Navigation -->
   <section class="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
     <div class="container mx-auto px-4">
-      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:justify-center" id="faq-nav">
+      <nav class="flex overflow-x-auto py-4 gap-2 scrollbar-hide md:flex-wrap md:justify-center" id="faq-nav">
         {faqCategories.map((category, index) => {
           const colors = categoryColors[category.id];
           return (

@@ -3,6 +3,10 @@ export const prerender = true;
 
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
+import Tracking from '../../tracking-kit/components/Tracking.astro';
+import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.astro';
+import Turnstile from '../../tracking-kit/components/Turnstile.astro';
+import BookingClick from '../components/tracking/BookingClick.astro';
 
 // Image imports
 import lezeresImg from '../assets/images/lezeres-szortelenites-beautyflow-bg.jpg';
@@ -34,6 +38,15 @@ const lang = 'hu';
 const canonicalUrl = 'https://beautyflow.pro/ingyenes-konzultacio';
 const huUrl = '/ingyenes-konzultacio';
 const enUrl = '/en/free-consultation';
+
+// Cloudflare Turnstile site key (public). Falls back to the production key so
+// local `astro dev` without env still renders a widget. The /api/contact
+// endpoint fails closed, so this token is required for a submit to succeed.
+const turnstileSiteKey =
+  (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined) ||
+  '0x4AAAAAADOTyE9gccGo16os';
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
 
 const treatments = treatmentImages;
 
@@ -86,7 +99,7 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Főoldal",
-      "item": "https://beautyflow.pro"
+      "item": "https://beautyflow.pro/"
     },
     {
       "@type": "ListItem",
@@ -101,6 +114,7 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
+    <Tracking gtmId={gtmId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />
@@ -114,6 +128,8 @@ const breadcrumbSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   </head>
   <body class="bg-[#fdf8f6] min-h-[100dvh] md:h-screen md:overflow-hidden">
+    <TrackingNoscript gtmId={gtmId} />
+    <Turnstile />
     <main class="min-h-[100dvh] md:h-full py-4 md:py-0">
       <!-- Form Container -->
       <div id="form-container" class="min-h-[100dvh] md:h-full flex items-center justify-center px-4">
@@ -371,6 +387,14 @@ const breadcrumbSchema = {
               <!-- Honeypot field (hidden) -->
               <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" />
 
+              {turnstileSiteKey && (
+                <div
+                  id="turnstile-container"
+                  data-sitekey={turnstileSiteKey}
+                  class="mb-4 flex justify-center min-h-[65px]"
+                ></div>
+              )}
+
               <div class="flex gap-3">
                 <button
                   type="button"
@@ -505,68 +529,56 @@ const breadcrumbSchema = {
       }
     </style>
 
+    {/* Turnstile api.js is loaded once, page-globally, by <Turnstile/> in the Layout
+        (auto-render mode). This calculator renders its own widget explicitly on the
+        id-div #turnstile-container (createTurnstile → no .cf-turnstile class → no
+        double-render), so no per-page api.js is needed here. */}
+
     <script>
       import {
-        trackConversion,
-        getFirstTouch,
-        getLastTouch,
-        getGclid,
-        getFbclid,
-        pushCalculatorStep,
-      } from '@leadgen/conversion-tracking/client';
+        trackCalculatorStart,
+        trackCalculatorStep,
+        trackCalculatorOption,
+        trackCalculatorComplete,
+        trackLeadSubmit,
+        waitForTracking,
+        getAllTrackingData,
+        getFbc,
+        getFbp,
+        collectAttribution,
+      } from '@tracking/lib';
+      import { createTurnstile } from '@/lib/forms/turnstile-client';
 
-      // Tracking is auto-initialized by the Astro integration
+      const FORM_ID = 'consultation-calculator';
+      const FORM_NAME = 'consultation_calculator';
+      const TOTAL_STEPS = 4;
 
-      // Helper to get all tracking data for beacon/forms
-      function getAllTrackingData() {
-        const first = getFirstTouch();
-        const last = getLastTouch();
+      // UTM/click ids for the lead record (CRM + Sheets). Sourced from the canonical
+      // lib: getAllTrackingData() (gclid/gbraid/wbraid/fbclid/utm_*) + collectAttribution()
+      // (adds msclkid, persists the superset) + getFbc/getFbp. Click IDs are
+      // marketing-consent gated inside the lib (GDPR). Survives the hard navigation.
+      function getTrackingData() {
+        const t = getAllTrackingData();
+        const a = collectAttribution();
         return {
-          gclid: getGclid(),
-          fbclid: getFbclid(),
-          utm_source: last?.utm_source || first?.utm_source || '',
-          utm_medium: last?.utm_medium || first?.utm_medium || '',
-          utm_campaign: last?.utm_campaign || first?.utm_campaign || '',
-          utm_content: last?.utm_content || first?.utm_content || '',
-          utm_term: last?.utm_term || first?.utm_term || '',
+          gclid: t.gclid || a.gclid || '',
+          fbclid: t.fbclid || a.fbclid || '',
+          utm_source: t.utm_source || '',
+          utm_medium: t.utm_medium || '',
+          utm_campaign: t.utm_campaign || '',
+          utm_content: t.utm_content || '',
+          utm_term: t.utm_term || '',
+          gbraid: t.gbraid || a.gbraid || '',
+          wbraid: t.wbraid || a.wbraid || '',
+          msclkid: a.msclkid || '',
+          fbc: getFbc() || '',
+          fbp: getFbp() || '',
         };
       }
 
-      // Send tracking beacon (guaranteed delivery)
-      function sendTrackingBeacon(data: Record<string, unknown>): void {
-        const endpoint = '/api/tracking-beacon';
-
-        try {
-          const payload = JSON.stringify({
-            ...data,
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-          });
-
-          if (navigator.sendBeacon) {
-            const blob = new Blob([payload], { type: 'application/json' });
-            navigator.sendBeacon(endpoint, blob);
-          } else {
-            fetch(endpoint, {
-              method: 'POST',
-              body: payload,
-              headers: { 'Content-Type': 'application/json' },
-              keepalive: true,
-            }).catch(() => {});
-          }
-        } catch {}
-      }
-
-      // Generate transaction ID
-      function generateTransactionId(): string {
-        const timestamp = Date.now().toString(36);
-        const random = Math.random().toString(36).slice(2, 7);
-        return `LEAD-${timestamp}-${random}`.toUpperCase();
-      }
-
       document.addEventListener('DOMContentLoaded', () => {
-        // Tracking is auto-initialized by Astro integration
+        // fires once per page-load (analytics-consented calculator funnel start)
+        trackCalculatorStart(FORM_NAME);
 
         let currentStep = 1;
 
@@ -612,6 +624,13 @@ const breadcrumbSchema = {
         const consentInput = document.getElementById('consent') as HTMLInputElement;
         const honeypotInput = document.querySelector('input[name="website"]') as HTMLInputElement;
 
+        // Cloudflare Turnstile — the calculator isn't a <form> and step 4 is
+        // hidden until reached, so render explicitly when the user gets there.
+        const turnstileEl = document.getElementById('turnstile-container');
+        const turnstile = turnstileEl
+          ? createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '')
+          : null;
+
         // Show/hide steps
         function showStep(step: number) {
           steps.forEach(s => s.classList.add('hidden'));
@@ -631,6 +650,9 @@ const breadcrumbSchema = {
             }
           });
 
+          // Render the bot-check the moment its step becomes visible.
+          if (step === 4) turnstile?.ensureRendered();
+
           currentStep = step;
         }
 
@@ -641,12 +663,18 @@ const breadcrumbSchema = {
               .filter(cb => cb.checked)
               .map(cb => cb.value);
             btnStep1.disabled = formData.treatments.length === 0;
+            // Restore the per-option engagement signal that the GTM container
+            // still has a trigger/tag for (CE - calculator_option). Fires only
+            // when an option becomes selected, not on de-select.
+            if (checkbox.checked) {
+              trackCalculatorOption('treatments', checkbox.value);
+            }
           });
         });
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
-            pushCalculatorStep(1, 'treatments');
+            trackCalculatorStep('treatments', 1, TOTAL_STEPS);
             showStep(2);
           }
         });
@@ -670,7 +698,7 @@ const breadcrumbSchema = {
 
         btnStep2.addEventListener('click', () => {
           if (formData.firstName.length >= 2 && formData.lastName.length >= 2) {
-            pushCalculatorStep(2, 'name');
+            trackCalculatorStep('name', 2, TOTAL_STEPS);
             showStep(3);
           }
         });
@@ -694,7 +722,7 @@ const breadcrumbSchema = {
 
         btnStep3.addEventListener('click', () => {
           if (validatePhone(formData.phone)) {
-            pushCalculatorStep(3, 'phone');
+            trackCalculatorStep('phone', 3, TOTAL_STEPS);
             showStep(4);
           }
         });
@@ -759,79 +787,69 @@ const breadcrumbSchema = {
         btnSubmit.addEventListener('click', async () => {
           formData.website = honeypotInput?.value || '';
           if (formData.website) {
-            showThankYou();
+            window.location.href = '/koszonjuk';
+            return;
+          }
+
+          // Bot-check must be solved before we send — the server fails closed.
+          const turnstileToken = turnstile ? turnstile.getToken() : '';
+          if (turnstile && !turnstileToken) {
+            turnstile.ensureRendered();
+            showError('Kérjük várj, amíg betöltődik a robot-ellenőrzés, majd próbáld újra.');
             return;
           }
 
           loadingOverlay?.classList.remove('hidden');
           errorMessage?.classList.add('hidden');
 
-          // Generate transaction ID for tracking
-          const transactionId = generateTransactionId();
+          const trackingData = getTrackingData();
 
-          // Track conversion (GTM + Zaraz) - consent-aware
-          const trackingResult = trackConversion('contact_form', {
-            email: formData.email,
-            phone: formData.phone,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            value: 5000, // Lead value in HUF
-            currency: 'HUF',
-          });
-
-          // Get all tracking data for beacon
-          const trackingData = getAllTrackingData();
-
-          // Send beacon (guaranteed delivery even on page unload)
-          sendTrackingBeacon({
-            email: formData.email,
-            phone: formData.phone,
-            transactionId,
-            gclid: trackingResult.gclid,
-            fbclid: trackingData.fbclid,
-            ...trackingData,
-          });
-
-          // Add tracking data to formData for Google Sheets
-          const formDataWithTracking = {
+          const payload = {
             ...formData,
-            gclid: trackingData.gclid || '',
-            fbclid: trackingData.fbclid || '',
-            utm_source: trackingData.utm_source || '',
-            utm_medium: trackingData.utm_medium || '',
-            utm_campaign: trackingData.utm_campaign || '',
-            utm_content: trackingData.utm_content || '',
-            utm_term: trackingData.utm_term || '',
+            formType: 'consultation' as const,
+            turnstileToken,
+            ...trackingData,
           };
 
           try {
             const response = await fetch('/api/contact', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formDataWithTracking),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
             });
 
             const result = await response.json();
 
             if (result.success) {
-              showThankYou();
+              trackCalculatorComplete(FORM_NAME);
+              // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
+              // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
+              // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
+              trackLeadSubmit({
+                email: formData.email,
+                phone: formData.phone,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
+                contentName: FORM_NAME,
+                eventName: 'contact_form_submit',
+              });
+              // Hold the loading overlay up, give GTM a beat to fire, then redirect;
+              // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
+              await waitForTracking(600);
+              window.location.href = '/koszonjuk';
             } else {
+              loadingOverlay?.classList.add('hidden');
+              // Token is single-use — reset so the user can retry.
+              turnstile?.reset();
               showError(result.error || 'Hiba történt, kérjük próbáld újra.');
             }
           } catch (error) {
-            showError('Hiba történt a küldés során. Kérjük próbáld újra később.');
-          } finally {
             loadingOverlay?.classList.add('hidden');
+            turnstile?.reset();
+            showError('Hiba történt a küldés során. Kérjük próbáld újra később.');
           }
         });
-
-        function showThankYou() {
-          steps.forEach(s => s.classList.add('hidden'));
-          document.getElementById('thank-you')?.classList.remove('hidden');
-          document.getElementById('progress')?.classList.add('hidden');
-        }
 
         function showError(message: string) {
           if (errorText) errorText.textContent = message;
@@ -842,5 +860,6 @@ const breadcrumbSchema = {
         }
       });
     </script>
+    <BookingClick />
   </body>
 </html>

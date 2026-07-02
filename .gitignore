@@ -16,9 +16,31 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+# .env.production holds ONLY public, non-secret market config (PUBLIC_TRACKING_*,
+# PUBLIC_TURNSTILE_SITE_KEY, GTM id) inlined into the client bundle at build —
+# committed on purpose so production builds are reproducible. NEVER put secrets here.
+!.env.production
+
+# cloudflare
+.wrangler/
 
 # macOS-specific files
 .DS_Store
 
 # jetbrains setting folder
 .idea/
+
+# tooling / scratch artifacts
+.playwright-mcp/
+references/
+
+# npm lockfile is intentionally NOT committed.
+# sharp / @tailwindcss/oxide / rolldown ship platform-specific native+wasm
+# optional deps whose nested @emnapi/@napi-rs entries a Windows-generated lock
+# cannot include for Linux. With a committed lock, Cloudflare's Linux build
+# runs `npm ci` and fails the consistency check; with no lock it runs
+# `npm install` and resolves correctly per-platform. See DEPLOY.md.
+package-lock.json

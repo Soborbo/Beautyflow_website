@@ -1,12 +1,9 @@
 ---
 export const prerender = true;
 
-import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import LocationsSection from '../../components/LocationsSection.astro';
-import ContentImage from '../../components/images/ContentImage.astro';
-import CardImage from '../../components/images/CardImage.astro';
-import FixedImage from '../../components/images/FixedImage.astro';
+import { ContentImage, CardImage, FixedImage } from '../../components/images';
 
 // Image imports
 import notinoIkon from '../../assets/images/notino-ikon.png';
@@ -140,7 +137,7 @@ const faqs = [
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://beautyflow.pro/en/"
+        "item": "https://beautyflow.pro/en"
       },
       {
         "@type": "ListItem",
@@ -223,7 +220,7 @@ const faqs = [
               <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full blur-sm opacity-50"></div>
               <div class="relative bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 p-1 rounded-full">
                 <div class="bg-white rounded-full p-1">
-                  <Image src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} quality={60} loading="eager" />
+                  <FixedImage src={notinoIkon} alt="Notino" class="w-8 h-8" width={32} height={32} />
                 </div>
               </div>
             </div>
@@ -280,7 +277,7 @@ const faqs = [
         <!-- Google Rating Badge -->
         <div class="absolute bottom-3 left-3 lg:bottom-5 lg:left-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 lg:p-3">
           <div class="flex items-center gap-2">
-            <Image src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} quality={60} loading="eager" />
+            <FixedImage src={googleLogo} alt="Google" class="w-7 h-7 lg:w-9 lg:h-9 rounded-full" width={36} height={36} />
             <div>
               <div class="flex items-center gap-1">
                 <span class="text-base lg:text-xl font-bold text-gray-900 rating-number" data-target="5.0">0</span>
@@ -898,14 +895,12 @@ const faqs = [
             </p>
             <div class="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
               <p class="font-semibold text-gray-900 text-sm flex-1">{testimonial.author}</p>
-              <Image
+              <FixedImage
                 src={googleLogo}
                 alt="Google"
                 class="w-7 h-7 object-contain flex-shrink-0"
                 width={28}
                 height={28}
-                quality={60}
-                loading="lazy"
               />
             </div>
           </div>

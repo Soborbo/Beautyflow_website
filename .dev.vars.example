@@ -1,0 +1,36 @@
+# Copy to .dev.vars for local development (`npm run dev`)
+# .dev.vars is gitignored. Production secrets live in the Cloudflare dashboard.
+
+# ---- Public (build-time, exposed to client) ----
+# NOTE: public market config lives in .env / .env.production (Astro inlines PUBLIC_*
+# into the client bundle at build). These mirror them for `wrangler dev`.
+PUBLIC_GTM_ID=GTM-W8V3BVGD
+PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+PUBLIC_SITE_URL=https://beautyflow.pro
+PUBLIC_TRACKING_COUNTRY=HU
+PUBLIC_TRACKING_CURRENCY=HUF
+PUBLIC_TRACKING_LOCALE=hu
+
+# ---- Server-only secrets ----
+# Cloudflare Turnstile test secret — always passes. Replace before production.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# Email
+RESEND_API_KEY=
+
+# EmailOctopus hírlevél (NewsletterModal → /api/newsletter)
+# API kulcs: EmailOctopus dashboard → Account → Integrations & API → API keys (v2 kulcs).
+# Lista ID: a kiválasztott lista → Settings, vagy a lista URL-jéből (UUID).
+EMAILOCTOPUS_API_KEY=
+EMAILOCTOPUS_LIST_ID=
+
+# Google Sheets (optional — keep existing if you want)
+GOOGLE_SHEETS_ID=
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+GOOGLE_PRIVATE_KEY=
+
+# Server-side conversion tracking (Meta CAPI + GA4 MP + Google Ads) now lives in the
+# Soborbo/Serverside event-gateway worker (same-origin /api/event/*). Its Meta/GA4/Ads
+# secrets live in the gateway's SITE_CONFIG KV, NOT here. See tracking-kit/server/SETUP-SERVER.md.
+
+SITE_URL=https://beautyflow.pro

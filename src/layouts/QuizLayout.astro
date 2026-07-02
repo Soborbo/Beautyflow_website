@@ -1,0 +1,51 @@
+---
+/**
+ * QuizLayout — minimális chrome a bőranalízis kvízhez és az eredményoldalhoz.
+ *  - Nincs fejléc / menü / lábléc (a kvízre fókuszál, lemorzsolódás ellen).
+ *  - Megtartja a GTM + tracking bootot (a funnel követhető legyen).
+ *  - noindex alapból (lead-magnet oldalak, nem SEO-célok).
+ */
+import '../styles/global.css';
+import Tracking from '../../tracking-kit/components/Tracking.astro';
+import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.astro';
+import Turnstile from '../../tracking-kit/components/Turnstile.astro';
+import BookingClick from '../components/tracking/BookingClick.astro';
+
+const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Ingyenes online bőranalízis – derítsd ki pár perc alatt, milyen a bőröd, és milyen kezelési irány illik hozzád. Beautyflow Buda & Pest.',
+  noindex = true,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <Tracking gtmId={gtmId} />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
+    <title>{title}</title>
+
+    <link rel="preload" href="/fonts/cormorant-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/cormorant-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="min-h-screen bg-[#faf7f8] text-gray-900 antialiased overflow-x-hidden">
+    <TrackingNoscript gtmId={gtmId} />
+    <Turnstile />
+    <BookingClick />
+    <main class="min-h-screen">
+      <slot />
+    </main>
+  </body>
+</html>

@@ -18,6 +18,7 @@ const content = {
       { value: '10 000+', label: 'kezelés' },
       { value: '12', label: 'csúcstechnológiájú gép' },
       { value: '1500+', label: 'elégedett vendég' },
+      { value: '10%', label: 'örökös VIP kedvezmény' },
     ],
     googleRating: 'Google értékelés alapján',
     googleRatingMobile: 'Google értékelés',
@@ -41,6 +42,7 @@ const content = {
       { value: '10,000+', label: 'treatments' },
       { value: '12', label: 'modern machines' },
       { value: '1500+', label: 'happy clients' },
+      { value: '10%', label: 'permanent VIP discount' },
     ],
     googleRating: 'Based on Google reviews',
     googleRatingMobile: 'Google rating',
@@ -104,7 +106,6 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
             src={heroImage}
             alt={t.imageAlt}
             class="w-full h-48 object-cover aspect-[16/9]"
-            priority={true}
           />
           <!-- Mobile Google Rating Badge -->
           <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-2 google-rating-badge">
@@ -174,7 +175,7 @@ const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio
   <!-- Stats Row - positioned at the bottom of the hero, always above the fold -->
   <div class="w-full bg-gradient-to-r from-[#c53f75] to-[#a33460] py-4 lg:h-[80px] flex-shrink-0 flex items-center justify-center">
     <div class="max-w-[1000px] mx-auto px-4 w-full">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8 h-full items-center">
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-6 h-full items-center">
         {t.stats.map((stat) => (
           <div class="text-center">
             <p class="text-[24px] lg:text-[32px] font-heading text-white font-bold leading-[0.9] mb-1">

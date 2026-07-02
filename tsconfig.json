@@ -1,5 +1,23 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": [
+    "dist",
+    "tracking-kit/tests",
+    "tracking-kit/server",
+    "tracking-kit/gtm",
+    "tracking-kit/monitoring",
+    "tracking-kit/examples",
+    "tracking-kit/env.d.ts",
+    "tracking-kit/vitest.config.ts",
+    "tracking-kit/tsconfig.json"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@tracking": ["tracking-kit/lib/index.ts"],
+      "@tracking/*": ["tracking-kit/*"]
+    }
+  }
 }

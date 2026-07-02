@@ -2,6 +2,18 @@ import { ui, defaultLang, type UIKey } from './ui';
 
 export type Locale = keyof typeof ui;
 
+// Canonical form: root stays '/', everything else has no trailing slash and no
+// `.html` suffix. Astro's `Astro.url.pathname` returns `/foo.html` during
+// prerender when `build.format: 'file'` is set, so we strip both here before
+// anything builds a canonical/hreflang/breadcrumb URL.
+// Matches Cloudflare's `drop-trailing-slash` and astro.config `trailingSlash: 'never'`.
+export function stripTrailingSlash(path: string): string {
+  if (!path) return '/';
+  const noHtml = path.replace(/\.html$/, '');
+  if (noHtml === '/' || noHtml === '') return '/';
+  return noHtml.replace(/\/+$/, '') || '/';
+}
+
 export function getLangFromUrl(url: URL): Locale {
   const [, lang] = url.pathname.split('/');
   if (lang in ui) return lang as Locale;
@@ -28,10 +40,11 @@ export function getRouteFromUrl(url: URL): string {
 }
 
 export function getLocalizedPath(path: string, lang: Locale): string {
+  const normalized = stripTrailingSlash(path);
   if (lang === defaultLang) {
-    return path;
+    return normalized;
   }
-  return `/${lang}${path === '/' ? '' : path}`;
+  return `/${lang}${normalized === '/' ? '' : normalized}`;
 }
 
 // Bidirectional route mappings between Hungarian and English
@@ -47,6 +60,9 @@ export const routeMappings: Array<{ hu: string; en: string }> = [
   { hu: '/pigmentfolt-eltavolitas', en: '/pigment-removal' },
   { hu: '/carbon-peeling', en: '/carbon-peeling' },
   { hu: '/hydrabeauty', en: '/hydrabeauty' },
+  { hu: '/green-sea-peel', en: '/green-sea-peel' },
+  { hu: '/biopen-q2', en: '/biopen-q2' },
+  { hu: '/anti-aging', en: '/anti-aging' },
   { hu: '/beautyflow-pest', en: '/beautyflow-pest' },
   { hu: '/beautyflow-buda', en: '/beautyflow-buda' },
   { hu: '/adatvedelmi-tajekoztato', en: '/privacy-policy' },
@@ -58,8 +74,7 @@ export const routeMappings: Array<{ hu: string; en: string }> = [
 
 // Get the equivalent route in another language
 export function getAlternateRoute(currentPath: string, fromLang: Locale, toLang: Locale): string {
-  // Normalize the path (remove trailing slash except for root)
-  const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
+  const normalizedPath = stripTrailingSlash(currentPath);
 
   // Find the mapping for the current path
   const mapping = routeMappings.find(m => m[fromLang] === normalizedPath);
