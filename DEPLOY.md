@@ -47,7 +47,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 | `GA4_MEASUREMENT_ID` | `G-774BY4X64P` |
 | `META_PIXEL_ID` | `915395591548632` |
 | `SITE_URL` | `https://beautyflow.pro` |
-| `EMAILOCTOPUS_LIST_ID` | *(töltsd ki a valós lista ID-vel — lásd 7. pont)* |
+| `EMAILOCTOPUS_LIST_ID` | `76d28252-7664-11f1-8850-59b9407f9225` |
 
 **Secrets (encrypted) — ezeket KÉZZEL kell a dashboardon beállítani:**
 
