@@ -14,7 +14,6 @@
  * A beküldés a /api/newsletter végpontra megy → EmailOctopus. Csak keresztnév +
  * email kell. Honeypot (`website`) véd a botok ellen.
  */
-const brand = '#c53f75';
 ---
 
 <div
@@ -43,15 +42,12 @@ const brand = '#c53f75';
 
     <div class="grid grid-cols-1 md:grid-cols-2">
       {/* BAL — szöveg */}
-      <div
-        class="flex flex-col justify-center gap-3 p-7 text-white md:p-8"
-        style={`background: linear-gradient(150deg, ${brand} 0%, #a33460 100%);`}
-      >
-        <h2 id="bf-nl-title" class="font-heading text-2xl leading-tight md:text-3xl">
+      <div class="flex flex-col justify-center gap-3 bg-white p-7 md:border-r md:border-gray-100 md:p-8">
+        <h2 id="bf-nl-title" class="font-heading text-2xl leading-tight text-[#c53f75] md:text-3xl">
           Szeretnél értesülni akcióinkról? Iratkozz fel a hírlevelünkre!
         </h2>
-        <p class="text-sm text-white/90">
-          Ígérem, nem küldünk spamet.
+        <p class="text-sm text-gray-600">
+          Ígérjük, nem küldünk spamet.
         </p>
       </div>
 
@@ -102,8 +98,7 @@ const brand = '#c53f75';
           </button>
 
           <p class="text-xs leading-relaxed text-gray-500">
-            A feliratkozással elfogadod az
-            <a href="/adatvedelmi-tajekoztato" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>.
+            A feliratkozással elfogadod az <a href="/adatvedelmi-tajekoztato" target="_blank" rel="noopener" class="text-[#c53f75] underline">adatvédelmi tájékoztatót</a>.
           </p>
 
           <p class="bf-nl-error hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></p>
