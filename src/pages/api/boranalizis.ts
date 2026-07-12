@@ -183,6 +183,20 @@ async function forwardToCrm(
   const secret = env.CRM_WEBHOOK_SECRET;
   if (!url || !secret) return;
 
+  // A sales számára releváns, stabil, származtatott válaszok strukturáltan a CRM
+  // lead_submissions-be (form_key: beautyflow_consult) — a ~20 nyers kvíz-válasz a
+  // message-ben marad. A concern/salon value-i 1:1 a kvíz opció-value-ival.
+  const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+  const concern = first(data.answers['fo-panasz']);
+  const salon = first(data.answers['szalon']);
+  const answers: Record<string, unknown> = {
+    baumann: baumannLabel(baumann).slice(0, 120),
+    skinProfile: rec.profile.label,
+    recommended: treatmentsLine(rec),
+  };
+  if (concern) answers.concern = concern;
+  if (salon === 'szalon-buda' || salon === 'szalon-pest') answers.salon = salon;
+
   const body = {
     name: data.firstName,
     phone: data.phone || undefined,
@@ -196,6 +210,8 @@ async function forwardToCrm(
     source_type: 'form' as const,
     consent_given: true,
     marketing_consent: data.consentMarketing,
+    form_key: 'beautyflow_consult',
+    answers,
     attribution: {
       utm_source: data.utm_source || undefined,
       utm_medium: data.utm_medium || undefined,
