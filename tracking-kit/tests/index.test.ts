@@ -23,36 +23,19 @@ beforeEach(() => {
 });
 
 describe('trackLeadSubmit', () => {
-  it('pushes dataLayer lead_submit AND dispatches to gateway with the SAME event_id', () => {
+  // SZERZŐDÉS-VÁLTÁS (gateway Run 6): a form-konverziók server-ingress-only-k —
+  // a böngésző-leg a gateway felé 403-at kapna, ezért NINCS többé
+  // dispatchToGateway; a szerver CAPI-leget a site backendje küldi UGYANEZZEL
+  // az event_id-vel. Itt azt bizonyítjuk, hogy a dataLayer-leg él, a gateway-leg nem.
+  it('pushes dataLayer lead_submit and does NOT dispatch to the gateway (server-ingress-only)', () => {
     const r = trackLeadSubmit({ email: 'a@b.com', phone: '07123456789', value: 380, currency: 'GBP' });
     expect(r.success).toBe(true);
     expect(r.consentBlocked).toBe(false);
 
     const dlEvent = lastEvent('lead_submit')!;
-    expect(mockSend).toHaveBeenCalledTimes(1);
-    const payload = mockSend.mock.calls[0][0];
-    // megosztott event_id → Meta Pixel↔CAPI dedup
-    expect(payload.event_id).toBe(dlEvent.event_id);
-    expect(payload.event_id).toBe(r.eventId);
-    // kanonikus gateway event-név
-    expect(payload.event_name).toBe('contact_form_submit');
-    // user_data nyersen (a gateway hashel)
-    expect(payload.user_data.email).toBe('a@b.com');
-    expect(payload.value).toBe(380);
-    expect(payload.currency).toBe('GBP');
-  });
-
-  it('event-név felülírható', () => {
-    trackLeadSubmit({ email: 'a@b.com', value: 1000, currency: 'HUF', eventName: 'quote_calculator_conversion' });
-    expect(mockSend.mock.calls[0][0].event_name).toBe('quote_calculator_conversion');
-  });
-
-  it('deviza a market-configból jön default-ban (HU → HUF), de hívásonként felülírható', () => {
-    trackLeadSubmit({ email: 'a@b.com', value: 5000 }); // nincs currency → config default
-    expect(mockSend.mock.calls[0][0].currency).toBe('HUF');
-    mockSend.mockClear();
-    trackLeadSubmit({ email: 'a@b.com', value: 100, currency: 'GBP' }); // explicit UK
-    expect(mockSend.mock.calls[0][0].currency).toBe('GBP');
+    // a visszaadott eventId megy a backendnek (hidden mező) → dedup kulcs
+    expect(dlEvent.event_id).toBe(r.eventId);
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
   it('consent nélkül: NINCS dispatch, NINCS dataLayer push', () => {
@@ -66,11 +49,10 @@ describe('trackLeadSubmit', () => {
 });
 
 describe('trackContactSubmit', () => {
-  it('contact_form_submit-ra dispatchol, contact_submit dataLayer-rel', () => {
+  it('contact_submit dataLayer-t push-ol, gateway-dispatch NÉLKÜL (server-ingress-only)', () => {
     const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
     expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
-    expect(mockSend.mock.calls[0][0].event_name).toBe('contact_form_submit');
-    expect(mockSend.mock.calls[0][0].event_id).toBe(r.eventId);
+    expect(mockSend).not.toHaveBeenCalled();
   });
 });
 
@@ -101,9 +83,12 @@ describe('click conversions — both channels, shared event_id', () => {
     expect(payload.user_data.phone_number).toBe('07123456789'); // raw → gateway hashes
   });
 
-  it('maps callback/email/whatsapp to the canonical gateway event names', () => {
+  it('maps email/whatsapp to the canonical gateway names; callback is dataLayer-only (gated)', () => {
+    // callback_conversion → callback_request_submitted: server-ingress-only a
+    // gateway-en (403 lenne) → nincs gateway-leg, csak dataLayer.
     trackCallbackConversion();
-    expect(mockSend.mock.calls[0][0].event_name).toBe('callback_conversion');
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(lastEvent('callback_click')).toBeTruthy();
     mockSend.mockClear();
     trackEmailConversion({ email: 'a@b.com' });
     expect(mockSend.mock.calls[0][0].event_name).toBe('email_conversion');
@@ -132,7 +117,8 @@ describe('click conversions — both channels, shared event_id', () => {
       expect(fn(), dlEvent).toBeTruthy();      // first click → fires
       expect(fn(), dlEvent).toBeNull();        // second click same session → suppressed
       expect(getDataLayer().filter((e) => e.event === dlEvent), dlEvent).toHaveLength(1);
-      expect(mockSend, dlEvent).toHaveBeenCalledTimes(1);
+      // callback: nincs gateway-leg (server-ingress-only); email/whatsapp: pontosan 1
+      expect(mockSend, dlEvent).toHaveBeenCalledTimes(dlEvent === 'callback_click' ? 0 : 1);
     }
   });
 

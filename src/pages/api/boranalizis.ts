@@ -187,9 +187,13 @@ function answersSummary(answers: QuizData['answers']): string {
   return lines.join('\n');
 }
 
+// Visszatérés: a CRM belső lead-azonosítója (a webhook `{ success, id }`
+// válaszából), ha megvan és a gateway lead_id-formátumának megfelel — a
+// gateway-dispatch lead_id-je, hogy a ledger a /lead-status offline-loophoz
+// joinolható legyen. Hiányában undefined (a NULL detektálható).
 async function forwardToCrm(
   data: QuizData, rec: Recommendation, baumann: BaumannResult, env: QuizEnv,
-): Promise<void> {
+): Promise<string | undefined> {
   const url = env.CRM_WEBHOOK_URL;
   const secret = env.CRM_WEBHOOK_SECRET;
   if (!url || !secret) return;
@@ -245,6 +249,17 @@ async function forwardToCrm(
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
+  try {
+    const resBody = (await res.json()) as { id?: unknown };
+    const rawId =
+      typeof resBody?.id === 'string' ? resBody.id
+      : typeof resBody?.id === 'number' && Number.isFinite(resBody.id) ? String(resBody.id)
+      : undefined;
+    if (rawId && /^[a-zA-Z0-9_-]{8,64}$/.test(rawId)) return rawId;
+  } catch {
+    // non-JSON válasz → lead id nélkül megyünk tovább
+  }
+  return undefined;
 }
 
 // ---- Emailek -----------------------------------------------------------
@@ -396,6 +411,7 @@ async function dispatchGatewayConversion(
   data: z.infer<typeof QuizSchema>,
   request: Request,
   value: number,
+  leadId?: string,
 ): Promise<void> {
   const raw = cfEnv as unknown as Record<string, unknown>;
   const gatewayEnv: GatewayEnv = {
@@ -429,6 +445,9 @@ async function dispatchGatewayConversion(
     const res = await sendGatewayConversion(gatewayEnv, {
       eventName: 'contact_form_submitted',
       eventId: data.event_id,
+      // A CRM lead-kulcsa: enélkül a gateway ledger sora lead_id=NULL, és a
+      // /lead-status offline-loop sosem joinolható vissza a konverzióhoz.
+      leadId,
       value,
       currency: 'HUF',
       source: 'server',
@@ -597,7 +616,10 @@ export const POST: APIRoute = async (context) => {
     // two Leads for one guest. Never throws; the result is already earned.
     // Value = the midpoint of the quiz's own price band, so both legs agree.
     const quizValue = rec.arSav ? Math.round((rec.arSav.min + rec.arSav.max) / 2) : 5000;
-    await dispatchGatewayConversion(data, request, quizValue);
+    // A CRM lead-kulcsa (a webhook válaszából) → gateway lead_id (ledger↔CRM join).
+    const crmLeadId =
+      results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+    await dispatchGatewayConversion(data, request, quizValue, crmLeadId);
 
     // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott
     // (a kliens localStorage-be is menti a result objektumot).
