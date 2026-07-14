@@ -45,6 +45,18 @@ export const ERROR_CODES = {
   /** Top-level catch in POST handler — bug / unexpected failure path. */
   CONTACT_UNHANDLED: 'CONTACT-UNHANDLED-001',
 
+  // ---- Server-side conversion → Soborbo event-gateway --------------------
+  // These are the "leads arrive, Meta sees nothing" codes. They must be loud:
+  // every one of them means a delivered lead produced NO conversion, which is
+  // invisible in the business's inbox and only shows up as unexplained ad
+  // underperformance weeks later.
+  /** Gateway misconfigured (service binding / per-site token / SITE_URL missing). */
+  GATEWAY_NOT_CONFIGURED: 'GATEWAY-CONFIG-001',
+  /** Client sent no event_id — no dedup key, so we refuse to invent one. */
+  GATEWAY_NO_EVENT_ID: 'GATEWAY-EVENTID-001',
+  /** Gateway rejected or kept failing the conversion dispatch. */
+  GATEWAY_DISPATCH_FAILED: 'GATEWAY-DISPATCH-001',
+
   // ---- /api/boranalizis (bőranalízis kvíz) ------------------------------
   /** TURNSTILE_SECRET_KEY missing — quiz submits rejected (fail closed). */
   QUIZ_CONFIG_TURNSTILE_MISSING: 'QUIZ-CONFIG-TURNSTILE-001',

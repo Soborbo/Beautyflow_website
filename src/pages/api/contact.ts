@@ -27,6 +27,12 @@ import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError } from '@/lib/errors/classify';
 import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
+import {
+  sendGatewayConversion,
+  readConsentFromCookie,
+  isGatewayConfigured,
+  type GatewayEnv,
+} from '@/lib/tracking/gateway-dispatch';
 
 export const prerender = false;
 
@@ -68,6 +74,13 @@ interface BaseFormData {
   website?: string; // honeypot
   turnstileToken?: string;
   lang?: 'hu' | 'en';
+  // The browser-minted conversion id for THIS submit — the same id the Meta Pixel
+  // gets via trackLeadSubmit. Meta dedupes the Pixel and CAPI legs on the
+  // (event_name, event_id) pair, so a different id here would not "add" a
+  // conversion, it would double-count the Lead (CLAUDE.md #16). Optional: an older
+  // cached client that omits it still gets its lead delivered — it just gets no
+  // server-side conversion, and that is logged rather than guessed at.
+  event_id?: string;
   // tracking
   gclid?: string;
   fbclid?: string;
@@ -649,6 +662,102 @@ function jsonError(status: number, error: string): Response {
   });
 }
 
+/**
+ * Pushes the conversion to the event-gateway from the server, so it no longer
+ * depends on the browser surviving Turnstile + the hard navigation to /koszonjuk.
+ *
+ * Consent is read from the SAME CookieYes cookie the browser lib reads, and the
+ * cookie rides along with this POST — so the two legs cannot disagree about what
+ * the user chose. This matters here specifically: beautyflow's gateway config sets
+ * `require_consent: true`, so without forwarding consent the gateway would accept
+ * and ledger every event and then silently send Meta nothing at all.
+ */
+async function dispatchGatewayConversion(
+  data: ContactFormData,
+  request: Request,
+): Promise<void> {
+  const raw = cfEnv as unknown as Record<string, unknown>;
+  const gatewayEnv: GatewayEnv = {
+    GATEWAY: raw.GATEWAY as GatewayEnv['GATEWAY'],
+    TRACKING_GATEWAY_TOKEN: raw.TRACKING_GATEWAY_TOKEN as string | undefined,
+    SITE_URL: raw.SITE_URL as string | undefined,
+    TRACKING_TEST_LEAD_EMAIL: raw.TRACKING_TEST_LEAD_EMAIL as string | undefined,
+    TRACKING_TEST_EVENT_CODE: raw.TRACKING_TEST_EVENT_CODE as string | undefined,
+  };
+
+  // Loud, not silent: an unconfigured gateway or a client that sent no event_id is
+  // precisely the "leads arrive, Meta sees nothing" state this leg exists to end.
+  if (!data.event_id) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_NO_EVENT_ID,
+      message: 'Gateway conversion skipped — client sent no event_id (no Pixel dedup key)',
+      source: '/api/contact',
+      request,
+    });
+    return;
+  }
+  if (!isGatewayConfigured(gatewayEnv)) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_NOT_CONFIGURED,
+      message: 'Gateway conversion skipped — gateway not configured (binding/token/SITE_URL)',
+      source: '/api/contact',
+      request,
+    });
+    return;
+  }
+
+  try {
+    const res = await sendGatewayConversion(gatewayEnv, {
+      eventName: 'contact_form_submitted',
+      eventId: data.event_id,
+      // Nominal HUF lead value — mirrors the browser leg's trackLeadSubmit(value: 5000)
+      // so the two legs describe the same conversion.
+      value: 5000,
+      currency: 'HUF',
+      source: 'server',
+      userData: {
+        email: data.email,
+        phone_number: data.phone,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        country: request.headers.get('CF-IPCountry') || 'HU',
+      },
+      attribution: {
+        gclid: data.gclid,
+        fbclid: data.fbclid,
+        gbraid: data.gbraid,
+        wbraid: data.wbraid,
+        msclkid: data.msclkid,
+        utm_source: data.utm_source,
+        utm_medium: data.utm_medium,
+        utm_campaign: data.utm_campaign,
+      },
+      consent: readConsentFromCookie(request.headers.get('Cookie')),
+      eventSourceUrl: request.headers.get('Referer') || undefined,
+      clientIpAddress: request.headers.get('CF-Connecting-IP') || undefined,
+      clientUserAgent: request.headers.get('User-Agent') || undefined,
+    });
+
+    if (!res.ok) {
+      reportServerError({
+        code: ERROR_CODES.GATEWAY_DISPATCH_FAILED,
+        message: `Gateway conversion dispatch failed (${res.error})`,
+        source: '/api/contact',
+        request,
+        context: { status: res.status, attempts: res.attempts, retriable: res.retriable },
+      });
+    }
+  } catch (cause) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_DISPATCH_FAILED,
+      message: 'Gateway conversion dispatch threw',
+      source: '/api/contact',
+      request,
+      cause,
+    });
+  }
+}
+
 export const POST: APIRoute = async (context) => {
   const { request } = context;
   try {
@@ -867,6 +976,15 @@ export const POST: APIRoute = async (context) => {
     if (bothEmailsFailed) {
       return jsonError(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
     }
+
+    // ── Server-side conversion → Soborbo event-gateway ───────────────────────
+    // Fired on the SUCCESS path only, exactly like the browser's trackLeadSubmit:
+    // a submit that returned 500 makes the user retry, and a retry mints a fresh
+    // event_id — firing here too would book two Leads for one customer.
+    //
+    // Never throws: the lead is already delivered, and tracking must not turn a
+    // delivered lead into an error page.
+    await dispatchGatewayConversion(data, request);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

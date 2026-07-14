@@ -812,10 +812,16 @@ const breadcrumbSchema = {
           };
 
           try {
+            // ONE id for this conversion, shared by the server dispatch inside
+            // /api/contact and the browser's trackLeadSubmit below. Meta dedupes the
+            // CAPI and Pixel legs on (event_name, event_id) — two ids would book the
+            // Lead twice rather than once (CLAUDE.md #16).
+            const eventId = crypto.randomUUID();
+
             const response = await fetch('/api/contact', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
+              body: JSON.stringify({ ...payload, event_id: eventId }),
             });
 
             const result = await response.json();
@@ -833,6 +839,7 @@ const breadcrumbSchema = {
                 value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
                 contentName: FORM_NAME,
                 eventName: 'contact_form_submit',
+                eventId,                     // shared with the server leg — see above
               });
               // Hold the loading overlay up, give GTM a beat to fire, then redirect;
               // the gateway dispatch uses sendBeacon/keepalive so it survives unload.

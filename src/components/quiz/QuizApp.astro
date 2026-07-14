@@ -505,10 +505,16 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         }
 
         try {
+          // ONE id for this conversion, shared by the server dispatch inside
+          // /api/boranalizis and the browser's trackLeadSubmit below. Meta dedupes
+          // the CAPI and Pixel legs on (event_name, event_id) — two ids would book
+          // the Lead twice rather than once (CLAUDE.md #16).
+          const eventId = crypto.randomUUID();
+
           const res = await fetch('/api/boranalizis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({ ...payload, event_id: eventId }),
           });
           const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string }; error?: string };
 
@@ -526,6 +532,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
               value,
               contentName: 'boranalizis_kviz',
               eventName: 'contact_form_submit',
+              eventId,                     // shared with the server leg — see above
             });
             await waitForTracking(600);
             // A kvíz kitöltőjét a saját publikus bőrtípus-oldalára érkeztetjük

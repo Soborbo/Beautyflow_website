@@ -80,6 +80,15 @@ export interface LeadSubmitParams {
   contentName?: string;
   /** Override the gateway event name (default: contact_form_submit). */
   eventName?: string;
+  /**
+   * Reuse an id the CALLER already minted, instead of generating one here.
+   *
+   * Needed when the same conversion is also dispatched server-side from the lead
+   * endpoint: the server leg must carry the SAME id, because Meta dedupes the Pixel
+   * and CAPI legs on the (event_name, event_id) pair. Two ids would not "add" a
+   * conversion — they would book the Lead twice.
+   */
+  eventId?: string;
 }
 
 export interface LeadSubmitResult {
@@ -120,7 +129,7 @@ function dispatchToGateway(
 }
 
 export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
-  const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
   if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
 
   const currency = params.currency || trackingConfig.currency;

@@ -51,7 +51,17 @@
     "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com",
     // EmailOctopus hírlevél lista azonosítója (NEM titok — a lista URL-je / Settings adja).
     // Az ehhez tartozó API kulcs SECRET: `wrangler secret put EMAILOCTOPUS_API_KEY` (lásd lent).
-    "EMAILOCTOPUS_LIST_ID": "76d28252-7664-11f1-8850-59b9407f9225"
+    "EMAILOCTOPUS_LIST_ID": "76d28252-7664-11f1-8850-59b9407f9225",
+    // Gateway smoke test. A conversion goes to Meta's *Test* stream ONLY when the
+    // lead's email is TRACKING_TEST_LEAD_EMAIL (see lib/tracking/gateway-dispatch.ts).
+    // Keyed on the lead, not on a global flag, so a REAL lead can never be diverted
+    // into the Test stream — which is why these are safe to leave set permanently and
+    // the whole chain stays re-testable without touching live config.
+    // TRACKING_TEST_EVENT_CODE should be the code from Meta Events Manager → Test
+    // Events for pixel 915395591548632; any value keeps the event out of the
+    // production dataset, but only the real one shows it in that tab.
+    "TRACKING_TEST_LEAD_EMAIL": "gateway-smoke-test@soborbo.co.uk",
+    "TRACKING_TEST_EVENT_CODE": "TEST_BEAUTYFLOW"
   }
   // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
   //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
