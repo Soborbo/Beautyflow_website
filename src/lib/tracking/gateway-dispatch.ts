@@ -262,9 +262,10 @@ export async function sendGatewayConversion(
         return { ok: true, status: res.status, attempts };
       }
 
-      // 401/403/404 are OUR misconfiguration (bad token, no KV site-config), not a
-      // transient fault. Retrying cannot fix them — fail loud instead.
-      if (res.status === 401 || res.status === 403 || res.status === 404) {
+      // 400/401/403/404 are OUR misconfiguration (invalid payload — the gateway
+      // Run 6 óta 400-at ad hitelesített hívónak —, bad token, no KV site-config),
+      // not a transient fault. Retrying cannot fix them — fail loud instead.
+      if (res.status === 400 || res.status === 401 || res.status === 403 || res.status === 404) {
         return {
           ok: false,
           status: res.status,
