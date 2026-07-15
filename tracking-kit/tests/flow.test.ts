@@ -10,7 +10,7 @@ vi.mock('../lib/gateway', () => ({
 }));
 
 import {
-  trackLeadSubmit, trackContactSubmit, trackServerEvent,
+  trackLeadSubmit, trackContactSubmit, trackServerEvent, trackPhoneConversion,
   trackCalculatorStart, trackCalculatorStep, trackCalculatorOption, trackCalculatorComplete,
 } from '../lib/index';
 import { sendToWorker } from '../lib/gateway';
@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 
 describe('lead journey — flows through both channels in the right shape', () => {
-  it('lead submit: side-channel PII + PII-free dataLayer + gateway payload, one shared event_id', () => {
+  it('lead submit: side-channel PII + PII-free dataLayer, NO browser gateway leg (server-ingress-only)', () => {
     const r = trackLeadSubmit({
       email: 'A@B.com', phone: '07123456789', firstName: 'Jo', lastName: 'Smith',
       value: 380, currency: 'GBP',
@@ -47,20 +47,10 @@ describe('lead journey — flows through both channels in the right shape', () =
     // side-channel — normalized PII for Enhanced Conversions
     expect(sideChannel()).toMatchObject({ email: 'a@b.com', phone_number: '+447123456789' });
 
-    // server channel (gateway) — exact contract the worker consumes
-    expect(mockSend).toHaveBeenCalledOnce();
-    const p = mockSend.mock.calls[0][0];
-    expect(p.event_name).toBe('contact_form_submit');
-    expect(p.event_id).toBe(r.eventId);               // SAME id → Meta dedup
-    expect(Number.isInteger(p.event_time)).toBe(true); // unix SECONDS, not ms
-    expect(p.event_time).toBeGreaterThan(1_000_000_000);
-    expect(p.event_time).toBeLessThan(100_000_000_000);
-    expect(p.value).toBe(380);
-    expect(p.currency).toBe('GBP');
-    // raw PII for the gateway to hash server-side (Meta CAPI contract)
-    expect(p.user_data).toEqual({
-      email: 'A@B.com', phone_number: '07123456789', first_name: 'Jo', last_name: 'Smith',
-    });
+    // server channel: a gateway Run 6 óta a form-konverziókat CSAK a
+    // hitelesített szerver-ingressen fogadja — a böngésző-leg 403 lenne, ezért
+    // NINCS dispatch; a backend küldi (r.eventId a hidden mezőn át) → dedup ép.
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
   it('calculator funnel runs start→step→option→complete, then the conversion reaches the gateway', () => {
@@ -78,21 +68,22 @@ describe('lead journey — flows through both channels in the right shape', () =
     expect(p.value).toBe(1200);
   });
 
-  it('contact submit maps to contact_form_submit with the shared id', () => {
+  it('contact submit: dataLayer with the shared id, no browser gateway leg', () => {
     const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
     expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
-    expect(mockSend.mock.calls[0][0].event_name).toBe('contact_form_submit');
+    expect(mockSend).not.toHaveBeenCalled();
   });
 });
 
 describe('the lead never gets stuck', () => {
   it('a hanging worker does NOT block the conversion (fire-and-forget)', () => {
-    // Worker promise never resolves — simulates a dead/slow gateway.
+    // Worker promise never resolves — simulates a dead/slow gateway. A click
+    // conversion still has a browser gateway leg (form events no longer do).
     mockSend.mockImplementation(() => new Promise<boolean>(() => { /* never resolves */ }));
-    const r = trackLeadSubmit({ email: 'a@b.com', value: 100, currency: 'GBP' });
-    // Returns synchronously with success; the browser event is already in the dataLayer.
-    expect(r.success).toBe(true);
-    expect(lastEvent('lead_submit')).toBeTruthy();
+    const id = trackPhoneConversion({ phone: '07123456789' });
+    // Returns synchronously; the browser event is already in the dataLayer.
+    expect(id).toBeTruthy();
+    expect(lastEvent('phone_click')).toBeTruthy();
     expect(mockSend).toHaveBeenCalledOnce();
   });
 

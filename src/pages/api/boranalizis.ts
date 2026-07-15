@@ -25,6 +25,12 @@ import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 import { sendEmail, classifyEmailFailure, classifySheetsFailure } from '@/lib/errors/classify';
+import {
+  sendGatewayConversion,
+  readConsentFromCookie,
+  isGatewayConfigured,
+  type GatewayEnv,
+} from '@/lib/tracking/gateway-dispatch';
 import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
 import { getGoogleAccessToken, getSheetGid, insertRowAtTop } from '@/lib/forms/google-sheets';
 import { recommend } from '@/quiz/lib/recommendation';
@@ -61,6 +67,11 @@ const QuizSchema = z
     consentAt: z.string().max(40).optional().default(''),
     website: z.string().max(200).optional().default(''), // honeypot
     turnstileToken: z.string().max(4000).optional().default(''),
+    // The browser-minted conversion id for THIS submit — the same id the Meta Pixel
+    // gets via trackLeadSubmit. Meta dedupes the Pixel and CAPI legs on the
+    // (event_name, event_id) pair, so a second id would double-count the Lead
+    // rather than add one (CLAUDE.md #16).
+    event_id: z.string().max(200).optional().default(''),
     gclid: z.string().max(200).optional().default(''),
     fbclid: z.string().max(200).optional().default(''),
     gbraid: z.string().max(200).optional().default(''),
@@ -176,12 +187,30 @@ function answersSummary(answers: QuizData['answers']): string {
   return lines.join('\n');
 }
 
+// Visszatérés: a CRM belső lead-azonosítója (a webhook `{ success, id }`
+// válaszából), ha megvan és a gateway lead_id-formátumának megfelel — a
+// gateway-dispatch lead_id-je, hogy a ledger a /lead-status offline-loophoz
+// joinolható legyen. Hiányában undefined (a NULL detektálható).
 async function forwardToCrm(
   data: QuizData, rec: Recommendation, baumann: BaumannResult, env: QuizEnv,
-): Promise<void> {
+): Promise<string | undefined> {
   const url = env.CRM_WEBHOOK_URL;
   const secret = env.CRM_WEBHOOK_SECRET;
   if (!url || !secret) return;
+
+  // A sales számára releváns, stabil, származtatott válaszok strukturáltan a CRM
+  // lead_submissions-be (form_key: beautyflow_consult) — a ~20 nyers kvíz-válasz a
+  // message-ben marad. A concern/salon value-i 1:1 a kvíz opció-value-ival.
+  const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+  const concern = first(data.answers['fo-panasz']);
+  const salon = first(data.answers['szalon']);
+  const answers: Record<string, unknown> = {
+    baumann: baumannLabel(baumann).slice(0, 120),
+    skinProfile: rec.profile.label,
+    recommended: treatmentsLine(rec),
+  };
+  if (concern) answers.concern = concern;
+  if (salon === 'szalon-buda' || salon === 'szalon-pest') answers.salon = salon;
 
   const body = {
     name: data.firstName,
@@ -196,6 +225,8 @@ async function forwardToCrm(
     source_type: 'form' as const,
     consent_given: true,
     marketing_consent: data.consentMarketing,
+    form_key: 'beautyflow_consult',
+    answers,
     attribution: {
       utm_source: data.utm_source || undefined,
       utm_medium: data.utm_medium || undefined,
@@ -218,6 +249,17 @@ async function forwardToCrm(
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
+  try {
+    const resBody = (await res.json()) as { id?: unknown };
+    const rawId =
+      typeof resBody?.id === 'string' ? resBody.id
+      : typeof resBody?.id === 'number' && Number.isFinite(resBody.id) ? String(resBody.id)
+      : undefined;
+    if (rawId && /^[a-zA-Z0-9_-]{8,64}$/.test(rawId)) return rawId;
+  } catch {
+    // non-JSON válasz → lead id nélkül megyünk tovább
+  }
+  return undefined;
 }
 
 // ---- Emailek -----------------------------------------------------------
@@ -356,6 +398,101 @@ function jsonError(status: number, error: string): Response {
   return new Response(JSON.stringify({ success: false, error }), { status, headers: { 'Content-Type': 'application/json' } });
 }
 
+/**
+ * Pushes the quiz conversion to the event-gateway from the server, so it survives
+ * the browser losing the race against the hard navigation to /bortipus/<slug>.
+ *
+ * Consent comes from the SAME CookieYes cookie the browser lib reads (it rides
+ * along with this POST), so the two legs cannot disagree. beautyflow's gateway
+ * config sets `require_consent: true` — without forwarding consent the gateway
+ * would accept and ledger every event and then send Meta nothing at all.
+ */
+async function dispatchGatewayConversion(
+  data: z.infer<typeof QuizSchema>,
+  request: Request,
+  value: number,
+  leadId?: string,
+): Promise<void> {
+  const raw = cfEnv as unknown as Record<string, unknown>;
+  const gatewayEnv: GatewayEnv = {
+    GATEWAY: raw.GATEWAY as GatewayEnv['GATEWAY'],
+    TRACKING_GATEWAY_TOKEN: raw.TRACKING_GATEWAY_TOKEN as string | undefined,
+    SITE_URL: raw.SITE_URL as string | undefined,
+    TRACKING_TEST_LEAD_EMAIL: raw.TRACKING_TEST_LEAD_EMAIL as string | undefined,
+    TRACKING_TEST_EVENT_CODE: raw.TRACKING_TEST_EVENT_CODE as string | undefined,
+  };
+
+  if (!data.event_id) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_NO_EVENT_ID,
+      message: 'Gateway conversion skipped — client sent no event_id (no Pixel dedup key)',
+      source: '/api/boranalizis',
+      request,
+    });
+    return;
+  }
+  if (!isGatewayConfigured(gatewayEnv)) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_NOT_CONFIGURED,
+      message: 'Gateway conversion skipped — gateway not configured (binding/token/SITE_URL)',
+      source: '/api/boranalizis',
+      request,
+    });
+    return;
+  }
+
+  try {
+    const res = await sendGatewayConversion(gatewayEnv, {
+      eventName: 'contact_form_submitted',
+      eventId: data.event_id,
+      // A CRM lead-kulcsa: enélkül a gateway ledger sora lead_id=NULL, és a
+      // /lead-status offline-loop sosem joinolható vissza a konverzióhoz.
+      leadId,
+      value,
+      currency: 'HUF',
+      source: 'server',
+      userData: {
+        email: data.email || undefined,
+        phone_number: data.phone || undefined,
+        first_name: data.firstName,
+        country: request.headers.get('CF-IPCountry') || 'HU',
+      },
+      attribution: {
+        gclid: data.gclid || undefined,
+        fbclid: data.fbclid || undefined,
+        gbraid: data.gbraid || undefined,
+        wbraid: data.wbraid || undefined,
+        msclkid: data.msclkid || undefined,
+        utm_source: data.utm_source || undefined,
+        utm_medium: data.utm_medium || undefined,
+        utm_campaign: data.utm_campaign || undefined,
+      },
+      consent: readConsentFromCookie(request.headers.get('Cookie')),
+      eventSourceUrl: request.headers.get('Referer') || undefined,
+      clientIpAddress: request.headers.get('CF-Connecting-IP') || undefined,
+      clientUserAgent: request.headers.get('User-Agent') || undefined,
+    });
+
+    if (!res.ok) {
+      reportServerError({
+        code: ERROR_CODES.GATEWAY_DISPATCH_FAILED,
+        message: `Gateway conversion dispatch failed (${res.error})`,
+        source: '/api/boranalizis',
+        request,
+        context: { status: res.status, attempts: res.attempts, retriable: res.retriable },
+      });
+    }
+  } catch (cause) {
+    reportServerError({
+      code: ERROR_CODES.GATEWAY_DISPATCH_FAILED,
+      message: 'Gateway conversion dispatch threw',
+      source: '/api/boranalizis',
+      request,
+      cause,
+    });
+  }
+}
+
 export const POST: APIRoute = async (context) => {
   const { request, locals } = context;
   try {
@@ -472,6 +609,17 @@ export const POST: APIRoute = async (context) => {
     if (bothEmailsFailed) {
       return jsonError(500, `Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);
     }
+
+    // ── Server-side conversion → Soborbo event-gateway ───────────────────────
+    // Success path only, mirroring the browser's trackLeadSubmit: a 500 makes the
+    // user retry, and a retry mints a fresh event_id — firing here too would book
+    // two Leads for one guest. Never throws; the result is already earned.
+    // Value = the midpoint of the quiz's own price band, so both legs agree.
+    const quizValue = rec.arSav ? Math.round((rec.arSav.min + rec.arSav.max) / 2) : 5000;
+    // A CRM lead-kulcsa (a webhook válaszából) → gateway lead_id (ledger↔CRM join).
+    const crmLeadId =
+      results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+    await dispatchGatewayConversion(data, request, quizValue, crmLeadId);
 
     // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott
     // (a kliens localStorage-be is menti a result objektumot).

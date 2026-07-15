@@ -80,6 +80,15 @@ export interface LeadSubmitParams {
   contentName?: string;
   /** Override the gateway event name (default: contact_form_submit). */
   eventName?: string;
+  /**
+   * Reuse an id the CALLER already minted, instead of generating one here.
+   *
+   * Needed when the same conversion is also dispatched server-side from the lead
+   * endpoint: the server leg must carry the SAME id, because Meta dedupes the Pixel
+   * and CAPI legs on the (event_name, event_id) pair. Two ids would not "add" a
+   * conversion — they would book the Lead twice.
+   */
+  eventId?: string;
 }
 
 export interface LeadSubmitResult {
@@ -108,7 +117,7 @@ function dispatchToGateway(
     event_name: eventName,
     event_id: eventId,
     event_time: Math.floor(Date.now() / 1000),
-    ...(typeof params.value === 'number' ? { value: params.value } : {}),
+    ...(typeof params.value === 'number' && params.value > 0 ? { value: params.value } : {}),
     ...(params.currency ? { currency: params.currency } : {}),
     user_data: {
       email: params.email,
@@ -120,24 +129,21 @@ function dispatchToGateway(
 }
 
 export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
-  const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
   if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
 
   const currency = params.currency || trackingConfig.currency;
 
-  // 1) Browser (GTM) — unchanged
+  // Browser (GTM) — Meta Pixel / GA4. A GATEWAY-leg SZÁNDÉKOSAN NINCS itt:
+  // a form-konverziók (contact_form_submit → contact_form_submitted) a gateway
+  // Run 6 óta server-ingress-only-k — a böngésző-útról 403 (TRK-400-017). A
+  // site backendje (/api/contact, /api/boranalizis → sendGatewayConversion)
+  // küldi őket UGYANEZZEL az event_id-vel → a Pixel↔CAPI dedup változatlan.
   pushLeadConversion({
     email: params.email, phone: params.phone,
     firstName: params.firstName, lastName: params.lastName,
     value: params.value, currency,
     gclid: gclid || undefined, eventId,
-  });
-
-  // 2) Server (gateway) — the SAME event_id
-  dispatchToGateway(params.eventName || DEFAULT_GATEWAY_EVENT, eventId, {
-    email: params.email, phone: params.phone,
-    firstName: params.firstName, lastName: params.lastName,
-    value: params.value, currency,
   });
 
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
@@ -149,10 +155,8 @@ export function trackContactSubmit(
   const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
   if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
 
+  // Gateway-leg nincs (server-ingress-only event) — lásd trackLeadSubmit.
   pushContactConversion({ email: params.email, phone: params.phone, eventId, gclid: gclid || undefined });
-  dispatchToGateway(params.eventName || DEFAULT_GATEWAY_EVENT, eventId, {
-    email: params.email, phone: params.phone,
-  });
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
 }
 
@@ -198,7 +202,8 @@ export const CLICK_GATEWAY_EVENT = {
 
 function trackClickConversion(
   pushDataLayer: (eventId: string) => void,
-  gatewayEvent: string,
+  // null → nincs gateway-leg (server-ingress-only event, a böngésző-út 403-mal dobná)
+  gatewayEvent: string | null,
   opts: { dedupName?: string; params?: { email?: string; phone?: string } } = {},
 ): string | null {
   const { dedupName, params = {} } = opts;
@@ -209,7 +214,7 @@ function trackClickConversion(
 
   const eventId = generateEventId();
   if (analytics) pushDataLayer(eventId);                  // browser GA4 (dataLayer)
-  if (marketing) dispatchToGateway(gatewayEvent, eventId, params); // server Meta CAPI + Google Ads
+  if (marketing && gatewayEvent) dispatchToGateway(gatewayEvent, eventId, params); // server Meta CAPI + Google Ads
   if (dedupName) markClickFired(dedupName);
   return eventId;
 }
@@ -224,7 +229,10 @@ export function trackPhoneConversion(params: { phone?: string } = {}): string | 
 
 /** Callback click → dataLayer `callback_click` + gateway `callback_conversion` (shared event_id, session-deduped). */
 export function trackCallbackConversion(params: { email?: string; phone?: string } = {}): string | null {
-  return trackClickConversion((id) => { trackCallbackClick(id); }, CLICK_GATEWAY_EVENT.callback, {
+  // Gateway-leg NINCS: a callback_conversion → callback_request_submitted a
+  // gateway Run 6 óta server-ingress-only (böngésző-útról 403). A dataLayer/
+  // Pixel-leg marad; szerver CAPI-t csak backend-es callback-flow küldhet.
+  return trackClickConversion((id) => { trackCallbackClick(id); }, null, {
     dedupName: 'callback', params,
   });
 }

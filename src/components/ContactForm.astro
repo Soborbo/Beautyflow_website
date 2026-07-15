@@ -272,10 +272,17 @@ const formId = `contact-form-${location}`;
         }
 
         try {
+          // ONE id for this conversion, minted before the submit and handed to BOTH
+          // legs: the server dispatch inside /api/contact and the browser's
+          // trackLeadSubmit below. Meta dedupes the CAPI and Pixel legs on the
+          // (event_name, event_id) pair — two ids would book the Lead twice, not
+          // once (CLAUDE.md #16).
+          const eventId = crypto.randomUUID();
+
           const res = await fetch('/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify({ ...data, event_id: eventId }),
           });
           const result = await res.json();
 
@@ -293,6 +300,7 @@ const formId = `contact-form-${location}`;
               value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
               contentName: formName,
               eventName: 'contact_form_submit',
+              eventId,                     // shared with the server leg — see above
             });
             // Give GTM a beat to fire its browser tags before the hard navigation;
             // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
