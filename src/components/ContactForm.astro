@@ -159,7 +159,7 @@ const formId = `contact-form-${location}`;
 
 <script>
   import {
-    trackLeadSubmit,
+    trackContactSubmit,
     initFormAbandonTracking,
     waitForTracking,
     getAllTrackingData,
@@ -287,18 +287,17 @@ const formId = `contact-form-${location}`;
           const result = await res.json();
 
           if (result.success) {
-            // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
-            // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
-            // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
-            // PII goes to the Enhanced-Conversions side-channel inside the lib, never
-            // the dataLayer. Navigation is independent of tracking consent.
-            trackLeadSubmit({
+            // A per-salon kapcsolat-űrlap = Meta Contact (üzleti döntés 2026-07-15):
+            // dataLayer `contact_submit` (böngésző GTM → Meta Pixel Contact) ÉS a
+            // gateway `contact_form_submitted` (Meta CAPI Contact), UGYANAZZAL az
+            // event_id-vel dedupolva. A kalkulátoros formok (kvíz + konzultáció)
+            // ezzel szemben `lead_submit` → Lead. PII a hidden EC side-channelbe
+            // megy a lib-ben, sosem a dataLayerbe. A navigáció független a consenttől.
+            trackContactSubmit({
               email: data.email,
               phone: data.phone,
               firstName: data.firstName,
               lastName: data.lastName,
-              value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
-              contentName: formName,
               eventName: 'contact_form_submit',
               eventId,                     // shared with the server leg — see above
             });
