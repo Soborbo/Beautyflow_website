@@ -443,7 +443,10 @@ async function dispatchGatewayConversion(
 
   try {
     const res = await sendGatewayConversion(gatewayEnv, {
-      eventName: 'contact_form_submitted',
+      // A többlépéses bőranalízis-kvíz a lead-kalkulátor: a gateway ezt Meta
+      // Lead-re képezi (a kontakt-űrlap marad contact_form_submitted → Contact).
+      // Üzleti döntés (2026-07-15): kvíz = Lead, kontakt-oldali űrlap = Contact.
+      eventName: 'quote_calculator_submitted',
       eventId: data.event_id,
       // A CRM lead-kulcsa: enélkül a gateway ledger sora lead_id=NULL, és a
       // /lead-status offline-loop sosem joinolható vissza a konverzióhoz.
