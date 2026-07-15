@@ -1,12 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "beautyflow-website",
-  // @astrojs/cloudflare v13 ships a single stable Worker entrypoint that wraps
-  // the Astro SSR build. `astro build` wires the generated manifest into it, so
-  // `main` no longer points at the build output (./dist/_worker.js/index.js).
-  "main": "@astrojs/cloudflare/entrypoints/server",
+  // Egyedi Worker-entry (@astrojs/cloudflare v14 custom entrypoint): az Astro
+  // SSR-handlert wrappeli ÉS a napi synthetic-lead füstteszt scheduled()
+  // handlerét exportálja (src/worker.ts → src/lib/tracking/smoke.ts).
+  "main": "./src/worker.ts",
   "compatibility_date": "2025-05-13",
   "compatibility_flags": ["nodejs_compat"],
+  // Napi füstteszt: szintetikus lead a TELJES szerver-láncon át a Meta TEST
+  // streambe. Szándékosan nem kerek perc.
+  "triggers": { "crons": ["47 4 * * *"] },
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist",
