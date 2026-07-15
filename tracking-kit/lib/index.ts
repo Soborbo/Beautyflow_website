@@ -150,13 +150,21 @@ export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
 }
 
 export function trackContactSubmit(
-  params: Pick<LeadSubmitParams, 'email' | 'phone' | 'eventName'>,
+  params: Pick<LeadSubmitParams, 'email' | 'phone' | 'firstName' | 'lastName' | 'eventName' | 'eventId'>,
 ): LeadSubmitResult {
-  const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
   if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
 
-  // Gateway-leg nincs (server-ingress-only event) — lásd trackLeadSubmit.
-  pushContactConversion({ email: params.email, phone: params.phone, eventId, gclid: gclid || undefined });
+  // Gateway-leg nincs (server-ingress-only event) — lásd trackLeadSubmit. Az
+  // eventId a HÍVÓTÓL jön (a form POST body-jával megosztva), így a böngésző
+  // Pixel Contact és a szerver CAPI Contact ugyanazon (Contact, event_id) páron
+  // dedupál. A név a hidden EC side-channelbe megy (buildConversionPayload), a
+  // dataLayer PII-mentes marad.
+  pushContactConversion({
+    email: params.email, phone: params.phone,
+    firstName: params.firstName, lastName: params.lastName,
+    eventId, gclid: gclid || undefined,
+  });
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
 }
 

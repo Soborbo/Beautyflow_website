@@ -726,7 +726,13 @@ async function dispatchGatewayConversion(
 
   try {
     const res = await sendGatewayConversion(gatewayEnv, {
-      eventName: 'contact_form_submitted',
+      // A konzultációs 4-lépcsős kalkulátor lead-kalkulátor → a gateway Meta
+      // Lead-re képezi; a per-salon kapcsolat-űrlap marad Contact. Üzleti döntés
+      // (2026-07-15): kalkulátor/kvíz = Lead, kapcsolat-űrlap = Contact. A böngésző
+      // oldalán a konzultáció trackLeadSubmit-et (lead_submit → Pixel Lead), a
+      // location trackContactSubmit-et (contact_submit → Pixel Contact) tüzel, és
+      // mindkettő UGYANAZT az event_id-t viszi → Meta dedup a standard eventen.
+      eventName: data.formType === 'consultation' ? 'quote_calculator_submitted' : 'contact_form_submitted',
       eventId: data.event_id,
       // A CRM lead-kulcsa (a webhook válaszából): enélkül a gateway ledger sora
       // lead_id=NULL, és a /lead-status offline-loop sosem joinolható vissza.
