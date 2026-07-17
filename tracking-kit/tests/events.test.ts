@@ -7,8 +7,8 @@ import {
 } from '../lib/events';
 import { setCkyConsent, resetAll, getDataLayer, lastEvent } from './helpers';
 
-function readSideChannel(): Record<string, string> | undefined {
-  return (window as unknown as { __sbUserData?: Record<string, string> }).__sbUserData;
+function readSideChannel(): Record<string, unknown> | undefined {
+  return (window as unknown as { __sbUserData?: Record<string, unknown> }).__sbUserData;
 }
 
 beforeEach(() => {
@@ -80,15 +80,27 @@ describe('conversion events → dataLayer', () => {
   });
 
   it('writes normalized PII to the hidden side-channel (not the dataLayer)', () => {
-    pushLeadConversion({ email: 'A@B.com', phone: '07123456789', firstName: 'Jo', eventId: 'E1b' });
+    pushLeadConversion({ email: 'A@B.com', phone: '07123456789', firstName: 'Jo', lastName: 'Smith', eventId: 'E1b' });
     const ud = readSideChannel()!;
     expect(ud.email).toBe('a@b.com');
     expect(ud.phone_number).toBe('+447123456789');
-    expect(ud.first_name).toBe('Jo');
+    // gtag user_provided_data schema: names MUST be nested under `address` —
+    // the Google Ads (awct) tag silently drops top-level first_name/last_name.
+    expect(ud.address).toEqual({ first_name: 'Jo', last_name: 'Smith' });
+    expect(ud.first_name).toBeUndefined();
+    expect(ud.last_name).toBeUndefined();
     // Also mirrored to the hidden DOM element for the GTM Custom JS variable.
     const el = document.getElementById(USER_DATA_ELEMENT_ID)!;
     expect(el.hidden).toBe(true);
-    expect(JSON.parse(el.textContent!).email).toBe('a@b.com');
+    const mirrored = JSON.parse(el.textContent!);
+    expect(mirrored.email).toBe('a@b.com');
+    expect(mirrored.address).toEqual({ first_name: 'Jo', last_name: 'Smith' });
+  });
+
+  it('omits `address` entirely when there is no name (no empty object noise)', () => {
+    pushLeadConversion({ email: 'a@b.com', phone: '07123456789', eventId: 'E1c' });
+    const ud = readSideChannel()!;
+    expect(ud.address).toBeUndefined();
   });
 
   it('omits value when 0 (no Smart Bidding poisoning)', () => {

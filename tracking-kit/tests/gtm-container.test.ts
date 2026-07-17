@@ -54,6 +54,11 @@ describe('gtm/container.json — importable export', () => {
     expect(upd.type).toBe('jsm');
     const js = upd.parameter.find((p: { key: string }) => p.key === 'javascript').value as string;
     expect(js).toContain('window.__sbUserData');
+    // The variable must return the side-channel object AS-IS (no reshaping):
+    // the lib already writes the gtag user_provided_data shape, names nested
+    // under `address` — a transforming variable here would break that contract.
+    expect(js).toContain('return window.__sbUserData || {}');
+    expect(js).toContain('address');
   });
 
   it('ad-platform tags gate on ad consent; GA4 tags on analytics consent', () => {

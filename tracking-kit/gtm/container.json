@@ -1933,7 +1933,7 @@
           {
             "type": "TEMPLATE",
             "key": "javascript",
-            "value": "function(){\n  // PII is written by setUserDataForEC() to a hidden side-channel,\n  // NOT the dataLayer (GDPR). Keys: email, phone_number, first_name, last_name.\n  try { return window.__sbUserData || {}; } catch (e) { return {}; }\n}"
+            "value": "function(){\n  // PII is written by setUserDataForEC() to a hidden side-channel,\n  // NOT the dataLayer (GDPR). Shape matches gtag user_provided_data:\n  // { email, phone_number, address: { first_name, last_name } }.\n  try { return window.__sbUserData || {}; } catch (e) { return {}; }\n}"
           }
         ],
         "fingerprint": "0"

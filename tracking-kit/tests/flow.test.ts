@@ -18,8 +18,8 @@ import { setCkyConsent, resetAll, lastEvent } from './helpers';
 
 const mockSend = sendToWorker as unknown as ReturnType<typeof vi.fn>;
 
-function sideChannel(): Record<string, string> | undefined {
-  return (window as unknown as { __sbUserData?: Record<string, string> }).__sbUserData;
+function sideChannel(): Record<string, unknown> | undefined {
+  return (window as unknown as { __sbUserData?: Record<string, unknown> }).__sbUserData;
 }
 
 beforeEach(() => {
@@ -44,8 +44,14 @@ describe('lead journey — flows through both channels in the right shape', () =
     expect(dl.currency).toBe('GBP');
     expect(JSON.stringify(dl)).not.toContain('A@B.com');
 
-    // side-channel — normalized PII for Enhanced Conversions
-    expect(sideChannel()).toMatchObject({ email: 'a@b.com', phone_number: '+447123456789' });
+    // side-channel — normalized PII for Enhanced Conversions, names nested under
+    // `address` (gtag user_provided_data schema; top-level names are dropped by awct)
+    expect(sideChannel()).toMatchObject({
+      email: 'a@b.com',
+      phone_number: '+447123456789',
+      address: { first_name: 'Jo', last_name: 'Smith' },
+    });
+    expect((sideChannel() as Record<string, unknown>).first_name).toBeUndefined();
 
     // server channel: a gateway Run 6 óta a form-konverziókat CSAK a
     // hitelesített szerver-ingressen fogadja — a böngésző-leg 403 lenne, ezért

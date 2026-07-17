@@ -95,9 +95,26 @@ export interface ConversionData {
  */
 export const USER_DATA_ELEMENT_ID = '__sb_user_data__';
 
+/**
+ * Shape of the EC side-channel — MUST match gtag's `user_provided_data` schema:
+ * names live under `address`, NOT at the top level. The awct (Google Ads
+ * conversion) tag silently DROPS top-level `first_name`/`last_name`, so a flat
+ * shape looks fine in Preview while quietly losing the name match keys.
+ */
+export interface EcAddress {
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface EcUserData {
+  email?: string;
+  phone_number?: string;
+  address?: EcAddress;
+}
+
 declare global {
   interface Window {
-    __sbUserData?: Record<string, string>;
+    __sbUserData?: EcUserData;
   }
 }
 
@@ -114,7 +131,7 @@ export function clearUserDataForEC(): void {
   try { document.getElementById(USER_DATA_ELEMENT_ID)?.remove(); } catch { /* */ }
 }
 
-export function setUserDataForEC(ud: Record<string, string>): void {
+export function setUserDataForEC(ud: EcUserData): void {
   if (!hasMarketingConsent()) return;
   if (typeof window === 'undefined') return;
   window.__sbUserData = ud;
@@ -136,10 +153,14 @@ export function setUserDataForEC(ud: Record<string, string>): void {
 }
 
 function buildConversionPayload(data: ConversionData): Record<string, unknown> {
-  const ud: Record<string, string> = { email: normalizeEmail(data.email) };
+  const ud: EcUserData = { email: normalizeEmail(data.email) };
   if (data.phone && data.phone.length >= 8) ud.phone_number = normalizePhone(data.phone);
-  if (data.firstName) ud.first_name = sanitizeName(data.firstName);
-  if (data.lastName) ud.last_name = sanitizeName(data.lastName);
+  // gtag user_provided_data schema: names go under `address` — top-level
+  // first_name/last_name are dropped by the Google Ads (awct) tag.
+  const address: EcAddress = {};
+  if (data.firstName) address.first_name = sanitizeName(data.firstName);
+  if (data.lastName) address.last_name = sanitizeName(data.lastName);
+  if (address.first_name || address.last_name) ud.address = address;
 
   // PII → hidden side-channel for Enhanced Conversions (NOT the dataLayer).
   setUserDataForEC(ud);

@@ -460,6 +460,10 @@ async function dispatchGatewayConversion(
         first_name: data.firstName,
         country: request.headers.get('CF-IPCountry') || 'HU',
       },
+      // Meta browser IDs from the client's _fbp/_fbc cookies (POSTed with the
+      // quiz) — plain, top-level; the gateway's CAPI leg needs them for EMQ.
+      fbp: data.fbp || undefined,
+      fbc: data.fbc || undefined,
       attribution: {
         gclid: data.gclid || undefined,
         fbclid: data.fbclid || undefined,
