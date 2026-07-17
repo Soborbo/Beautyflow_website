@@ -1094,8 +1094,7 @@
         "fingerprint": "0",
         "firingTriggerId": [
           "1",
-          "3",
-          "7"
+          "3"
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
@@ -1215,8 +1214,7 @@
         "firingTriggerId": [
           "1",
           "3",
-          "4",
-          "7"
+          "4"
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
