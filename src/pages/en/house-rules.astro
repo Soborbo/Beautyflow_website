@@ -1,0 +1,189 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+
+const effectiveFrom = 'August 1, 2026';
+---
+
+<Layout
+  title="House Rules and Booking Policy | Beautyflow Beauty Salon"
+  description="Beautyflow Beauty Salon's house rules and booking policy. Booking, cancellation, discounts, opening hours, and general information."
+  lang="en"
+  noindex={true}
+>
+  <section class="py-16 bg-gradient-to-br from-[#fdf8f6] via-white to-[#f8f4f9]">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="font-heading text-3xl md:text-4xl text-gray-900 mb-4 uppercase text-center font-bold">
+        House Rules
+      </h1>
+      <p class="text-center text-gray-500 mb-12">Booking Policy &middot; Effective from {effectiveFrom}</p>
+
+      <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Booking</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            You can book your appointment via the link in our Instagram bio or through the
+            website — please use these instead of sending a message! (www.beautyflow.pro)
+          </p>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li><strong>For treatments of 2 hours or longer</strong>, a deposit is required to finalize the appointment. Amount: 50% of the treatment price, deducted from the final amount on-site.</li>
+            <li><strong>As a new guest</strong>, a deposit is required for every treatment. Amount: 50% of the treatment price, deducted from the final amount on-site.</li>
+            <li>If you have a treatment pass, no deposit is needed — the pass is your means of payment.</li>
+            <li>If the amount does not arrive within <strong>72 hours</strong>, we unfortunately cannot hold your chosen appointment.</li>
+          </ul>
+          <p class="text-gray-600 leading-relaxed mt-4">
+            📲 Regarding the deposit, we will contact you by SMS.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Rescheduling and Cancellation</h2>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li><strong>More than 48 hours in advance:</strong> free of charge via the online booking system.</li>
+            <li><strong>Within 48 hours:</strong> accepted EXCLUSIVELY by phone at <a href="tel:+36308346204" class="text-[#c53f75] underline">+36 30 834 6204</a>.</li>
+            <li>Cancellation within 48 hours: <strong>25%</strong> of the treatment price is payable.</li>
+            <li>Cancellation within 24 hours: <strong>50%</strong> of the treatment price is payable, calculated from the start of the appointment.</li>
+            <li>We CANNOT accept cancellations or modifications sent as replies to SMS, push, or email notifications from the Notino system, or via private messages or email.</li>
+          </ul>
+          <p class="text-gray-600 leading-relaxed mt-4">
+            📆 Any rescheduling within 48 hours qualifies as a cancellation and will be invoiced.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">No Show</h2>
+          <p class="text-gray-600 leading-relaxed">
+            ❌ If you fail to appear at your booked appointment without prior notice, we
+            unfortunately will not be able to offer you appointments in the future, and
+            <strong>100%</strong> of the treatment price is payable.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">If We Have to Reschedule</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            If we ever have to cancel an appointment, we provide <strong>redeemable
+            credit</strong> as compensation, which you can use for <strong>a new booking or
+            product purchase</strong>. The credit cannot be redeemed for cash.
+          </p>
+          <p class="text-gray-600 leading-relaxed">
+            💳 Amount: within 48 hours, 25% of the treatment price; within 24 hours, 50% of
+            the treatment price.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Permanent Discounts</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            🎓 <strong>Student discount:</strong> −10% on every booking. Only with a valid
+            student ID, which must be presented on-site. When booking, enter the code
+            <strong>"DIAK10"</strong> in the comment field.
+          </p>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            ✨ <strong>VIP membership:</strong> collect 15 stamps in your loyalty booklet
+            and you automatically become a VIP member. Includes: a <strong>lifetime −10%
+            discount</strong> on all treatments. Plus, you'll be the first to hear about
+            news, new treatments, and special offers — before anyone else.
+          </p>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            Permanent discounts (student discount, VIP membership) cannot be combined with
+            any other discount.
+          </p>
+          <p class="text-gray-600 leading-relaxed">
+            Check out the discounts highlight on our Instagram page for more info!
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Opening Hours</h2>
+          <div class="grid md:grid-cols-2 gap-6 mb-4">
+            <div>
+              <p class="text-gray-900 font-semibold">Beautyflow Buda</p>
+              <p class="text-gray-600">📍 1116 Budapest, Vegyész u. 1.</p>
+              <p class="text-gray-600 mt-2">Monday–Friday: 08:00–20:00<br />Saturday–Sunday: 10:00–20:00</p>
+            </div>
+            <div>
+              <p class="text-gray-900 font-semibold">Beautyflow Pest</p>
+              <p class="text-gray-600">📍 1135 Budapest, Reitter Ferenc u. 90.</p>
+              <p class="text-gray-600 mt-2">Monday–Friday: 08:00–20:00<br />Saturday–Sunday: 10:00–20:00</p>
+            </div>
+          </div>
+          <p class="text-gray-600 leading-relaxed">
+            We reserve the right to change our opening hours — always check the website!
+            We also announce our holiday opening hours in our newsletter and Instagram
+            stories.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Payment Methods</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            Payment takes place on-site at the end of the treatment; the deposit is
+            deducted from the final amount.
+          </p>
+          <ul class="list-disc pl-6 text-gray-600 space-y-2">
+            <li>💳 Card payment</li>
+            <li>📲 Revolut transfer</li>
+            <li>💸 Cash (Hungarian forint)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Parking</h2>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-gray-900 font-semibold">Beautyflow Buda</p>
+              <p class="text-gray-600">📍 1116 Budapest, Vegyész u. 1.</p>
+              <p class="text-gray-600 mt-2">Parking zone code: 3114<br />Paid between 08:00–18:00</p>
+            </div>
+            <div>
+              <p class="text-gray-900 font-semibold">Beautyflow Pest</p>
+              <p class="text-gray-600">📍 1135 Budapest, Reitter Ferenc u. 90.</p>
+              <p class="text-gray-600 mt-2">Parking zone code: 0135<br />Paid between 08:30–18:00</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Language</h2>
+          <p class="text-gray-600 leading-relaxed">
+            🇺🇸 Our treatments and consultations are primarily conducted in Hungarian, but
+            we're happy to welcome English-speaking guests as well — feel free to book your
+            appointment!
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Pet-Friendly Salon</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            🐾 If your pet doesn't require special supervision and you can't arrange care
+            for them, feel free to bring them along to your appointment!
+          </p>
+          <p class="text-gray-600 leading-relaxed">
+            Please let us know in advance if you're arriving with a "companion" at
+            <a href="tel:+36309503549" class="text-[#c53f75] underline">+36 30 950 3549</a>! 🙂
+          </p>
+        </section>
+
+        <section>
+          <p class="text-gray-600 leading-relaxed font-semibold">
+            You can find the <a href="/en/terms-and-conditions" class="text-[#c53f75] underline">Terms and Conditions here</a> —
+            by booking an appointment, you automatically accept the house rules!
+          </p>
+        </section>
+
+      </div>
+
+      <div class="text-center mt-8">
+        <a
+          href="/en/"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+        >
+          Back to Homepage
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
