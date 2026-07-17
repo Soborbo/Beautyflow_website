@@ -80,6 +80,15 @@ export interface GatewayConversionInput {
   currency?: string;
   source?: string;
   userData?: GatewayUserData;
+  /**
+   * Meta browser IDs, PLAIN (never hashed — CLAUDE.md #1). The client reads
+   * them from the _fbp/_fbc cookies and POSTs them with the form; forwarding
+   * them here lets the gateway's Meta CAPI leg carry the same identifiers as
+   * the Pixel leg (EMQ + attribution). Top-level in the gateway payload —
+   * the gateway reads `payload.fbp` / `payload.fbc`, not user_data.
+   */
+  fbp?: string;
+  fbc?: string;
   attribution?: Record<string, string | undefined>;
   consent?: ConsentState;
   eventSourceUrl?: string;
@@ -198,6 +207,10 @@ export function buildGatewayPayload(input: GatewayConversionInput): Record<strin
     lead_id: input.leadId,
     ...(hasValue ? { value: input.value, currency: input.currency || 'HUF' } : {}),
     source: input.source,
+    // Meta browser IDs — top-level, PLAIN (the gateway maps them onto the CAPI
+    // user_data.fbp/fbc itself; hashing or nesting them here would break dedup).
+    fbp: input.fbp,
+    fbc: input.fbc,
     user_data: userData && Object.keys(userData).length > 0 ? userData : undefined,
     attribution: attribution && Object.keys(attribution).length > 0 ? attribution : undefined,
     consent: input.consent,

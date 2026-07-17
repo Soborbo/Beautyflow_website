@@ -26,7 +26,8 @@ Variable). Name it `CJS - User Provided Data`:
 ```js
 function () {
   try {
-    // Written by setUserDataForEC() — keys: email, phone_number, first_name, last_name.
+    // Written by setUserDataForEC() — shape matches gtag user_provided_data:
+    // { email, phone_number, address: { first_name, last_name } }.
     return window.__sbUserData || {};
   } catch (e) {
     return {};
@@ -35,7 +36,9 @@ function () {
 ```
 Then in the Google Ads / GA4 tags set **User-Provided Data → Manual → Variable** to
 `{{CJS - User Provided Data}}` (it already has `email` / `phone_number` /
-`first_name` / `last_name` keys in the shape Google expects). The Custom JS variable
+`address.first_name` / `address.last_name` keys in the shape Google expects — the
+names MUST be nested under `address`, top-level names are dropped by the Google
+Ads tag). The Custom JS variable
 runs in the tag's context, so the PII never enters the dataLayer.
 
 ## Triggers (Custom Event)
