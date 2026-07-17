@@ -23,7 +23,7 @@
     "astro-critters": "^2.2.1",
     "resend": "^6.17.2",
     "sharp": "^0.35.3",
-    "tailwindcss": "^4.3.1"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -31,7 +31,7 @@
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.105.0"
+    "wrangler": "^4.112.0"
   },
   "overrides": {
     "vite": "^8"
