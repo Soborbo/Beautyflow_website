@@ -8,7 +8,7 @@
  *    konfigurált ÉS a kód feloldható — enélkül a szintetikus event a PRODUCTION
  *    Meta-streambe menne (a 2 korábbi éles Meta-leak osztálya). Ha nincs kód,
  *    a teszt HANGOSAN kimarad, nem küld semmit.
- *  - Determinisztikus napi event_id (`smoke-lomtalan-YYYYMMDD`): a cron dupla
+ *  - Determinisztikus napi event_id (`smoke-beautyflow-YYYYMMDD`): a cron dupla
  *    tüzelését a gateway idempotenciája nyeli el, nem lesz dupla event.
  *  - A lead_id ugyanez a smoke-kulcs → a ledger lead-trail útja is gyakorlódik,
  *    és a smoke-sorok `smoke-` prefixszel kiszűrhetők minden auditból.
