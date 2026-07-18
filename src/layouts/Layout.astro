@@ -52,9 +52,13 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <Tracking gtmId={gtmId} />
+    <!-- charset + viewport must be in the first 1024 bytes. <Tracking/> injects
+         ~1.5KB of inline consent/GTM bootstrap, so it has to come AFTER these
+         two tags — otherwise the charset declaration is pushed past the 1024-byte
+         window (Lighthouse "Charset declaration … occurs too late"). -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Tracking gtmId={gtmId} />
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
