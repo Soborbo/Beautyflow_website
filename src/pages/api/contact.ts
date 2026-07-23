@@ -253,6 +253,21 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
 
 // ---- Email senders -----------------------------------------------------
 
+/**
+ * A telefonszám `tel:` URI-alakja. A nyers mezőt nem lehet href-be tenni: egy
+ * beírt `06 70 683 8600` a szóközök miatt érvénytelen URI-t ad, amit a
+ * levelezőkliensek nem tesznek kattinthatóvá. A megjelenített szöveg marad a
+ * beírt, ember-olvasható alak — csak a href normalizált.
+ */
+function telHref(phone: string): string {
+  const cleaned = String(phone).replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+')) return `+${cleaned.slice(1).replace(/\D/g, '')}`;
+  const digits = cleaned.replace(/\D/g, '');
+  if (digits.startsWith('00')) return `+${digits.slice(2)}`;
+  if (digits.startsWith('06')) return `+36${digits.slice(2)}`;
+  return digits ? `+${digits}` : '';
+}
+
 async function sendAdminEmail(resend: Resend, data: ContactFormData): Promise<void> {
   const lang = data.lang || 'hu';
   const langLabel = lang === 'en' ? 'EN' : 'HU';
@@ -313,7 +328,7 @@ Automatikus üzenet a beautyflow.pro weboldalról.
   <p style="color: #666; font-size: 13px;">${escapeHtml(timestamp)} · ${escapeHtml(langLabel)} · ${escapeHtml(sourcePage)}</p>
   <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
     <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 120px;">Név</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(fullName)}</td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Telefon</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${escapeHtml(data.phone)}">${escapeHtml(data.phone)}</a></td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Telefon</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${escapeHtml(telHref(data.phone))}">${escapeHtml(data.phone)}</a></td></tr>
     <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
     <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;vertical-align:top;">Tárgy</td><td style="padding: 8px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(topic)}</td></tr>
     ${utmString ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Marketing</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(utmString)}</td></tr>` : ''}

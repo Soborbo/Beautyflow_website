@@ -435,6 +435,13 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   'QUIZ-KV-001':                 { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'KV eredmény-mentés failed (eredmény localStorage-ben + emailben megvan)', requiredContext: [] },
   'QUIZ-UNHANDLED-001':          { severity: 'ERROR',    retryable: false, userImpact: 'blocked',  message: 'Top-level catch a quiz POST handlerben', requiredContext: [] },
 
+  // ---- /api/webhook/resend ----------------------------------------------
+  'WEBHOOK-RESEND-BOUNCE-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Admin értesítő visszapattant — a szalon NEM kapta meg a leadet', requiredContext: ['emailId', 'to', 'subject', 'bounce'] },
+  'WEBHOOK-RESEND-BOUNCE-002':   { severity: 'ERROR',    retryable: false, userImpact: 'degraded', message: 'User visszaigazoló visszapattant (a lead a CRM-ben megvan)', requiredContext: ['emailId', 'to', 'subject', 'bounce'] },
+  'WEBHOOK-RESEND-COMPLAINT-001':{ severity: 'ERROR',    retryable: false, userImpact: 'degraded', message: 'Címzett spamnek jelölte a levelet (Resend complaint)', requiredContext: ['emailId', 'to', 'subject'] },
+  'WEBHOOK-RESEND-CONFIG-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'RESEND_WEBHOOK_SECRET nincs beállítva — a bounce-ok újra láthatatlanok', requiredContext: [] },
+  'WEBHOOK-RESEND-LEAD-001':     { severity: 'WARN',     retryable: false, userImpact: 'none',     message: 'Bounce megjött, de a lead nem azonosítható a CRM-ben (nincs timeline-jelzés)', requiredContext: ['emailId', 'subject'] },
+
   // ---- /api/meta/capi ---------------------------------------------------
   'TRACK-META-CAPI-001':         { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Meta Conversions API mirror failed — pixel kliens-oldalon fut', requiredContext: [] },
 

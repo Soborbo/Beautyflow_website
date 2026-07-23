@@ -55,6 +55,7 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 |---|---|---|
 | `TURNSTILE_SECRET_KEY` | Turnstile server-side verification | **kötelező** |
 | `RESEND_API_KEY` | Email küldés (info@beautyflow.pro) | **kötelező** |
+| `RESEND_WEBHOOK_SECRET` | Resend bounce/complaint webhook aláírás (`whsec_…`) | **kötelező a bounce-figyeléshez** |
 | `EMAILOCTOPUS_API_KEY` | Hírlevél feliratkozás (NewsletterModal) | **kötelező a hírlevélhez** |
 | `GOOGLE_SHEETS_ID` | Lead log Google Sheets-be | opcionális |
 | `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Sheets service account | opcionális |
