@@ -34,21 +34,6 @@
   "services": [
     { "binding": "GATEWAY", "service": "event-gateway" }
   ],
-  /*
-   * A Painless-CRM D1-je. CSAK a /api/webhook/resend endpoint használja, és csak
-   * olvasásra (`leads`) + egyetlen `lead_activities` note beszúrására: egy
-   * visszapattant értesítő így a lead timeline-ján is látszik, nem csak a
-   * logban. A CRM-nek nincs erre HTTP-endpointja (a `/api/webhook/lead` csak
-   * lead-létrehozás), ezért megy közvetlenül a D1-re. A binding OPCIONÁLIS: ha
-   * hiányzik, a webhook továbbra is jelenti a bounce-ot, csak CRM-jelzés nélkül.
-   */
-  "d1_databases": [
-    {
-      "binding": "CRM_DB",
-      "database_name": "beautyflow-crm",
-      "database_id": "4ce91cdf-e61e-46f9-ba6b-88b2e2d847d6"
-    }
-  ],
   "vars": {
     "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
     "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",

@@ -89,8 +89,6 @@ export const ERROR_CODES = {
   WEBHOOK_RESEND_COMPLAINED: 'WEBHOOK-RESEND-COMPLAINT-001',
   /** RESEND_WEBHOOK_SECRET hiányzik — a bounce-ok újra láthatatlanok. CRITICAL. */
   WEBHOOK_RESEND_CONFIG_MISSING: 'WEBHOOK-RESEND-CONFIG-001',
-  /** Bounce megjött, de a leadet nem sikerült a CRM-ben azonosítani. */
-  WEBHOOK_RESEND_LEAD_UNRESOLVED: 'WEBHOOK-RESEND-LEAD-001',
 
   // ---- /api/meta/capi ---------------------------------------------------
   /** Meta Conversions API mirror request threw — pixel still fires client-side. */
