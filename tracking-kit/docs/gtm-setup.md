@@ -45,13 +45,17 @@ runs in the tag's context, so the PII never enters the dataLayer.
 One each for the dataLayer events: `calculator_start`, `calculator_step`,
 `calculator_option`, `calculator_complete`, `lead_submit`, `contact_submit`,
 `phone_click`, `callback_click`, `email_click`, `whatsapp_click`, `form_abandon`,
-`scroll_depth`.
+`scroll_depth`, plus site events such as `booking_click`, `newsletter_signup`, and
+`calculator_result_view` when the application emits them.
 
 ## Tags — base
-- **Consent Default** (Custom HTML, Consent Initialization) — CookieYes handles the update.
+- **Consent Default** — declared inline by `Tracking.astro` before CookieYes and
+  `gtm.js`; do not duplicate it inside GTM. CookieYes handles the update.
 - **Conversion Linker** — ad_storage, Initialization. Without it, Google Ads does not
   attribute (gclid → _gcl_aw).
-- **Google Tag (GA4)** — G-XXXXXXXXXX, analytics_storage, All Pages.
+- **Google Tag (GA4)** — G-XXXXXXXXXX, All Pages, page view enabled. Use the
+  tag's built-in Consent Mode checks; do not add an Additional Consent Check that
+  prevents the base tag from running under the denied default.
 
 ## GA4 Event tags — with the CANONICAL event name
 
@@ -62,10 +66,13 @@ One each for the dataLayer events: `calculator_start`, `calculator_step`,
 | `phone_click` | `phone_conversion` | ✅ | event_id, session_id, device |
 | `email_click` | `email_conversion` | ✅ | event_id, session_id |
 | `whatsapp_click` | `whatsapp_conversion` | ✅ | event_id, session_id |
+| `booking_click` | `booking_click` | ✅ | event_id, session_id, source |
 | `calculator_complete` | `quote_calculator_conversion` | ✅ | value, currency, event_id, calculator_name |
 | `calculator_start/step/option` | `calculator_start` / `_step` / `_option` | ❌ | calculator_name, step_id, step_index |
 | `form_abandon` | `form_abandon` | ❌ | form_id, last_field |
 | `scroll_depth` | `scroll_depth` | ❌ | scroll_percentage |
+| `newsletter_signup` | `newsletter_signup` | ❌ | session_id |
+| `calculator_result_view` | `calculator_result_view` | ❌ | route, safe, session_id |
 
 > The "GA4 event name" column = the table in `CANONICAL-EVENTS.md`. (If you want to use
 > a GA4 recommended name, e.g. `generate_lead`, then you must send that name on the
@@ -88,8 +95,13 @@ from index.ts) → Meta Pixel↔CAPI dedup.
 
 ## Google Ads Conversion tag
 Conversion Value: {{DLV - value}}. Transaction ID: {{DLV - event_id}}.
-User-provided data: {{CJS - User Provided Data}}. ad_storage + ad_user_data.
-Trigger: the conversion CEs (lead_submit/callback_click/phone_click/calculator_complete).
+User-provided data: {{CJS - User Provided Data}}. Use Google Ads' built-in
+Consent Mode checks; the application exposes user-provided data only after
+marketing consent.
+
+Use one conversion tag/action per business signal. Contact/Lead and Phone must
+not share a label. Booking must have its own action or stay GA4-only until one
+exists; never send it under the Contact label.
 **Don't set a fixed value default of 1+currency** — it poisons the bidding (see INVARIANTS).
 
 ## Enhanced Conversions

@@ -130,7 +130,11 @@ function dispatchToGateway(
 
 export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
   const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
-  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+  const analytics = hasAnalyticsConsent();
+  const marketing = hasMarketingConsent();
+  if (!analytics && !marketing) {
+    return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+  }
 
   const currency = params.currency || trackingConfig.currency;
 
@@ -139,12 +143,14 @@ export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
   // Run 6 óta server-ingress-only-k — a böngésző-útról 403 (TRK-400-017). A
   // site backendje (/api/contact, /api/boranalizis → sendGatewayConversion)
   // küldi őket UGYANEZZEL az event_id-vel → a Pixel↔CAPI dedup változatlan.
-  pushLeadConversion({
-    email: params.email, phone: params.phone,
-    firstName: params.firstName, lastName: params.lastName,
-    value: params.value, currency,
-    gclid: gclid || undefined, eventId,
-  });
+  if (analytics) {
+    pushLeadConversion({
+      email: params.email, phone: params.phone,
+      firstName: params.firstName, lastName: params.lastName,
+      value: params.value, currency,
+      gclid: gclid || undefined, eventId,
+    });
+  }
 
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
 }
@@ -153,18 +159,24 @@ export function trackContactSubmit(
   params: Pick<LeadSubmitParams, 'email' | 'phone' | 'firstName' | 'lastName' | 'eventName' | 'eventId'>,
 ): LeadSubmitResult {
   const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
-  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+  const analytics = hasAnalyticsConsent();
+  const marketing = hasMarketingConsent();
+  if (!analytics && !marketing) {
+    return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+  }
 
   // Gateway-leg nincs (server-ingress-only event) — lásd trackLeadSubmit. Az
   // eventId a HÍVÓTÓL jön (a form POST body-jával megosztva), így a böngésző
   // Pixel Contact és a szerver CAPI Contact ugyanazon (Contact, event_id) páron
   // dedupál. A név a hidden EC side-channelbe megy (buildConversionPayload), a
   // dataLayer PII-mentes marad.
-  pushContactConversion({
-    email: params.email, phone: params.phone,
-    firstName: params.firstName, lastName: params.lastName,
-    eventId, gclid: gclid || undefined,
-  });
+  if (analytics) {
+    pushContactConversion({
+      email: params.email, phone: params.phone,
+      firstName: params.firstName, lastName: params.lastName,
+      eventId, gclid: gclid || undefined,
+    });
+  }
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
 }
 

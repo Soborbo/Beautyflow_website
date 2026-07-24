@@ -38,12 +38,30 @@ describe('trackLeadSubmit', () => {
     expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it('consent nélkül: NINCS dispatch, NINCS dataLayer push', () => {
+  it('analytics-only consent: GA4 dataLayer fires, marketing PII and gateway do not', () => {
     setCkyConsent({ analytics: true, marketing: false });
+    const r = trackLeadSubmit({ email: 'a@b.com' });
+    expect(r.success).toBe(true);
+    expect(r.consentBlocked).toBe(false);
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(true);
+    expect((window as unknown as { __sbUserData?: unknown }).__sbUserData).toBeUndefined();
+  });
+
+  it('marketing-only consent: backend/server leg remains allowed, browser GA4 stays off', () => {
+    setCkyConsent({ analytics: false, marketing: true });
+    const r = trackLeadSubmit({ email: 'a@b.com' });
+    expect(r.success).toBe(true);
+    expect(r.consentBlocked).toBe(false);
+    expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(false);
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('no consent: no browser event and result is consent-blocked', () => {
+    setCkyConsent({ analytics: false, marketing: false });
     const r = trackLeadSubmit({ email: 'a@b.com' });
     expect(r.success).toBe(false);
     expect(r.consentBlocked).toBe(true);
-    expect(mockSend).not.toHaveBeenCalled();
     expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(false);
   });
 });
@@ -53,6 +71,14 @@ describe('trackContactSubmit', () => {
     const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
     expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
     expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('uses analytics consent independently from marketing consent', () => {
+    setCkyConsent({ analytics: true, marketing: false });
+    const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
+    expect(r.success).toBe(true);
+    expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
+    expect((window as unknown as { __sbUserData?: unknown }).__sbUserData).toBeUndefined();
   });
 });
 

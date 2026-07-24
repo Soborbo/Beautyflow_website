@@ -2,17 +2,17 @@
   "exportFormatVersion": 2,
   "exportTime": "2026-01-01 00:00:00",
   "containerVersion": {
-    "path": "accounts/0/containers/0/versions/0",
-    "accountId": "0",
-    "containerId": "0",
+    "path": "accounts/6252358257/containers/196968106/versions/0",
+    "accountId": "6252358257",
+    "containerId": "196968106",
     "containerVersionId": "0",
-    "name": "Soborbo Tracking — canonical (v6)",
+    "name": "Beautyflow Tracking — canonical v6",
     "container": {
-      "path": "accounts/0/containers/0",
-      "accountId": "0",
-      "containerId": "0",
-      "name": "Soborbo Tracking",
-      "publicId": "GTM-XXXXXXX",
+      "path": "accounts/6252358257/containers/196968106",
+      "accountId": "6252358257",
+      "containerId": "196968106",
+      "name": "www.beautyflow.pro",
+      "publicId": "GTM-W8V3BVGD",
       "usageContext": [
         "WEB"
       ],
@@ -21,8 +21,8 @@
     },
     "tag": [
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "1",
         "name": "Conversion Linker",
         "type": "gclidw",
@@ -40,8 +40,8 @@
         "tagFiringOption": "ONCE_PER_EVENT"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "2",
         "name": "GA4 - Configuration",
         "type": "googtag",
@@ -62,8 +62,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "3",
         "name": "GA4 - contact_form_submit",
         "type": "gaawe",
@@ -206,8 +206,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "4",
         "name": "GA4 - callback_conversion",
         "type": "gaawe",
@@ -289,8 +289,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "5",
         "name": "GA4 - phone_conversion",
         "type": "gaawe",
@@ -372,8 +372,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "6",
         "name": "GA4 - email_conversion",
         "type": "gaawe",
@@ -440,8 +440,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "7",
         "name": "GA4 - whatsapp_conversion",
         "type": "gaawe",
@@ -508,8 +508,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "8",
         "name": "GA4 - booking_click",
         "type": "gaawe",
@@ -591,8 +591,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "9",
         "name": "GA4 - quote_calculator_conversion",
         "type": "gaawe",
@@ -689,8 +689,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "10",
         "name": "GA4 - calculator_start",
         "type": "gaawe",
@@ -757,8 +757,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "11",
         "name": "GA4 - calculator_step",
         "type": "gaawe",
@@ -840,8 +840,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "12",
         "name": "GA4 - calculator_option",
         "type": "gaawe",
@@ -908,8 +908,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "13",
         "name": "GA4 - form_abandon",
         "type": "gaawe",
@@ -991,8 +991,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "14",
         "name": "GA4 - scroll_depth",
         "type": "gaawe",
@@ -1059,8 +1059,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "15",
         "name": "GA4 - newsletter_signup",
         "type": "gaawe",
@@ -1112,8 +1112,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "16",
         "name": "GA4 - calculator_result_view",
         "type": "gaawe",
@@ -1195,8 +1195,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "17",
         "name": "Meta Pixel - Base",
         "type": "html",
@@ -1235,8 +1235,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "18",
         "name": "Meta Pixel - Lead",
         "type": "html",
@@ -1276,8 +1276,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "19",
         "name": "Meta Pixel - Contact",
         "type": "html",
@@ -1319,8 +1319,8 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "20",
         "name": "Meta Pixel - InitiateCheckout",
         "type": "html",
@@ -1359,9 +1359,45 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "tagId": "21",
+        "name": "Microsoft Clarity - Base",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"x2xfksq6xq\");\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": false
+          }
+        ],
+        "fingerprint": "0",
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "consentSettings": {
+          "consentStatus": "NEEDED",
+          "consentType": {
+            "type": "LIST",
+            "list": [
+              {
+                "type": "TEMPLATE",
+                "value": "analytics_storage"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "tagId": "22",
         "name": "Google Ads - Contact / Lead",
         "type": "awct",
         "parameter": [
@@ -1427,9 +1463,9 @@
         }
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "tagId": "22",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "tagId": "23",
         "name": "Google Ads - Phone",
         "type": "awct",
         "parameter": [
@@ -1492,79 +1528,12 @@
         "consentSettings": {
           "consentStatus": "NOT_SET"
         }
-      },
-      {
-        "accountId": "0",
-        "containerId": "0",
-        "tagId": "23",
-        "name": "Google Ads - Booking",
-        "type": "awct",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "conversionId",
-            "value": "{{Const - Google Ads Conversion ID}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionLabel",
-            "value": "{{Const - Google Ads Booking Label}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "orderId",
-            "value": "{{DLV - event_id}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionValue",
-            "value": "{{DLV - value}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "currencyCode",
-            "value": "{{DLV - currency}}"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableConversionLinker",
-            "value": true
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "rdp",
-            "value": false
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableEnhancedConversionsCheckbox",
-            "value": true
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "enableUserProvidedData",
-            "value": true
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "userProvidedData",
-            "value": "{{CJS - User Provided Data}}"
-          }
-        ],
-        "fingerprint": "0",
-        "firingTriggerId": [
-          "7"
-        ],
-        "tagFiringOption": "ONCE_PER_EVENT",
-        "consentSettings": {
-          "consentStatus": "NOT_SET"
-        }
       }
     ],
     "trigger": [
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "1",
         "name": "CE - lead_submit",
         "type": "CUSTOM_EVENT",
@@ -1588,8 +1557,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "2",
         "name": "CE - contact_submit",
         "type": "CUSTOM_EVENT",
@@ -1613,8 +1582,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "3",
         "name": "CE - callback_click",
         "type": "CUSTOM_EVENT",
@@ -1638,8 +1607,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "4",
         "name": "CE - phone_click",
         "type": "CUSTOM_EVENT",
@@ -1663,8 +1632,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "5",
         "name": "CE - email_click",
         "type": "CUSTOM_EVENT",
@@ -1688,8 +1657,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "6",
         "name": "CE - whatsapp_click",
         "type": "CUSTOM_EVENT",
@@ -1713,8 +1682,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "7",
         "name": "CE - booking_click",
         "type": "CUSTOM_EVENT",
@@ -1738,8 +1707,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "8",
         "name": "CE - calculator_complete",
         "type": "CUSTOM_EVENT",
@@ -1763,8 +1732,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "9",
         "name": "CE - calculator_start",
         "type": "CUSTOM_EVENT",
@@ -1788,8 +1757,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "10",
         "name": "CE - calculator_step",
         "type": "CUSTOM_EVENT",
@@ -1813,8 +1782,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "11",
         "name": "CE - calculator_option",
         "type": "CUSTOM_EVENT",
@@ -1838,8 +1807,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "12",
         "name": "CE - form_abandon",
         "type": "CUSTOM_EVENT",
@@ -1863,8 +1832,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "13",
         "name": "CE - scroll_depth",
         "type": "CUSTOM_EVENT",
@@ -1888,8 +1857,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "14",
         "name": "CE - newsletter_signup",
         "type": "CUSTOM_EVENT",
@@ -1913,8 +1882,8 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "triggerId": "15",
         "name": "CE - calculator_result_view",
         "type": "CUSTOM_EVENT",
@@ -1940,8 +1909,8 @@
     ],
     "variable": [
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "1",
         "name": "Const - GA4 Measurement ID",
         "type": "c",
@@ -1949,14 +1918,14 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "G-XXXXXXXXXX"
+            "value": "G-774BY4X64P"
           }
         ],
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "2",
         "name": "Const - Meta Pixel ID",
         "type": "c",
@@ -1964,14 +1933,14 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "META_PIXEL_ID"
+            "value": "915395591548632"
           }
         ],
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "3",
         "name": "Const - Google Ads Conversion ID",
         "type": "c",
@@ -1979,14 +1948,14 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "AW-XXXXXXXXX"
+            "value": "AW-17613140258"
           }
         ],
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "4",
         "name": "Const - Google Ads Contact Label",
         "type": "c",
@@ -1994,14 +1963,14 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "CONTACT_CONVERSION_LABEL"
+            "value": "s1NzCOWX76kbEKLizM5B"
           }
         ],
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "5",
         "name": "Const - Google Ads Phone Label",
         "type": "c",
@@ -2009,30 +1978,15 @@
           {
             "type": "TEMPLATE",
             "key": "value",
-            "value": "PHONE_CONVERSION_LABEL"
+            "value": "D0UgCMKZ-6kbEKLizM5B"
           }
         ],
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "variableId": "6",
-        "name": "Const - Google Ads Booking Label",
-        "type": "c",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "value",
-            "value": "BOOKING_CONVERSION_LABEL"
-          }
-        ],
-        "fingerprint": "0"
-      },
-      {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "7",
         "name": "DLV - event_id",
         "type": "v",
         "parameter": [
@@ -2055,9 +2009,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "8",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "7",
         "name": "DLV - value",
         "type": "v",
         "parameter": [
@@ -2080,9 +2034,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "9",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "8",
         "name": "DLV - currency",
         "type": "v",
         "parameter": [
@@ -2105,9 +2059,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "10",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "9",
         "name": "DLV - session_id",
         "type": "v",
         "parameter": [
@@ -2130,9 +2084,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "11",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "10",
         "name": "DLV - device",
         "type": "v",
         "parameter": [
@@ -2155,9 +2109,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "12",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "11",
         "name": "DLV - calculator_name",
         "type": "v",
         "parameter": [
@@ -2180,9 +2134,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "13",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "12",
         "name": "DLV - step_id",
         "type": "v",
         "parameter": [
@@ -2205,9 +2159,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "14",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "13",
         "name": "DLV - step_index",
         "type": "v",
         "parameter": [
@@ -2230,9 +2184,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "15",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "14",
         "name": "DLV - form_id",
         "type": "v",
         "parameter": [
@@ -2255,9 +2209,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "16",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "15",
         "name": "DLV - last_field",
         "type": "v",
         "parameter": [
@@ -2280,9 +2234,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "17",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "16",
         "name": "DLV - scroll_percentage",
         "type": "v",
         "parameter": [
@@ -2305,9 +2259,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "18",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "17",
         "name": "DLV - source",
         "type": "v",
         "parameter": [
@@ -2330,9 +2284,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "19",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "18",
         "name": "DLV - service",
         "type": "v",
         "parameter": [
@@ -2355,9 +2309,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "20",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "19",
         "name": "DLV - route",
         "type": "v",
         "parameter": [
@@ -2380,9 +2334,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "21",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "20",
         "name": "DLV - safe",
         "type": "v",
         "parameter": [
@@ -2405,9 +2359,9 @@
         "fingerprint": "0"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
-        "variableId": "22",
+        "accountId": "6252358257",
+        "containerId": "196968106",
+        "variableId": "21",
         "name": "CJS - User Provided Data",
         "type": "jsm",
         "parameter": [
@@ -2422,14 +2376,14 @@
     ],
     "builtInVariable": [
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "type": "EVENT",
         "name": "Event"
       },
       {
-        "accountId": "0",
-        "containerId": "0",
+        "accountId": "6252358257",
+        "containerId": "196968106",
         "type": "PAGE_URL",
         "name": "Page URL"
       }

@@ -12,11 +12,6 @@ interface Props {
 const { gtmId, cookieYesId } = Astro.props;
 ---
 
-{cookieYesId && (
-  <script is:inline id="cookieyes" type="text/javascript"
-    src={`https://cdn-cookieyes.com/client_data/${cookieYesId}/script.js`} />
-)}
-
 <script is:inline>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -33,6 +28,13 @@ const { gtmId, cookieYesId } = Astro.props;
     'security_storage': 'granted', 'wait_for_update': 2000
   });
 </script>
+
+{/* Load the CMP directly, after the denied default and before GTM. Keeping the
+    CMP outside the container avoids a second, drifting consent-default source. */}
+{cookieYesId && (
+  <script is:inline id="cookieyes" type="text/javascript"
+    src={`https://cdn-cookieyes.com/client_data/${cookieYesId}/script.js`} />
+)}
 
 <script is:inline define:vars={{ gtmId }}>
   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

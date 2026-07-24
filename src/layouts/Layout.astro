@@ -13,9 +13,8 @@ import TrackingNoscript from '../../tracking-kit/components/TrackingNoscript.ast
 import Turnstile from '../../tracking-kit/components/Turnstile.astro';
 import BookingClick from '../components/tracking/BookingClick.astro';
 
-// CookieYes is loaded as a GTM tag (Consent Initialization), so we do NOT pass
-// cookieYesId to <Tracking/> — that would double-load the CMP. GTM id stays GTM-W8V3BVGD.
 const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
+const cookieYesId = (import.meta.env.PUBLIC_COOKIEYES_ID as string | undefined) || 'dadaccaebea652a6453d3041';
 
 interface Props {
   title: string;
@@ -52,7 +51,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <Tracking gtmId={gtmId} />
+    <Tracking gtmId={gtmId} cookieYesId={cookieYesId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />

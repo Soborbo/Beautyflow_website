@@ -191,7 +191,7 @@ ${cfg.meta.test_event_code ? '- [ ] ⚠️ test_event_code REMOVED from KV befor
 - [ ] <Tracking/> + <TrackingNoscript/> + <Turnstile/> placed in the layout
 - [ ] PUBLIC_TURNSTILE_SITE_KEY set (.env) + Turnstile invisible widget on the page
       (\`<div id="cf-turnstile-invisible">\`, provided by <Turnstile/>)
-- [ ] CookieYes (from GTM) active → consent comes automatically from the cookieyes-consent cookie
+- [ ] CookieYes (loaded directly by Tracking.astro before GTM) active → consent comes automatically from the cookieyes-consent cookie
 - [ ] At conversion points use the documented API: \`trackLeadSubmit({ email, phone, value, currency })\`,
       \`trackContactSubmit(...)\`, or \`trackServerEvent('<event_name>', { value, currency, email, phone })\`
       (clicks auto-bind via <Tracking/>). Allowed gateway event names: ${[...ALLOWED_EVENT_NAMES].join(', ')}

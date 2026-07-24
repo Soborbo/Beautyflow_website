@@ -1,9 +1,31 @@
 // Generates a valid, importable GTM container export for soborbo-tracking.
 // Implements docs/gtm-setup.md + docs/CANONICAL-EVENTS.md (browser side).
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
-const ACC = '0';
-const CNT = '0';
+const out = process.argv[2];
+const configPath = process.argv[3];
+if (!out) {
+  throw new Error('Usage: node gen-container.mjs <output.json> [site-config.json]');
+}
+
+const site = configPath
+  ? JSON.parse(readFileSync(configPath, 'utf8'))
+  : {};
+
+const ACC = String(site.account_id || '0');
+const CNT = String(site.container_id || '0');
+const PUBLIC_ID = site.container_public_id || 'GTM-XXXXXXX';
+const CONTAINER_NAME = site.container_name || 'Soborbo Tracking';
+const VERSION_NAME = site.version_name || 'Soborbo Tracking — canonical (v6)';
+const GA4_MEASUREMENT_ID = site.ga4_measurement_id || 'G-XXXXXXXXXX';
+const META_PIXEL_ID = site.meta_pixel_id || 'META_PIXEL_ID';
+const GOOGLE_ADS_ID = site.google_ads_conversion_id || 'AW-XXXXXXXXX';
+const ADS_LABELS = site.google_ads_conversion_labels || {
+  contact: 'CONTACT_CONVERSION_LABEL',
+  phone: 'PHONE_CONVERSION_LABEL',
+  booking: 'BOOKING_CONVERSION_LABEL',
+};
+const CLARITY_PROJECT_ID = site.clarity_project_id || null;
 
 // ── id counters ──────────────────────────────────────────────────────
 let tId = 0, gId = 0, vId = 0;
@@ -13,18 +35,17 @@ const nextVar = () => String(++vId);
 
 // Reserved built-in trigger ids
 const ALL_PAGES = '2147479553';
-const CONSENT_INIT = '2147479572';
 
 const tags = [], triggers = [], variables = [];
 
 // ── helpers ──────────────────────────────────────────────────────────
 const tmpl = (key, value) => ({ type: 'TEMPLATE', key, value });
 const bool = (key, value) => ({ type: 'BOOLEAN', key, value });
-const tagRef = (key, value) => ({ type: 'TAG_REFERENCE', key, value });
 const consent = (...types) => ({
   consentStatus: 'NEEDED',
   consentType: { type: 'LIST', list: types.map((t) => ({ type: 'TEMPLATE', value: t })) },
 });
+const builtinConsent = { consentStatus: 'NOT_SET' };
 
 function dlv(name, dataLayerName) {
   const variableId = nextVar();
@@ -79,10 +100,18 @@ function tag(name, type, parameter, firingTriggerId, extra = {}) {
 }
 
 // ── Constants (placeholders to replace on import) ────────────────────
-const GA4_ID = constVar('GA4 Measurement ID', 'G-XXXXXXXXXX');
-const PIXEL_ID = constVar('Meta Pixel ID', 'META_PIXEL_ID');
-const ADS_ID = constVar('Google Ads Conversion ID', 'AW-XXXXXXXXX');
-const ADS_LABEL = constVar('Google Ads Conversion Label', 'CONVERSION_LABEL');
+const GA4_ID = constVar('GA4 Measurement ID', GA4_MEASUREMENT_ID);
+const PIXEL_ID = constVar('Meta Pixel ID', META_PIXEL_ID);
+const ADS_ID = constVar('Google Ads Conversion ID', GOOGLE_ADS_ID);
+const ADS_CONTACT_LABEL = ADS_LABELS.contact
+  ? constVar('Google Ads Contact Label', ADS_LABELS.contact)
+  : null;
+const ADS_PHONE_LABEL = ADS_LABELS.phone
+  ? constVar('Google Ads Phone Label', ADS_LABELS.phone)
+  : null;
+const ADS_BOOKING_LABEL = ADS_LABELS.booking
+  ? constVar('Google Ads Booking Label', ADS_LABELS.booking)
+  : null;
 
 // ── Data Layer Variables (PII-free) ──────────────────────────────────
 const V_EVENT_ID = dlv('event_id', 'event_id');
@@ -98,6 +127,8 @@ const V_LAST_FIELD = dlv('last_field', 'last_field');
 const V_SCROLL = dlv('scroll_percentage', 'scroll_percentage');
 const V_SOURCE = dlv('source', 'source');
 const V_SERVICE = dlv('service', 'service');
+const V_ROUTE = dlv('route', 'route');
+const V_SAFE = dlv('safe', 'safe');
 
 // ── Custom JS variable: User-Provided Data side-channel (Task 2) ─────
 const V_UPD = (() => {
@@ -108,7 +139,7 @@ const V_UPD = (() => {
     parameter: [tmpl('javascript',
       'function(){\n' +
       '  // PII is written by setUserDataForEC() to a hidden side-channel,\n' +
-      '  // NOT the dataLayer (GDPR). Keys: email, phone_number, first_name, last_name.\n' +
+      '  // NOT the dataLayer (GDPR). Shape: email, phone_number, address.{first_name,last_name}.\n' +
       '  try { return window.__sbUserData || {}; } catch (e) { return {}; }\n' +
       '}')],
     fingerprint: '0',
@@ -123,12 +154,15 @@ const T_CALLBACK = customEventTrigger('callback_click');
 const T_PHONE = customEventTrigger('phone_click');
 const T_EMAIL = customEventTrigger('email_click');
 const T_WHATSAPP = customEventTrigger('whatsapp_click');
+const T_BOOKING = customEventTrigger('booking_click');
 const T_CALC_DONE = customEventTrigger('calculator_complete');
 const T_CALC_START = customEventTrigger('calculator_start');
 const T_CALC_STEP = customEventTrigger('calculator_step');
 const T_CALC_OPT = customEventTrigger('calculator_option');
 const T_ABANDON = customEventTrigger('form_abandon');
 const T_SCROLL = customEventTrigger('scroll_depth');
+const T_NEWSLETTER = customEventTrigger('newsletter_signup');
+const T_RESULT_VIEW = customEventTrigger('calculator_result_view');
 
 // ── Base tags ────────────────────────────────────────────────────────
 // NOTE: the Consent Mode v2 DEFAULT (denied) is intentionally NOT shipped as a GTM
@@ -141,21 +175,21 @@ tag('Conversion Linker', 'gclidw', [
   bool('enableCrossDomain', false),
 ], [ALL_PAGES]);
 
-// GA4 Configuration (Google tag)
-const GA4_CONFIG = tag('GA4 - Configuration', 'gaawc', [
-  tmpl('measurementId', GA4_ID),
-  bool('sendPageView', true),
-], [ALL_PAGES], { consentSettings: consent('analytics_storage') });
+// Modern Google tag. A Google tag sends page_view by default when it loads.
+tag('GA4 - Configuration', 'googtag', [
+  tmpl('tagId', GA4_ID),
+], [ALL_PAGES], { consentSettings: builtinConsent });
 
 // ── GA4 event tag factory ────────────────────────────────────────────
 function ga4Event(name, ga4EventName, firing, params) {
   tag(name, 'gaawe', [
-    tagRef('measurementId', 'GA4 - Configuration'),
-    tmpl('eventName', ga4EventName),
-    { type: 'LIST', key: 'eventParameters', list: params.map(([k, v]) => ({
-      type: 'MAP', map: [tmpl('name', k), tmpl('value', v)],
+    bool('sendEcommerceData', false),
+    { type: 'LIST', key: 'eventSettingsTable', list: params.map(([k, v]) => ({
+      type: 'MAP', map: [tmpl('parameter', k), tmpl('parameterValue', v)],
     })) },
-  ], firing, { consentSettings: consent('analytics_storage') });
+    tmpl('eventName', ga4EventName),
+    tmpl('measurementIdOverride', GA4_ID),
+  ], firing, { consentSettings: builtinConsent });
 }
 
 // Conversions — canonical GA4 event names
@@ -174,6 +208,9 @@ ga4Event('GA4 - email_conversion', 'email_conversion', [T_EMAIL], [
 ]);
 ga4Event('GA4 - whatsapp_conversion', 'whatsapp_conversion', [T_WHATSAPP], [
   ['event_id', V_EVENT_ID], ['session_id', V_SESSION],
+]);
+ga4Event('GA4 - booking_click', 'booking_click', [T_BOOKING], [
+  ['event_id', V_EVENT_ID], ['source', V_SOURCE], ['session_id', V_SESSION],
 ]);
 ga4Event('GA4 - quote_calculator_conversion', 'quote_calculator_conversion', [T_CALC_DONE], [
   ['value', V_VALUE], ['currency', V_CURRENCY], ['event_id', V_EVENT_ID], ['calculator_name', V_CALC],
@@ -194,6 +231,12 @@ ga4Event('GA4 - form_abandon', 'form_abandon', [T_ABANDON], [
 ga4Event('GA4 - scroll_depth', 'scroll_depth', [T_SCROLL], [
   ['scroll_percentage', V_SCROLL], ['session_id', V_SESSION],
 ]);
+ga4Event('GA4 - newsletter_signup', 'newsletter_signup', [T_NEWSLETTER], [
+  ['session_id', V_SESSION],
+]);
+ga4Event('GA4 - calculator_result_view', 'calculator_result_view', [T_RESULT_VIEW], [
+  ['route', V_ROUTE], ['safe', V_SAFE], ['session_id', V_SESSION],
+]);
 
 // ── Meta Pixel ───────────────────────────────────────────────────────
 tag('Meta Pixel - Base', 'html', [
@@ -210,6 +253,9 @@ tag('Meta Pixel - Base', 'html', [
   bool('supportDocumentWrite', false),
 ], [ALL_PAGES], { consentSettings: consent('ad_storage', 'ad_user_data') });
 
+// Successful calculator forms also emit lead_submit with their server-shared
+// event_id. Firing Lead on calculator_complete as well would count one form as
+// two Meta leads because calculator_complete has a different event_id.
 tag('Meta Pixel - Lead', 'html', [
   tmpl('html',
     '<script>\n' +
@@ -218,7 +264,7 @@ tag('Meta Pixel - Lead', 'html', [
     "  fbq('track','Lead', cd, { eventID: '" + V_EVENT_ID + "' });\n" +
     '</script>'),
   bool('supportDocumentWrite', false),
-], [T_LEAD, T_CALLBACK, T_CALC_DONE], { consentSettings: consent('ad_storage', 'ad_user_data') });
+], [T_LEAD, T_CALLBACK], { consentSettings: consent('ad_storage', 'ad_user_data') });
 
 tag('Meta Pixel - Contact', 'html', [
   tmpl('html',
@@ -228,20 +274,51 @@ tag('Meta Pixel - Contact', 'html', [
   bool('supportDocumentWrite', false),
 ], [T_CONTACT, T_PHONE, T_EMAIL, T_WHATSAPP], { consentSettings: consent('ad_storage', 'ad_user_data') });
 
-// ── Google Ads Conversion (with Enhanced Conversions side-channel) ───
-tag('Google Ads - Conversion', 'awct', [
-  tmpl('conversionId', ADS_ID),
-  tmpl('conversionLabel', ADS_LABEL),
-  tmpl('orderId', V_EVENT_ID),
-  tmpl('conversionValue', V_VALUE),
-  tmpl('currencyCode', V_CURRENCY),
-  bool('enableConversionLinker', true),
-  bool('rdp', false),
-  bool('enableUserProvidedData', true),
-  tmpl('userProvidedData', V_UPD),
-], [T_LEAD, T_CALLBACK, T_PHONE, T_CALC_DONE], {
-  consentSettings: consent('ad_storage', 'ad_user_data'),
-});
+tag('Meta Pixel - InitiateCheckout', 'html', [
+  tmpl('html',
+    '<script>\n' +
+    "  fbq('track','InitiateCheckout', {}, { eventID: '" + V_EVENT_ID + "' });\n" +
+    '</script>'),
+  bool('supportDocumentWrite', false),
+], [T_BOOKING], { consentSettings: consent('ad_storage', 'ad_user_data') });
+
+if (CLARITY_PROJECT_ID) {
+  tag('Microsoft Clarity - Base', 'html', [
+    tmpl('html',
+      '<script>\n' +
+      `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};` +
+      `t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;` +
+      `y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);` +
+      `})(window,document,"clarity","script","${CLARITY_PROJECT_ID}");\n` +
+      '</script>'),
+    bool('supportDocumentWrite', false),
+  ], [ALL_PAGES], { consentSettings: consent('analytics_storage') });
+}
+
+// ── Google Ads Conversions (one action/label per business signal) ───
+function googleAdsConversion(name, label, firing) {
+  if (!label) return;
+  tag(name, 'awct', [
+    tmpl('conversionId', ADS_ID),
+    tmpl('conversionLabel', label),
+    tmpl('orderId', V_EVENT_ID),
+    tmpl('conversionValue', V_VALUE),
+    tmpl('currencyCode', V_CURRENCY),
+    bool('enableConversionLinker', true),
+    bool('rdp', false),
+    bool('enableEnhancedConversionsCheckbox', true),
+    bool('enableUserProvidedData', true),
+    tmpl('userProvidedData', V_UPD),
+  ], firing, {
+    // Google Ads has built-in Consent Mode checks. Additional checks would
+    // suppress cookieless/modelled pings and can strand first-page events.
+    consentSettings: builtinConsent,
+  });
+}
+
+googleAdsConversion('Google Ads - Contact / Lead', ADS_CONTACT_LABEL, [T_LEAD, T_CONTACT]);
+googleAdsConversion('Google Ads - Phone', ADS_PHONE_LABEL, [T_PHONE]);
+googleAdsConversion('Google Ads - Booking', ADS_BOOKING_LABEL, [T_BOOKING]);
 
 // ── Assemble export ──────────────────────────────────────────────────
 const container = {
@@ -252,13 +329,13 @@ const container = {
     accountId: ACC,
     containerId: CNT,
     containerVersionId: '0',
-    name: 'Soborbo Tracking — canonical (v5)',
+    name: VERSION_NAME,
     container: {
       path: `accounts/${ACC}/containers/${CNT}`,
       accountId: ACC,
       containerId: CNT,
-      name: 'Soborbo Tracking',
-      publicId: 'GTM-XXXXXXX',
+      name: CONTAINER_NAME,
+      publicId: PUBLIC_ID,
       usageContext: ['WEB'],
       fingerprint: '0',
       tagManagerUrl: 'https://tagmanager.google.com/',
@@ -274,7 +351,6 @@ const container = {
   },
 };
 
-const out = process.argv[2];
 writeFileSync(out, JSON.stringify(container, null, 2) + '\n');
 console.log(`Wrote ${out}: ${tags.length} tags, ${triggers.length} triggers, ${variables.length} variables`);
 // Validate it round-trips
