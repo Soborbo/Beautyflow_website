@@ -4,12 +4,17 @@
  * Pipeline:
  *   1. Rate limit (per-IP) + Content-Length cap
  *   2. JSON parse + honeypot (némán „sikerül")
- *   3. Könnyű validáció (keresztnév ≥2, érvényes email)
- *   4. EmailOctopus v2 API → kontakt létrehozása a listán
+ *   3. Könnyű validáció (keresztnév ≥2, érvényes email, kiválasztott szalon)
+ *   4. EmailOctopus v2 API → kontakt létrehozása a kiválasztott szalon listáján
+ *
+ * Szalonválasztás: a modalban a látogató EGY szalont választ (rádiógomb), és
+ * annak a listájába kerül. Két külön EmailOctopus lista („Budai vendégek" /
+ * „Pesti vendégek"), mert a kampányok is onnan mennek.
  *
  * Env (Cloudflare dashboard / wrangler):
- *   EMAILOCTOPUS_API_KEY   — v2 API kulcs (SECRET, `wrangler secret put`)   [kötelező]
- *   EMAILOCTOPUS_LIST_ID   — a cél lista azonosítója (nem titok)            [kötelező]
+ *   EMAILOCTOPUS_API_KEY      — v2 API kulcs (SECRET, `wrangler secret put`) [kötelező]
+ *   EMAILOCTOPUS_LIST_ID_BUDA — a budai lista azonosítója (nem titok)        [kötelező]
+ *   EMAILOCTOPUS_LIST_ID_PEST — a pesti lista azonosítója (nem titok)        [kötelező]
  *
  * A modal 18 mp után jön fel, és honeypot + rate limit véd a botok ellen —
  * ehhez a form-hoz NEM kérünk Turnstile-t (alacsony súrlódású feliratkozás).
@@ -26,9 +31,19 @@ export const prerender = false;
 const MAX_BODY_BYTES = 8_000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** A választható szalonok — a modal ugyanezeket a kulcsokat küldi. */
+const SALONS = ['buda', 'pest'] as const;
+type Salon = (typeof SALONS)[number];
+
+const SALON_LABEL: Record<Salon, string> = {
+  buda: 'Beautyflow Buda',
+  pest: 'Beautyflow Pest',
+};
+
 interface NewsletterEnv {
   EMAILOCTOPUS_API_KEY?: string;
-  EMAILOCTOPUS_LIST_ID?: string;
+  EMAILOCTOPUS_LIST_ID_BUDA?: string;
+  EMAILOCTOPUS_LIST_ID_PEST?: string;
 }
 
 function readEnv(): NewsletterEnv {
@@ -39,8 +54,13 @@ function readEnv(): NewsletterEnv {
     (import.meta.env as Record<string, string | undefined>)[key];
   return {
     EMAILOCTOPUS_API_KEY: pick('EMAILOCTOPUS_API_KEY'),
-    EMAILOCTOPUS_LIST_ID: pick('EMAILOCTOPUS_LIST_ID'),
+    EMAILOCTOPUS_LIST_ID_BUDA: pick('EMAILOCTOPUS_LIST_ID_BUDA'),
+    EMAILOCTOPUS_LIST_ID_PEST: pick('EMAILOCTOPUS_LIST_ID_PEST'),
   };
+}
+
+function listIdFor(env: NewsletterEnv, salon: Salon): string | undefined {
+  return salon === 'buda' ? env.EMAILOCTOPUS_LIST_ID_BUDA : env.EMAILOCTOPUS_LIST_ID_PEST;
 }
 
 function json(status: number, payload: Record<string, unknown>): Response {
@@ -94,24 +114,40 @@ export const POST: APIRoute = async ({ request }) => {
       return fail(400, 'Kérjük adj meg egy érvényes email címet.');
     }
 
+    // Szalonválasztás — pontosan egy. A `salons` tömb csak a régi, cache-elt
+    // modal-JS miatt van itt (akkor még checkbox volt): az elsőt vesszük belőle.
+    const rawSalon = typeof b.salon === 'string'
+      ? b.salon
+      : Array.isArray(b.salons)
+        ? String(b.salons[0] ?? '')
+        : '';
+    const salon = SALONS.find((s) => s === rawSalon);
+
+    if (!salon) {
+      return fail(400, 'Kérjük válaszd ki, melyik szalon híreire szeretnél feliratkozni.');
+    }
+
     const env = readEnv();
-    if (!env.EMAILOCTOPUS_API_KEY || !env.EMAILOCTOPUS_LIST_ID) {
+    const missingVar = !env.EMAILOCTOPUS_API_KEY
+      ? 'EMAILOCTOPUS_API_KEY'
+      : !listIdFor(env, salon)
+        ? `EMAILOCTOPUS_LIST_ID_${salon.toUpperCase()}`
+        : null;
+
+    if (missingVar) {
       reportServerError({
         code: 'SRV-ENV-001',
         message: 'EmailOctopus env not configured (API key / list id missing)',
         source: '/api/newsletter',
         request,
-        context: {
-          varName: !env.EMAILOCTOPUS_API_KEY ? 'EMAILOCTOPUS_API_KEY' : 'EMAILOCTOPUS_LIST_ID',
-          functionPath: '/api/newsletter',
-        },
+        context: { varName: missingVar, functionPath: '/api/newsletter' },
       });
       return fail(503, 'A feliratkozás átmenetileg nem elérhető. Kérjük próbáld újra később.');
     }
 
     const result = await subscribeContact({
-      apiKey: env.EMAILOCTOPUS_API_KEY,
-      listId: env.EMAILOCTOPUS_LIST_ID,
+      apiKey: env.EMAILOCTOPUS_API_KEY as string,
+      listId: listIdFor(env, salon) as string,
       email,
       firstName: firstName.slice(0, 100),
     });
@@ -119,19 +155,19 @@ export const POST: APIRoute = async ({ request }) => {
     if (!result.ok) {
       reportServerError({
         code: 'HTTP-500-002',
-        message: 'EmailOctopus subscribe failed',
+        message: `EmailOctopus subscribe failed (${SALON_LABEL[salon]})`,
         source: '/api/newsletter',
         request,
         context: {
           endpoint: '/api/newsletter',
           dependency: 'emailoctopus',
-          depError: `${result.status} ${result.code || ''} ${result.message}`.trim(),
+          depError: `${salon} ${result.status} ${result.code || ''} ${result.message}`.trim(),
         },
       });
       return fail(502, 'A feliratkozás most nem sikerült. Kérjük próbáld újra később.');
     }
 
-    return ok({ alreadySubscribed: result.alreadySubscribed });
+    return ok({ salon, alreadySubscribed: result.alreadySubscribed });
   } catch (err) {
     reportServerError({
       code: 'SRV-FUNC-001',

@@ -52,9 +52,14 @@
     // no-op'd). Only the private key is secret (set via `wrangler secret put`).
     "GOOGLE_SHEETS_ID": "1gDFG6wpLDLgUNIqicNwLL9QMNC9OuIgoKBMB3lLF810",
     "GOOGLE_SERVICE_ACCOUNT_EMAIL": "beautyflow-sheets@beautyflow-470406.iam.gserviceaccount.com",
-    // EmailOctopus hírlevél lista azonosítója (NEM titok — a lista URL-je / Settings adja).
+    // EmailOctopus hírlevél listák (NEM titok — a lista URL-je / Settings adja).
+    // A modalban a látogató EGY szalont választ (rádiógomb) → a /api/newsletter
+    // annak a listájába ír. A meglévő
+    // „Budai vendégek" / „Pesti vendégek" listákat használjuk, hogy a webes
+    // feliratkozók ugyanoda kerüljenek, ahonnan a kampányok mennek.
     // Az ehhez tartozó API kulcs SECRET: `wrangler secret put EMAILOCTOPUS_API_KEY` (lásd lent).
-    "EMAILOCTOPUS_LIST_ID": "76d28252-7664-11f1-8850-59b9407f9225",
+    "EMAILOCTOPUS_LIST_ID_BUDA": "e8ede3e8-7913-11f1-802c-13a603a274b7",
+    "EMAILOCTOPUS_LIST_ID_PEST": "1b73f668-7914-11f1-9f79-b770fd549614",
     // Gateway smoke test. A conversion goes to Meta's *Test* stream ONLY when the
     // lead's email is TRACKING_TEST_LEAD_EMAIL (see lib/tracking/gateway-dispatch.ts).
     // Keyed on the lead, not on a global flag, so a REAL lead can never be diverted
@@ -95,6 +100,7 @@
    *
    *   TURNSTILE_SECRET_KEY            — Cloudflare Turnstile secret (server)    [required]
    *   RESEND_API_KEY                  — Resend API key (info@beautyflow.pro)    [required]
+   *   RESEND_WEBHOOK_SECRET           — Resend webhook signing secret (whsec_…) [required a bounce-figyeléshez]
    *   EMAILOCTOPUS_API_KEY            — EmailOctopus v2 API key (hírlevél)      [required a hírlevélhez]
    *   GOOGLE_SHEETS_ID                — existing leadlist sheet id              [optional]
    *   GOOGLE_SERVICE_ACCOUNT_EMAIL    — Google service account                  [optional]

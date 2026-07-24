@@ -21,8 +21,10 @@ RESEND_API_KEY=
 # EmailOctopus hírlevél (NewsletterModal → /api/newsletter)
 # API kulcs: EmailOctopus dashboard → Account → Integrations & API → API keys (v2 kulcs).
 # Lista ID: a kiválasztott lista → Settings, vagy a lista URL-jéből (UUID).
+# Két lista: a látogató a modalban egy szalont választ, annak a listájába kerül.
 EMAILOCTOPUS_API_KEY=
-EMAILOCTOPUS_LIST_ID=
+EMAILOCTOPUS_LIST_ID_BUDA=
+EMAILOCTOPUS_LIST_ID_PEST=
 
 # Google Sheets (optional — keep existing if you want)
 GOOGLE_SHEETS_ID=

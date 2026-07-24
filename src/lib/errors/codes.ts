@@ -77,6 +77,19 @@ export const ERROR_CODES = {
   /** Top-level catch in quiz POST handler — bug / unexpected path. */
   QUIZ_UNHANDLED: 'QUIZ-UNHANDLED-001',
 
+  // ---- /api/webhook/resend ----------------------------------------------
+  // A Resend 200-as accept NEM kézbesítés. Ezek a kódok az egyetlen jel arról,
+  // hogy egy elfogadott levél a fogadó MTA-n visszapattant — enélkül minden log
+  // sikeres submitet mutat, miközben a szalon nem kapott értesítést.
+  /** Admin értesítő visszapattant a fogadó MTA-n — a szalon NEM látta a leadet. */
+  WEBHOOK_RESEND_ADMIN_BOUNCED: 'WEBHOOK-RESEND-BOUNCE-001',
+  /** User visszaigazoló visszapattant — az érdeklődő nem kapott visszajelzést. */
+  WEBHOOK_RESEND_USER_BOUNCED: 'WEBHOOK-RESEND-BOUNCE-002',
+  /** Címzett spamnek jelölte a levelet (Resend email.complained). */
+  WEBHOOK_RESEND_COMPLAINED: 'WEBHOOK-RESEND-COMPLAINT-001',
+  /** RESEND_WEBHOOK_SECRET hiányzik — a bounce-ok újra láthatatlanok. CRITICAL. */
+  WEBHOOK_RESEND_CONFIG_MISSING: 'WEBHOOK-RESEND-CONFIG-001',
+
   // ---- /api/meta/capi ---------------------------------------------------
   /** Meta Conversions API mirror request threw — pixel still fires client-side. */
   TRACK_META_CAPI_FAILED: 'TRACK-META-CAPI-001',

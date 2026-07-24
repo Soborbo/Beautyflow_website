@@ -11,8 +11,12 @@
  *   - Bezárható: X gomb, háttérre kattintás, Esc.
  *
  * Elrendezés: bal oldalon a szöveg, jobbra mellette a form (mobilon egymás alatt).
- * A beküldés a /api/newsletter végpontra megy → EmailOctopus. Csak keresztnév +
- * email kell. Honeypot (`website`) véd a botok ellen.
+ * A beküldés a /api/newsletter végpontra megy → EmailOctopus. Keresztnév + email +
+ * szalon kell. Honeypot (`website`) véd a botok ellen.
+ *
+ * Szalonválasztás: rádiógomb (budai VAGY pesti) — pontosan egyet lehet választani,
+ * előre kiválasztott érték nélkül, hogy tudatos döntés legyen. Ez dönti el,
+ * melyik EmailOctopus listába kerül a kontakt.
  */
 ---
 
@@ -88,6 +92,36 @@
               placeholder="pelda@email.com"
             />
           </div>
+
+          <fieldset>
+            <legend class="mb-1.5 block text-sm font-medium text-gray-700">
+              Melyik szalon híreit kéred?
+            </legend>
+            {/* A teljes sor kattintható (label), nem csak a pötty — 44 px-nél
+                magasabb célfelület mobilon és asztalin egyaránt. Egymás alatt,
+                mert a modal jobb oszlopa túl szűk ahhoz, hogy a két felirat
+                egymás mellett elférjen törés nélkül. */}
+            <div class="flex flex-col gap-2">
+              <label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-gray-200 px-4 py-3 transition-colors hover:border-[#c53f75]/60 has-[:checked]:border-[#c53f75] has-[:checked]:bg-[#c53f75]/5">
+                <input
+                  type="radio"
+                  name="salon"
+                  value="buda"
+                  class="h-5 w-5 shrink-0 accent-[#c53f75]"
+                />
+                <span class="text-sm font-medium text-gray-800">Budai szalon</span>
+              </label>
+              <label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-gray-200 px-4 py-3 transition-colors hover:border-[#c53f75]/60 has-[:checked]:border-[#c53f75] has-[:checked]:bg-[#c53f75]/5">
+                <input
+                  type="radio"
+                  name="salon"
+                  value="pest"
+                  class="h-5 w-5 shrink-0 accent-[#c53f75]"
+                />
+                <span class="text-sm font-medium text-gray-800">Pesti szalon</span>
+              </label>
+            </div>
+          </fieldset>
 
           <button
             type="submit"
@@ -177,9 +211,28 @@
     }
   }
 
+  /**
+   * Szalon-oldalon (magyar és /en/ változat is) az ottani szalont jelöljük be
+   * előre — máshol marad üresen, hogy tudatos választás legyen. Csak akkor
+   * nyúlunk hozzá, ha a látogató még nem választott.
+   */
+  function preselectSalon(modal: HTMLElement): void {
+    if (modal.querySelector<HTMLInputElement>('input[name="salon"]:checked')) return;
+    const path = location.pathname;
+    const salon = path.includes('/beautyflow-buda')
+      ? 'buda'
+      : path.includes('/beautyflow-pest')
+        ? 'pest'
+        : null;
+    if (!salon) return;
+    const input = modal.querySelector<HTMLInputElement>(`input[name="salon"][value="${salon}"]`);
+    if (input) input.checked = true;
+  }
+
   function openModal(): void {
     const modal = document.getElementById(MODAL_ID);
     if (!modal || modal.classList.contains('bf-nl-open')) return;
+    preselectSalon(modal);
     modal.classList.add('bf-nl-open');
     modal.setAttribute('aria-hidden', 'false');
     // fókusz az első mezőre
@@ -218,6 +271,7 @@
       const firstName = String(fd.get('firstName') || '').trim();
       const email = String(fd.get('email') || '').trim();
       const website = String(fd.get('website') || '');
+      const salon = String(fd.get('salon') || '');
 
       if (firstName.length < 2) {
         if (errEl) { errEl.textContent = 'Kérjük add meg a keresztneved.'; errEl.classList.remove('hidden'); }
@@ -225,6 +279,10 @@
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         if (errEl) { errEl.textContent = 'Kérjük adj meg egy érvényes email címet.'; errEl.classList.remove('hidden'); }
+        return;
+      }
+      if (!salon) {
+        if (errEl) { errEl.textContent = 'Kérjük válaszd ki, melyik szalon híreit kéred.'; errEl.classList.remove('hidden'); }
         return;
       }
 
@@ -239,15 +297,20 @@
         const res = await fetch('/api/newsletter', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, email, website }),
+          body: JSON.stringify({ firstName, email, website, salon }),
         });
         const result = await res.json().catch(() => ({ success: false }));
 
         if (result.success) {
           remember('subscribed');
           // Soft-konverzió jelzése a GTM dataLayer felé (PII nélkül).
+          // A szalonválasztás mehet: nem személyes adat, viszont látszik belőle,
+          // melyik szalon hírlevele hozza a feliratkozókat.
           try {
-            (window as unknown as { dataLayer?: unknown[] }).dataLayer?.push({ event: 'newsletter_signup' });
+            (window as unknown as { dataLayer?: unknown[] }).dataLayer?.push({
+              event: 'newsletter_signup',
+              newsletter_salon: result.salon || salon,
+            });
           } catch { /* nincs dataLayer — nem baj */ }
           form.classList.add('hidden');
           successEl?.classList.remove('hidden');
