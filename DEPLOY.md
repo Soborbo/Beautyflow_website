@@ -112,42 +112,50 @@ megerősítő emailt (ilyenkor `pending` státusszal kerül be, amíg meg nem er
 Amíg a lista ID vagy az API kulcs hiányzik, a végpont `503`-at ad és a modal barátságos
 hibaüzenetet mutat — a többi form (kapcsolat, kvíz) ettől független, változatlanul megy.
 
-## Tracking — mi van be drótozva, mi nincs
+## Tracking
 
-A teljes tracking-kit ([src/lib/tracking/](src/lib/tracking/)) telepítve. Browser-side events:
+A browser tracking forrása a `tracking-kit`, a production GTM egyetlen
+importálható forrása pedig:
 
-| Event | Trigger |
-|---|---|
-| `form_start` | első fókusz egy kapcsolati / kalkulátor űrlapra |
-| `form_step_complete` | kalkulátor lépés továbblépéskor (Buda/Pest formhoz nincs lépés) |
-| `form_abandonment` | tab close / hide submit nélkül (sendBeacon → `/api/track/abandonment`) |
-| `contact_form_submit` | sikeres kapcsolat- vagy konzultáció-küldés (→ Meta CAPI `Contact`) |
-| `phone_conversion` | tel: link kattintás (kit globális listener) |
-| `email_conversion` | mailto: kattintás |
-| `whatsapp_conversion` | wa.me / whatsapp.com kattintás |
-| `booking_click` | bármilyen Notino salon link kattintás (→ Meta CAPI `InitiateCheckout`) |
-| `scroll_50`, `scroll_90` | scroll mélység |
+`tracking/GTM-W8V3BVGD_fixed.json`
 
-### GTM munka (te csinálod a dashboardon)
+Újragenerálás:
 
-A meglevő `GTM-W8V3BVGD` container-ben a régi tracking package event neveket lőtt; az új kit nevei különböznek. Be kell drótoznod:
+```sh
+npm run generate:gtm
+```
 
-1. **Custom Event triggerek** minden új event név után (`form_start`, `contact_form_submit`, `phone_conversion`, `booking_click`, stb.) — pontos match az event név mezőre.
-2. **Data Layer Variables** a paramekhez: `event_id`, `value`, `currency`, `service`, `source`, `form_name`, `step_number`.
-3. **Google Tag (GA4 Config)** marad — most már az `G-774BY4X64P` ID-vel.
-4. **GA4 Event tagek** minden új eventhez.
-5. **Meta Pixel base tag** (`915395591548632`) — Consent Initialization triggeren, `ad_storage = granted` required.
-6. **Meta Pixel event tagek** — `Lead`, `Contact`, `ViewContent`, `InitiateCheckout`. Mindegyikbe rakd be az `eventID` paramétert a `DLV - event_id`-ből — ez kell a browser+CAPI dedup-hoz.
-7. **Google Ads conversion tagek** — a `booking_click` és `contact_form_submit` eventekhez, `event_id` mint Transaction ID.
-8. **User-Provided Data** (Enhanced Conversions): Custom JS variable ami olvas a `#__bf_user_data__` hidden div-ből (van setup példa a [tracking-kit SETUP.md](https://github.com/Soborbo/claudeskills/blob/main/tracking-kit/SETUP.md)-ben).
-9. **Consent Mode v2** alapból denied state-ben — kell egy CMP (CookieYes) tag az "Consent Initialization - All Pages" triggeren.
+A konténer tartalmazza:
 
-### Server-side tracking státusza
+- GA4 Configuration `G-774BY4X64P` ID-val és pageview-val;
+- minden alkalmazás által küldött dataLayer event triggerét és GA4 tagjét;
+- külön Contact/Lead és Phone Google Ads actiont;
+- közvetlen Enhanced Conversions user-data változót;
+- Meta PageView, Lead, Contact és InitiateCheckout tageket;
+- Clarity taget analytics consenttel.
 
-- **GA4 Measurement Protocol**: `GA4_API_SECRET` ha be van állítva, akkor abandonment + form events server-side is mennek
-- **Meta CAPI**: `META_CAPI_ACCESS_TOKEN` ha be van állítva, akkor a browser-side mirror (`/api/meta/capi`) átküldi a Meta-nak. Hashing az `@noble/hashes`-szel megy a worker-ben.
+CookieYes nem GTM-tagként töltődik: a `Tracking.astro` közvetlenül tölti be a
+denied Consent Mode default után és a GTM előtt. Így nincs kettős vagy eltérő
+consent-konfiguráció.
 
-Mindkettő gracefully no-op-ol ha a token hiányzik — browser-side tracking attól még megy.
+A régi `tracking/GTM-W8V3BVGD_migrated.json` és `tracking/gtm-transform.py`
+csak migrációs előzmény, nem importálható production forrás.
+
+### Server-side tracking
+
+A site Worker az `/api/event/*` útvonalat a központi event-gateway Workerhez
+proxyzza. A gateway végzi a Meta CAPI és Google Ads fan-outot; GA4 alapértelmezetten
+browser-oldali, hogy ne legyen Measurement Protocol dupla számlálás.
+
+A health check:
+
+```sh
+curl https://beautyflow.pro/api/event/health
+```
+
+A Google Ads accountban jelenleg csak Contact/Lead és Phone action/label ismert.
+A booking GA4-ban és Metában mérve van, de addig nem küldhető Contactként a Google
+Adsba, amíg nincs saját Booking conversion actionje.
 
 ## Astro middleware
 
@@ -161,10 +169,13 @@ A régi `functions/_middleware.js` (Pages style) ki lett véve és [src/middlewa
 1. ✅ A 4 secret beállítása a CF dashboardon: `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY` (már megvan).
 2. ✅ A plain text env varok beállítása (lásd 3. pont fent).
 3. ✅ Turnstile domainek (`beautyflow.pro`, `www.beautyflow.pro`) hozzáadása a Cloudflare Turnstile widget-hez.
-4. ⚠️ GTM container update — új event nevek + Meta Pixel base tag (Pixel ID: `915395591548632`).
-5. ⚠️ Meta Conversions API access token (`META_CAPI_ACCESS_TOKEN`) beállítása amikor kész a Meta CAPI bekapcsolásra (kód már várja).
-6. ⚠️ GA4 Measurement Protocol API secret (`GA4_API_SECRET`) ha kell a server-side abandonment tracking.
-7. ⚠️ Régi GTM tagek archiválása / triggereik kikapcsolása (a régi event nevek `contact_form`, `tel_click`, stb. már nem fognak tüzelni — az új kit más neveket használ).
+4. ⚠️ A `tracking/GTM-W8V3BVGD_fixed.json` importálása **Overwrite** módban,
+   Preview ellenőrzése és publikálása.
+5. ⚠️ Külön Google Ads Booking conversion action létrehozása, a label beírása
+   `tracking/beautyflow.gtm.json`-ba, regenerálás és újrapublikálás.
+6. ✅ A régi GTM tageket az Overwrite import eltávolítja; Merge módot ne használj.
+7. ✅ GA4 Measurement Protocol maradjon kikapcsolva a gateway-ben, amíg a browser
+   GA4 aktív, különben a konverziók duplán számolódnak.
 
 ## Lokális teszt forgatókönyv
 

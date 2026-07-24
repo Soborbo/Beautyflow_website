@@ -47,6 +47,7 @@ const turnstileSiteKey =
   '0x4AAAAAADOTyE9gccGo16os';
 
 const gtmId = (import.meta.env.PUBLIC_GTM_ID as string | undefined) || 'GTM-W8V3BVGD';
+const cookieYesId = (import.meta.env.PUBLIC_COOKIEYES_ID as string | undefined) || 'dadaccaebea652a6453d3041';
 
 const treatments = treatmentImages;
 
@@ -114,7 +115,7 @@ const breadcrumbSchema = {
 <!DOCTYPE html>
 <html lang="hu">
   <head>
-    <Tracking gtmId={gtmId} />
+    <Tracking gtmId={gtmId} cookieYesId={cookieYesId} />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Kérj ingyenes konzultációt a Beautyflow szépségszalonban. Személyre szabott tanácsadás lézeres szőrtelenítés, arckezelés, sminktetoválás témában." />

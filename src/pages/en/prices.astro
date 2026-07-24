@@ -3,39 +3,60 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 
-// Color scheme matching FAQ page
+// Valid from 2026. 09. 01. (Árlista_202609.pdf)
+const priceListValidFrom = '1 September 2026';
+
 const categoryColors = {
-  'lezeres': { primary: '#3b82f6', light: '#93c5fd', bg: '#eff6ff' },
-  'hydrabeauty': { primary: '#0d9488', light: '#5eead4', bg: '#f0fdfa' },
-  'sminktetovalas': { primary: '#6366f1', light: '#a5b4fc', bg: '#eef2ff' },
-  'tetovalas-eltavolitas': { primary: '#ef4444', light: '#fca5a5', bg: '#fef2f2' },
-  'carbon-peeling': { primary: '#8b5cf6', light: '#c4b5fd', bg: '#f5f3ff' },
-  'green-sea-peel': { primary: '#059669', light: '#6ee7b7', bg: '#ecfdf5' },
-  'biopen-q2': { primary: '#d97706', light: '#fcd34d', bg: '#fffbeb' },
-  'anti-aging': { primary: '#ec4899', light: '#f9a8d4', bg: '#fdf2f8' },
+  'lezeres': { primary: '#3b82f6', bg: '#eff6ff' },
+  'koreai': { primary: '#0d9488', bg: '#f0fdfa' },
+  'anti-aging': { primary: '#ec4899', bg: '#fdf2f8' },
+  'tisztito': { primary: '#8b5cf6', bg: '#f5f3ff' },
+  'bormegujito': { primary: '#059669', bg: '#ecfdf5' },
+  'nanotus': { primary: '#d97706', bg: '#fffbeb' },
+  'plazma': { primary: '#0891b2', bg: '#ecfeff' },
+  'lezeres-kezelesek': { primary: '#ef4444', bg: '#fef2f2' },
+  'sminktetovalas': { primary: '#6366f1', bg: '#eef2ff' },
+  'extrak': { primary: '#78716c', bg: '#fafaf9' },
 };
 
-// Laser Hair Removal Packages
+// ---------------------------------------------------------------------------
+// Laser hair removal – packages
+// ---------------------------------------------------------------------------
+const freeConsultation = {
+  name: 'Free consultation',
+  zones: 'Personalised treatment plan. Booking is mandatory for your first visit!',
+  price: '0 Ft',
+  duration: '15 min',
+};
+
 const laserPackages = [
-  { name: 'Diamond', zones: 'Full bikini + Inner buttocks + Full arms + Underarms + Full legs', price: '60 000', popular: true },
-  { name: 'Gold', zones: 'Full bikini + Inner buttocks + Underarms + Full legs', price: '50 000' },
-  { name: 'Silver', zones: 'Full bikini + Inner buttocks + Underarms + Lower legs', price: '40 000' },
-  { name: 'Bronze', zones: 'Full legs + Underarms', price: '38 000' },
-  { name: 'Platinum - PCOS', zones: 'Areola + Between breasts + Sideburns + Upper lip + Face + Chin + Neck + Stomach line', price: '34 000' },
-  { name: 'Crystal', zones: 'Full legs + Full arms', price: '45 000' },
-  { name: 'White', zones: 'Full bikini + Inner buttocks + Underarms + Stomach line', price: '26 000' },
-  { name: 'Pearl', zones: 'Underarms + Lower legs', price: '24 000' },
-  { name: 'Shine', zones: 'Underarms + Bikini line', price: '18 000' },
+  { name: 'Shine', zones: 'Underarms + bikini line', price: '18 000 Ft', duration: '45 min' },
+  { name: 'Pearl', zones: 'Underarms + lower legs', price: '24 000 Ft', duration: '75 min' },
+  { name: 'White', zones: 'Full bikini + inner buttocks + underarms + stomach line', price: '26 000 Ft', duration: '45 min' },
+  { name: 'Platinum - PCOS', zones: 'Areola + between breasts + sideburns + upper lip + face + chin + neck + stomach line', price: '34 000 Ft', duration: '75 min' },
+  { name: 'Bronze', zones: 'Full legs + underarms', price: '38 000 Ft', duration: '120 min' },
+  { name: 'Silver', zones: 'Full bikini + inner buttocks + underarms + lower legs', price: '40 000 Ft', duration: '90 min' },
+  { name: 'Gold', zones: 'Full bikini + inner buttocks + underarms + lower legs', price: '50 000 Ft', duration: '120 min' },
+  { name: 'Diamond', zones: 'Full bikini + inner buttocks + full arms + underarms + full legs', price: '60 000 Ft', duration: '180 min', popular: true },
 ];
 
-// Laser Hair Removal Passes - grouped
+// Package pass discounts
+const packagePasses = [
+  { sessions: '3 sessions', discount: '-5%' },
+  { sessions: '6 sessions', discount: '-10%' },
+  { sessions: '10 sessions', discount: '-15%' },
+];
+
+// ---------------------------------------------------------------------------
+// Diode laser hair removal – per area (1 / 3 / 6 / 10 sessions)
+// ---------------------------------------------------------------------------
 const laserPassesGrouped = [
   {
     group: 'Face',
     items: [
       { zone: 'Upper lip', prices: ['7 000', '18 500', '35 500', '56 000'] },
       { zone: 'Chin', prices: ['7 000', '18 500', '35 500', '56 000'] },
-      { zone: 'Upper lip + Chin', prices: ['12 000', '32 000', '61 000', '96 000'] },
+      { zone: 'Upper lip + chin', prices: ['12 000', '32 000', '61 000', '96 000'] },
       { zone: 'Full face', prices: ['18 000', '48 500', '91 500', '144 000'] },
       { zone: 'Sideburns', prices: ['7 000', '18 500', '35 500', '56 000'] },
     ]
@@ -89,96 +110,278 @@ const laserPassesGrouped = [
   },
 ];
 
-// Hydratouch Prices
-const hydratouchPrices = [
-  { service: 'Hydratouch – face', duration: '75 min', price: '30 000' },
-  { service: 'Hydratouch – back', duration: '90 min', price: '35 000' },
-  { service: 'Hydratouch – face, neck, decolletage', duration: '105 min', price: '40 000' },
-  { service: 'Hydratouch + Carbon peeling (face)', duration: '105 min', price: '45 000' },
-  { service: 'Hydratouch + Carbon peeling (face + decolletage)', duration: '120 min', price: '50 000' },
-  { service: 'Hydratouch + Carbon peeling (back)', duration: '120 min', price: '55 000' },
-];
+// ---------------------------------------------------------------------------
+// Cosmetic and laser treatments
+// ---------------------------------------------------------------------------
+interface TreatmentItem {
+  name: string;
+  desc?: string;
+  duration?: string;
+  price: string;
+}
 
-// Permanent Makeup Prices
-const permanentMakeupPrices = [
-  { service: 'Eyebrow tattoo (powder)', price: '75 000' },
-  { service: 'Eyebrow tattoo (ombre)', price: '75 000' },
-  { service: 'Botched eyebrow tattoo correction, cover-up, color refresh', price: '80 000' },
-  { service: 'Eyeliner tattoo (lash enhancement)', price: '55 000' },
-  { service: 'Half lip contour', price: '65 000' },
-  { service: 'Full lip contour', price: '75 000' },
-];
+interface TreatmentGroup {
+  title?: string;
+  note?: string;
+  footnote?: string;
+  items: TreatmentItem[];
+}
 
-// Tattoo Removal Prices
-const tattooRemovalPrices = [
-  { area: 'Face', size: 'eyebrow', price: '20 000' },
-  { area: 'Face', size: 'lip contour', price: '15 000' },
-  { area: 'Face', size: 'makeup (partial)', price: '15 000' },
-  { area: 'Body', size: '2x2 cm', price: '10 000' },
-  { area: 'Body', size: '5x5 cm', price: '20 000' },
-  { area: 'Body', size: '8x8 cm', price: '25 000' },
-  { area: 'Body', size: '10x10 cm', price: 'from 30 000' },
-];
+interface TreatmentSection {
+  id: string;
+  label: string;
+  color: { primary: string; bg: string };
+  highlight?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  groups: TreatmentGroup[];
+}
 
-// Carbon Peeling Per Session Prices
-const carbonPeelingSession = [
-  { service: 'Pigment spot removal', price: '10 000' },
-  { service: 'Hands (both)', price: '15 000' },
-  { service: 'Underarm lightening (both)', price: '15 000' },
-  { service: 'Eyebrow lightening', price: '15 000' },
-  { service: 'Full face', price: '25 000' },
-  { service: 'Decolletage', price: '25 000' },
-  { service: 'Full back', price: '35 000' },
-  { service: 'Face + neck + decolletage', price: '40 000' },
-];
-
-const carbonPeelingPass = [
-  { service: 'Full face (4+1 free)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
-  { service: 'Decolletage (4+1 free)', price: '100 000', originalPrice: '125 000', discount: '-20%' },
-  { service: 'Full face + neck + decolletage (4+1 free)', price: '160 000', originalPrice: '200 000', discount: '-20%' },
-  { service: 'Full back (4+1 free)', price: '140 000', originalPrice: '175 000', discount: '-20%' },
-  { service: 'Hands (both, 4+1 free)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
-  { service: 'Underarm lightening (both, 4+1 free)', price: '60 000', originalPrice: '75 000', discount: '-20%' },
-];
-
-// Green Sea Peel Prices
-const greenSeaPeelPrices = [
-  { service: 'Green Sea Peel – per session', duration: '75 min', price: '30 000' },
-];
-
-const greenSeaPeelPass = [
-  { service: 'Green Sea Peel – 4-session pass', price: '96 000', originalPrice: '120 000', discount: '-20%' },
-];
-
-// Biopen Q2 Prices
-const biopenQ2Prices = [
-  { service: 'Biopen Q2 – per session', duration: '75 min', price: '35 000' },
-];
-
-const biopenQ2Pass = [
-  { service: 'Biopen Q2 – 4-session pass', price: '112 000', originalPrice: '140 000', discount: '-20%' },
-];
-
-// Anti Aging Treatment Prices
-const antiAgingPrices = [
-  { service: 'Anti Aging Treatment', duration: '90 min', description: 'Complex skin rejuvenation with ultrasound and radiofrequency', price: '35 000' },
+const treatmentSections: TreatmentSection[] = [
+  {
+    id: 'korean',
+    label: 'Korean speciality treatments',
+    color: categoryColors['koreai'],
+    groups: [
+      {
+        title: 'Skin diagnostics',
+        items: [
+          {
+            name: 'Skin diagnostics',
+            desc: 'Includes microcamera diagnostics, a personalised treatment plan and home-care product recommendations. Professional products are available for purchase in the salon.',
+            price: '10 000 Ft',
+            duration: '60 min',
+          },
+        ],
+      },
+      {
+        title: 'Korean speciality treatments',
+        items: [
+          { name: 'Inflacure KRX', desc: 'Soothes rosacea-prone, acne-prone and inflamed skin.', price: '30 000 Ft', duration: '75 min' },
+          { name: 'Korea Peel – Dactor Peel', desc: 'Gentle skin renewal treatment, safe in summer and during pregnancy.', price: '25 000 Ft', duration: '60 min' },
+          { name: 'Recovery Exosode treatment', desc: 'Regenerates sensitive or eczema-prone skin and restores the skin barrier.', price: '25 000 Ft', duration: '60 min' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'anti-aging',
+    label: 'Anti-aging treatments',
+    color: categoryColors['anti-aging'],
+    groups: [
+      {
+        items: [
+          { name: 'Thread-fill treatment', desc: 'Absorbable collagen threads support skin firmness, reduce fine lines and help a more youthful appearance.', price: '25 000 Ft', duration: '60 min' },
+          { name: 'V-tox lifting treatment', desc: 'Tightens facial contours with a more visible lifting effect on sagging skin.', price: '30 000 Ft', duration: '75 min' },
+          { name: 'Carboxy therapy', desc: 'Revitalises oxygen-deprived, dull and tired skin and restores its radiance.', price: '25 000 Ft', duration: '75 min' },
+          { name: 'Carboxy therapy + Thread-fill', desc: 'Complex skin rejuvenation supporting both collagen production and the skin’s oxygen supply.', price: '45 000 Ft', duration: '90 min' },
+          { name: 'Carboxy therapy + V-tox', desc: 'Premium lifting treatment for firmer facial contours and fresher, younger-looking skin.', price: '50 000 Ft', duration: '120 min' },
+          { name: 'Premium laser skin rejuvenation', desc: 'The most advanced version of carbon peeling, twice as effective as conventional carbon treatment.', price: '50 000 Ft', duration: '90 min' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cleansing',
+    label: 'Cleansing & problem skin',
+    color: categoryColors['tisztito'],
+    groups: [
+      {
+        title: 'Hydra cleansing treatments',
+        items: [
+          { name: 'Hydra cleansing treatment – face', desc: 'Intensive cleansing and hydration in a single treatment.', price: '30 000 Ft', duration: '75 min' },
+          { name: 'Hydra cleansing treatment – back', desc: 'Deep-cleansing back treatment for problem skin.', price: '35 000 Ft', duration: '90 min' },
+          { name: 'Hydra cleansing – face + neck + decolletage', desc: 'Full deep cleansing and hydration.', price: '40 000 Ft', duration: '110 min' },
+          { name: 'Hydra + Carbon peeling – face', desc: 'The most effective cleansing and pore-refining combination.', price: '45 000 Ft', duration: '110 min' },
+          { name: 'Hydra + Carbon premium – back', desc: 'Intensive back treatment for stubborn skin problems.', price: '55 000 Ft', duration: '120 min' },
+        ],
+      },
+      {
+        title: 'Carbon peeling',
+        items: [
+          { name: 'Carbon peeling – face', desc: 'Deep cleansing, pore tightening and a more radiant complexion.', price: '25 000 Ft', duration: '60 min' },
+          { name: 'Carbon peeling – face + decolletage', desc: 'Complex cleansing and skin renewal treatment.', price: '40 000 Ft', duration: '120 min' },
+          { name: 'Carbon peeling – decolletage', desc: 'For acne-prone, sun-damaged or blotchy decolletage.', price: '25 000 Ft', duration: '45 min' },
+          { name: 'Carbon peeling – back', desc: 'For back acne and clogged pores.', price: '35 000 Ft', duration: '75 min' },
+          { name: 'Carbon peeling – hands', desc: 'Fades pigment spots and evens out skin tone.', price: '15 000 Ft', duration: '30 min' },
+          { name: 'Carbon underarm lightening', desc: 'Lightens and evens out darker underarm skin.', price: '15 000 Ft', duration: '30 min' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'skin-renewal',
+    label: 'Skin renewal treatments',
+    color: categoryColors['bormegujito'],
+    groups: [
+      {
+        items: [
+          { name: 'BioHerb50 treatment', desc: 'Acid-free exfoliation for pigment spots and acne. Safe in summer too!', price: '30 000 Ft', duration: '75 min' },
+          { name: 'Green Sea Peel – face', desc: 'Acid-free exfoliation with peeling. For acne-prone and scarred skin. Available from October to May only!', price: '30 000 Ft', duration: '75 min' },
+          { name: 'Green Sea Peel – back', desc: 'Acid-free exfoliation with peeling. For acne-prone and scarred skin. Available from October to May only!', price: '50 000 Ft', duration: '90 min' },
+          { name: 'Lazer Peel treatment', desc: 'Skin-evening treatment against hyperpigmentation.', price: '25 000 Ft', duration: '60 min' },
+          { name: 'Oxy Bubble (Oxy Pod)', desc: 'Recommended for thickened skin, restores elasticity.', price: '20 000 Ft', duration: '60 min' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'nanoneedling',
+    label: 'Nano-needling treatments 0.5 mm',
+    color: categoryColors['nanotus'],
+    groups: [
+      {
+        items: [
+          { name: 'Biopen facial treatment', desc: 'Nano or micro-needling skin renewal treatment with medical-grade actives, selected individually according to your skin condition (pigment spots, acne).', price: '30 000 Ft', duration: '60 min' },
+          { name: 'Biopen KRX – with Hyaluron powder', desc: 'Nano-needling treatment with Hyaluron powder that intensively hydrates the skin, supports regeneration and improves elasticity.', price: '35 000 Ft', duration: '75 min' },
+          { name: 'Biopen KRX – with B.tox ampoule', desc: 'Nano-needling treatment with a B.tox ampoule for smoother, firmer skin. Helps reduce the appearance of fine lines.', price: '35 000 Ft', duration: '75 min' },
+          { name: 'Biopen KRX – with Thread-fill', desc: 'Intensive firming, volumising micro-needling procedure with absorbable collagen threads.', price: '45 000 Ft', duration: '90 min' },
+        ],
+        footnote: 'Biopen treatments can be performed in summer too, with proper sun protection!',
+      },
+    ],
+  },
+  {
+    id: 'plasma',
+    label: 'Plasma therapy – skin tightening & lifting',
+    color: categoryColors['plazma'],
+    highlight: 'Plasma therapy is available in our Pest salon only! (Reitter Ferenc u. 90., 1135 Budapest)',
+    groups: [
+      {
+        items: [
+          { name: 'Plasma Therapy', desc: 'Visible skin tightening, stimulated collagen production and natural lifting without surgery.', price: '35 000 Ft', duration: '60 min' },
+          { name: 'Plasma Glow – full face + eyelids + crow’s feet', desc: 'Full facial rejuvenation with intensive tightening around the eyes.', price: '50 000 Ft', duration: '75 min' },
+          { name: 'Plasma Glow – lower + upper eyelids + eye area + forehead', desc: 'Targeted treatment for drooping eyelids, fine lines and forehead wrinkles.', price: '30 000 Ft', duration: '60 min' },
+          { name: 'Plasma Glow – neck + decolletage', desc: 'Tightens and renews the skin of the neck and decolletage.', price: '25 000 Ft', duration: '45 min' },
+          { name: 'Plasma Glow – smile lines (smoker’s lines)', desc: 'Fades and tightens fine lines around the mouth.', price: '20 000 Ft', duration: '30 min' },
+          { name: 'Plasma Glow – full face + neck + decolletage', desc: 'Complex lifting treatment for full renewal of the face, neck and decolletage.', price: '65 000 Ft', duration: '90 min' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'laser-treatments',
+    label: 'Laser treatments',
+    color: categoryColors['lezeres-kezelesek'],
+    groups: [
+      {
+        title: 'Permanent makeup removal',
+        note: 'Removal sessions are recommended every 6–8 weeks. Duration: 30 min.',
+        items: [
+          { name: 'Eyebrow tattoo', price: '20 000 Ft' },
+          { name: 'Lip contour tattoo', price: '15 000 Ft' },
+          { name: 'Partial permanent makeup', price: '15 000 Ft' },
+          { name: 'Carbon eyebrow lightening', price: '15 000 Ft' },
+        ],
+      },
+      {
+        title: 'Body tattoo removal',
+        note: 'Removal sessions are recommended every 6–8–12 weeks. Duration: 30–45 min.',
+        items: [
+          { name: '2x2 cm', price: '10 000 Ft' },
+          { name: '5x5 cm', price: '20 000 Ft' },
+          { name: '8x8 cm', price: '25 000 Ft' },
+          { name: '10x10 cm', price: '30 000 Ft' },
+        ],
+      },
+      {
+        title: 'Pigment spot removal',
+        items: [
+          { name: '1 pigment spot', price: '10 000 Ft' },
+          { name: '2 pigment spots', price: '15 000 Ft' },
+          { name: '3 pigment spots', price: '20 000 Ft' },
+          { name: '4 pigment spots', price: '25 000 Ft' },
+          { name: '5 pigment spots', price: '30 000 Ft' },
+        ],
+        footnote: 'Each additional pigment spot: +5 000 Ft / spot.',
+      },
+      {
+        title: 'Scar treatment / skin regeneration',
+        note: 'Duration: 30–45 min.',
+        items: [
+          { name: 'Surgical scars', desc: 'E.g. caesarean section, breast surgery, mole removal, etc.', price: 'individual quote' },
+          { name: 'Acne scars on the face', price: 'individual quote' },
+          { name: 'Scarred tattooed skin', price: 'individual quote' },
+          { name: 'Scars caused by incorrect laser tattoo removal', price: 'individual quote' },
+        ],
+      },
+    ],
+    ctaLabel: 'Free consultation',
+    ctaHref: '/en/free-consultation',
+  },
+  {
+    id: 'permanent-makeup',
+    label: 'Permanent makeup',
+    color: categoryColors['sminktetovalas'],
+    groups: [
+      {
+        items: [
+          { name: 'Eyebrow tattoo (powder)', price: '75 000 Ft' },
+          { name: 'Eyebrow tattoo (ombre)', price: '75 000 Ft' },
+          { name: 'Botched eyebrow tattoo correction, cover-up, colour refresh', price: '80 000 Ft' },
+          { name: 'Eyeliner tattoo (lash enhancement)', price: '55 000 Ft' },
+          { name: 'Half lip contour', price: '65 000 Ft' },
+          { name: 'Full lip contour', price: '75 000 Ft' },
+        ],
+        footnote: 'Prices include the correction fee (within 60 days)! Further corrections: 15 000 Ft / session.',
+      },
+    ],
+  },
+  {
+    id: 'wax-extras',
+    label: 'Wax & extras',
+    color: categoryColors['extrak'],
+    groups: [
+      {
+        title: 'Waxing',
+        items: [
+          { name: 'Upper lip wax', price: '2 500 Ft' },
+          { name: 'Nose wax', price: '1 500 Ft' },
+        ],
+      },
+      {
+        title: 'Extras',
+        note: 'Available as add-ons to existing treatments only! Please write the name of the extra in the comment field when booking.',
+        items: [
+          { name: 'Ultrasound + active ingredient', price: '+5 000 Ft' },
+          { name: 'Active ingredient serum', price: '+2 000 Ft' },
+          { name: 'KRX Hyaluron filler powder', price: '+4 000 Ft' },
+          { name: 'KRX Thread-fill ampoule', price: '+5 000 Ft' },
+          { name: 'Esthemax Hydrojelly mask', price: '+3 000 Ft' },
+          { name: 'Hydroabrasion peeling', price: '+2 000 Ft' },
+          { name: 'Vio – ozone treatment', price: '+2 000 Ft' },
+          { name: 'Cold/heat therapy', price: '+2 500 Ft' },
+          { name: 'LED mask light therapy', price: '+2 500 Ft' },
+          { name: 'Microcamera skin analysis', price: '+3 000 Ft' },
+          { name: 'Radiofrequency', price: '+3 500 Ft' },
+          { name: 'Machine massage', price: '+2 500 Ft' },
+          { name: 'Carboxy therapy mask', price: '+5 000 Ft' },
+          { name: 'Fusion plasma skin disinfection', price: '+10 000 Ft' },
+        ],
+      },
+    ],
+  },
 ];
 
 const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
 
 const categories = [
-  { id: 'laser-packages', label: 'Laser Packages', color: categoryColors['lezeres'] },
-  { id: 'laser-passes', label: 'Laser Passes', color: categoryColors['lezeres'] },
-  { id: 'hydratouch', label: 'Hydratouch', color: categoryColors['hydrabeauty'] },
-  { id: 'permanent-makeup', label: 'Permanent Makeup', color: categoryColors['sminktetovalas'] },
-  { id: 'tattoo-removal', label: 'Tattoo Removal', color: categoryColors['tetovalas-eltavolitas'] },
-  { id: 'carbon-peeling', label: 'Carbon Peeling', color: categoryColors['carbon-peeling'] },
-  { id: 'green-sea-peel', label: 'Green Sea Peel', color: categoryColors['green-sea-peel'] },
-  { id: 'biopen-q2', label: 'Biopen Q2', color: categoryColors['biopen-q2'] },
-  { id: 'anti-aging', label: 'Anti Aging', color: categoryColors['anti-aging'] },
+  { id: 'laser-packages', label: 'Laser packages', color: categoryColors['lezeres'] },
+  { id: 'laser-passes', label: 'Laser passes', color: categoryColors['lezeres'] },
+  ...treatmentSections.map((s) => ({ id: s.id, label: s.label, color: s.color })),
 ];
 
-// Schema.org - Service Catalog with Offers (all services + both locations)
+// Schema.org – Service Catalog with Offers (all services + both locations)
+const toOffers = (items: TreatmentItem[]) =>
+  items
+    .filter((item) => /\d/.test(item.price))
+    .map((item) => ({
+      "@type": "Offer",
+      "itemOffered": { "@type": "Service", "name": item.name, ...(item.desc ? { "description": item.desc } : {}) },
+      "price": item.price.replace(/[^\d]/g, ''),
+      "priceCurrency": "HUF",
+    }));
+
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "BeautySalon",
@@ -208,78 +411,15 @@ const serviceSchema = {
       {
         "@type": "OfferCatalog",
         "name": "Laser Hair Removal Packages",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Diamond Package", "description": "Full bikini + Inner buttocks + Full arms + Underarms + Full legs" }, "price": "60000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gold Package", "description": "Full bikini + Inner buttocks + Underarms + Full legs" }, "price": "50000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Silver Package", "description": "Full bikini + Inner buttocks + Underarms + Lower legs" }, "price": "40000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "White Package", "description": "Full bikini + Inner buttocks + Underarms + Stomach line" }, "price": "26000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pearl Package", "description": "Underarms + Lower legs" }, "price": "24000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Shine Package", "description": "Underarms + Bikini line" }, "price": "18000", "priceCurrency": "HUF" }
-        ]
+        "itemListElement": toOffers(
+          laserPackages.map((p) => ({ name: `${p.name} package`, desc: p.zones, price: p.price }))
+        ),
       },
-      {
+      ...treatmentSections.map((section) => ({
         "@type": "OfferCatalog",
-        "name": "Hydratouch Facial Treatments",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – face", "description": "75-minute professional facial" }, "price": "30000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – back", "description": "90-minute back treatment" }, "price": "35000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch – face, neck, decolletage", "description": "105-minute comprehensive treatment" }, "price": "40000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hydratouch + Carbon peeling (face)", "description": "105-minute combined treatment" }, "price": "45000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Permanent Makeup",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyebrow tattoo (powder/ombre)", "description": "Long-lasting eyebrow permanent makeup" }, "price": "75000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Botched eyebrow tattoo correction", "description": "Corrective permanent makeup" }, "price": "80000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyeliner tattoo (lash enhancement)", "description": "Long-lasting eyeliner permanent makeup" }, "price": "55000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Half lip contour", "description": "Partial lip permanent makeup" }, "price": "65000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Full lip contour", "description": "Complete lip permanent makeup" }, "price": "75000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Tattoo Removal",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Eyebrow tattoo removal", "description": "Laser removal" }, "price": "20000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Lip contour removal", "description": "Laser removal" }, "price": "15000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tattoo removal (2x2 cm)", "description": "Small area laser removal" }, "price": "10000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tattoo removal (5x5 cm)", "description": "Medium area laser removal" }, "price": "20000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Carbon Peeling",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pigment spot removal", "description": "Targeted pigmentation treatment" }, "price": "10000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (full face)", "description": "Skin rejuvenation treatment" }, "price": "25000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (decolletage)", "description": "Decolletage treatment" }, "price": "25000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (full back)", "description": "Back treatment" }, "price": "35000", "priceCurrency": "HUF" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Carbon Peeling (face + neck + decolletage)", "description": "Comprehensive treatment" }, "price": "40000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Green Sea Peel",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Green Sea Peel", "description": "75-minute skin renewal treatment" }, "price": "30000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Biopen Q2",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Biopen Q2", "description": "75-minute skin rejuvenation treatment" }, "price": "35000", "priceCurrency": "HUF" }
-        ]
-      },
-      {
-        "@type": "OfferCatalog",
-        "name": "Anti Aging Treatment",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Anti Aging Treatment", "description": "90-minute complex skin rejuvenation with ultrasound and radiofrequency" }, "price": "35000", "priceCurrency": "HUF" }
-        ]
-      }
+        "name": section.label,
+        "itemListElement": toOffers(section.groups.flatMap((g) => g.items)),
+      })),
     ]
   }
 };
@@ -293,7 +433,7 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://beautyflow.pro/en"
+      "item": "https://beautyflow.pro/en/"
     },
     {
       "@type": "ListItem",
@@ -307,8 +447,7 @@ const breadcrumbSchema = {
 
 <Layout
   title="Prices - Beautyflow Beauty Salon Budapest"
-  description="Beautyflow beauty salon price list: laser hair removal, permanent makeup, carbon peeling, facial treatments and tattoo removal prices in Budapest."
-  lang="en"
+  description="Beautyflow beauty salon price list: laser hair removal, cosmetic treatments, plasma therapy, carbon peeling, tattoo and pigment spot removal prices in Budapest."
 >
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
@@ -319,7 +458,10 @@ const breadcrumbSchema = {
         Our Prices
       </h1>
       <p class="text-gray-600 max-w-2xl mx-auto text-sm lg:text-base">
-        Transparent pricing, quality services. Choose from our treatments and book an appointment online!
+        Transparent pricing, quality services. Choose a treatment and book your appointment online!
+      </p>
+      <p class="text-gray-500 text-xs lg:text-sm mt-3">
+        Valid from {priceListValidFrom}
       </p>
     </div>
   </section>
@@ -334,7 +476,7 @@ const breadcrumbSchema = {
         </div>
         <span class="hidden sm:block w-px h-6 bg-white/30"></span>
         <p class="text-white/90 text-sm sm:text-base">
-          Collect a stamp after every treatment! <strong class="text-white">15 stamps = permanent 10% discount</strong> on all treatments.
+          Collect a stamp after every treatment! <strong class="text-white">15 stamps = lifetime 10% discount</strong> on all treatments.
         </p>
       </div>
     </div>
@@ -362,45 +504,78 @@ const breadcrumbSchema = {
     <div class="container mx-auto px-4 max-w-5xl">
 
       <!-- Laser Hair Removal Packages -->
-      <section id="laser-packages" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30">
+      <section id="laser-packages" class="price-section mb-12 p-6 rounded-2xl" style={`background-color: ${categoryColors['lezeres'].bg};`}>
         <div class="flex items-center gap-3 mb-6">
           <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['lezeres'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Laser Hair Removal Packages</h2>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Laser hair removal packages</h2>
+        </div>
+
+        <!-- Free consultation -->
+        <div class="bg-white rounded-lg p-5 shadow-sm border-2 border-dashed border-blue-300 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 class="font-semibold text-lg text-gray-900 mb-1">{freeConsultation.name}</h3>
+              <p class="text-gray-600 text-sm leading-relaxed">{freeConsultation.zones}</p>
+            </div>
+            <div class="text-right whitespace-nowrap">
+              <span class="text-2xl font-bold text-blue-600">{freeConsultation.price}</span>
+              <span class="block text-gray-500 text-sm">{freeConsultation.duration}</span>
+            </div>
+          </div>
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {laserPackages.map((pkg) => (
-            <div class={`bg-white rounded-lg p-5 shadow-sm border ${pkg.popular ? 'border-blue-300 ring-2 ring-blue-100' : 'border-gray-200'} relative`}>
+            <div class={`bg-white rounded-lg p-5 shadow-sm border ${pkg.popular ? 'border-blue-300 ring-2 ring-blue-100' : 'border-gray-200'} relative flex flex-col`}>
               {pkg.popular && (
                 <span class="absolute -top-3 left-4 bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                  Most Popular
+                  Most popular
                 </span>
               )}
-              <h3 class="font-semibold text-lg text-gray-900 mb-2">{pkg.name} Package</h3>
-              <p class="text-gray-600 text-sm mb-4 leading-relaxed">{pkg.zones}</p>
+              <h3 class="font-semibold text-lg text-gray-900 mb-2">{pkg.name} package</h3>
+              <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-grow">{pkg.zones}</p>
               <div class="flex items-baseline justify-between">
-                <span class="text-2xl font-bold text-gray-900 whitespace-nowrap">{pkg.price} Ft</span>
-                <span class="text-gray-500 text-sm">/ session</span>
+                <span class="text-2xl font-bold text-gray-900 whitespace-nowrap">{pkg.price}</span>
+                <span class="text-gray-500 text-sm">{pkg.duration}</span>
               </div>
             </div>
           ))}
         </div>
 
+        <!-- Diamond deposit -->
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p class="text-sm text-gray-800">
+            <strong>A deposit is required before every appointment for the Diamond package!</strong>
+            See the <a href="/en/house-rules" class="text-blue-600 underline hover:text-blue-700">house rules</a> for details.
+          </p>
+        </div>
+
+        <!-- Package passes -->
+        <h3 class="font-semibold text-lg text-gray-800 mt-8 mb-3">Package passes</h3>
+        <div class="grid grid-cols-3 gap-3">
+          {packagePasses.map((pass) => (
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 text-center">
+              <span class="block text-sm text-gray-600 mb-2">{pass.sessions}</span>
+              <span class="inline-block bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full">{pass.discount}</span>
+            </div>
+          ))}
+        </div>
+
         <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
+          <a href={notinoUrl} target="_blank" rel="noopener" class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
+            Book an appointment
           </a>
         </div>
       </section>
 
-      <!-- Laser Hair Removal Passes -->
-      <section id="laser-passes" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30">
+      <!-- Diode laser hair removal – per area -->
+      <section id="laser-passes" class="price-section mb-12 p-6 rounded-2xl" style={`background-color: ${categoryColors['lezeres'].bg};`}>
         <div class="flex items-center gap-3 mb-6">
           <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['lezeres'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Laser Hair Removal Passes</h2>
+          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Diode laser hair removal passes</h2>
         </div>
 
-        <p class="text-gray-600 text-sm mb-4">With passes you can save up to 30%! The more sessions you choose, the more you save.</p>
+        <p class="text-gray-600 text-sm mb-4">Save up to 20% with a pass! The more sessions you choose, the more you save.</p>
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div class="overflow-x-auto">
@@ -408,22 +583,22 @@ const breadcrumbSchema = {
               <thead class="bg-blue-50">
                 <tr>
                   <th class="text-left py-3 px-4 font-semibold text-gray-700">Area</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">1 sess.</th>
+                  <th class="text-center py-3 px-3 font-semibold text-gray-700">1 session</th>
                   <th class="text-center py-3 px-3 font-semibold text-gray-700">
                     <div class="flex flex-col items-center gap-1">
-                      <span>3 sess.</span>
+                      <span>3 sessions</span>
                       <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-10%</span>
                     </div>
                   </th>
                   <th class="text-center py-3 px-3 font-semibold text-gray-700">
                     <div class="flex flex-col items-center gap-1">
-                      <span>6 sess.</span>
+                      <span>6 sessions</span>
                       <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-15%</span>
                     </div>
                   </th>
                   <th class="text-center py-3 px-3 font-semibold text-gray-700">
                     <div class="flex flex-col items-center gap-1">
-                      <span>10 sess.</span>
+                      <span>10 sessions</span>
                       <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">-20%</span>
                     </div>
                   </th>
@@ -456,317 +631,82 @@ const breadcrumbSchema = {
         </div>
 
         <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
+          <a href={notinoUrl} target="_blank" rel="noopener" class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
+            Book an appointment
           </a>
         </div>
       </section>
 
-      <!-- Hydratouch Prices -->
-      <section id="hydratouch" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-teal-50/50 via-white to-teal-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['hydrabeauty'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Hydratouch Prices</h2>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-teal-50">
-                <tr>
-                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Service</th>
-                  <th class="text-center py-3 px-3 font-semibold text-gray-700">Duration</th>
-                  <th class="text-right py-3 px-4 font-semibold text-gray-700">Price</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                {hydratouchPrices.map((item) => (
-                  <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-4 font-medium text-gray-900">{item.service}</td>
-                    <td class="py-4 px-3 text-center text-gray-600">{item.duration}</td>
-                    <td class="py-4 px-4 text-right">
-                      <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <!-- Cosmetic and laser treatments -->
+      {treatmentSections.map((section) => (
+        <section id={section.id} class="price-section mb-12 p-6 rounded-2xl" style={`background-color: ${section.color.bg};`}>
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-1 h-8 rounded-full" style={`background-color: ${section.color.primary};`}></div>
+            <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">{section.label}</h2>
           </div>
-        </div>
 
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
+          {section.highlight && (
+            <div class="mb-6 p-4 bg-white rounded-lg border-l-4" style={`border-color: ${section.color.primary};`}>
+              <p class="text-sm font-semibold text-gray-800">{section.highlight}</p>
+            </div>
+          )}
 
-      <!-- Permanent Makeup Prices -->
-      <section id="permanent-makeup" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-indigo-50/50 via-white to-indigo-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['sminktetovalas'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Permanent Makeup Prices</h2>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {permanentMakeupPrices.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-4 px-5 font-medium text-gray-900">{item.service}</td>
-                  <td class="py-4 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
-          <p class="text-sm text-gray-700">
-            <strong>Note:</strong> Prices include the correction fee (within 60 days)!
-            Additional corrections: 15 000 Ft / session.
-          </p>
-        </div>
-
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
-
-      <!-- Tattoo Removal -->
-      <section id="tattoo-removal" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-red-50/50 via-white to-red-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['tetovalas-eltavolitas'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Tattoo Removal</h2>
-        </div>
-
-        <p class="text-gray-600 text-sm mb-4">The price depends on the size and location of the tattoo. During the consultation, we will assess it precisely and provide the expected number of treatments.</p>
-
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-red-50">
-                <tr>
-                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Area</th>
-                  <th class="text-left py-3 px-4 font-semibold text-gray-700">Size</th>
-                  <th class="text-right py-3 px-4 font-semibold text-gray-700">Price / session</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                {tattooRemovalPrices.map((item) => (
-                  <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-4 text-gray-600">{item.area}</td>
-                    <td class="py-3 px-4 font-medium text-gray-900">{item.size}</td>
-                    <td class="py-3 px-4 text-right">
-                      <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div class="space-y-8">
+            {section.groups.map((group) => (
+              <div>
+                {group.title && (
+                  <h3 class="font-semibold text-lg text-gray-800 mb-2">{group.title}</h3>
+                )}
+                {group.note && (
+                  <p class="text-gray-600 text-sm mb-3">{group.note}</p>
+                )}
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <table class="w-full text-sm">
+                    <tbody class="divide-y divide-gray-100">
+                      {group.items.map((item) => (
+                        <tr class="hover:bg-gray-50 align-top">
+                          <td class="py-4 px-5">
+                            <span class="font-medium text-gray-900">{item.name}</span>
+                            {item.desc && (
+                              <span class="block text-xs text-gray-500 mt-1 leading-relaxed">{item.desc}</span>
+                            )}
+                          </td>
+                          <td class="py-4 px-5 text-right whitespace-nowrap">
+                            <span class="text-lg font-bold text-gray-900">{item.price}</span>
+                            {item.duration && (
+                              <span class="block text-xs text-gray-500 mt-1">{item.duration}</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {group.footnote && (
+                  <p class="mt-3 text-sm text-gray-600 italic">{group.footnote}</p>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
 
-        <div class="mt-6 text-center">
-          <a href="/en/free-consultation" class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Free Consultation
-          </a>
-        </div>
-      </section>
-
-      <!-- Carbon Peeling Prices -->
-      <section id="carbon-peeling" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-purple-50/50 via-white to-purple-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['carbon-peeling'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Carbon Peeling Prices</h2>
-        </div>
-
-        <!-- Per session prices -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Per Session Treatment</h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {carbonPeelingSession.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pass prices -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Passes <span class="text-purple-600">(-20% discount)</span></h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {carbonPeelingPass.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
-                    <span class="text-lg font-bold text-purple-600 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-purple-500 hover:bg-purple-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
-
-      <!-- Green Sea Peel -->
-      <section id="green-sea-peel" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-emerald-50/50 via-white to-emerald-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['green-sea-peel'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Green Sea Peel Prices</h2>
-        </div>
-
-        <!-- Per session -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Per Session Treatment</h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {greenSeaPeelPrices.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">
-                    {item.service}
-                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration}</span>
-                  </td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pass -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Pass <span class="text-emerald-600">(-20% discount)</span></h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {greenSeaPeelPass.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
-                    <span class="text-lg font-bold text-emerald-600 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
-
-      <!-- Biopen Q2 -->
-      <section id="biopen-q2" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-amber-50/50 via-white to-amber-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['biopen-q2'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Biopen Q2 Prices</h2>
-        </div>
-
-        <!-- Per session -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Per Session Treatment</h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {biopenQ2Prices.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">
-                    {item.service}
-                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration}</span>
-                  </td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pass -->
-        <h3 class="font-semibold text-lg text-gray-800 mb-3">Pass <span class="text-amber-600">(-20% discount)</span></h3>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {biopenQ2Pass.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">{item.service}</td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-gray-400 line-through text-sm mr-2">{item.originalPrice} Ft</span>
-                    <span class="text-lg font-bold text-amber-600 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
-
-      <!-- Anti Aging Treatment -->
-      <section id="anti-aging" class="price-section mb-12 p-6 rounded-2xl bg-gradient-to-br from-pink-50/50 via-white to-pink-50/30">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-1 h-8 rounded-full" style={`background-color: ${categoryColors['anti-aging'].primary};`}></div>
-          <h2 class="font-heading text-2xl lg:text-3xl text-gray-900">Anti Aging Treatment Prices</h2>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {antiAgingPrices.map((item) => (
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 px-5 font-medium text-gray-900">
-                    {item.service}
-                    <span class="block text-xs text-gray-500 mt-0.5">{item.duration} – {item.description}</span>
-                  </td>
-                  <td class="py-3 px-5 text-right">
-                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{item.price} Ft</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="inline-block bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-            Book Appointment
-          </a>
-        </div>
-      </section>
+          <div class="mt-6 text-center">
+            <a
+              href={section.ctaHref ?? notinoUrl}
+              target={section.ctaHref ? undefined : '_blank'}
+              rel={section.ctaHref ? undefined : 'noopener'}
+              class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all"
+              style={`background-color: ${section.color.primary};`}
+            >
+              {section.ctaLabel ?? 'Book an appointment'}
+            </a>
+          </div>
+        </section>
+      ))}
 
       <!-- CTA Section -->
       <section class="bg-gradient-to-r from-[#c53f75] to-[#a33460] rounded-lg p-8 text-center text-white">
-        <h2 class="font-heading text-2xl lg:text-3xl mb-3">Have questions about our prices?</h2>
-        <p class="mb-6 opacity-90">Call us or request a free consultation and we'll help you find the ideal treatment for you!</p>
+        <h2 class="font-heading text-2xl lg:text-3xl mb-3">Questions about our prices?</h2>
+        <p class="mb-6 opacity-90">Call us or book a free consultation and we will help you find the ideal treatment!</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="tel:+3613009414" class="inline-flex items-center justify-center gap-2 bg-white text-[#c53f75] font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -775,7 +715,7 @@ const breadcrumbSchema = {
             +36 1 300 9414
           </a>
           <a href="/en/free-consultation" class="inline-flex items-center justify-center gap-2 bg-white/20 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/30 transition-colors border border-white/30">
-            Free Consultation
+            Free consultation
           </a>
         </div>
       </section>
@@ -804,6 +744,10 @@ const breadcrumbSchema = {
 
   .price-nav-btn.active {
     color: white;
+  }
+
+  .cta-btn:hover {
+    filter: brightness(0.92);
   }
 
   /* Smooth scroll offset for sticky nav */

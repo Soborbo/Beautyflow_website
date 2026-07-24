@@ -5,6 +5,7 @@
 # NOTE: public market config lives in .env / .env.production (Astro inlines PUBLIC_*
 # into the client bundle at build). These mirror them for `wrangler dev`.
 PUBLIC_GTM_ID=GTM-W8V3BVGD
+PUBLIC_COOKIEYES_ID=dadaccaebea652a6453d3041
 PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
 PUBLIC_SITE_URL=https://beautyflow.pro
 PUBLIC_TRACKING_COUNTRY=HU

@@ -37,15 +37,16 @@ import { parseArgs } from 'node:util';
 
 const { values: args } = parseArgs({
   options: {
-    src: { type: 'string', default: './lib,./components' },
+    src: { type: 'string', default: existsSync('../src') ? './lib,./components,../src' : './lib,./components' },
     events: { type: 'string', default: './docs/CANONICAL-EVENTS.md' },
     gtm: { type: 'string', default: './gtm/container.json' },
   },
 });
 
 const SRC_EXTENSIONS = ['.ts', '.tsx', '.js', '.mjs', '.cjs', '.astro'];
-// dataLayer pushes: `push({ event: 'X' ... })` or `dataLayer.push({ event: 'X' ... })`.
-const EVENT_KEY_RE = /\bevent:\s*['"]([A-Za-z0-9_.]+)['"]/g;
+// Actual dataLayer pushes only. Matching a bare `event:` property produced false
+// positives for ordinary UI data such as `{ year, event: "Milestone" }`.
+const EVENT_PUSH_RE = /(?:\bpush|(?:\b[A-Za-z_$][\w$]*\.)?dataLayer\.push)\s*\(\s*\{[\s\S]{0,500}?\bevent:\s*['"]([A-Za-z0-9_.]+)['"]/g;
 // GTM bootstrap events that are not tracking events.
 const IGNORE_EVENTS = new Set(['gtm.js', 'gtm.dom', 'gtm.load', 'gtm.start']);
 // Inline-code spans on markdown list items / table rows (the documented names).
@@ -71,17 +72,16 @@ async function eventsInCode(srcDirs) {
   const found = new Map();
   for (const dir of srcDirs) {
     for (const f of await walk(dir, SRC_EXTENSIONS)) {
-      const lines = (await readFile(f, 'utf8')).split('\n');
-      lines.forEach((line, i) => {
-        EVENT_KEY_RE.lastIndex = 0;
-        let m;
-        while ((m = EVENT_KEY_RE.exec(line))) {
-          const e = m[1];
-          if (IGNORE_EVENTS.has(e) || e.includes('.')) continue;
-          if (!found.has(e)) found.set(e, []);
-          /** @type {string[]} */ (found.get(e)).push(`${f}:${i + 1}`);
-        }
-      });
+      const text = await readFile(f, 'utf8');
+      EVENT_PUSH_RE.lastIndex = 0;
+      let m;
+      while ((m = EVENT_PUSH_RE.exec(text))) {
+        const e = m[1];
+        if (IGNORE_EVENTS.has(e) || e.includes('.')) continue;
+        if (!found.has(e)) found.set(e, []);
+        const line = text.slice(0, m.index).split('\n').length;
+        /** @type {string[]} */ (found.get(e)).push(`${f}:${line}`);
+      }
     }
   }
   return found;

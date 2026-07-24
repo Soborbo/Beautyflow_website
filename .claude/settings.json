@@ -6,7 +6,9 @@
       "Bash(sed -E 's/=.*/=<hidden>/' .dev.vars)",
       "Bash(sed -E 's/=.*/=<hidden>/' .env)",
       "Read(//tmp/**)",
-      "Bash(grep -iE 'error|exception|throw|binding|gateway|restart|cannot|undefined' /tmp/wdev.log | head -25)"
+      "Bash(grep -iE 'error|exception|throw|binding|gateway|restart|cannot|undefined' /tmp/wdev.log | head -25)",
+      "mcp__mxroute__get_spam_config",
+      "mcp__mxroute__search_emails"
     ]
   }
 }

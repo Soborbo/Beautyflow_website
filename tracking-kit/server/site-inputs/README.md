@@ -12,7 +12,6 @@ so you don't have to re-gather the IDs.
    - `meta.access_token` — Meta Events Manager → Conversions API → System User token.
    - `ga4.measurement_id` — GA4 Admin → Data Streams → <web stream> → Measurement ID (`G-XXXX`).
    - `ga4.api_secret` — same stream → Measurement Protocol API secrets → Create.
-   - `beautyflow.json` also: `meta.pixel_id` (see the note below).
 2. Run the generator:
    ```bash
    node ../generate-site.mjs --input beautyflow.json --out /tmp/beautyflow-out
@@ -28,10 +27,10 @@ so you don't have to re-gather the IDs.
   `require_consent`.
 - **trapezlemezes.json** (HU) — pixel + Google Ads (4 actions) ready. EEA →
   `require_consent: true`.
-- **beautyflow.json** (HU) — Google Ads ready (2 actions: contact_form_submit,
-  phone_conversion). **`meta.pixel_id` is REPLACE_ME** — the Beautyflow pixel was
-  not visible under any connected Meta ad account (likely a different Business
-  Manager); copy it from Meta Events Manager. EEA → `require_consent: true`.
+- **beautyflow.json** (HU) — Meta pixel `915395591548632` and Google Ads
+  mappings ready (2 actions: contact_form_submit, phone_conversion). GA4
+  Measurement Protocol is intentionally omitted: browser GA4 is the single
+  source, avoiding duplicate GA4 conversions. EEA → `require_consent: true`.
 
 ## Rollout testing (optional)
 

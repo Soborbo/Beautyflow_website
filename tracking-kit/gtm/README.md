@@ -15,13 +15,14 @@ and [`../docs/CANONICAL-EVENTS.md`](../docs/CANONICAL-EVENTS.md).
 | **Base tags** | Conversion Linker, GA4 Configuration |
 | **GA4 event tags** | `contact_form_submit`, `callback_conversion`, `phone_conversion`, `email_conversion`, `whatsapp_conversion`, `quote_calculator_conversion` (Key Events) + `calculator_start/step/option`, `form_abandon`, `scroll_depth` (engagement) — each emits the **canonical GA4 event name** |
 | **Meta Pixel** | Base (PageView), Lead (`eventID` = `{{DLV - event_id}}`), Contact (`eventID` = `{{DLV - event_id}}`) → Pixel↔CAPI dedup |
-| **Google Ads** | Conversion tag (orderId = `event_id`, value/currency, Enhanced Conversions via the side-channel) |
+| **Google Ads** | Separate Contact/Lead, Phone, and optional Booking conversion tags (orderId = `event_id`, value/currency, Enhanced Conversions via the side-channel) |
 | **Triggers** | one Custom Event trigger per dataLayer event |
 | **Variables** | PII-free DLVs (`event_id`, `value`, `currency`, `session_id`, `device`, …) + `CJS - User Provided Data` (reads the Task-2 side-channel) + constants |
 
-Consent is enforced via per-tag **Additional Consent Checks** (`analytics_storage`
-for GA4; `ad_storage` + `ad_user_data` for Meta/Ads), on top of the denied-by-default
-consent state. **The Consent Mode v2 default is NOT in this container** — it is
+Google GA4/Ads tags use their **built-in Consent Mode checks**, which preserves
+Google's cookieless/modelled pings under a denied state. Custom Meta tags use
+explicit Additional Consent Checks (`ad_storage` + `ad_user_data`). The denied
+Consent Mode v2 default is **not** in this container — it is
 declared inline in `<Tracking/>` (Tracking.astro), which runs *before* `gtm.js` loads
 (the only correct place; a GTM tag on Consent Initialization fires too late and
 duplicating it risks silent divergence). Keep that the single source of truth.
@@ -44,7 +45,9 @@ not inside each tag:
 | `Const - GA4 Measurement ID` | `G-XXXXXXXXXX` | your GA4 Measurement ID |
 | `Const - Meta Pixel ID` | `META_PIXEL_ID` | your Meta Pixel ID |
 | `Const - Google Ads Conversion ID` | `AW-XXXXXXXXX` | your Google Ads conversion ID |
-| `Const - Google Ads Conversion Label` | `CONVERSION_LABEL` | the conversion action's label |
+| `Const - Google Ads Contact Label` | `CONTACT_CONVERSION_LABEL` | Contact/Lead conversion action label |
+| `Const - Google Ads Phone Label` | `PHONE_CONVERSION_LABEL` | Phone conversion action label |
+| `Const - Google Ads Booking Label` | `BOOKING_CONVERSION_LABEL` | Booking conversion action label, when one exists |
 
 The container's own public id shows as `GTM-XXXXXXX`; GTM assigns the real id of the
 container you import **into**, so you don't edit that.
@@ -56,7 +59,7 @@ container you import **into**, so you don't edit that.
    Conversion → User-Provided Data**, confirm the source is **Manual / a variable**
    and points to `{{CJS - User Provided Data}}`. Then in Google Ads → Conversions →
    Enhanced Conversions, turn it **ON** with method **Google Tag Manager**.
-   (The variable returns `{ email, phone_number, first_name, last_name }` from
+   (The variable returns `{ email, phone_number, address: { first_name, last_name } }` from
    `window.__sbUserData`, written by `setUserDataForEC()` — no PII in the dataLayer.)
 2. **GA4 Key Events.** In GA4 mark `contact_form_submit`, `callback_conversion`,
    `phone_conversion`, `email_conversion`, `whatsapp_conversion`,
@@ -76,6 +79,12 @@ folder; if you change `docs/gtm-setup.md`, re-run the generator and re-import:
 
 ```sh
 node gtm/gen-container.mjs gtm/container.json
+```
+
+For a real site, pass a public site config as the second argument:
+
+```sh
+node gtm/gen-container.mjs /path/to/GTM-SITE_fixed.json /path/to/site.gtm.json
 ```
 
 The file is plain JSON — validate with `node -e "require('./gtm/container.json')"`.

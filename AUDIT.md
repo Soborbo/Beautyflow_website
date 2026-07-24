@@ -1,5 +1,9 @@
 # Beautyflow Website — Full Code Audit
 
+> Historical application audit. For the current Google Analytics / Google Ads
+> tracking implementation and the production GTM import, use
+> `tracking/README.md` and `tracking/GTM-W8V3BVGD_fixed.json`.
+
 **Date:** 2026-06-10
 **Scope:** all application code (`src/`, config, `public/`, `tracking/`), dependency health, build verification, type checking
 **Method:** manual review of all API endpoints, forms, tracking library, pages/i18n/SEO layer; `astro build` (passes); `astro check` (27 type errors); `npm audit`

@@ -41,4 +41,15 @@ describe('component → lib import contract', () => {
       }
     });
   }
+
+  it('Tracking.astro declares denied consent before loading CookieYes and GTM', () => {
+    const src = components['../components/Tracking.astro'];
+    expect(src).toBeTruthy();
+    const consentIndex = src.indexOf("gtag('consent', 'default'");
+    const cookieYesIndex = src.indexOf('cdn-cookieyes.com/client_data');
+    const gtmIndex = src.indexOf('www.googletagmanager.com/gtm.js');
+    expect(consentIndex).toBeGreaterThanOrEqual(0);
+    expect(cookieYesIndex).toBeGreaterThan(consentIndex);
+    expect(gtmIndex).toBeGreaterThan(cookieYesIndex);
+  });
 });

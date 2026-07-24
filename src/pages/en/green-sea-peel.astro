@@ -52,16 +52,11 @@ const testimonials = [
 ];
 
 const singlePrices = [
-  { area: 'Green Sea Peel – Light', price: '30 000 Ft', description: 'Light peel, powder-like exfoliation' },
-  { area: 'Green Sea Peel – Medium', price: '30 000 Ft', description: 'Medium peel' },
-  { area: 'Green Sea Peel – Deep', price: '30 000 Ft', description: 'Intensive, sheet-like peeling' },
+  { area: 'Green Sea Peel – face', price: '30 000 Ft', description: '75 min – acid-free exfoliation with peeling' },
+  { area: 'Green Sea Peel – back', price: '50 000 Ft', description: '90 min – acid-free exfoliation with peeling' },
 ];
 
-const packages = [
-  { area: '4-session course (Light)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-  { area: '4-session course (Medium)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-  { area: '4-session course (Deep)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-];
+const packages: { area: string; originalPrice: string; price: string; discount: string }[] = [];
 
 const howItWorks = [
   {
@@ -873,7 +868,7 @@ const faqSchema = {
 
       <div class="flex flex-col lg:flex-row gap-8 items-stretch">
         <!-- Single Treatments -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class={`flex flex-col ${packages.length > 0 ? 'lg:w-1/2' : 'w-full max-w-xl mx-auto'}`}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Per session</h3>
 
           <div class="space-y-3 flex-1 flex flex-col justify-center">
@@ -892,7 +887,7 @@ const faqSchema = {
         </div>
 
         <!-- Packages -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class="lg:w-1/2 flex-col" style={packages.length > 0 ? 'display: flex;' : 'display: none;'}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
             Packages <span class="text-[#c53f75]">(4 sessions)</span>
           </h3>

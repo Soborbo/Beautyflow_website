@@ -44,7 +44,12 @@
       "Bash(powershell.exe -Command \"Remove-Item -Recurse -Force 'd:\\\\beautyflow\\\\functions' -ErrorAction SilentlyContinue; Test-Path 'd:\\\\beautyflow\\\\functions'\")",
       "Bash(powershell.exe -Command \"Remove-Item -Recurse -Force 'd:\\\\beautyflow\\\\packages' -ErrorAction SilentlyContinue; Remove-Item -Force 'd:\\\\beautyflow\\\\src\\\\pages\\\\api\\\\tracking-beacon.ts' -ErrorAction SilentlyContinue; @\\(Test-Path 'd:\\\\beautyflow\\\\packages'\\), \\(Test-Path 'd:\\\\beautyflow\\\\src\\\\pages\\\\api\\\\tracking-beacon.ts'\\)\")",
       "mcp__cloudflare__env_var_bulk_set",
-      "mcp__cloudflare__env_var_set"
+      "mcp__cloudflare__env_var_set",
+      "mcp__mxroute__list_messages",
+      "mcp__mxroute__get_catchall",
+      "Bash(ls -la | grep -i -E \"dev.vars|env\" ; echo \"--- gitignored env files ---\"; ls -a src/../ 2>/dev/null | head -40; echo \"--- resend refs ---\"; grep -rn \"RESEND_API_KEY\" --include=*.ts --include=*.jsonc --include=*.json --include=*.md . 2>/dev/null | grep -v node_modules | head -20)",
+      "Read(//d/beautyflow/**)",
+      "mcp__mxroute__check_reputation"
     ]
   }
 }

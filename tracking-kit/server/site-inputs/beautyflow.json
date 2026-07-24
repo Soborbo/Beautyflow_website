@@ -5,12 +5,8 @@
   "currency": "HUF",
   "require_consent": true,
   "meta": {
-    "pixel_id": "REPLACE_ME_16_DIGIT_PIXEL_ID",
+    "pixel_id": "915395591548632",
     "access_token": "REPLACE_ME_META_CAPI_SYSTEM_USER_TOKEN"
-  },
-  "ga4": {
-    "measurement_id": "REPLACE_ME_GA4_MEASUREMENT_ID",
-    "api_secret": "REPLACE_ME_GA4_API_SECRET"
   },
   "gads": {
     "customer_id": "9796138635",

@@ -3,7 +3,8 @@
  *
  * Every event checks consent before pushing.
  * Analytics events need analytics consent.
- * Conversion events need marketing consent (checked in index.ts).
+ * Browser conversion events need analytics consent (checked in index.ts).
+ * Their Enhanced-Conversions PII side-channel independently needs marketing consent.
  */
 
 import { hasAnalyticsConsent, hasMarketingConsent } from './consent';

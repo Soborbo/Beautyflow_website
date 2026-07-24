@@ -36,6 +36,7 @@
   ],
   "vars": {
     "PUBLIC_GTM_ID": "GTM-W8V3BVGD",
+    "PUBLIC_COOKIEYES_ID": "dadaccaebea652a6453d3041",
     "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADOTyE9gccGo16os",
     "PUBLIC_SITE_URL": "https://beautyflow.pro",
     // Soborbo canonical tracking market config. Keep in sync with the event-gateway

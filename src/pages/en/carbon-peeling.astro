@@ -52,22 +52,17 @@ const testimonials = [
 
 const singlePrices = [
   { area: 'Pigment spot removal', price: '10,000 Ft' },
-  { area: 'Back of hands (both)', price: '15,000 Ft' },
-  { area: 'Armpit lightening (both)', price: '15,000 Ft' },
+  { area: 'Hands', price: '15,000 Ft' },
+  { area: 'Underarm lightening', price: '15,000 Ft' },
   { area: 'Eyebrow lightening', price: '15,000 Ft' },
-  { area: 'Full face', price: '25,000 Ft' },
+  { area: 'Face', price: '25,000 Ft' },
   { area: 'Decolletage', price: '25,000 Ft' },
-  { area: 'Full back', price: '35,000 Ft' },
+  { area: 'Back', price: '35,000 Ft' },
+  { area: 'Face + decolletage', price: '40,000 Ft' },
+  { area: 'Premium laser skin rejuvenation', price: '50,000 Ft' },
 ];
 
-const packages = [
-  { area: 'Full face', originalPrice: '125,000', price: '100,000 Ft', discount: '-20%' },
-  { area: 'Decolletage', originalPrice: '125,000', price: '100,000 Ft', discount: '-20%' },
-  { area: 'Full face + neck + decolletage', originalPrice: '200,000', price: '160,000 Ft', discount: '-20%' },
-  { area: 'Full back', originalPrice: '175,000', price: '140,000 Ft', discount: '-20%' },
-  { area: 'Back of hands (both)', originalPrice: '75,000', price: '60,000 Ft', discount: '-20%' },
-  { area: 'Armpit lightening (both)', originalPrice: '75,000', price: '60,000 Ft', discount: '-20%' },
-];
+const packages: { area: string; originalPrice: string; price: string; discount: string }[] = [];
 
 const howItWorks = [
   {
@@ -472,7 +467,7 @@ const faqs = [
 
       <div class="flex flex-col lg:flex-row gap-8 items-stretch">
         <!-- Single Treatments -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class={`flex flex-col ${packages.length > 0 ? 'lg:w-1/2' : 'w-full max-w-xl mx-auto'}`}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Per session</h3>
 
           <!-- Price List -->
@@ -489,7 +484,7 @@ const faqs = [
         </div>
 
         <!-- Packages -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class="lg:w-1/2 flex-col" style={packages.length > 0 ? 'display: flex;' : 'display: none;'}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
             Packages <span class="text-[#c53f75]">(5 sessions)</span>
           </h3>

@@ -44,7 +44,15 @@ const testimonials = [
   }
 ];
 
-const antiAgingPrice = { service: 'Anti Aging Treatment', duration: '90 min', price: 35000 };
+// Anti-aging treatments - price list valid from 1 September 2026
+const antiAgingPrices = [
+  { service: 'Thread-fill treatment', duration: '60 min', price: 25000 },
+  { service: 'V-tox lifting treatment', duration: '75 min', price: 30000 },
+  { service: 'Carboxy therapy', duration: '75 min', price: 25000 },
+  { service: 'Carboxy therapy + Thread-fill', duration: '90 min', price: 45000 },
+  { service: 'Carboxy therapy + V-tox', duration: '120 min', price: 50000 },
+  { service: 'Premium laser skin rejuvenation', duration: '90 min', price: 50000 },
+];
 
 const howItWorks = [
   {
@@ -168,17 +176,15 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Anti Aging services",
-      "itemListElement": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Anti Aging Treatment"
-          },
-          "price": antiAgingPrice.price.toString(),
-          "priceCurrency": "HUF"
-        }
-      ]
+      "itemListElement": antiAgingPrices.map((item) => ({
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": item.service
+        },
+        "price": item.price.toString(),
+        "priceCurrency": "HUF"
+      }))
     }
   })} />
 
@@ -389,19 +395,21 @@ const faqs = [
   <!-- Pricing Section -->
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
-      <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">Anti Aging Treatment Price</h2>
-      <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Complex skin rejuvenation with ultrasound and radiofrequency</p>
+      <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">Anti Aging Treatment Prices</h2>
+      <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Choose the skin rejuvenation treatment that fits your skin</p>
 
-      <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg p-6 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="text-gray-800 font-medium block text-lg">{antiAgingPrice.service}</span>
-              <span class="text-gray-500 text-sm">{antiAgingPrice.duration}</span>
+      <div class="max-w-xl mx-auto space-y-3">
+        {antiAgingPrices.map((item) => (
+          <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center gap-4">
+              <div>
+                <span class="text-gray-800 font-medium block">{item.service}</span>
+                <span class="text-gray-500 text-sm">{item.duration}</span>
+              </div>
+              <span class="text-[#c53f75] font-bold text-xl whitespace-nowrap">{item.price.toLocaleString('hu-HU')} Ft</span>
             </div>
-            <span class="text-[#c53f75] font-bold text-2xl whitespace-nowrap">{antiAgingPrice.price.toLocaleString('hu-HU')} Ft</span>
           </div>
-        </div>
+        ))}
       </div>
 
       <div class="mt-10 text-center">

@@ -26,6 +26,7 @@ funnel-adaptation guide; in case of a name conflict, THIS file wins.)
 | Phone click | `phone_click` | `phone_conversion` | `phone_conversion` | Contact | `phone_conversion` | ✅ |
 | Email click | `email_click` | `email_conversion` | `email_conversion` | Contact | — | ✅ |
 | WhatsApp click | `whatsapp_click` | `whatsapp_conversion` | `whatsapp_conversion` | Contact | — | ✅ |
+| Booking hand-off | `booking_click` | `booking_click` | `booking_click` | InitiateCheckout | dedicated action only | ✅ |
 | Calculator complete (quote) | `calculator_complete` | `quote_calculator_conversion` | `quote_calculator_conversion` | Lead | `quote_calculator_conversion` | ✅ |
 | Calculator first view | — | `quote_calculator_first_view` | `quote_calculator_first_view` | ViewContent | — | ❌ |
 
@@ -41,12 +42,15 @@ so reporting stays unified (but see the double-counting warning above).
 | `calculator_start` / `calculator_step` / `calculator_option` | funnel | regular event |
 | `form_abandon` | form abandonment | regular event |
 | `scroll_depth` (25/50/75/100) | scroll | regular event |
+| `newsletter_signup` | newsletter success | regular event |
+| `calculator_result_view` | result-page view | regular event |
 
 ## GA4 admin tasks (once per property)
 
 1. **Key Events (Admin → Events → Mark as key event):**
    `contact_form_submit`, `callback_conversion`, `phone_conversion`,
-   `email_conversion`, `whatsapp_conversion`, `quote_calculator_conversion`.
+   `email_conversion`, `whatsapp_conversion`, `booking_click`,
+   `quote_calculator_conversion`.
 2. **Custom dimensions (Admin → Custom definitions → event-scoped):**
    `event_id`, `session_id`, `source`, `service`, `device`,
    `calculator_name`, `step_id`. (The campaign parameters — source/medium/campaign —
