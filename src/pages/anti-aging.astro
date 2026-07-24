@@ -44,7 +44,15 @@ const testimonials = [
   }
 ];
 
-const antiAgingPrice = { service: 'Anti Aging Kezelés', duration: '90 perc', price: 35000 };
+// Anti-aging kezelések – Árlista 2026. 09. 01-től
+const antiAgingPrices = [
+  { service: 'Thread-fill kezelés', duration: '60 perc', price: 25000 },
+  { service: 'V-tox lifting kezelés', duration: '75 perc', price: 30000 },
+  { service: 'Carboxy terápia', duration: '75 perc', price: 25000 },
+  { service: 'Carboxy terápia + Thread-fill', duration: '90 perc', price: 45000 },
+  { service: 'Carboxy terápia + V-tox', duration: '120 perc', price: 50000 },
+  { service: 'Prémium lézeres arcfiatalítás', duration: '90 perc', price: 50000 },
+];
 
 const howItWorks = [
   {
@@ -167,17 +175,15 @@ const faqs = [
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Anti Aging szolgáltatások",
-      "itemListElement": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Anti Aging Kezelés"
-          },
-          "price": antiAgingPrice.price.toString(),
-          "priceCurrency": "HUF"
-        }
-      ]
+      "itemListElement": antiAgingPrices.map((item) => ({
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": item.service
+        },
+        "price": item.price.toString(),
+        "priceCurrency": "HUF"
+      }))
     }
   })} />
 
@@ -423,22 +429,24 @@ const faqs = [
   <section class="py-16 bg-gradient-to-b from-[#f9f5f3] to-white">
     <div class="max-w-[1000px] mx-auto px-4">
       <h2 class="font-heading text-2xl lg:text-3xl text-gray-900 mb-4 text-center uppercase">
-        Anti Aging Kezelés Ár
+        Anti Aging Kezelések Árai
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Komplex bőrfiatalító kezelés ultrahanggal és rádiófrekvenciával
+        Válaszd ki a bőröd igényeihez illő bőrfiatalító kezelést
       </p>
 
-      <div class="max-w-md mx-auto">
-        <div class="bg-white rounded-lg p-6 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="text-gray-800 font-medium block text-lg">{antiAgingPrice.service}</span>
-              <span class="text-gray-500 text-sm">{antiAgingPrice.duration}</span>
+      <div class="max-w-xl mx-auto space-y-3">
+        {antiAgingPrices.map((item) => (
+          <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-[#c53f75] hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center gap-4">
+              <div>
+                <span class="text-gray-800 font-medium block">{item.service}</span>
+                <span class="text-gray-500 text-sm">{item.duration}</span>
+              </div>
+              <span class="text-[#c53f75] font-bold text-xl whitespace-nowrap">{item.price.toLocaleString('hu-HU')} Ft</span>
             </div>
-            <span class="text-[#c53f75] font-bold text-2xl whitespace-nowrap">{antiAgingPrice.price.toLocaleString('hu-HU')} Ft</span>
           </div>
-        </div>
+        ))}
       </div>
 
       <div class="mt-10 text-center">

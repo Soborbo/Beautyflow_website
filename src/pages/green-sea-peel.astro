@@ -49,16 +49,11 @@ const testimonials = [
 ];
 
 const singlePrices = [
-  { area: 'Green Sea Peel – Light', price: '30 000 Ft', description: 'Enyhe hámlasztás, púderszerű hámlás' },
-  { area: 'Green Sea Peel – Medium', price: '30 000 Ft', description: 'Közepes hámlasztás' },
-  { area: 'Green Sea Peel – Deep', price: '30 000 Ft', description: 'Intenzív, lemezes hámlás' },
+  { area: 'Green Sea Peel – arc', price: '30 000 Ft', description: '75 perc – hámlással járó, sav nélküli hámlasztás' },
+  { area: 'Green Sea Peel – hát', price: '50 000 Ft', description: '90 perc – hámlással járó, sav nélküli hámlasztás' },
 ];
 
-const packages = [
-  { area: '4 alkalmas kúra (Light)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-  { area: '4 alkalmas kúra (Medium)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-  { area: '4 alkalmas kúra (Deep)', originalPrice: '120 000', price: '96 000 Ft', discount: '-20%' },
-];
+const packages: { area: string; originalPrice: string; price: string; discount: string }[] = [];
 
 const howItWorks = [
   {
@@ -864,12 +859,12 @@ const faqSchema = {
         Green Sea Peel Árak
       </h2>
       <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        Válaszd ki a számodra megfelelő hámlasztási szintet
+        Válaszd ki a számodra megfelelő kezelési területet. A Green Sea Peel kizárólag október–május között elérhető!
       </p>
 
       <div class="flex flex-col lg:flex-row gap-8 items-stretch">
         <!-- Single Treatments -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class={`flex flex-col ${packages.length > 0 ? 'lg:w-1/2' : 'w-full max-w-xl mx-auto'}`}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
 
           <div class="space-y-3 flex-1 flex flex-col justify-center">
@@ -888,7 +883,7 @@ const faqSchema = {
         </div>
 
         <!-- Packages -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class="lg:w-1/2 flex-col" style={packages.length > 0 ? 'display: flex;' : 'display: none;'}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
             Bérletek <span class="text-[#c53f75]">(4 alkalom)</span>
           </h3>

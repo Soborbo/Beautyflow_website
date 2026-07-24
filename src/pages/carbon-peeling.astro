@@ -52,22 +52,17 @@ const testimonials = [
 
 const singlePrices = [
   { area: 'Pigmentfolt eltávolítás', price: '10 000 Ft' },
-  { area: 'Kézfej (mindkettő)', price: '15 000 Ft' },
-  { area: 'Hónalj világosítás (mindkettő)', price: '15 000 Ft' },
+  { area: 'Kézfej', price: '15 000 Ft' },
+  { area: 'Hónalj halványítás', price: '15 000 Ft' },
   { area: 'Szemöldök halványítás', price: '15 000 Ft' },
-  { area: 'Teljes arc', price: '25 000 Ft' },
+  { area: 'Arc', price: '25 000 Ft' },
   { area: 'Dekoltázs', price: '25 000 Ft' },
-  { area: 'Teljes hát', price: '35 000 Ft' },
+  { area: 'Hát', price: '35 000 Ft' },
+  { area: 'Arc + dekoltázs', price: '40 000 Ft' },
+  { area: 'Prémium lézeres arcfiatalítás', price: '50 000 Ft' },
 ];
 
-const packages = [
-  { area: 'Teljes arc', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Dekoltázs', originalPrice: '125 000', price: '100 000 Ft', discount: '-20%' },
-  { area: 'Teljes arc + nyak + dekoltázs', originalPrice: '200 000', price: '160 000 Ft', discount: '-20%' },
-  { area: 'Teljes hát', originalPrice: '175 000', price: '140 000 Ft', discount: '-20%' },
-  { area: 'Kézfej (mindkettő)', originalPrice: '75 000', price: '60 000 Ft', discount: '-20%' },
-  { area: 'Hónalj világosítás (mindkettő)', originalPrice: '75 000', price: '60 000 Ft', discount: '-20%' },
-];
+const packages: { area: string; originalPrice: string; price: string; discount: string }[] = [];
 
 const howItWorks = [
   {
@@ -472,7 +467,7 @@ const faqs = [
 
       <div class="flex flex-col lg:flex-row gap-8 items-stretch">
         <!-- Single Treatments -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class={`flex flex-col ${packages.length > 0 ? 'lg:w-1/2' : 'w-full max-w-xl mx-auto'}`}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">Alkalmanként</h3>
 
           <!-- Price List -->
@@ -489,7 +484,7 @@ const faqs = [
         </div>
 
         <!-- Packages -->
-        <div class="lg:w-1/2 flex flex-col">
+        <div class="lg:w-1/2 flex-col" style={packages.length > 0 ? 'display: flex;' : 'display: none;'}>
           <h3 class="font-heading text-xl text-gray-900 mb-6 uppercase text-center">
             Bérletek <span class="text-[#c53f75]">(5 alkalom)</span>
           </h3>
