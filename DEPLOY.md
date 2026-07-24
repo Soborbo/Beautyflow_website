@@ -47,7 +47,8 @@ Cloudflare dashboard → Workers & Pages → Create → Import a repository → 
 | `GA4_MEASUREMENT_ID` | `G-774BY4X64P` |
 | `META_PIXEL_ID` | `915395591548632` |
 | `SITE_URL` | `https://beautyflow.pro` |
-| `EMAILOCTOPUS_LIST_ID` | `76d28252-7664-11f1-8850-59b9407f9225` |
+| `EMAILOCTOPUS_LIST_ID_BUDA` | `e8ede3e8-7913-11f1-802c-13a603a274b7` (Budai vendégek) |
+| `EMAILOCTOPUS_LIST_ID_PEST` | `1b73f668-7914-11f1-9f79-b770fd549614` (Pesti vendégek) |
 
 **Secrets (encrypted) — ezeket KÉZZEL kell a dashboardon beállítani:**
 
@@ -86,14 +87,22 @@ Dashboard → a worker beállításai → Custom Domains → Add → `beautyflow
 A főoldalon (és minden magyar oldalon) 18 mp után felugró hírlevél-modal a
 [`/api/newsletter`](src/pages/api/newsletter.ts) végponton át az EmailOctopus **v2** API-ba
 ír (`POST https://api.emailoctopus.com/lists/{list_id}/contacts`, `Authorization: Bearer <API_KEY>`).
-Csak keresztnév + email kell; a keresztnév a lista **FirstName** mezőjébe kerül.
+Keresztnév + email + szalon kell; a keresztnév a lista **FirstName** mezőjébe kerül.
+
+**Szalonválasztás.** A modalban rádiógomb van (budai VAGY pesti szalon) — pontosan egyet
+lehet választani, alapból egyik sincs kijelölve. A választás dönti el, melyik listába kerül
+a kontakt. Ha a kontakt már fenn van az adott listán, az API 409-et ad — ezt sikernek
+vesszük („már fel vagy iratkozva"). Ugyanaz az email cím a másik listára is felkerülhet egy
+későbbi feliratkozással; a két lista független.
 
 A működéshez az EmailOctopus dashboardról kell két dolog:
 
-1. **Lista (audience) létrehozása / kiválasztása.** Ha új lista, hagyd rajta az alapértelmezett
-   `FirstName` mezőt (ezt küldjük). A lista **ID**-jét (UUID) a lista URL-jéből vagy a lista
-   Settings oldaláról másold ki → tedd a [wrangler.jsonc](wrangler.jsonc) `vars` blokkjában lévő
-   `EMAILOCTOPUS_LIST_ID` mezőbe (nem titok, deployjal szállítjuk).
+1. **A két lista ID-je.** A meglévő „Budai vendégek" / „Pesti vendégek" listákat használjuk.
+   A lista **ID**-je (UUID) a lista URL-jéből vagy a Settings oldaláról másolható →
+   [wrangler.jsonc](wrangler.jsonc) `vars` blokk, `EMAILOCTOPUS_LIST_ID_BUDA` /
+   `EMAILOCTOPUS_LIST_ID_PEST` (nem titok, deployjal szállítjuk).
+   Mindkét listán legyen `FirstName` mező (ezt küldjük) — ha egy régi, importált listán
+   más a mező tag-je, a feliratkozás hibára fut.
 2. **API kulcs (v2).** Account → **Integrations & API** → API keys → *Create a new key*.
    Ez SECRET → `wrangler secret put EMAILOCTOPUS_API_KEY` (vagy CF dashboard → Secrets).
 
