@@ -13,7 +13,8 @@
     "test": "vitest run --root tracking-kit",
     "test:tracking": "vitest run --root tracking-kit",
     "typecheck:tracking": "tsc -p tracking-kit/tsconfig.json",
-    "generate:gtm": "node tracking-kit/gtm/gen-container.mjs tracking-kit/gtm/container.json && node tracking-kit/gtm/gen-container.mjs tracking/GTM-W8V3BVGD_fixed.json tracking/beautyflow.gtm.json"
+    "generate:gtm": "node tracking-kit/gtm/gen-container.mjs tracking-kit/gtm/container.json && node tracking-kit/gtm/gen-container.mjs tracking/GTM-W8V3BVGD_fixed.json tracking/beautyflow.gtm.json",
+    "verify:clickids": "npx tsx scripts/verify-tracking-clickids.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.3",

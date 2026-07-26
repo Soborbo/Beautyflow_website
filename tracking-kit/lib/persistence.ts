@@ -160,6 +160,37 @@ export function captureUrlParams(): void {
   capturedParams = urlTrackingParams();
 }
 
+/**
+ * A Google klikk-ID-k KÖLCSÖNÖSEN KIZÁRÓAK: egy kattintás gclid VAGY gbraid VAGY
+ * wbraid-ot ad, sosem többet. A 90 napos `sb_tracking` blob viszont kulcsonként
+ * merge-elődött, ezért egy visszatérő fizetett látogatónál a KORÁBBI klikk ID-je
+ * bennragadt az új mellett, és a lead mindkettőt vitte — más-más kattintásból.
+ * Az offline konverzió-feltöltés az ilyen sort elutasítja (a Google egy eseményhez
+ * egy klikk-azonosítót vár).
+ *
+ * Ezért: amint a friss forrás BÁRMELYIK Google klikk-ID-t hozza, a többit eldobjuk
+ * a tárolt/kimenő adatból — a friss kattintás felülírja a régit. Ha nincs friss
+ * Google klikk-ID (organikus/direkt visszatérés), a tárolt marad érvényben.
+ * Az `fbclid` MÁS hálózat, ezért érintetlen.
+ */
+const GOOGLE_CLICK_KEYS = ['gclid', 'gbraid', 'wbraid'] as const;
+type GoogleClickKey = (typeof GOOGLE_CLICK_KEYS)[number];
+
+function hasFreshGoogleClickId(source: { [K in GoogleClickKey]?: string | null }): boolean {
+  return GOOGLE_CLICK_KEYS.some((k) => source[k]);
+}
+
+/** A `stored` másolata, amelyből a friss klikkben NEM szereplő Google klikk-ID-k kiestek. */
+function dropStaleGoogleClickIds(
+  stored: Partial<TrackingData>,
+  fresh: Partial<TrackingData>,
+): Partial<TrackingData> {
+  if (!hasFreshGoogleClickId(fresh)) return stored;
+  const cleaned = { ...stored };
+  for (const k of GOOGLE_CLICK_KEYS) if (!fresh[k]) delete cleaned[k];
+  return cleaned;
+}
+
 function persistFirstTouch(params: Partial<TrackingData>): void {
   if (lsGet(FIRST_TOUCH_KEY)) return;
   lsSet(FIRST_TOUCH_KEY, JSON.stringify({
@@ -183,8 +214,10 @@ export function persistTrackingParams(): void {
   const fbclidAt = fresh.fbclid && (!stored?.fbclid || stored.fbclid !== fresh.fbclid)
     ? Date.now()
     : stored?.fbclidAt;
+  // A friss Google klikk-ID kiüti a tárolt testvéreit (lásd dropStaleGoogleClickIds).
+  const base = dropStaleGoogleClickIds(stored ?? {}, fresh);
   lsSet(TRACKING_KEY, JSON.stringify({
-    ...stored, ...fresh,
+    ...base, ...fresh,
     fbclidAt,
     timestamp: Date.now(),
     landingPage: stored?.landingPage || window.location.pathname,
@@ -231,12 +264,35 @@ export function getStoredData(): TrackingData | null {
   try {
     const d: TrackingData = JSON.parse(raw);
     if (Date.now() - d.timestamp > EXPIRY_DAYS * 86_400_000) { lsRm(TRACKING_KEY); return null; }
-    return d;
+    return healLegacyGoogleClickIds(d);
   } catch { lsRm(TRACKING_KEY); return null; }
 }
 
+/**
+ * Egyszeri ön-gyógyítás a HIBÁS merge korából származó bloboknál: ezekben egyszerre
+ * több Google klikk-ID is ül (más-más kattintásból), amit a Google offline-feltöltés
+ * elutasít. Nem tudjuk, melyik a frissebb — a `gclid`-et tartjuk meg (ez a domináns,
+ * nem-iOS alak), a testvéreit eldobjuk, és a blobot egyszer visszaírjuk. Ép blobot
+ * (0 vagy 1 Google klikk-ID) nem érint és nem ír.
+ */
+function healLegacyGoogleClickIds(d: TrackingData): TrackingData {
+  const present = GOOGLE_CLICK_KEYS.filter((k) => d[k]);
+  if (present.length < 2) return d;
+  const keep: GoogleClickKey = present.includes('gclid') ? 'gclid' : present[0];
+  const healed = { ...d };
+  for (const k of GOOGLE_CLICK_KEYS) if (k !== keep) delete healed[k];
+  lsSet(TRACKING_KEY, JSON.stringify(healed));
+  return healed;
+}
+
 export function getGclid(): string | null {
-  return new URLSearchParams(window.location.search).get('gclid') || getStoredData()?.gclid || null;
+  const u = new URLSearchParams(window.location.search);
+  const fromUrl = u.get('gclid');
+  if (fromUrl) return fromUrl;
+  // Ha az AKTUÁLIS URL más Google klikk-ID-t hoz (gbraid/wbraid — iOS-forgalom),
+  // a tárolt gclid egy KORÁBBI kattintásé: nem szabad ehhez a konverzióhoz adni.
+  if (GOOGLE_CLICK_KEYS.some((k) => u.get(k))) return null;
+  return getStoredData()?.gclid || null;
 }
 export function getFbclid(): string | null {
   return new URLSearchParams(window.location.search).get('fbclid') || getStoredData()?.fbclid || null;
@@ -244,9 +300,14 @@ export function getFbclid(): string | null {
 
 export function getAllTrackingData(): Partial<TrackingData> {
   const s = getStoredData(); const u = new URLSearchParams(window.location.search);
+  // Az URL-ben érkező Google klikk-ID kiüti a tárolt testvéreit ERRE a hívásra is
+  // (különben a hidden mezőkbe két különböző kattintás ID-je kerülne egyszerre).
+  const urlGoogle: Partial<Record<GoogleClickKey, string>> = {};
+  for (const k of GOOGLE_CLICK_KEYS) { const v = u.get(k); if (v) urlGoogle[k] = v; }
+  const g = dropStaleGoogleClickIds(s ?? {}, urlGoogle);
   return {
-    gclid: u.get('gclid') || s?.gclid, gbraid: u.get('gbraid') || s?.gbraid,
-    wbraid: u.get('wbraid') || s?.wbraid, fbclid: u.get('fbclid') || s?.fbclid,
+    gclid: urlGoogle.gclid || g.gclid, gbraid: urlGoogle.gbraid || g.gbraid,
+    wbraid: urlGoogle.wbraid || g.wbraid, fbclid: u.get('fbclid') || s?.fbclid,
     utm_source: u.get('utm_source') || s?.utm_source, utm_medium: u.get('utm_medium') || s?.utm_medium,
     utm_campaign: u.get('utm_campaign') || s?.utm_campaign, utm_content: u.get('utm_content') || s?.utm_content,
     utm_term: u.get('utm_term') || s?.utm_term,
