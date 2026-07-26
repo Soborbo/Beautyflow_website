@@ -191,6 +191,23 @@ function dropStaleGoogleClickIds(
   return cleaned;
 }
 
+/**
+ * A FRISS forrásból is csak EGY Google klikk-ID maradhat. Egy kattintás egyet ad, de az
+ * URL-be redirect / tag-manager / kézzel másolt link útján bekerülhet több is (pl. a
+ * gclid megmarad, miközben egy átirányítás gbraid-et fűz hozzá). A `dropStale…` ilyenkor
+ * mindkettőt frissnek látja, tehát önmagában NEM elég — ez a függvény determinisztikusan
+ * egyet választ: a `gclid`-et (domináns, nem-iOS alak), UGYANAZZAL a precedenciával, mint
+ * a legacy blobok ön-gyógyítása. Így a tárolt és a beküldött érték nem térhet el.
+ */
+function pickSingleGoogleClickId(fresh: Partial<TrackingData>): Partial<TrackingData> {
+  const present = GOOGLE_CLICK_KEYS.filter((k) => fresh[k]);
+  if (present.length < 2) return fresh;
+  const keep: GoogleClickKey = present.includes('gclid') ? 'gclid' : present[0];
+  const out = { ...fresh };
+  for (const k of GOOGLE_CLICK_KEYS) if (k !== keep) delete out[k];
+  return out;
+}
+
 function persistFirstTouch(params: Partial<TrackingData>): void {
   if (lsGet(FIRST_TOUCH_KEY)) return;
   lsSet(FIRST_TOUCH_KEY, JSON.stringify({
@@ -203,8 +220,10 @@ function persistFirstTouch(params: Partial<TrackingData>): void {
 /** Persist captured params to localStorage. ONLY after marketing consent. */
 export function persistTrackingParams(): void {
   if (!hasMarketingConsent()) return;
-  const fresh = capturedParams || urlTrackingParams();
-  if (!fresh) return;
+  const freshRaw = capturedParams || urlTrackingParams();
+  if (!freshRaw) return;
+  // Több friss Google klikk-ID (redirect-artefakt) → determinisztikusan egy marad.
+  const fresh = pickSingleGoogleClickId(freshRaw);
   persistFirstTouch(fresh);
   const stored = getStoredData();
   // Stamp the fbclid capture time only when fbclid is new — needed to
@@ -302,8 +321,10 @@ export function getAllTrackingData(): Partial<TrackingData> {
   const s = getStoredData(); const u = new URLSearchParams(window.location.search);
   // Az URL-ben érkező Google klikk-ID kiüti a tárolt testvéreit ERRE a hívásra is
   // (különben a hidden mezőkbe két különböző kattintás ID-je kerülne egyszerre).
-  const urlGoogle: Partial<Record<GoogleClickKey, string>> = {};
-  for (const k of GOOGLE_CLICK_KEYS) { const v = u.get(k); if (v) urlGoogle[k] = v; }
+  const urlRaw: Partial<Record<GoogleClickKey, string>> = {};
+  for (const k of GOOGLE_CLICK_KEYS) { const v = u.get(k); if (v) urlRaw[k] = v; }
+  // Ha az URL egyszerre több Google klikk-ID-t hoz, itt is EGY marad (redirect-artefakt).
+  const urlGoogle = pickSingleGoogleClickId(urlRaw);
   const g = dropStaleGoogleClickIds(s ?? {}, urlGoogle);
   return {
     gclid: urlGoogle.gclid || g.gclid, gbraid: urlGoogle.gbraid || g.gbraid,
