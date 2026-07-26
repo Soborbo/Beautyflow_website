@@ -38,7 +38,8 @@ setUrl('');
 
 // A modul helye repónként eltér (src/lib/tracking vs. tracking-kit/lib) — a
 // szkript ugyanaz marad mindenhol, csak a jelöltek közül veszi az elsőt, ami létezik.
-const CANDIDATES = ['../src/lib/tracking/persistence.ts', '../tracking-kit/lib/persistence.ts'];
+const CANDIDATES = ['../src/lib/tracking/persistence.ts', '../tracking-kit/lib/persistence.ts',
+                    '../src/lib/tracking/gclid.ts'];
 let p, resolved;
 for (const rel of CANDIDATES) {
   const url = new URL(rel, import.meta.url);
@@ -58,15 +59,26 @@ const check = (name, actual, expected) => {
   if (!ok) console.log(`      expected ${JSON.stringify(expected)}\n      actual   ${JSON.stringify(actual)}`);
 };
 
-const TRACKING_KEY = 'sb_tracking';
+// A tárolókulcs repónként eltér (sb_tracking / sso_tracking), ezért NEM hardcode-oljuk:
+// egy próba-írásból derítjük ki, melyik kulcsot használja a betöltött modul.
+const persist = () => { if (typeof p.captureUrlParams === 'function') p.captureUrlParams(); p.persistTrackingParams(); };
+store.clear();
+setUrl('?gclid=PROBE');
+persist();
+// Több kulcs is íródhat (pl. a first-touch blob) — a FŐ blobot a `landingPage`
+// mezőjéről ismerjük fel, nem a beírás sorrendjéről.
+const TRACKING_KEY = [...store.keys()].find((k) => {
+  try { return 'landingPage' in JSON.parse(store.get(k)); } catch { return false; }
+});
+if (!TRACKING_KEY) { console.error('nem sikerult kideriteni a tarolokulcsot (a persist nem irt)'); process.exit(2); }
+console.log(`tarolokulcs: ${TRACKING_KEY}\n`);
 const seed = (obj) => store.set(TRACKING_KEY, JSON.stringify({ timestamp: Date.now(), landingPage: '/', ...obj }));
 const stored = () => JSON.parse(store.get(TRACKING_KEY) ?? '{}');
 
 // 1. Friss gbraid-kattintás egy korábbi gclid MELLÉ → a gclid kiesik (ez a prod-hiba).
 seed({ gclid: 'OLD_GCLID' });
 setUrl('?gbraid=NEW_GBRAID');
-p.captureUrlParams();
-p.persistTrackingParams();
+persist();
 check('friss gbraid kiüti a tárolt gclid-et (tárolás)', [stored().gclid, stored().gbraid], [undefined, 'NEW_GBRAID']);
 check('friss gbraid kiüti a tárolt gclid-et (kimenő adat)', [p.getAllTrackingData().gclid, p.getAllTrackingData().gbraid], [undefined, 'NEW_GBRAID']);
 check('getGclid() nem ad vissza korábbi kattintásból való gclid-et', p.getGclid(), null);
@@ -75,16 +87,14 @@ check('getGclid() nem ad vissza korábbi kattintásból való gclid-et', p.getGc
 store.clear();
 seed({ gbraid: 'OLD_GBRAID' });
 setUrl('?gclid=NEW_GCLID');
-p.captureUrlParams();
-p.persistTrackingParams();
+persist();
 check('friss gclid kiüti a tárolt gbraid-et', [stored().gclid, stored().gbraid], ['NEW_GCLID', undefined]);
 
 // 3. Nincs friss Google klikk-ID (organikus visszatérés) → a tárolt MEGMARAD.
 store.clear();
 seed({ gclid: 'KEPT_GCLID' });
 setUrl('?utm_source=newsletter');
-p.captureUrlParams();
-p.persistTrackingParams();
+persist();
 check('friss Google klikk-ID nélkül a tárolt gclid megmarad', stored().gclid, 'KEPT_GCLID');
 check('...és a kimenő adatban is ott van', p.getAllTrackingData().gclid, 'KEPT_GCLID');
 
@@ -101,8 +111,7 @@ check('...a kimenő adat sem visz többé kettőt', [p.getAllTrackingData().gcli
 store.clear();
 seed({ fbclid: 'FBCLID_KEPT', gclid: 'OLD_GCLID' });
 setUrl('?gbraid=NEW_GBRAID');
-p.captureUrlParams();
-p.persistTrackingParams();
+persist();
 check('fbclid érintetlen marad a Google-tisztítás során', stored().fbclid, 'FBCLID_KEPT');
 
 console.log(failures === 0 ? '\nMinden ellenőrzés zöld.' : `\n${failures} ellenőrzés bukott.`);
