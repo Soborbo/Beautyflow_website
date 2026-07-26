@@ -291,6 +291,33 @@ function gclidFromCookie(): string | undefined {
   return parts.length >= 3 ? parts.slice(2).join('.') : undefined;
 }
 
+// Google click IDs are MUTUALLY EXCLUSIVE: one click yields gclid OR gbraid OR wbraid,
+// never several. This store merged per key, so a returning paid visitor kept the
+// PREVIOUS click's ID alongside the new one and the conversion payload carried two IDs
+// from two different clicks — which the offline upload rejects. So: as soon as the fresh
+// source carries ANY Google click ID, its siblings are dropped. `fbclid`/`msclkid` are
+// other networks and stay untouched.
+const GOOGLE_CLICK_KEYS = ['gclid', 'gbraid', 'wbraid'] as const;
+
+function dropStaleGoogleClickIds(
+  stored: AttributionParams,
+  fresh: AttributionParams,
+): AttributionParams {
+  if (!GOOGLE_CLICK_KEYS.some((k) => fresh[k])) {
+    // No fresh Google click ID. A legacy store may still hold several from the
+    // buggy era — keep `gclid` (the dominant, non-iOS form) and drop the siblings.
+    const present = GOOGLE_CLICK_KEYS.filter((k) => stored[k]);
+    if (present.length < 2) return stored;
+    const keep = present.includes('gclid') ? 'gclid' : present[0];
+    const healed = { ...stored };
+    for (const k of GOOGLE_CLICK_KEYS) if (k !== keep) delete healed[k];
+    return healed;
+  }
+  const cleaned = { ...stored };
+  for (const k of GOOGLE_CLICK_KEYS) if (!fresh[k]) delete cleaned[k];
+  return cleaned;
+}
+
 export function collectAttribution(): AttributionParams {
   const stored = readStoredAttribution();
   const fresh: AttributionParams = {};
@@ -331,8 +358,9 @@ export function collectAttribution(): AttributionParams {
     if (g) fresh.gclid = g;
   }
 
-  // Last-touch: the fresh URL signals override the stored ones.
-  const merged: AttributionParams = { ...stored, ...fresh };
+  // Last-touch: the fresh URL signals override the stored ones. A fresh Google click
+  // ID also EVICTS its stored siblings (see dropStaleGoogleClickIds).
+  const merged: AttributionParams = { ...dropStaleGoogleClickIds(stored, fresh), ...fresh };
 
   // Ad-consent revoked/missing → drop the previously stored click IDs too
   // (don't persist/send an ad identifier without consent).
