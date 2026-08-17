@@ -71,28 +71,28 @@ const SKINLAB_URL = 'https://skinlabhungary.hu/anti-aging/';
 // A készülék által mért szempontok — a szalonban készült felvételen látható
 // elemzési fülek alapján. Csak azt soroljuk fel, amit a gép ténylegesen mér.
 const analysisPoints = [
-  { title: 'Faggyútermelés', desc: 'Hol fénylik és hol szárad ki a bőröd — zónánként, nem ránézésre.' },
-  { title: 'Hidratáltság', desc: 'A vízhiányos bőr nem ugyanaz, mint a száraz — ez a kettő szétválik.' },
+  { title: 'Faggyútermelés', desc: 'Hol fénylik és hol szárad ki a bőröd - zónánként, nem ránézésre.' },
+  { title: 'Hidratáltság', desc: 'A vízhiányos bőr nem ugyanaz, mint a száraz - ez a kettő szétválik.' },
   { title: 'Pórusok', desc: 'Méret és eltömődöttség a T-zónában és az arcél mentén.' },
   { title: 'Pigmentfoltok', desc: 'A felszín alatt lapuló foltok is, amiket szabad szemmel még nem látsz.' },
   { title: 'Ráncok', desc: 'Finom vonalak és mimikai ráncok térképe, mélység szerint.' },
   { title: 'Aknéra hajlamos területek', desc: 'A gyulladásra hajlamos zónák, még a kiütés megjelenése előtt.' },
   { title: 'Bőrtónus egyenletessége', desc: 'Pirosság, elszíneződés, egyenetlen tónus mértéke.' },
-  { title: 'Érzékenység', desc: 'Mennyire reaktív a bőröd — ez dönti el, milyen erős hatóanyag fér bele.' },
+  { title: 'Érzékenység', desc: 'Mennyire reaktív a bőröd - ez dönti el, milyen erős hatóanyag fér bele.' },
 ];
 
 const kinekAjanljuk = [
   'Ha még sosem jártál nálunk, és nem tudod, honnan induljon a bőrápolásod.',
   'Ha sok terméket végigpróbáltál már, de nem látsz eredményt.',
-  'Ha visszatérő problémáid vannak — pattanás, pirosság, pigmentfolt —, és tudni szeretnéd, mi áll a hátterében.',
+  'Ha visszatérő problémáid vannak - pattanás, pirosság, pigmentfolt -, és tudni szeretnéd, mi áll a hátterében.',
   'Ha hatásos, személyre szabott bőrápolási tervet szeretnél, nem csak egy alkalmi kezelést.',
   'Ha meg szeretnéd előzni a ráncokat, és egészséges bőrképet szeretnél minden nap.',
 ];
 
 const folyamat = [
   { n: '1', title: 'Beszélgetés', desc: 'Elmondod, mi a problémád a bőröddel, és mik a céljaid. Ez adja a keretet mindennek, ami utána jön.' },
-  { n: '2', title: 'Gépi arcszkennelés', desc: 'A készülék több megvilágításban rögzíti az arcodat, és kielemzi a bőr állapotát — a felszín alatti rétegeket is.' },
-  { n: '3', title: 'Kiértékelés', desc: 'Együtt végignézzük a képernyőn, mit látunk. Egyszerű, érthető nyelven — nem ijesztgetünk szakzsargonnal.' },
+  { n: '2', title: 'Gépi arcszkennelés', desc: 'A készülék több megvilágításban rögzíti az arcodat, és kielemzi a bőr állapotát - a felszín alatti rétegeket is.' },
+  { n: '3', title: 'Kiértékelés', desc: 'Együtt végignézzük a képernyőn, mit látunk. Egyszerű, érthető nyelven - nem ijesztgetünk szakzsargonnal.' },
   { n: '4', title: 'Kezelési terv', desc: 'Összeállítjuk a bőrödhöz illő kezeléssorozatot: mivel kezdünk, mi jön utána, és milyen ütemezésben.' },
   { n: '5', title: 'Otthoni rutin', desc: 'Kapsz egy személyre szabott otthoni ápolási javaslatot a KRX koreai prémium termékcsaládból, amit helyben meg is vásárolhatsz.' },
   { n: '6', title: 'Nyomon követés', desc: 'Minden további kezelésnél figyeljük a bőröd állapotát, és ha kell, finomítunk a terven.' },
@@ -101,11 +101,11 @@ const folyamat = [
 const krxKategoriak = [
   {
     title: 'Tisztítás',
-    desc: 'A rutin alapja: olyan lemosó és hámlasztó, ami a te bőröd faggyútermeléséhez van mérve — nem szárítja ki, és nem hagyja eltömődve.',
+    desc: 'A rutin alapja: olyan lemosó és hámlasztó, ami a te bőröd faggyútermeléséhez van mérve - nem szárítja ki, és nem hagyja eltömődve.',
   },
   {
     title: 'Hidratálás',
-    desc: 'Nyugtató, barrier-erősítő szérumok és krémek. Külön kezeljük a vízhiányos és a valóban száraz bőrt — más a megoldás a kettőre.',
+    desc: 'Nyugtató, barrier-erősítő szérumok és krémek. Külön kezeljük a vízhiányos és a valóban száraz bőrt - más a megoldás a kettőre.',
   },
   {
     title: 'Pattanás & folt elleni',
@@ -128,7 +128,7 @@ const faq = [
   },
   {
     q: 'Sminkben mehetek?',
-    a: 'A pontos méréshez tiszta arcra van szükség. Ha sminkben érkezel, nem gond — a vizsgálat előtt letisztítjuk az arcodat, csak számolj pár plusz perccel.',
+    a: 'A pontos méréshez tiszta arcra van szükség. Ha sminkben érkezel, nem gond - a vizsgálat előtt letisztítjuk az arcodat, csak számolj pár plusz perccel.',
   },
   {
     q: 'Mit viszek haza a bőrdiagnosztikáról?',
@@ -136,11 +136,11 @@ const faq = [
   },
   {
     q: 'Ez ugyanaz, mint az ingyenes online bőranalízis?',
-    a: 'Nem. Az online bőranalízis egy kb. 3 perces kérdőív, ami irányt ad és megmondja a bőrtípusodat — ingyenes, bármikor kitöltheted. A bőrdiagnosztika ezzel szemben személyes, géppel végzett vizsgálat a szalonban, aminek a végén konkrét kezelési terv és termékajánló születik.',
+    a: 'Nem. Az online bőranalízis egy kb. 3 perces kérdőív, ami irányt ad és megmondja a bőrtípusodat - ingyenes, bármikor kitöltheted. A bőrdiagnosztika ezzel szemben személyes, géppel végzett vizsgálat a szalonban, aminek a végén konkrét kezelési terv és termékajánló születik.',
   },
   {
     q: 'Helyettesíti a bőrgyógyászati vizsgálatot?',
-    a: 'Nem. A bőrdiagnosztika kozmetikai célú felmérés, nem orvosi diagnózis. Súlyos gyulladás vagy tartós bőrprobléma esetén javasoljuk, hogy fordulj bőrgyógyászhoz — illetve ha a tünetek hátterében emésztőrendszeri ok merül fel, gasztroenterológushoz.',
+    a: 'Nem. A bőrdiagnosztika kozmetikai célú felmérés, nem orvosi diagnózis. Súlyos gyulladás vagy tartós bőrprobléma esetén javasoljuk, hogy fordulj bőrgyógyászhoz - illetve ha a tünetek hátterében emésztőrendszeri ok merül fel, gasztroenterológushoz.',
   },
 ];
 
@@ -226,8 +226,8 @@ const breadcrumbSchema = {
 ---
 
 <Layout
-  title="Bőrdiagnosztika Budapest – gépi bőranalízis kezelési tervvel | Beautyflow"
-  description="Ne találgass: professzionális bőrdiagnosztika géppel a Beautyflow szalonokban, Budán és Pesten. 60 perc, 10 000 Ft — amit levonunk az első kezelésed árából. Személyre szabott kezelési terv és otthoni termékajánló."
+  title="Bőrdiagnosztika Budapest - gépi bőranalízis kezelési tervvel | Beautyflow"
+  description="Ne találgass: professzionális bőrdiagnosztika géppel a Beautyflow szalonokban, Budán és Pesten. 60 perc, 10 000 Ft - amit levonunk az első kezelésed árából. Személyre szabott kezelési terv és otthoni termékajánló."
   newsletter={false}
 >
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
@@ -243,7 +243,7 @@ const breadcrumbSchema = {
       <div class="relative order-1 lg:order-2 min-h-[300px] sm:min-h-[420px] lg:min-h-[640px]">
         <ContentImage
           src={heroImg}
-          alt="Bőrdiagnosztika a Beautyflow szalonban – a kozmetikus a bőranalízis eredményét mutatja a vendégnek"
+          alt="Bőrdiagnosztika a Beautyflow szalonban - a kozmetikus a bőranalízis eredményét mutatja a vendégnek"
           priority={true}
           class="absolute inset-0 h-full w-full object-cover"
         />
@@ -263,14 +263,35 @@ const breadcrumbSchema = {
               alatt marad minden töréspontnál (a plafon kell, mert `max-w-2xl` fölött
               a hasáb már nem nő, a betű viszont nőne). */}
           <h1 class="font-heading text-[#1e293b] text-[26px] sm:text-[32px] lg:text-[clamp(24px,2.2vw,37px)] tracking-[0.015em] leading-[1.15] text-balance mb-5">
-            Ne találgass — tudd meg, mire van szüksége a bőrödnek
+            Ne találgass - tudd meg, mire van szüksége a bőrödnek
           </h1>
-          <p class="text-lg text-[#334155] leading-relaxed mb-7">
+          <p class="text-lg text-[#334155] leading-relaxed mb-4">
             Mielőtt megvennéd a századik arcápoló terméket, vagy kipróbálnál egy újabb kezelést a
-            problémás bőrödön, érdemes megtalálni a probléma gyökerét. A bőrdiagnosztikát azért
-            vezettük be, hogy feltárjuk azokat a területeket, amiket szabad szemmel nem lehet
-            látni — és hogy onnantól ne tippelés, hanem terv legyen.
+            problémás bőrödön, érdemes megtalálni a probléma gyökerét.
           </p>
+          <p class="text-lg text-[#334155] leading-relaxed mb-7">
+            A bőrdiagnosztikát azért vezettük be, hogy feltárjuk azokat a területeket, amiket
+            szabad szemmel nem lehet látni - és hogy onnantól ne tippelés, hanem terv legyen.
+          </p>
+
+          {/* Ár-tudnivalók egy sorban, a lead alatt és a gombok fölött. Szűk
+              hasábon tördel (`flex-wrap`), hogy ne lógjon ki. */}
+          <ul class="mb-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5">
+            {[
+              `${DURATION_MIN} perc`,
+              `${PRICE.toLocaleString('hu-HU')} Ft`,
+              'Levonjuk a kezelésed árából',
+            ].map((item) => (
+              <li class="flex items-center gap-1.5 text-[#334155]">
+                <span class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-[#c53f75]/10">
+                  <svg class="h-2.5 w-2.5 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span class="font-semibold whitespace-nowrap">{item}</span>
+              </li>
+            ))}
+          </ul>
 
           {/* A feliratok egysorosak (`whitespace-nowrap`), ezért a két gomb egymás
               mellett ~500px-et kér. Az `lg` sávban a hasáb ennél szűkebb (a fél
@@ -294,25 +315,6 @@ const breadcrumbSchema = {
           <p class="mt-3 text-sm text-[#6f676e]">
             Az online bőranalízis kb. 3 perc, és ingyenes.
           </p>
-
-          {/* Ár-tudnivalók listaként. A doboz középre zárt, de a tételek balra
-              igazítva olvashatóbbak, mint egy középre zárt lista. */}
-          <ul class="mt-8 inline-flex flex-col gap-2.5 text-left">
-            {[
-              `${DURATION_MIN} perc`,
-              `${PRICE.toLocaleString('hu-HU')} Ft`,
-              'Levonjuk a kezelésed árából',
-            ].map((item) => (
-              <li class="flex items-center gap-2.5 text-[#334155]">
-                <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#c53f75]/10">
-                  <svg class="h-3 w-3 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </span>
-                <span class="font-semibold">{item}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </div>
@@ -351,8 +353,8 @@ const breadcrumbSchema = {
     </h2>
     <div class="grid sm:grid-cols-3 gap-5">
       {[
-        { t: 'Felmérjük a bőröd állapotát', d: 'Professzionális bőranalizáló készülékkel, több megvilágításban — érintés nélkül.' },
-        { t: 'Megnézzük a problémás területeket', d: 'Pigmentfolt, gyulladás, pórusok, ráncok, hidratáltság — zónánként.' },
+        { t: 'Felmérjük a bőröd állapotát', d: 'Professzionális bőranalizáló készülékkel, több megvilágításban - érintés nélkül.' },
+        { t: 'Megnézzük a problémás területeket', d: 'Pigmentfolt, gyulladás, pórusok, ráncok, hidratáltság - zónánként.' },
         { t: 'Tervet kapsz, nem tanácsot', d: 'Személyre szabott kezeléssorozat, otthoni arcápolási javaslattal kiegészítve.' },
       ].map((item) => (
         <div class="rounded-2xl border border-[#e7d8df] bg-white p-6">
@@ -378,7 +380,7 @@ const breadcrumbSchema = {
           </h2>
           <p class="text-[#334155] leading-relaxed mb-4">
             A bőrdiagnosztika egy rövid, de alapos vizsgálat, ami során professzionális
-            készülékkel nézzük meg a bőröd valós állapotát — azt is, amit puszta szemmel nem
+            készülékkel nézzük meg a bőröd valós állapotát - azt is, amit puszta szemmel nem
             lehet észrevenni.
           </p>
           <p class="text-[#334155] leading-relaxed mb-4">
@@ -394,7 +396,7 @@ const breadcrumbSchema = {
               rel="noopener"
               class="text-[#c53f75] font-semibold hover:underline">Skinlab Hungary</a
             > forgalmaz. A készülék több megvilágításban fényképezi az arcot, és mesterséges
-            intelligenciával elemzi ki a felvételeket — így a felszín alatti elváltozások is
+            intelligenciával elemzi ki a felvételeket - így a felszín alatti elváltozások is
             láthatóvá válnak.
           </p>
         </div>
@@ -428,11 +430,11 @@ const breadcrumbSchema = {
       <div class="mt-10 max-w-3xl mx-auto">
         <ContentImage
           src={kepernyoImg}
-          alt="A bőranalízis eredménye a készülék képernyőjén – ránctérkép az arcon"
+          alt="A bőranalízis eredménye a készülék képernyőjén - ránctérkép az arcon"
           class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2]"
         />
         <p class="mt-3 text-sm text-[#6f676e] text-center italic">
-          Az elemzés eredményét együtt nézzük végig a képernyőn — így te is látod, amit mi.
+          Az elemzés eredményét együtt nézzük végig a képernyőn - így te is látod, amit mi.
         </p>
       </div>
     </div>
@@ -462,7 +464,7 @@ const breadcrumbSchema = {
         Így néz ki nálunk a folyamat
       </h2>
       <p class="text-[#334155] text-center mb-10 max-w-2xl mx-auto">
-        Hatvan perc, hat lépés — a beszélgetéstől a kezedbe adott tervig.
+        Hatvan perc, hat lépés - a beszélgetéstől a kezedbe adott tervig.
       </p>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -497,7 +499,7 @@ const breadcrumbSchema = {
         <h3 class="font-heading text-xl text-[#1e293b] mb-2">A kezelés nem ér véget a szalonban</h3>
         <p class="text-[#334155] leading-relaxed">
           Minden alkalommal figyelemmel kísérjük a bőröd állapotát, és ha szükséges, módosítjuk a
-          kezelési tervet — mert a bőr folyamatosan változik, és a kezelésednek követnie kell ezt.
+          kezelési tervet - mert a bőr folyamatosan változik, és a kezelésednek követnie kell ezt.
           Nyáron teljesen másra lehet szüksége, mint télen.
         </p>
       </div>
@@ -515,7 +517,7 @@ const breadcrumbSchema = {
     </p>
     <YouTubeFacade
       videoId="gqDfrUfJF20"
-      title="Interjú Kónya Fannival – Beautyflow"
+      title="Interjú Kónya Fannival - Beautyflow"
       class="rounded-2xl"
     />
   </section>
@@ -527,7 +529,7 @@ const breadcrumbSchema = {
         Diagnózis → terv → eredmény
       </h2>
       <p class="text-[#334155] leading-relaxed mb-2">
-        A bőrdiagnosztika önmagában nem kezelés — de ez az a lépés, amitől a rá épülő
+        A bőrdiagnosztika önmagában nem kezelés - de ez az a lépés, amitől a rá épülő
         kezeléssorozat célzott lesz ahelyett, hogy próbálgatnánk. Az alábbi vendégünknél a
         felmérés után összeállított terv szerint haladtunk.
       </p>
@@ -544,16 +546,16 @@ const breadcrumbSchema = {
     <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
       <div>
         <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-4">
-          Otthoni arcápolás — koreai prémium termékekkel
+          Otthoni arcápolás - koreai prémium termékekkel
         </h2>
         <p class="text-[#334155] leading-relaxed mb-4">
-          A szalonban töltött 60 perc a bőröd életének töredéke — a többit otthon te csinálod.
+          A szalonban töltött 60 perc a bőröd életének töredéke - a többit otthon te csinálod.
           Ezért a diagnózis végén összeállítunk neked egy otthoni rutint a
           <strong>KRX koreai prémium termékcsaládból</strong>: csak azokkal a termékekkel, amikre
           a bőrödnek valóban szüksége van.
         </p>
         <p class="text-[#334155] leading-relaxed">
-          Nincs szükséged száz termékre — csak azokra, amik a te bőrödhöz valók. A javasolt
+          Nincs szükséged száz termékre - csak azokra, amik a te bőrödhöz valók. A javasolt
           termékeket a helyszínen meg is vásárolhatod, de semmi nem kötelező.
         </p>
       </div>
@@ -578,7 +580,7 @@ const breadcrumbSchema = {
     <div class="mt-8 max-w-3xl mx-auto">
       <ContentImage
         src={krxTermekek2Img}
-        alt="KRX arcápolási termékek – peel és feszesítő készlet a Beautyflow szalonban"
+        alt="KRX arcápolási termékek - peel és feszesítő készlet a Beautyflow szalonban"
         class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2] bg-white"
       />
     </div>
@@ -598,7 +600,7 @@ const breadcrumbSchema = {
           <span class="font-heading text-4xl">{PRICE.toLocaleString('hu-HU')} Ft</span>
         </div>
         <p class="text-white/90 leading-relaxed max-w-md mx-auto mb-7">
-          A teljes összeget <strong>levonjuk az első kezelésed árából</strong> — így ha nálunk
+          A teljes összeget <strong>levonjuk az első kezelésed árából</strong> - így ha nálunk
           folytatod, a diagnosztika gyakorlatilag ingyen van.
         </p>
         <a
@@ -619,7 +621,7 @@ const breadcrumbSchema = {
       <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6">
         <h3 class="font-heading text-lg text-[#1e293b] mb-2 text-center">Hol érhető el?</h3>
         <p class="text-[#334155] leading-relaxed text-center mb-5">
-          Mindkét szalonunkban — válaszd azt, amelyik közelebb esik hozzád.
+          Mindkét szalonunkban - válaszd azt, amelyik közelebb esik hozzád.
         </p>
         <div class="grid sm:grid-cols-2 gap-4">
           {SALONS.map((s) => (
@@ -660,7 +662,7 @@ const breadcrumbSchema = {
         Kezdd az ingyenes online bőranalízissel
       </h2>
       <p class="text-[#334155] leading-relaxed max-w-2xl mx-auto mb-6">
-        Kb. 3 perc, néhány kérdés a bőröd viselkedéséről — a végén megkapod a
+        Kb. 3 perc, néhány kérdés a bőröd viselkedéséről - a végén megkapod a
         <a href="/bortipus" class="text-[#c53f75] font-semibold hover:underline">bőrtípusodat</a>
         a 16 lehetséges közül, otthoni alapelvekkel és iránnyal. Ingyenes, és jó belépő a
         személyes bőrdiagnosztikához.
