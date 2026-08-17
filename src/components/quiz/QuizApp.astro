@@ -69,7 +69,11 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
   {/* ---- Kérdés-lépések ---- */}
   {allQuestions.map((q, i) => {
     const meta = flat[i];
-    const isPicture = q.pictureCards === true;
+    // A képes kártya-elrendezés CSAK akkor kapcsol be, ha van is mit mutatni.
+    // Illusztráció nélkül a `pictureCards: true` nagy, üres rózsaszín négyzeteket
+    // adott, ami elütött a többi kérdés listás stílusától. Amint az opciókhoz
+    // bekerül az `image`, magától visszaáll a képes rács.
+    const isPicture = q.pictureCards === true && q.options.some((o) => o.image);
     return (
       <section
         class="quiz-step hidden"
@@ -113,8 +117,12 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
                 data-exclusive={opt.exclusive ? 'true' : undefined}
               />
               {q.type === 'checkbox' && (
+                /* `quiz-check` — a pipa-négyzet HORGONYA. A lenti CSS csak erre
+                   festhet hátteret; korábban `:checked ~ span` volt, ami a
+                   címkeszöveg <span>-jére is illeszkedett, és a bejelölt opció
+                   szövege sötét betűvel, rózsaszín háttéren olvashatatlan lett. */
                 <span
-                  class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 border-gray-300 text-white peer-checked:border-[#c53f75] peer-checked:bg-[#c53f75]"
+                  class="quiz-check flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 border-gray-300 text-white peer-checked:border-[#c53f75] peer-checked:bg-[#c53f75]"
                   aria-hidden="true"
                 >
                   <svg class="hidden h-3 w-3 peer-checked:block" viewBox="0 0 12 10" fill="none">
@@ -583,8 +591,10 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     border-color: #c53f75;
     background-color: rgba(197, 63, 117, 0.06);
   }
-  .quiz-card input[type="checkbox"]:checked ~ span svg { display: block; }
-  .quiz-card input[type="checkbox"]:checked ~ span {
+  /* CSAK a pipa-négyzet (.quiz-check) — semmiképp nem az általános `span`,
+     mert az a címkeszöveget is befestené (lásd a fenti megjegyzést). */
+  .quiz-card input[type="checkbox"]:checked ~ .quiz-check svg { display: block; }
+  .quiz-card input[type="checkbox"]:checked ~ .quiz-check {
     border-color: #c53f75;
     background-color: #c53f75;
   }
