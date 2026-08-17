@@ -291,7 +291,7 @@ async function sendSalonEmail(
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Baumann-bőrtípus</td><td style="padding:6px 8px;border-bottom:1px solid #eee;"><strong>${escapeHtml(baumann.code)}</strong> — ${escapeHtml(baumannByCode[baumann.code]?.displayName || '')}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Bőrprofil</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.profile.label)}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Javasolt irány</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(treatmentsLine(rec))}</td></tr>
-    <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Becsült ársáv</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.arSav?.formatted || '—')}</td></tr>
+    <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Kezelés ára</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.arSav?.formatted || '—')}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Útvonal</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${escapeHtml(rec.utvonal)}${rec.safe ? '' : ' (biztonsági felülbírálás)'}</td></tr>
     <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold;">Hírlevél</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${data.consentMarketing ? '✅ feliratkozott' : '— nem'}</td></tr>
   </table>
@@ -329,7 +329,7 @@ async function sendUserEmail(resend: Resend, data: QuizData, rec: Recommendation
   <p>Köszönjük, hogy kitöltötted a Beautyflow ingyenes online bőranalízisét. Íme a személyre szabott bőrprofilod:</p>
   <p style="background:#fdf2f8;border-radius:10px;padding:14px;font-size:16px;"><strong>A bőröd profilja:</strong> ${escapeHtml(rec.profile.label)}</p>
   ${direction}
-  ${rec.arSav ? `<p style="font-size:14px;color:#666;">Becsült ársáv: <strong>${escapeHtml(rec.arSav.formatted)}</strong> (tájékoztató jellegű).</p>` : ''}
+  ${rec.arSav ? `<p style="font-size:14px;color:#666;">A kezelés ára: <strong>${escapeHtml(rec.arSav.formatted)}</strong> (az érvényes árlista szerint).</p>` : ''}
   <p style="font-size:13px;color:#666;background:#f8f8f8;border-left:3px solid #c53f75;padding:10px 12px;">
     A pontos kezelési tervet csak személyesen, fényben és tapintással végzett vizsgálat után tudjuk megadni.
     Ez az eredmény kozmetikai konzultációs irány, nem orvosi diagnózis.
@@ -337,8 +337,9 @@ async function sendUserEmail(resend: Resend, data: QuizData, rec: Recommendation
   <p style="text-align:center;margin:22px 0;">
     <a href="${escapeHtml(resultUrl)}" style="display:inline-block;background:#c53f75;color:#fff;text-decoration:none;padding:12px 26px;border-radius:999px;font-weight:bold;">Megnézem a részletes eredményem</a>
   </p>
-  <h3 style="color:#c53f75;">A következő lépés: 5 000 Ft-os szakmai bőranalízis</h3>
-  <p style="font-size:14px;">Egy alapos, személyes bőranalízissel folytatjuk a szalonban. Az 5 000 Ft <strong>teljes egészében levásárolható</strong>, ha nálunk folytatod a kezelést. Hamarosan vissza is hívunk a megadott elérhetőségen.</p>
+  <h3 style="color:#c53f75;">A következő lépés: bőrdiagnosztika</h3>
+  <p style="font-size:14px;">A szalonban géppel felmérjük a bőröd valós állapotát, és személyre szabott kezelési tervet kapsz, otthoni termékajánlóval. 60 perc, 10 000 Ft — amit <strong>levonunk az első kezelésed árából</strong>, így ha nálunk folytatod, gyakorlatilag ingyen van. Kizárólag a Beautyflow Pest szalonban. Hamarosan vissza is hívunk a megadott elérhetőségen.</p>
+  <p style="text-align:center;margin:18px 0;"><a href="https://beautyflow.pro/bordiagnosztika" style="display:inline-block;background:#c53f75;color:#fff;text-decoration:none;padding:12px 26px;border-radius:999px;font-weight:bold;">Kérem a bőrdiagnosztikát</a></p>
   <p style="margin-top:18px;">Sürgős esetben hívj minket: <a href="tel:+3613009414" style="color:#c53f75;">${PHONE}</a></p>
   <p style="margin-top:20px;">Szeretettel,<br><strong>Kónya Fanni</strong><br><span style="color:#c53f75;">a Beautyflow alapítója</span></p>
 </body></html>`.trim();
@@ -373,7 +374,7 @@ async function writeToSheet(
     salonLabel(salon),                                  // F szalon
     rec.profile.label,                                  // G bőrprofil
     treatmentsLine(rec),                                // H javasolt irány
-    rec.arSav?.formatted || '',                         // I becsült ársáv
+    rec.arSav?.formatted || '',                         // I kezelés ára
     rec.utvonal + (rec.safe ? '' : ' (felülbírálva)'),  // J útvonal
     rec.flags.join(' | '),                              // K kozmetikus flagek
     answerText('fo-panasz', data.answers['fo-panasz'] || ''),     // L fő panasz

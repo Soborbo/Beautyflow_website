@@ -1,0 +1,548 @@
+---
+/**
+ * /en/skin-diagnostics — the English mirror of /bordiagnosztika.
+ *
+ * Kept structurally identical to the Hungarian page so the two stay easy to
+ * diff. Same funnel: warm traffic books, cold traffic goes to the free online
+ * skin analysis quiz (Hungarian-only for now — the quiz itself is not
+ * translated, so we link it as a clearly-labelled Hungarian resource).
+ *
+ * Location: Beautyflow Pest ONLY — the analyser device lives there.
+ */
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import YouTubeFacade from '../../components/YouTubeFacade.astro';
+import { HeroImage, ContentImage, CardImage } from '../../components/images';
+
+import heroImg from '../../assets/images/bordiagnosztika/bordiagnosztika-konzultacio-beautyflow.jpg';
+import gepImg from '../../assets/images/bordiagnosztika/skitenic-ai-boranalizis-keszulek.jpg';
+import kepernyoImg from '../../assets/images/bordiagnosztika/ai-borelemzes-eredmeny-kepernyo.jpg';
+import szkennelesImg from '../../assets/images/bordiagnosztika/bordiagnosztika-arcszkenneles.jpg';
+import kiertekelesImg from '../../assets/images/bordiagnosztika/bordiagnosztika-kiertekeles.jpg';
+import termekAtadasImg from '../../assets/images/bordiagnosztika/otthoni-arcapolas-atadas.jpg';
+import krxTermekekImg from '../../assets/images/bordiagnosztika/krx-koreai-termekcsalad.jpg';
+import krxTermekek2Img from '../../assets/images/bordiagnosztika/krx-termekek-beautyflow.jpg';
+
+const url = 'https://beautyflow.pro/en/skin-diagnostics';
+const PRICE = 10000;
+const DURATION_MIN = 60;
+
+const CTA_HREF = '/en/free-consultation?kezeles=bordiagnosztika';
+const NOTINO_PEST =
+  'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom';
+
+// TODO(skinlab): swap to the exact Skitenic product URL once it goes live:
+// /anti-aging/skitenic-ai-mesterseges-intelligencia-boranalizis-keszulek-821
+const SKINLAB_URL = 'https://skinlabhungary.hu/anti-aging/';
+
+const analysisPoints = [
+  { title: 'Sebum production', desc: 'Where your skin gets oily and where it dries out — zone by zone, not by guesswork.' },
+  { title: 'Hydration', desc: 'Dehydrated skin is not the same as dry skin — the scan separates the two.' },
+  { title: 'Pores', desc: 'Size and congestion across the T-zone and along the jawline.' },
+  { title: 'Pigmentation', desc: 'Including the spots sitting below the surface that you cannot see yet.' },
+  { title: 'Wrinkles', desc: 'A map of fine lines and expression lines, graded by depth.' },
+  { title: 'Acne-prone areas', desc: 'The zones inclined to inflammation — before a breakout appears.' },
+  { title: 'Skin tone evenness', desc: 'Redness, discolouration and how uneven your tone actually is.' },
+  { title: 'Sensitivity', desc: 'How reactive your skin is — this decides how strong an active it can take.' },
+];
+
+const whoIsItFor = [
+  'You have never been to us and do not know where your skincare should start.',
+  'You have worked through a lot of products but see no real results.',
+  'You have recurring problems — breakouts, redness, pigmentation — and want to know what is behind them.',
+  'You want an effective, personalised skincare plan rather than a one-off treatment.',
+  'You want to prevent wrinkles and keep healthy-looking skin every day.',
+];
+
+const process = [
+  { n: '1', title: 'Conversation', desc: 'You tell us what bothers you about your skin and what your goals are. Everything that follows is framed by this.' },
+  { n: '2', title: 'Facial scan', desc: 'The device photographs your face under several light settings and analyses the condition of your skin — including the deeper layers.' },
+  { n: '3', title: 'Read-out', desc: 'We go through the results on screen together, in plain language — no scare tactics, no jargon.' },
+  { n: '4', title: 'Treatment plan', desc: 'We put together the treatment series that suits your skin: what we start with, what follows, and at what pace.' },
+  { n: '5', title: 'Home routine', desc: 'You get a personalised home care recommendation from the KRX Korean premium range, available to buy on site.' },
+  { n: '6', title: 'Follow-up', desc: 'At every following treatment we track how your skin responds and fine-tune the plan if needed.' },
+];
+
+const krxCategories = [
+  { title: 'Cleansing', desc: 'The base of the routine: a cleanser and exfoliant matched to your sebum production — it will not strip your skin, and it will not leave it congested.' },
+  { title: 'Hydration', desc: 'Soothing, barrier-supporting serums and creams. We treat dehydrated and genuinely dry skin differently, because the answer is different.' },
+  { title: 'Blemish & pigmentation', desc: 'Targeted actives for inflammation-prone zones and the marks they leave behind, dosed to what your skin tolerates.' },
+];
+
+const faq = [
+  { q: 'How much does the skin diagnostics cost?', a: 'It is 10,000 HUF and takes 60 minutes. We deduct the full amount from the price of your first treatment, so if you continue with us it is effectively free.' },
+  { q: 'Is the examination painful or uncomfortable?', a: 'Not at all. The facial scan is contact-free: you sit in front of the device for a few seconds while it photographs your face under several light settings. Nothing is applied to your skin.' },
+  { q: 'Which salon offers it?', a: 'Only our Beautyflow Pest salon (Reitter Ferenc utca 90., 1135 Budapest, District XIII), because the skin analysis device is located there.' },
+  { q: 'Can I come wearing make-up?', a: 'An accurate reading needs a clean face. If you arrive with make-up on it is not a problem — we cleanse your face before the scan, just allow a few extra minutes.' },
+  { q: 'What do I take home from the appointment?', a: 'A detailed read-out of your skin condition, a treatment plan built for you, and a home skincare recommendation with specific products. You can buy the products on site, but nothing is obligatory.' },
+  { q: 'Does it replace a dermatological examination?', a: 'No. Skin diagnostics is a cosmetic assessment, not a medical diagnosis. For severe inflammation or a persistent skin condition we recommend seeing a dermatologist — or a gastroenterologist if the symptoms may have a digestive cause.' },
+];
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${url}#service`,
+  name: 'Skin Diagnostics',
+  serviceType: 'Skin analysis',
+  description:
+    'Professional device-based skin diagnostics at the Beautyflow Pest salon in Budapest. The facial scan assesses sebum, hydration, pores, pigmentation, wrinkles and sensitivity, and produces a personalised treatment plan plus a home care recommendation.',
+  url,
+  provider: {
+    '@type': 'BeautySalon',
+    name: 'Beautyflow Pest',
+    telephone: '+36 1 300 9414',
+    email: 'info@beautyflow.pro',
+    url: 'https://beautyflow.pro/en/beautyflow-pest',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Reitter Ferenc utca 90.',
+      addressLocality: 'Budapest',
+      addressRegion: 'District XIII',
+      postalCode: '1135',
+      addressCountry: 'HU',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: '47.5287', longitude: '19.0512' },
+  },
+  areaServed: [{ '@type': 'City', name: 'Budapest' }],
+  offers: {
+    '@type': 'Offer',
+    price: String(PRICE),
+    priceCurrency: 'HUF',
+    availability: 'https://schema.org/InStock',
+    url,
+    description: 'The fee is deducted from the price of your first treatment.',
+  },
+  inLanguage: 'en',
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://beautyflow.pro/en' },
+    { '@type': 'ListItem', position: 2, name: 'Skin Diagnostics', item: url },
+  ],
+};
+---
+
+<Layout
+  title="Skin Diagnostics Budapest – Device Skin Analysis with Treatment Plan | Beautyflow"
+  description="Stop guessing: professional device-based skin diagnostics at Beautyflow Pest, Budapest. 60 minutes, 10,000 HUF — deducted from your first treatment. Personalised treatment plan and home care recommendation."
+  lang="en"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- ================= HERO ================= -->
+  <section class="relative">
+    <div class="absolute inset-0">
+      <HeroImage
+        src={heroImg}
+        alt="Skin diagnostics at Beautyflow Pest – the beautician shows the skin analysis results to the client"
+        priority={true}
+        class="h-full w-full object-cover"
+      />
+      {/* Two-layer scrim: on the hero photo the bright tablet screen sits right
+          behind the H1, so the directional gradient alone is not enough. */}
+      <div class="absolute inset-0 bg-black/35"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-transparent"></div>
+    </div>
+
+    <div class="relative max-w-[1200px] mx-auto px-5 sm:px-6 py-16 sm:py-24 lg:py-28">
+      <div class="max-w-2xl text-white">
+        <p class="text-sm font-semibold uppercase tracking-wider text-[#f0a8c4] mb-3">
+          Beautyflow Pest · District XIII
+        </p>
+        <h1 class="font-heading text-white text-3xl sm:text-4xl lg:text-5xl leading-tight mb-5">
+          Stop guessing — find out what your skin actually needs
+        </h1>
+        <p class="text-lg text-white/90 leading-relaxed mb-4">
+          Before you buy your hundredth skincare product or try yet another treatment on
+          problem skin, it is worth finding the root of the problem.
+        </p>
+        <p class="text-lg text-white/90 leading-relaxed mb-7">
+          We introduced skin diagnostics to reveal what cannot be seen with the naked eye — so
+          that from here on it is a plan, not guesswork.
+        </p>
+
+        <div class="flex flex-wrap gap-2.5 mb-8">
+          <span class="rounded-full bg-white/15 backdrop-blur px-4 py-2 text-sm font-semibold border border-white/25">
+            {DURATION_MIN} minutes
+          </span>
+          <span class="rounded-full bg-white/15 backdrop-blur px-4 py-2 text-sm font-semibold border border-white/25">
+            {PRICE.toLocaleString('en-US')} HUF
+          </span>
+          <span class="rounded-full bg-[#c53f75] px-4 py-2 text-sm font-semibold">
+            ✓ Deducted from your treatment
+          </span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a
+            href={CTA_HREF}
+            data-track="booking_click"
+            data-source="skin_diagnostics_hero"
+            class="inline-block text-center px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+          >
+            Book an appointment
+          </a>
+          <a
+            href="tel:+3613009414"
+            class="inline-block text-center px-8 py-4 border-2 border-white/70 text-white font-semibold uppercase tracking-wide rounded-full hover:bg-white/10 transition-colors"
+          >
+            Call +36 1 300 9414
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TRUST BAR ================= -->
+  <section class="bg-[#fff9f7] border-b border-[#e7d8df]">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-6 py-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 text-center">
+        <div>
+          <div class="flex items-center justify-center gap-1 mb-1">
+            {[1, 2, 3, 4, 5].map(() => (
+              <svg class="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+          <p class="text-sm text-[#334155]">5.0 rating · from real clients</p>
+        </div>
+        <div>
+          <p class="font-heading text-lg text-[#c53f75]">Fanni Kónya</p>
+          <p class="text-sm text-[#334155]">beautician, professional lead</p>
+        </div>
+        <div>
+          <p class="font-heading text-lg text-[#c53f75]">Specialised in Korean treatments</p>
+          <p class="text-sm text-[#334155]">since 2015</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WHAT TO EXPECT ================= -->
+  <section class="max-w-[1000px] mx-auto px-5 sm:px-6 py-14 sm:py-16">
+    <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-7 text-center">
+      What to expect
+    </h2>
+    <div class="grid sm:grid-cols-3 gap-5">
+      {[
+        { t: 'We assess your skin', d: 'With a professional skin analysis device, under several light settings — contact-free.' },
+        { t: 'We look at the problem areas', d: 'Pigmentation, inflammation, pores, wrinkles, hydration — zone by zone.' },
+        { t: 'You get a plan, not advice', d: 'A personalised treatment series, complete with a home skincare recommendation.' },
+      ].map((item) => (
+        <div class="rounded-2xl border border-[#e7d8df] bg-white p-6">
+          <div class="w-10 h-10 rounded-full bg-[#c53f75]/10 flex items-center justify-center mb-3">
+            <svg class="w-5 h-5 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="font-heading text-lg text-[#1e293b] mb-2">{item.t}</h3>
+          <p class="text-[#334155] leading-relaxed text-[15px]">{item.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ================= WHAT IS IT + DEVICE ================= -->
+  <section class="bg-[#faf7f8] py-14 sm:py-18">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-6">
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        <div>
+          <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-4">
+            What is skin diagnostics?
+          </h2>
+          <p class="text-[#334155] leading-relaxed mb-4">
+            Skin diagnostics is a short but thorough examination in which we look at the real
+            condition of your skin with a professional device — including what cannot be seen
+            with the naked eye.
+          </p>
+          <p class="text-[#334155] leading-relaxed mb-4">
+            <strong>This is not an ordinary consultation.</strong> It is the point that
+            establishes your treatment series and your products. We only recommend a treatment or
+            a product once we know exactly what your skin needs.
+          </p>
+          <p class="text-[#334155] leading-relaxed">
+            We use the <strong>Skitenic AI skin analysis device</strong>, distributed by
+            <a href={SKINLAB_URL} target="_blank" rel="noopener" class="text-[#c53f75] font-semibold hover:underline">Skinlab Hungary</a>.
+            It photographs the face under several light settings and analyses the images with
+            artificial intelligence, so changes below the surface become visible too.
+          </p>
+        </div>
+        <div>
+          <ContentImage
+            src={gepImg}
+            alt="Skitenic AI skin analysis device at the Beautyflow Pest salon"
+            class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2]"
+          />
+        </div>
+      </div>
+
+      <div class="mt-12">
+        <h3 class="font-heading text-xl sm:text-2xl text-[#1e293b] mb-2 text-center">
+          What does the device measure?
+        </h3>
+        <p class="text-[#334155] text-center mb-7 max-w-2xl mx-auto">
+          It does not give a general impression — it breaks your skin condition down point by point:
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {analysisPoints.map((p) => (
+            <div class="rounded-xl border border-[#e7d8df] bg-white p-5">
+              <h4 class="font-heading text-base text-[#c53f75] mb-1.5">{p.title}</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-10 max-w-3xl mx-auto">
+        <ContentImage
+          src={kepernyoImg}
+          alt="Skin analysis results on the device screen – a wrinkle map of the face"
+          class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2]"
+        />
+        <p class="mt-3 text-sm text-[#6f676e] text-center italic">
+          We review the results on screen together — so you see exactly what we see.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WHO IS IT FOR ================= -->
+  <section class="max-w-[900px] mx-auto px-5 sm:px-6 py-14 sm:py-16">
+    <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-6">Who is it for?</h2>
+    <ul class="space-y-3.5">
+      {whoIsItFor.map((item) => (
+        <li class="flex gap-3 items-start">
+          <span class="flex-shrink-0 w-6 h-6 rounded-full bg-[#c53f75]/10 flex items-center justify-center mt-0.5">
+            <svg class="w-3.5 h-3.5 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+          <span class="text-[#334155] leading-relaxed">{item}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- ================= PROCESS ================= -->
+  <section class="bg-[#faf7f8] py-14 sm:py-18">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-6">
+      <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-3 text-center">
+        How the appointment works
+      </h2>
+      <p class="text-[#334155] text-center mb-10 max-w-2xl mx-auto">
+        Sixty minutes, six steps — from the first conversation to the plan in your hands.
+      </p>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {process.map((step) => (
+          <div class="rounded-2xl bg-white border border-[#e7d8df] p-6">
+            <div class="w-9 h-9 rounded-full bg-[#c53f75] text-white font-heading text-lg flex items-center justify-center mb-3">
+              {step.n}
+            </div>
+            <h3 class="font-heading text-lg text-[#1e293b] mb-2">{step.title}</h3>
+            <p class="text-[#334155] leading-relaxed text-[15px]">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-4 mt-8">
+        {[
+          { src: szkennelesImg, alt: 'Facial scanning during the skin diagnostics appointment', cap: 'The scan' },
+          { src: kiertekelesImg, alt: 'Reviewing the skin analysis results together with the client', cap: 'The read-out' },
+          { src: termekAtadasImg, alt: 'The beautician hands the personalised home skincare product to the client', cap: 'The home routine' },
+        ].map((s) => (
+          <figure class="m-0">
+            <CardImage src={s.src} alt={s.alt} class="w-full rounded-xl object-cover aspect-[3/2]" />
+            <figcaption class="mt-2 text-center text-sm font-semibold uppercase tracking-wide text-[#6f676e]">
+              {s.cap}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <div class="mt-10 rounded-2xl bg-white border-l-4 border-[#c53f75] p-6 max-w-3xl mx-auto">
+        <h3 class="font-heading text-xl text-[#1e293b] mb-2">Care does not end at the salon</h3>
+        <p class="text-[#334155] leading-relaxed">
+          At every appointment we keep track of how your skin is doing and adjust the treatment
+          plan if needed — because skin keeps changing, and your treatment has to follow it. What
+          it needs in summer can be entirely different from what it needs in winter.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIDEO ================= -->
+  <section class="max-w-[900px] mx-auto px-5 sm:px-6 py-14 sm:py-16">
+    <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-3 text-center">Meet Fanni</h2>
+    <p class="text-[#334155] text-center mb-7 max-w-2xl mx-auto">
+      On why we start with a diagnosis, and the difference between a one-off treatment and a
+      skincare journey seen through. <span class="italic">(Interview in Hungarian.)</span>
+    </p>
+    <YouTubeFacade
+      videoId="gqDfrUfJF20"
+      title="Interview with Fanni Kónya – Beautyflow"
+      class="rounded-2xl"
+    />
+  </section>
+
+  <!-- ================= HOME ROUTINE / KRX ================= -->
+  <section class="max-w-[1200px] mx-auto px-5 sm:px-6 py-14 sm:py-16">
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+      <div>
+        <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-4">
+          Home skincare — with Korean premium products
+        </h2>
+        <p class="text-[#334155] leading-relaxed mb-4">
+          The 60 minutes you spend at the salon are a fraction of your skin's life — the rest is
+          down to what you do at home. So at the end of the diagnosis we build you a home routine
+          from the <strong>KRX Korean premium range</strong>, using only the products your skin
+          genuinely needs.
+        </p>
+        <p class="text-[#334155] leading-relaxed">
+          You do not need a hundred products — only the ones that suit your skin. You can buy the
+          recommended items on site, but nothing is obligatory.
+        </p>
+      </div>
+      <div>
+        <ContentImage
+          src={krxTermekekImg}
+          alt="KRX Korean premium skincare range at the Beautyflow salon"
+          class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2] bg-white"
+        />
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-5 mt-10">
+      {krxCategories.map((k) => (
+        <div class="rounded-2xl border border-[#e7d8df] bg-[#fff9f7] p-6">
+          <h3 class="font-heading text-lg text-[#c53f75] mb-2">{k.title}</h3>
+          <p class="text-[#334155] leading-relaxed text-[15px]">{k.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-8 max-w-3xl mx-auto">
+      <ContentImage
+        src={krxTermekek2Img}
+        alt="KRX skincare products – peel and firming set at the Beautyflow salon"
+        class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2] bg-white"
+      />
+    </div>
+  </section>
+
+  <!-- ================= PRICE + CTA ================= -->
+  <section class="bg-[#faf7f8] py-14 sm:py-18">
+    <div class="max-w-[720px] mx-auto px-5 sm:px-6">
+      <div class="rounded-3xl bg-gradient-to-br from-[#c53f75] to-[#a33460] text-white p-8 sm:p-10 text-center shadow-xl">
+        <p class="text-sm font-semibold uppercase tracking-wider text-white/80 mb-2">
+          Leave your skin to us
+        </p>
+        <h2 class="font-heading text-white text-3xl sm:text-4xl mb-4">Skin Diagnostics</h2>
+        <div class="flex items-center justify-center gap-4 mb-4">
+          <span class="text-lg text-white/90">{DURATION_MIN} minutes</span>
+          <span class="text-white/40">·</span>
+          <span class="font-heading text-4xl">{PRICE.toLocaleString('en-US')} HUF</span>
+        </div>
+        <p class="text-white/90 leading-relaxed max-w-md mx-auto mb-7">
+          We <strong>deduct the full amount from the price of your first treatment</strong> — so
+          if you continue with us, the diagnostics is effectively free.
+        </p>
+        <a
+          href={CTA_HREF}
+          data-track="booking_click"
+          data-source="skin_diagnostics_pricecard"
+          class="inline-block px-9 py-4 bg-white text-[#c53f75] font-semibold uppercase tracking-wide rounded-full hover:scale-105 transition-transform"
+        >
+          Book an appointment
+        </a>
+        <p class="mt-5 text-sm text-white/80">
+          Or call us:{' '}
+          <a href="tel:+3613009414" class="font-semibold text-white underline">+36 1 300 9414</a>
+        </p>
+      </div>
+
+      <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6 text-center">
+        <h3 class="font-heading text-lg text-[#1e293b] mb-2">Where is it available?</h3>
+        <p class="text-[#334155] leading-relaxed">
+          Skin diagnostics is available exclusively at our <strong>Beautyflow Pest</strong> salon,
+          because the skin analysis device is located there.
+        </p>
+        <p class="mt-2 text-[#334155]">Reitter Ferenc utca 90., 1135 Budapest (District XIII)</p>
+        <div class="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href="/en/beautyflow-pest"
+            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
+          >
+            About the salon
+          </a>
+          <a
+            href={NOTINO_PEST}
+            target="_blank"
+            rel="noopener"
+            data-track="booking_click"
+            data-source="skin_diagnostics_notino_pest"
+            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
+          >
+            Book on Notino
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section class="max-w-[900px] mx-auto px-5 sm:px-6 py-14 sm:py-16">
+    <h2 class="font-heading text-2xl sm:text-3xl text-[#1e293b] mb-6">
+      Frequently asked questions
+    </h2>
+    <div class="space-y-3">
+      {faq.map((f) => (
+        <details class="group rounded-xl border border-[#e7d8df] bg-white p-5 open:bg-[#fff9f7]">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 font-heading text-lg text-[#1e293b] list-none">
+            {f.q}
+            <svg
+              class="w-5 h-5 flex-shrink-0 text-[#c53f75] transition-transform group-open:rotate-180"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <p class="mt-3 text-[#334155] leading-relaxed">{f.a}</p>
+        </details>
+      ))}
+    </div>
+
+    <p class="mt-6 text-sm text-[#6f676e] leading-relaxed">
+      ⚠️ Skin diagnostics is a cosmetic assessment and does not replace a medical diagnosis. For
+      severe inflammation or a persistent skin condition we recommend seeing a dermatologist, or a
+      gastroenterologist if the symptoms may have a digestive cause.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

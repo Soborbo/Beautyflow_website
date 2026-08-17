@@ -71,6 +71,12 @@ export function formatPrice(amount: number): string {
   );
 }
 
+/**
+ * Ársáv formázása. A kezeléseknek 2026-09-01 óta FIX áruk van (nem sáv), ezért
+ * min === max esetén egyetlen árat írunk ki — a „30 000 – 30 000 Ft" hibásnak
+ * látszana a vendég-emailben és az eredményoldalon.
+ */
 export function formatPriceRange(min: number, max: number): string {
+  if (min === max) return formatPrice(min);
   return `${formatPrice(min)} – ${formatPrice(max)}`;
 }

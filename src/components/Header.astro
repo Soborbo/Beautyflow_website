@@ -17,6 +17,9 @@ const menuItems: Record<Locale, MenuItem[]> = {
   hu: [
     { label: 'Főoldal', href: '/' },
     { label: 'Rólunk', href: '/rolunk' },
+    // Saját menüpont, szándékosan legördülő NÉLKÜL: a bőrdiagnosztika a funnel
+    // kereskedelmi belépője, nem szabad beleolvadnia a Kezelések listájába.
+    { label: 'Bőrdiagnosztika', href: '/bordiagnosztika' },
     {
       label: 'Kezelések',
       href: '#',
@@ -53,6 +56,7 @@ const menuItems: Record<Locale, MenuItem[]> = {
   en: [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
+    { label: 'Skin Diagnostics', href: '/skin-diagnostics' },
     {
       label: 'Treatments',
       href: '#',

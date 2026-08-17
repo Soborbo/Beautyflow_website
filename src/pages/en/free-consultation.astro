@@ -15,11 +15,15 @@ import sminkImg from '../../assets/images/sminktetovalas-budapest-beautyflow.jpg
 import carbonImg from '../../assets/images/carbon-peeling-lezeres.jpg';
 import tetovalasImg from '../../assets/images/tetovalas-eltavolitas-budapest.jpg';
 import pigmentImg from '../../assets/images/pigmentfolt-eltavoitas.webp';
+import bordiagImg from '../../assets/images/bordiagnosztika/skitenic-ai-boranalizis-keszulek.jpg';
 import googleLogo from '../../assets/images/google-logo.jpg';
 
 // Optimize images - 1x and 2x for retina displays, webp for broad support
 // Card size is ~150-200px on mobile, ~180px on desktop, so 200px 1x + 400px 2x covers all cases
 const treatmentImages = await Promise.all([
+  // First card: /en/skin-diagnostics links here with `?kezeles=bordiagnosztika`,
+  // which pre-selects it.
+  { id: 'bordiagnosztika', name: 'Skin Diagnostics (Pest)', src: bordiagImg },
   { id: 'lezer', name: 'Diode Laser Hair Removal', src: lezeresImg },
   { id: 'hydra', name: 'HydraBeauty Facial Treatment', src: hydraImg },
   { id: 'smink', name: 'Permanent Makeup', src: sminkImg },
@@ -672,6 +676,18 @@ const breadcrumbSchema = {
             }
           });
         });
+
+        // Pre-selection from the `?kezeles=` param so the skin-diagnostics
+        // landing CTAs do not drop the visitor back to step zero. Only an
+        // existing card is accepted, so the value set stays closed.
+        const preselect = new URLSearchParams(window.location.search).get('kezeles');
+        if (preselect) {
+          const match = Array.from(treatmentCheckboxes).find((cb) => cb.value === preselect);
+          if (match) {
+            match.checked = true;
+            match.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
 
         btnStep1.addEventListener('click', () => {
           if (formData.treatments.length > 0) {
