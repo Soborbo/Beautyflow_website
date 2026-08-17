@@ -7,7 +7,7 @@
  * skin analysis quiz (Hungarian-only for now — the quiz itself is not
  * translated, so we link it as a clearly-labelled Hungarian resource).
  *
- * Location: Beautyflow Pest ONLY — the analyser device lives there.
+ * Location: BOTH salons (Buda and Pest) — the analyser is available at each.
  */
 export const prerender = true;
 
@@ -29,8 +29,27 @@ const PRICE = 10000;
 const DURATION_MIN = 60;
 
 const CTA_HREF = '/en/free-consultation?kezeles=bordiagnosztika';
-const NOTINO_PEST =
-  'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom';
+
+// Skin diagnostics is available at BOTH salons — the client picks whichever is
+// closer. Notino links follow the same parameterisation as the Header.
+const SALONS = [
+  {
+    id: 'buda',
+    name: 'Beautyflow Buda',
+    address: 'Vegyész utca 1., 1116 Budapest (District XI)',
+    page: '/en/beautyflow-buda',
+    notino:
+      'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
+  },
+  {
+    id: 'pest',
+    name: 'Beautyflow Pest',
+    address: 'Reitter Ferenc utca 90., 1135 Budapest (District XIII)',
+    page: '/en/beautyflow-pest',
+    notino:
+      'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
+  },
+];
 
 // TODO(skinlab): swap to the exact Skitenic product URL once it goes live:
 // /anti-aging/skitenic-ai-mesterseges-intelligencia-boranalizis-keszulek-821
@@ -73,7 +92,7 @@ const krxCategories = [
 const faq = [
   { q: 'How much does the skin diagnostics cost?', a: 'It is 10,000 HUF and takes 60 minutes. We deduct the full amount from the price of your first treatment, so if you continue with us it is effectively free.' },
   { q: 'Is the examination painful or uncomfortable?', a: 'Not at all. The facial scan is contact-free: you sit in front of the device for a few seconds while it photographs your face under several light settings. Nothing is applied to your skin.' },
-  { q: 'Which salon offers it?', a: 'Only our Beautyflow Pest salon (Reitter Ferenc utca 90., 1135 Budapest, District XIII), because the skin analysis device is located there.' },
+  { q: 'Which salon offers it?', a: 'Both of our salons: Beautyflow Buda (Vegyész utca 1., 1116 Budapest) and Beautyflow Pest (Reitter Ferenc utca 90., 1135 Budapest). Pick whichever is closer to you when you book.' },
   { q: 'Can I come wearing make-up?', a: 'An accurate reading needs a clean face. If you arrive with make-up on it is not a problem — we cleanse your face before the scan, just allow a few extra minutes.' },
   { q: 'What do I take home from the appointment?', a: 'A detailed read-out of your skin condition, a treatment plan built for you, and a home skincare recommendation with specific products. You can buy the products on site, but nothing is obligatory.' },
   { q: 'Does it replace a dermatological examination?', a: 'No. Skin diagnostics is a cosmetic assessment, not a medical diagnosis. For severe inflammation or a persistent skin condition we recommend seeing a dermatologist — or a gastroenterologist if the symptoms may have a digestive cause.' },
@@ -86,24 +105,41 @@ const serviceSchema = {
   name: 'Skin Diagnostics',
   serviceType: 'Skin analysis',
   description:
-    'Professional device-based skin diagnostics at the Beautyflow Pest salon in Budapest. The facial scan assesses sebum, hydration, pores, pigmentation, wrinkles and sensitivity, and produces a personalised treatment plan plus a home care recommendation.',
+    'Professional device-based skin diagnostics at the Beautyflow salons in Budapest (Buda and Pest). The facial scan assesses sebum, hydration, pores, pigmentation, wrinkles and sensitivity, and produces a personalised treatment plan plus a home care recommendation.',
   url,
-  provider: {
-    '@type': 'BeautySalon',
-    name: 'Beautyflow Pest',
-    telephone: '+36 1 300 9414',
-    email: 'info@beautyflow.pro',
-    url: 'https://beautyflow.pro/en/beautyflow-pest',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Reitter Ferenc utca 90.',
-      addressLocality: 'Budapest',
-      addressRegion: 'District XIII',
-      postalCode: '1135',
-      addressCountry: 'HU',
+  provider: [
+    {
+      '@type': 'BeautySalon',
+      name: 'Beautyflow Buda',
+      telephone: '+36 1 300 9414',
+      email: 'info@beautyflow.pro',
+      url: 'https://beautyflow.pro/en/beautyflow-buda',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Vegyész utca 1.',
+        addressLocality: 'Budapest',
+        addressRegion: 'District XI',
+        postalCode: '1116',
+        addressCountry: 'HU',
+      },
     },
-    geo: { '@type': 'GeoCoordinates', latitude: '47.5287', longitude: '19.0512' },
-  },
+    {
+      '@type': 'BeautySalon',
+      name: 'Beautyflow Pest',
+      telephone: '+36 1 300 9414',
+      email: 'info@beautyflow.pro',
+      url: 'https://beautyflow.pro/en/beautyflow-pest',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Reitter Ferenc utca 90.',
+        addressLocality: 'Budapest',
+        addressRegion: 'District XIII',
+        postalCode: '1135',
+        addressCountry: 'HU',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: '47.5287', longitude: '19.0512' },
+    },
+  ],
   areaServed: [{ '@type': 'City', name: 'Budapest' }],
   offers: {
     '@type': 'Offer',
@@ -138,7 +174,7 @@ const breadcrumbSchema = {
 
 <Layout
   title="Skin Diagnostics Budapest – Device Skin Analysis with Treatment Plan | Beautyflow"
-  description="Stop guessing: professional device-based skin diagnostics at Beautyflow Pest, Budapest. 60 minutes, 10,000 HUF — deducted from your first treatment. Personalised treatment plan and home care recommendation."
+  description="Stop guessing: professional device-based skin diagnostics at the Beautyflow salons in Budapest. 60 minutes, 10,000 HUF — deducted from your first treatment. Personalised treatment plan and home care recommendation."
   lang="en"
 >
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
@@ -150,7 +186,7 @@ const breadcrumbSchema = {
     <div class="absolute inset-0">
       <HeroImage
         src={heroImg}
-        alt="Skin diagnostics at Beautyflow Pest – the beautician shows the skin analysis results to the client"
+        alt="Skin diagnostics at Beautyflow – the beautician shows the skin analysis results to the client"
         priority={true}
         class="h-full w-full object-cover"
       />
@@ -163,7 +199,7 @@ const breadcrumbSchema = {
     <div class="relative max-w-[1200px] mx-auto px-5 sm:px-6 py-16 sm:py-24 lg:py-28">
       <div class="max-w-2xl text-white">
         <p class="text-sm font-semibold uppercase tracking-wider text-[#f0a8c4] mb-3">
-          Beautyflow Pest · District XIII
+          Beautyflow Buda &amp; Pest
         </p>
         <h1 class="font-heading text-white text-3xl sm:text-4xl lg:text-5xl leading-tight mb-5">
           Stop guessing — find out what your skin actually needs
@@ -287,7 +323,7 @@ const breadcrumbSchema = {
         <div>
           <ContentImage
             src={gepImg}
-            alt="Skitenic AI skin analysis device at the Beautyflow Pest salon"
+            alt="Skitenic AI skin analysis device at the Beautyflow salon"
             class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2]"
           />
         </div>
@@ -478,30 +514,33 @@ const breadcrumbSchema = {
         </p>
       </div>
 
-      <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6 text-center">
-        <h3 class="font-heading text-lg text-[#1e293b] mb-2">Where is it available?</h3>
-        <p class="text-[#334155] leading-relaxed">
-          Skin diagnostics is available exclusively at our <strong>Beautyflow Pest</strong> salon,
-          because the skin analysis device is located there.
+      <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6">
+        <h3 class="font-heading text-lg text-[#1e293b] mb-2 text-center">Where is it available?</h3>
+        <p class="text-[#334155] leading-relaxed text-center mb-5">
+          At both of our salons — pick whichever is closer to you.
         </p>
-        <p class="mt-2 text-[#334155]">Reitter Ferenc utca 90., 1135 Budapest (District XIII)</p>
-        <div class="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href="/en/beautyflow-pest"
-            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
-          >
-            About the salon
-          </a>
-          <a
-            href={NOTINO_PEST}
-            target="_blank"
-            rel="noopener"
-            data-track="booking_click"
-            data-source="skin_diagnostics_notino_pest"
-            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
-          >
-            Book on Notino
-          </a>
+        <div class="grid sm:grid-cols-2 gap-4">
+          {SALONS.map((s) => (
+            <div class="rounded-xl border border-[#e7d8df] bg-[#fff9f7] p-5 text-center">
+              <p class="font-heading text-lg text-[#c53f75]">{s.name}</p>
+              <p class="mt-1 text-sm text-[#334155]">{s.address}</p>
+              <div class="mt-4 flex flex-col gap-2">
+                <a
+                  href={s.notino}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="booking_click"
+                  data-source={`skin_diagnostics_notino_${s.id}`}
+                  class="inline-block px-5 py-2.5 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+                >
+                  Book on Notino
+                </a>
+                <a href={s.page} class="text-sm font-semibold text-[#c53f75] hover:underline">
+                  About the salon →
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

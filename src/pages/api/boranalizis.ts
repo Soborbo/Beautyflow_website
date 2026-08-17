@@ -338,7 +338,7 @@ async function sendUserEmail(resend: Resend, data: QuizData, rec: Recommendation
     <a href="${escapeHtml(resultUrl)}" style="display:inline-block;background:#c53f75;color:#fff;text-decoration:none;padding:12px 26px;border-radius:999px;font-weight:bold;">Megnézem a részletes eredményem</a>
   </p>
   <h3 style="color:#c53f75;">A következő lépés: bőrdiagnosztika</h3>
-  <p style="font-size:14px;">A szalonban géppel felmérjük a bőröd valós állapotát, és személyre szabott kezelési tervet kapsz, otthoni termékajánlóval. 60 perc, 10 000 Ft — amit <strong>levonunk az első kezelésed árából</strong>, így ha nálunk folytatod, gyakorlatilag ingyen van. Kizárólag a Beautyflow Pest szalonban. Hamarosan vissza is hívunk a megadott elérhetőségen.</p>
+  <p style="font-size:14px;">A szalonban géppel felmérjük a bőröd valós állapotát, és személyre szabott kezelési tervet kapsz, otthoni termékajánlóval. 60 perc, 10 000 Ft — amit <strong>levonunk az első kezelésed árából</strong>, így ha nálunk folytatod, gyakorlatilag ingyen van. Budai és pesti szalonunkban is elérhető. Hamarosan vissza is hívunk a megadott elérhetőségen.</p>
   <p style="text-align:center;margin:18px 0;"><a href="https://beautyflow.pro/bordiagnosztika" style="display:inline-block;background:#c53f75;color:#fff;text-decoration:none;padding:12px 26px;border-radius:999px;font-weight:bold;">Kérem a bőrdiagnosztikát</a></p>
   <p style="margin-top:18px;">Sürgős esetben hívj minket: <a href="tel:+3613009414" style="color:#c53f75;">${PHONE}</a></p>
   <p style="margin-top:20px;">Szeretettel,<br><strong>Kónya Fanni</strong><br><span style="color:#c53f75;">a Beautyflow alapítója</span></p>

@@ -14,7 +14,7 @@
  * kockázat-megfordítása, ezért szó szerint ugyanígy szerepel a 16 bőrtípus-
  * oldalon, az eredményoldalon és a kvíz vendég-emailjében is.
  *
- * Helyszín: KIZÁRÓLAG Beautyflow Pest (a készülék ott van) — mint a plazma.
+ * Helyszín: MINDKÉT szalon (Buda és Pest) — a készülék mindkettőben elérhető.
  */
 export const prerender = true;
 
@@ -40,8 +40,27 @@ const DURATION_MIN = 60;
 // A konzultációs űrlap előre kiválasztott kezeléssel — a lead nálunk landol
 // (Sheets + CRM + szalon-email), nem egy külső foglalómotorban.
 const CTA_HREF = '/ingyenes-konzultacio?kezeles=bordiagnosztika';
-const NOTINO_PEST =
-  'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom';
+
+// A bőrdiagnosztika MINDKÉT szalonban elérhető — a vendég a hozzá közelebbit
+// választja. A Notino-linkek a Headerben használt paraméterezést követik.
+const SALONS = [
+  {
+    id: 'buda',
+    name: 'Beautyflow Buda',
+    address: '1116 Budapest, Vegyész utca 1. (XI. kerület)',
+    page: '/beautyflow-buda',
+    notino:
+      'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
+  },
+  {
+    id: 'pest',
+    name: 'Beautyflow Pest',
+    address: '1135 Budapest, Reitter Ferenc utca 90. (XIII. kerület)',
+    page: '/beautyflow-pest',
+    notino:
+      'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
+  },
+];
 
 // TODO(skinlab): amint a Skitenic terméklap élesedik a skinlabhungary.hu-n,
 // cseréld a pontos termék-URL-re:
@@ -105,7 +124,7 @@ const faq = [
   },
   {
     q: 'Melyik szalonban érhető el?',
-    a: 'Kizárólag a Beautyflow Pest szalonunkban (1135 Budapest, Reitter Ferenc utca 90., XIII. kerület), mert a bőranalizáló készülék ott található.',
+    a: 'Mindkét szalonunkban: Beautyflow Buda (1116 Budapest, Vegyész utca 1.) és Beautyflow Pest (1135 Budapest, Reitter Ferenc utca 90.). Foglaláskor válaszd ki, melyik esik közelebb hozzád.',
   },
   {
     q: 'Sminkben mehetek?',
@@ -134,26 +153,45 @@ const serviceSchema = {
   alternateName: 'Gépi bőranalízis',
   serviceType: 'Bőrdiagnosztika',
   description:
-    'Professzionális, géppel végzett bőrdiagnosztika a Beautyflow Pest szalonban. Az arcszkennelés felméri a bőr faggyútermelését, hidratáltságát, pórusait, pigmentfoltjait, ráncait és érzékenységét, majd ez alapján személyre szabott kezelési terv és otthoni termékajánló készül.',
+    'Professzionális, géppel végzett bőrdiagnosztika a Beautyflow szalonokban (Buda és Pest). Az arcszkennelés felméri a bőr faggyútermelését, hidratáltságát, pórusait, pigmentfoltjait, ráncait és érzékenységét, majd ez alapján személyre szabott kezelési terv és otthoni termékajánló készül.',
   url,
-  provider: {
-    '@type': 'BeautySalon',
-    name: 'Beautyflow Pest',
-    telephone: '+36 1 300 9414',
-    email: 'info@beautyflow.pro',
-    url: 'https://beautyflow.pro/beautyflow-pest',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Reitter Ferenc utca 90.',
-      addressLocality: 'Budapest',
-      addressRegion: 'XIII. kerület',
-      postalCode: '1135',
-      addressCountry: 'HU',
+  // Mindkét szalon szolgáltatója — a provider tömbként is érvényes.
+  provider: [
+    {
+      '@type': 'BeautySalon',
+      name: 'Beautyflow Buda',
+      telephone: '+36 1 300 9414',
+      email: 'info@beautyflow.pro',
+      url: 'https://beautyflow.pro/beautyflow-buda',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Vegyész utca 1.',
+        addressLocality: 'Budapest',
+        addressRegion: 'XI. kerület',
+        postalCode: '1116',
+        addressCountry: 'HU',
+      },
     },
-    geo: { '@type': 'GeoCoordinates', latitude: '47.5287', longitude: '19.0512' },
-  },
+    {
+      '@type': 'BeautySalon',
+      name: 'Beautyflow Pest',
+      telephone: '+36 1 300 9414',
+      email: 'info@beautyflow.pro',
+      url: 'https://beautyflow.pro/beautyflow-pest',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Reitter Ferenc utca 90.',
+        addressLocality: 'Budapest',
+        addressRegion: 'XIII. kerület',
+        postalCode: '1135',
+        addressCountry: 'HU',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: '47.5287', longitude: '19.0512' },
+    },
+  ],
   areaServed: [
     { '@type': 'City', name: 'Budapest' },
+    { '@type': 'AdministrativeArea', name: 'XI. kerület' },
     { '@type': 'AdministrativeArea', name: 'XIII. kerület' },
   ],
   offers: {
@@ -189,7 +227,8 @@ const breadcrumbSchema = {
 
 <Layout
   title="Bőrdiagnosztika Budapest – gépi bőranalízis kezelési tervvel | Beautyflow"
-  description="Ne találgass: professzionális bőrdiagnosztika géppel a Beautyflow Pest szalonban. 60 perc, 10 000 Ft — amit levonunk az első kezelésed árából. Személyre szabott kezelési terv és otthoni termékajánló."
+  description="Ne találgass: professzionális bőrdiagnosztika géppel a Beautyflow szalonokban, Budán és Pesten. 60 perc, 10 000 Ft — amit levonunk az első kezelésed árából. Személyre szabott kezelési terv és otthoni termékajánló."
+  newsletter={false}
 >
   <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
@@ -200,7 +239,7 @@ const breadcrumbSchema = {
     <div class="absolute inset-0">
       <HeroImage
         src={heroImg}
-        alt="Bőrdiagnosztika a Beautyflow Pest szalonban – a kozmetikus a bőranalízis eredményét mutatja a vendégnek"
+        alt="Bőrdiagnosztika a Beautyflow szalonban – a kozmetikus a bőranalízis eredményét mutatja a vendégnek"
         priority={true}
         class="h-full w-full object-cover"
       />
@@ -213,7 +252,7 @@ const breadcrumbSchema = {
     <div class="relative max-w-[1200px] mx-auto px-5 sm:px-6 py-16 sm:py-24 lg:py-28">
       <div class="max-w-2xl text-white">
         <p class="text-sm font-semibold uppercase tracking-wider text-[#f0a8c4] mb-3">
-          Beautyflow Pest · XIII. kerület
+          Beautyflow Buda &amp; Pest
         </p>
         <h1 class="font-heading text-white text-3xl sm:text-4xl lg:text-5xl leading-tight mb-5">
           Ne találgass — tudd meg, mire van szüksége a bőrödnek
@@ -346,7 +385,7 @@ const breadcrumbSchema = {
         <div>
           <ContentImage
             src={gepImg}
-            alt="Skitenic AI bőranalízis-készülék a Beautyflow Pest szalonban"
+            alt="Skitenic AI bőranalízis-készülék a Beautyflow szalonban"
             class="w-full rounded-2xl shadow-lg object-cover aspect-[3/2]"
           />
         </div>
@@ -560,31 +599,34 @@ const breadcrumbSchema = {
         </p>
       </div>
 
-      <!-- Helyszín -->
-      <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6 text-center">
-        <h3 class="font-heading text-lg text-[#1e293b] mb-2">Hol érhető el?</h3>
-        <p class="text-[#334155] leading-relaxed">
-          A bőrdiagnosztika kizárólag a <strong>Beautyflow Pest</strong> szalonunkban érhető el,
-          mert a bőranalizáló készülék ott található.
+      <!-- Helyszín — mindkét szalon -->
+      <div class="mt-8 rounded-2xl border border-[#e7d8df] bg-white p-6">
+        <h3 class="font-heading text-lg text-[#1e293b] mb-2 text-center">Hol érhető el?</h3>
+        <p class="text-[#334155] leading-relaxed text-center mb-5">
+          Mindkét szalonunkban — válaszd azt, amelyik közelebb esik hozzád.
         </p>
-        <p class="mt-2 text-[#334155]">1135 Budapest, Reitter Ferenc utca 90. (XIII. kerület)</p>
-        <div class="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href="/beautyflow-pest"
-            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
-          >
-            A szalonról
-          </a>
-          <a
-            href={NOTINO_PEST}
-            target="_blank"
-            rel="noopener"
-            data-track="booking_click"
-            data-source="bordiagnosztika_notino_pest"
-            class="inline-block px-6 py-2.5 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
-          >
-            Foglalás Notinón
-          </a>
+        <div class="grid sm:grid-cols-2 gap-4">
+          {SALONS.map((s) => (
+            <div class="rounded-xl border border-[#e7d8df] bg-[#fff9f7] p-5 text-center">
+              <p class="font-heading text-lg text-[#c53f75]">{s.name}</p>
+              <p class="mt-1 text-sm text-[#334155]">{s.address}</p>
+              <div class="mt-4 flex flex-col gap-2">
+                <a
+                  href={s.notino}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="booking_click"
+                  data-source={`bordiagnosztika_notino_${s.id}`}
+                  class="inline-block px-5 py-2.5 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+                >
+                  Foglalás Notinón
+                </a>
+                <a href={s.page} class="text-sm font-semibold text-[#c53f75] hover:underline">
+                  A szalonról →
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

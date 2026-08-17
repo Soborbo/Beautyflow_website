@@ -23,6 +23,11 @@ interface Props {
   translationOf?: string;
   noindex?: boolean;
   ogImage?: string;
+  /**
+   * false = ne jelenjen meg a hírlevél-modal. Konverziós landingeken (hirdetési
+   * forgalom) a felugró ablak elviszi a figyelmet a lap saját CTA-járól.
+   */
+  newsletter?: boolean;
 }
 
 const currentLang = Astro.props.lang || getLangFromUrl(Astro.url);
@@ -31,7 +36,7 @@ const t = useTranslations(currentLang);
 const defaultDescription = t('meta.defaultDescription');
 const siteName = t('meta.siteName');
 
-const { title, description = defaultDescription, translationOf, noindex = false, ogImage } = Astro.props;
+const { title, description = defaultDescription, translationOf, noindex = false, ogImage, newsletter = true } = Astro.props;
 const defaultOgImage = 'https://beautyflow.pro/images/beautyflow-fb.jpg';
 const finalOgImage = ogImage ? `https://beautyflow.pro${ogImage}` : defaultOgImage;
 
@@ -102,7 +107,7 @@ const hasEnAlternate = hasAlternateRoute(pathWithoutLang);
     </main>
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
-    {currentLang === 'hu' && <NewsletterModal />}
+    {currentLang === 'hu' && newsletter && <NewsletterModal />}
     <LCPTracker />
   </body>
 </html>
