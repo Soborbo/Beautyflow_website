@@ -198,51 +198,63 @@ const breadcrumbSchema = {
 
       {/* Text on its own light panel — no scrim needed, and the long headline no
           longer lands on the bright parts of the photo. */}
-      <div class="order-2 lg:order-1 flex items-center px-5 sm:px-8 lg:px-12 xl:px-16 py-12 sm:py-16 lg:py-20">
-        <div class="w-full max-w-xl mx-auto lg:mr-0 lg:ml-auto">
+      <div class="order-2 lg:order-1 flex items-center px-5 sm:px-8 lg:px-10 xl:px-14 py-12 sm:py-16 lg:py-20">
+        <div class="w-full max-w-2xl mx-auto lg:mr-0 lg:ml-auto text-center">
           <p class="text-sm font-semibold uppercase tracking-wider text-[#c53f75] mb-3">
             Beautyflow Buda &amp; Pest
           </p>
-          <h1 class="font-heading text-[#1e293b] text-3xl sm:text-4xl lg:text-5xl leading-tight mb-5">
+          {/* Two lines. The global `h1` uppercases AND adds 0.1em tracking, which is
+              what pushed this to four lines. Size is calibrated to the column width
+              (break happens above ~0.0587 x column); the 37px ceiling matters because
+              past `max-w-2xl` the column stops growing while the font would not. */}
+          <h1 class="font-heading text-[#1e293b] text-[26px] sm:text-[32px] lg:text-[clamp(24px,2.2vw,37px)] tracking-[0.015em] leading-[1.15] text-balance mb-5">
             Stop guessing — find out what your skin actually needs
           </h1>
-          <p class="text-lg text-[#334155] leading-relaxed mb-4">
-            Before you buy your hundredth skincare product or try yet another treatment on
-            problem skin, it is worth finding the root of the problem.
-          </p>
           <p class="text-lg text-[#334155] leading-relaxed mb-7">
-            We introduced skin diagnostics to reveal what cannot be seen with the naked eye — so
-            that from here on it is a plan, not guesswork.
+            Before you buy your hundredth skincare product or try yet another treatment on
+            problem skin, it is worth finding the root of the problem. We introduced skin
+            diagnostics to reveal what cannot be seen with the naked eye — so that from here on
+            it is a plan, not guesswork.
           </p>
 
-          <div class="flex flex-wrap gap-2.5 mb-8">
-            <span class="rounded-full bg-[#fff9f7] border border-[#e7d8df] px-4 py-2 text-sm font-semibold text-[#334155]">
-              {DURATION_MIN} minutes
-            </span>
-            <span class="rounded-full bg-[#fff9f7] border border-[#e7d8df] px-4 py-2 text-sm font-semibold text-[#334155]">
-              {PRICE.toLocaleString('en-US')} HUF
-            </span>
-            <span class="rounded-full bg-[#c53f75] px-4 py-2 text-sm font-semibold text-white">
-              ✓ Deducted from your treatment
-            </span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-3">
+          {/* Labels stay on one line (`whitespace-nowrap`), so the pair needs the full
+              column. In the `lg` range the column is narrower than that, so they stack
+              there and sit side by side again from `xl`. */}
+          <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 justify-center">
             <a
               href={CTA_HREF}
               data-track="booking_click"
               data-source="skin_diagnostics_hero"
-              class="inline-block text-center px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+              class="inline-block whitespace-nowrap text-center px-7 py-4 text-sm bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
             >
               Book an appointment
             </a>
             <a
               href="tel:+3613009414"
-              class="inline-block text-center px-8 py-4 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
+              class="inline-block whitespace-nowrap text-center px-7 py-4 text-sm border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
             >
               Call +36 1 300 9414
             </a>
           </div>
+
+          {/* Pricing facts as a list. The box is centred, but the items read better
+              left-aligned than a centre-aligned list would. */}
+          <ul class="mt-8 inline-flex flex-col gap-2.5 text-left">
+            {[
+              `${DURATION_MIN} minutes`,
+              `${PRICE.toLocaleString('en-US')} HUF`,
+              'Deducted from your treatment',
+            ].map((item) => (
+              <li class="flex items-center gap-2.5 text-[#334155]">
+                <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#c53f75]/10">
+                  <svg class="h-3 w-3 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span class="font-semibold">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

@@ -251,48 +251,42 @@ const breadcrumbSchema = {
 
       {/* Szöveg: saját, világos háttéren — így nincs szükség szkrímre, és a
           hosszú cím sem a fotó világos foltjaira esik. */}
-      <div class="order-2 lg:order-1 flex items-center px-5 sm:px-8 lg:px-12 xl:px-16 py-12 sm:py-16 lg:py-20">
-        <div class="w-full max-w-xl mx-auto lg:mr-0 lg:ml-auto">
+      <div class="order-2 lg:order-1 flex items-center px-5 sm:px-8 lg:px-10 xl:px-14 py-12 sm:py-16 lg:py-20">
+        <div class="w-full max-w-2xl mx-auto lg:mr-0 lg:ml-auto text-center">
           <p class="text-sm font-semibold uppercase tracking-wider text-[#c53f75] mb-3">
             Beautyflow Buda &amp; Pest
           </p>
-          <h1 class="font-heading text-[#1e293b] text-3xl sm:text-4xl lg:text-5xl leading-tight mb-5">
+          {/* 2 SOR a cél. A globális `h1` nagybetűsít ÉS 0.1em betűközt ad — együtt
+              ez tördelte 4 sorra. Ezért: szűk tracking + fluid méret + `text-balance`.
+              A méret a hasáb szélességéhez van kalibrálva: mérve a törés ~0.0587 ×
+              hasábszélesség fölött következik be, a `2.2vw` és a 37px-es plafon ez
+              alatt marad minden töréspontnál (a plafon kell, mert `max-w-2xl` fölött
+              a hasáb már nem nő, a betű viszont nőne). */}
+          <h1 class="font-heading text-[#1e293b] text-[26px] sm:text-[32px] lg:text-[clamp(24px,2.2vw,37px)] tracking-[0.015em] leading-[1.15] text-balance mb-5">
             Ne találgass — tudd meg, mire van szüksége a bőrödnek
           </h1>
-          <p class="text-lg text-[#334155] leading-relaxed mb-4">
-            Mielőtt megvennéd a századik arcápoló terméket, vagy kipróbálnál egy újabb kezelést a
-            problémás bőrödön, érdemes megtalálni a probléma gyökerét.
-          </p>
           <p class="text-lg text-[#334155] leading-relaxed mb-7">
-            A bőrdiagnosztikát azért vezettük be, hogy feltárjuk azokat a területeket, amiket szabad
-            szemmel nem lehet látni — és hogy onnantól ne tippelés, hanem terv legyen.
+            Mielőtt megvennéd a századik arcápoló terméket, vagy kipróbálnál egy újabb kezelést a
+            problémás bőrödön, érdemes megtalálni a probléma gyökerét. A bőrdiagnosztikát azért
+            vezettük be, hogy feltárjuk azokat a területeket, amiket szabad szemmel nem lehet
+            látni — és hogy onnantól ne tippelés, hanem terv legyen.
           </p>
 
-          <!-- Ár-badge sor -->
-          <div class="flex flex-wrap gap-2.5 mb-8">
-            <span class="rounded-full bg-[#fff9f7] border border-[#e7d8df] px-4 py-2 text-sm font-semibold text-[#334155]">
-              {DURATION_MIN} perc
-            </span>
-            <span class="rounded-full bg-[#fff9f7] border border-[#e7d8df] px-4 py-2 text-sm font-semibold text-[#334155]">
-              {PRICE.toLocaleString('hu-HU')} Ft
-            </span>
-            <span class="rounded-full bg-[#c53f75] px-4 py-2 text-sm font-semibold text-white">
-              ✓ Levonjuk a kezelésed árából
-            </span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-3">
+          {/* A feliratok egysorosak (`whitespace-nowrap`), ezért a két gomb egymás
+              mellett ~500px-et kér. Az `lg` sávban a hasáb ennél szűkebb (a fél
+              oszlop), ott tehát egymás alá kerülnek; `xl`-től újra egy sorban. */}
+          <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 justify-center">
             <a
               href={CTA_HREF}
               data-track="booking_click"
               data-source="bordiagnosztika_hero"
-              class="inline-block text-center px-8 py-4 bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
+              class="inline-block whitespace-nowrap text-center px-7 py-4 text-sm bg-[#c53f75] text-white font-semibold uppercase tracking-wide rounded-full hover:bg-[#a33460] transition-colors"
             >
               Időpontot kérek
             </a>
             <a
               href="/boranalizis"
-              class="inline-block text-center px-8 py-4 border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
+              class="inline-block whitespace-nowrap text-center px-7 py-4 text-sm border-2 border-[#c53f75] text-[#c53f75] font-semibold uppercase tracking-wide rounded-full hover:bg-[#c53f75] hover:text-white transition-colors"
             >
               Előbb kitöltöm az ingyenes tesztet
             </a>
@@ -300,6 +294,25 @@ const breadcrumbSchema = {
           <p class="mt-3 text-sm text-[#6f676e]">
             Az online bőranalízis kb. 3 perc, és ingyenes.
           </p>
+
+          {/* Ár-tudnivalók listaként. A doboz középre zárt, de a tételek balra
+              igazítva olvashatóbbak, mint egy középre zárt lista. */}
+          <ul class="mt-8 inline-flex flex-col gap-2.5 text-left">
+            {[
+              `${DURATION_MIN} perc`,
+              `${PRICE.toLocaleString('hu-HU')} Ft`,
+              'Levonjuk a kezelésed árából',
+            ].map((item) => (
+              <li class="flex items-center gap-2.5 text-[#334155]">
+                <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#c53f75]/10">
+                  <svg class="h-3 w-3 text-[#c53f75]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span class="font-semibold">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
