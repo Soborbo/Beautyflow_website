@@ -51,6 +51,7 @@ export function getLocalizedPath(path: string, lang: Locale): string {
 export const routeMappings: Array<{ hu: string; en: string }> = [
   { hu: '/', en: '/' },
   { hu: '/rolunk', en: '/about' },
+  { hu: '/bordiagnosztika', en: '/skin-diagnostics' },
   { hu: '/arak', en: '/prices' },
   { hu: '/gyakran-ismetelt-kerdesek', en: '/faq' },
   { hu: '/ingyenes-konzultacio', en: '/free-consultation' },
@@ -68,10 +69,25 @@ export const routeMappings: Array<{ hu: string; en: string }> = [
   { hu: '/adatvedelmi-tajekoztato', en: '/privacy-policy' },
   { hu: '/aszf', en: '/terms-and-conditions' },
   { hu: '/hazirend', en: '/house-rules' },
+  { hu: '/koszonjuk', en: '/thank-you' },
   // Knowledge Base / Tudástár
   { hu: '/tudastar', en: '/knowledge-base' },
   { hu: '/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell', en: '/knowledge-base/diode-laser-hair-removal-everything-you-need-to-know' },
 ];
+
+// Magyar-only szekciók: NINCS angol párjuk, és nem is lesz egyhamar (a kvíz és a
+// 16 Baumann-bőrtípusoldal magyar tartalom). Ezek nélkül a nyelvváltó vakon
+// `/en/<ugyanaz>`-ra mutatott, ami 404 — a Layout hreflangja pedig egy nem
+// létező URL-t hirdetett. Prefix-egyezés, hogy az aloldalak is bejöjjenek.
+const HU_ONLY_PREFIXES = ['/bortipus', '/boranalizis', '/eredmeny'];
+
+/** Van-e a megadott (nyelv-prefix nélküli) útvonalnak párja a másik nyelven? */
+export function hasAlternateRoute(path: string): boolean {
+  const normalized = stripTrailingSlash(path);
+  return !HU_ONLY_PREFIXES.some(
+    (p) => normalized === p || normalized.startsWith(`${p}/`),
+  );
+}
 
 // Get the equivalent route in another language
 export function getAlternateRoute(currentPath: string, fromLang: Locale, toLang: Locale): string {
@@ -83,6 +99,14 @@ export function getAlternateRoute(currentPath: string, fromLang: Locale, toLang:
   if (mapping) {
     const targetPath = mapping[toLang];
     return getLocalizedPath(targetPath, toLang);
+  }
+
+  // Magyar-only szekció (kvíz, bőrtípusoldalak): a MÁSIK nyelven nincs hova
+  // mutatni — a nyelvváltó a főoldalra visz 404 helyett. A saját nyelvére
+  // kérdezve viszont önmagát kell visszaadnia (különben a hreflang="hu" is a
+  // főoldalra mutatna a 16 bőrtípusoldalon).
+  if (toLang !== fromLang && !hasAlternateRoute(normalizedPath)) {
+    return getLocalizedPath('/', toLang);
   }
 
   // If no mapping found, return the same path with proper localization

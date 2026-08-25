@@ -12,19 +12,33 @@
  * EVENT_NAME_MAP → InitiateCheckout) for the server-side leg to deliver; until then
  * the dispatch is a harmless no-op on the gateway. Per LEAD-FLOW-INCIDENT.md this is
  * the site's dominant high-intent signal, so it must never regress.
+ *
+ * booking_click IS A CONVERSION, SO IT ONLY BELONGS ON A REAL HAND-OFF (a click that
+ * leaves the site for Notino). In GTM `CE - booking_click` fires three tags — GA4,
+ * Meta Pixel InitiateCheckout and the Google Ads conversion — and in Ads the GA4-imported
+ * `booking_click` action is a PRIMARY goal, so marking an internal link (a CTA that just
+ * navigates to /ingyenes-konzultacio) would book a conversion before the visitor submits
+ * anything, on top of the lead the form itself reports.
+ *
+ * Internal CTAs therefore use data-track="cta_click" instead: an engagement-only event
+ * (browser dataLayer, analytics consent, no gateway leg) that must NOT be marked as a GA4
+ * key event and must NOT be imported into Ads.
  */
 ---
 
 <script>
   import { hasAnalyticsConsent, hasMarketingConsent, generateEventId, trackServerEvent } from '@tracking/lib';
 
-  function findBookingLink(target: EventTarget | null): HTMLAnchorElement | null {
+  type TrackedClick = { link: HTMLAnchorElement; kind: 'booking' | 'cta' };
+
+  function classifyClick(target: EventTarget | null): TrackedClick | null {
     if (!(target instanceof Element)) return null;
     const link = target.closest('a');
     if (!link) return null;
     const href = link.getAttribute('href') || '';
-    if (/notino\.hu\/szalonok\/beautyflow/i.test(href)) return link;
-    if (link.dataset.track === 'booking_click') return link;
+    if (/notino\.hu\/szalonok\/beautyflow/i.test(href)) return { link, kind: 'booking' };
+    if (link.dataset.track === 'booking_click') return { link, kind: 'booking' };
+    if (link.dataset.track === 'cta_click') return { link, kind: 'cta' };
     return null;
   }
 
@@ -42,10 +56,20 @@
     if (installed) return;
     installed = true;
     document.addEventListener('click', (e) => {
-      const link = findBookingLink(e.target);
-      if (!link) return;
+      const hit = classifyClick(e.target);
+      if (!hit) return;
+      const { link, kind } = hit;
       const analytics = hasAnalyticsConsent();
       const marketing = hasMarketingConsent();
+
+      if (kind === 'cta') {
+        if (!analytics) return;
+        const w = window as unknown as { dataLayer: Record<string, unknown>[] };
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({ event: 'cta_click', source: inferSource(link), page_path: location.pathname });
+        return;
+      }
+
       if (!analytics && !marketing) return;
 
       const eventId = generateEventId();

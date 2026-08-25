@@ -75,7 +75,7 @@ export interface RecommendedTreatment {
 
 export type RouteKind =
   | 'normal' // sima ajánlott irány
-  | 'kismama' // várandós / szoptató → kíméletes / CoreaPil
+  | 'kismama' // várandós / szoptató → kíméletes / Korea Peel
   | 'gyogyuljon' // aktív bőrprobléma → először gyógyuljon a bőr
   | 'ovatos'; // krónikus/autoimmun/stb. → óvatos, orvosi egyeztetés
 

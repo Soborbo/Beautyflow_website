@@ -127,8 +127,8 @@ function salonOf(a: QuizAnswers): SalonId {
   return 'barmely';
 }
 
-/** Fusion Plasma csak Pesten (13. ker.) vagy ha nincs preferencia. */
-function fusionAllowed(salon: SalonId): boolean {
+/** Plazmaterápia csak Pesten (13. ker.) vagy ha nincs szalon-preferencia. */
+function plasmaAllowed(salon: SalonId): boolean {
   return salon === 'pest' || salon === 'barmely';
 }
 
@@ -190,9 +190,9 @@ export function recommend(a: QuizAnswers): Recommendation {
       'Mivel fényérzékenyítő gyógyszert szedsz, a fény- és lézeralapú kezeléseknél fokozottan óvatosak vagyunk; a részleteket a személyes vizsgálaton beszéljük át.',
     );
   }
-  // Aszpirin / allergia → Lazer Savkomplex kizárva
+  // Ismert allergia → a savas/aktív hámlasztó irány (Lazer Peel) kizárva
   if (hasAllergy) {
-    flags.push('Ismert allergia jelzett — a Lazer Savkomplex kizárva, allergének egyeztetése szükséges.');
+    flags.push('Ismert allergia jelzett — a Lazer Peel kizárva, allergének egyeztetése szükséges.');
   }
 
   // ============================================================
@@ -207,7 +207,7 @@ export function recommend(a: QuizAnswers): Recommendation {
     flags.push(`Aktív bőrprobléma (${which}) — kezelés csak gyógyulás után.`);
     return buildResult({
       profile,
-      treatments: [pick('coreapil')], // kíméletes irány, de a fő üzenet a halasztás
+      treatments: [pick('korea-peel')], // kíméletes irány, de a fő üzenet a halasztás
       flags,
       kontraindikaciok,
       utvonal: 'gyogyuljon',
@@ -217,20 +217,20 @@ export function recommend(a: QuizAnswers): Recommendation {
     });
   }
 
-  // 2b. Várandós / szoptató → kíméletes / CoreaPil, savas+gépi TILTVA
+  // 2b. Várandós / szoptató → kíméletes / Korea Peel, savas+gépi TILTVA
   if (isPregnantOrNursing) {
     flags.push(
-      'Várandós/szoptató — savas (Lazer Savkomplex) és gépi kezelések TILTVA. Irány: kíméletes / CoreaPil.',
+      'Várandós/szoptató — savas (Lazer Peel) és gépi kezelések TILTVA. Irány: kíméletes / Korea Peel.',
     );
     return buildResult({
       profile,
-      treatments: [pick('coreapil')],
+      treatments: [pick('korea-peel')],
       flags,
       kontraindikaciok,
       utvonal: 'kismama',
       safe: false,
       routeMessage:
-        'Várandósan és szoptatás idején a kismamák sem maradnak ki nálunk! Ilyenkor a savas hámlasztó és a gépi kezelések helyett egy kíméletes, kismamabarát irányt (pl. CoreaPil) javaslunk, ami biztonságos ebben az időszakban. A pontos, biztonságos tervet a személyes konzultáción állítjuk össze.',
+        'Várandósan és szoptatás idején a kismamák sem maradnak ki nálunk! Ilyenkor a savas hámlasztó és a gépi kezelések helyett egy kíméletes, kismamabarát irányt (Korea Peel) javaslunk, ami biztonságos ebben az időszakban. A pontos, biztonságos tervet a személyes konzultáción állítjuk össze.',
     });
   }
 
@@ -243,7 +243,8 @@ export function recommend(a: QuizAnswers): Recommendation {
       'A megadott egészségügyi háttér miatt csak kíméletes, nem-invazív irányt javaslunk, és ajánljuk, hogy a kezelést előzetesen egyeztesd a kezelőorvosoddal.',
     );
     // Kíméletes, nem-invazív alapirány a profil szerint (nincs savas/gépi).
-    const gentle = profile.sensitivity === 'Érzékeny' ? pick('oxy-cica') : pick('oxy-hydra');
+    const gentle =
+      profile.sensitivity === 'Érzékeny' ? pick('recovery-exosode') : pick('hydra-arc');
     return buildResult({
       profile,
       treatments: [gentle],
@@ -275,6 +276,21 @@ export function recommend(a: QuizAnswers): Recommendation {
           treatments.push(pick('v-tox'));
           treatments.push(pick('thread-fill')); // opcionális kombináció
         }
+        // Erősebb feszesítő alternatíva — a plazmakezelés csak Pesten (13. ker.).
+        if (plasmaAllowed(salon)) {
+          treatments.push(
+            pick(
+              'plasma-therapy',
+              salon === 'barmely'
+                ? 'Csak a Beautyflow Pest (13. ker.) szalonban elérhető.'
+                : undefined,
+            ),
+          );
+        } else {
+          flags.push(
+            'Plasma Therapy csak Beautyflow Pest (13. ker.) — a választott szalonban nem elérhető.',
+          );
+        }
       } else {
         treatments.push(pick('thread-fill'));
       }
@@ -282,48 +298,40 @@ export function recommend(a: QuizAnswers): Recommendation {
     }
     case 'pigment': {
       if (pig === 'pih-2') {
-        // pattanás utáni → enyhébb
-        treatments.push(pick('oxy-tranexamic'));
+        // pattanás utáni elszíneződés → kíméletesebb, sav nélküli irány
+        treatments.push(pick('bioherb50'));
       } else if (!sensitive && !usesAcidOrRetinol && !hasAllergy) {
-        treatments.push(pick('lazer-savkomplex'));
+        treatments.push(pick('lazer-peel'));
       } else {
         // érzékenyebb / sav-retinol / allergia → kíméletes tónuskiegyenlítés
-        treatments.push(pick('oxy-tranexamic'));
+        treatments.push(pick('bioherb50'));
       }
       break;
     }
     case 'akne': {
-      treatments.push(pick('oxy-acne'));
-      if (fusionAllowed(salon)) {
-        treatments.push(
-          pick(
-            'fusion-plasma',
-            salon === 'barmely'
-              ? 'Csak a Beautyflow Pest (13. ker.) szalonban elérhető.'
-              : undefined,
-          ),
-        );
-      } else {
-        flags.push('Fusion Plasma csak Beautyflow Pest (13. ker.) — a választott szalonban nem elérhető.');
-      }
+      treatments.push(pick('inflacure-krx'));
+      treatments.push(pick('hydra-arc')); // mélytisztítás az eltömődött pórusokra
       break;
     }
     case 'rosacea': {
-      treatments.push(pick('oxy-cica'));
+      treatments.push(pick('inflacure-krx'));
       break;
     }
     case 'porus': {
-      // zsíros / tág pórus → pórustisztító akne-irány
-      treatments.push(pick('oxy-acne'));
+      // zsíros / tág pórus → pórusösszehúzó, mélytisztító irány
+      treatments.push(pick('carbon-arc'));
       break;
     }
-    case 'fako':
+    case 'fako': {
+      treatments.push(pick('carboxy'));
+      break;
+    }
     case 'szaraz': {
-      treatments.push(pick('oxy-hydra'));
+      treatments.push(pick('hydra-arc'));
       break;
     }
     case 'heg': {
-      treatments.push(pick('hack'));
+      treatments.push(pick('hegkezeles'));
       break;
     }
     case 'nem-tudom':
@@ -332,26 +340,26 @@ export function recommend(a: QuizAnswers): Recommendation {
       if (cel === 'cel-feszes' || profile.wrinkleTendency === 'magas') {
         treatments.push(age35plus ? pick('v-tox') : pick('thread-fill'));
       } else if (cel === 'cel-tiszta') {
-        treatments.push(pick('oxy-acne'));
+        treatments.push(pick('hydra-arc'));
       } else if (cel === 'cel-folt' || profile.pigmentProne) {
-        treatments.push(sensitive ? pick('oxy-tranexamic') : pick('lazer-savkomplex'));
+        treatments.push(sensitive ? pick('bioherb50') : pick('lazer-peel'));
       } else if (sensitive) {
-        treatments.push(pick('oxy-cica'));
+        treatments.push(pick('recovery-exosode'));
       } else {
-        treatments.push(pick('oxy-hydra')); // alapértelmezés: Hydra Glow
+        treatments.push(pick('hydra-arc')); // alapértelmezés: Hydra tisztító
       }
       break;
     }
   }
 
-  // Nyári / esemény kontextus felülfinomítás: ha a cél esemény előtti ragyogás
-  // és nincs erősebb indok, Summer/Hydra Glow ragyogást is felajánlunk.
-  if (cel === 'cel-esemeny' && !treatments.some((tt) => tt.id === 'oxy-hydra')) {
-    treatments.push(pick('oxy-hydra'));
+  // Esemény előtti kontextus: ha a cél az esemény előtti ragyogás és nincs
+  // erősebb indok, a revitalizáló Carboxy terápiát is felajánljuk.
+  if (cel === 'cel-esemeny' && !treatments.some((tt) => tt.id === 'carboxy')) {
+    treatments.push(pick('carboxy'));
   }
 
   // Védőháló: ha valamiért üres maradt
-  if (treatments.length === 0) treatments.push(pick('oxy-hydra'));
+  if (treatments.length === 0) treatments.push(pick('hydra-arc'));
 
   return buildResult({
     profile,

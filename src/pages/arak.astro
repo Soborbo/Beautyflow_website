@@ -36,7 +36,7 @@ const lezerCsomagok = [
   { name: 'Platinum - PCOS', zones: 'Mellbimbó körül + mellek között + pajesz + bajusz + arc + áll + nyak + hascsík', price: '34 000 Ft', duration: '75 perc' },
   { name: 'Bronze', zones: 'Teljes láb + hónalj', price: '38 000 Ft', duration: '120 perc' },
   { name: 'Silver', zones: 'Teljes intim + popsi belső + hónalj + lábszár térdig', price: '40 000 Ft', duration: '90 perc' },
-  { name: 'Gold', zones: 'Teljes intim + popsi belső + hónalj + lábszár térdig', price: '50 000 Ft', duration: '120 perc' },
+  { name: 'Gold', zones: 'Teljes intim + popsi belső + hónalj + teljes láb', price: '50 000 Ft', duration: '120 perc' },
   { name: 'Diamond', zones: 'Teljes intim + popsi belső + teljes kar + hónalj + teljes láb', price: '60 000 Ft', duration: '180 perc', popular: true },
 ];
 
@@ -148,11 +148,12 @@ const treatmentSections: TreatmentSection[] = [
         items: [
           {
             name: 'Bőrdiagnosztika',
-            desc: 'Tartalmazza a mikrokamerás diagnosztikát, kezeléssorozat felállítását és az otthoni termékajánlót. Professzionális termékek vásárlására a szalonban van lehetőség.',
+            desc: 'Gépi bőranalízis: tartalmazza a mikrokamerás diagnosztikát, a kezeléssorozat felállítását és az otthoni termékajánlót. A díját levonjuk az első kezelésed árából. Professzionális termékek vásárlására a szalonban van lehetőség.',
             price: '10 000 Ft',
             duration: '60 perc',
           },
         ],
+        footnote: 'A bőrdiagnosztika 10 000 Ft-os díját levonjuk az első kezelés árából.',
       },
       {
         title: 'Koreai speciális kezelések',
@@ -356,6 +357,7 @@ const treatmentSections: TreatmentSection[] = [
           { name: 'Rádiófrekvencia', price: '+3 500 Ft' },
           { name: 'Masszázs géppel', price: '+2 500 Ft' },
           { name: 'Carboxy-terápiás maszk', price: '+5 000 Ft' },
+          { name: 'Bőr analizátor', price: '+5 000 Ft' },
           { name: 'Fusion plasma bőrfertőtlenítés', price: '+10 000 Ft' },
         ],
       },

@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 import NewsletterModal from '../components/NewsletterModal.astro';
 import { LCPTracker } from '../components/images';
-import { getLangFromUrl, useTranslations, getAlternateRoute, stripTrailingSlash, type Locale } from '../i18n';
+import { getLangFromUrl, useTranslations, getAlternateRoute, hasAlternateRoute, stripTrailingSlash, type Locale } from '../i18n';
 // Soborbo canonical tracking (v5): browser (GTM dataLayer) + server (event-gateway
 // worker) with a shared event_id. The kit lives verbatim under /tracking-kit.
 import Tracking from '../../tracking-kit/components/Tracking.astro';
@@ -23,6 +23,11 @@ interface Props {
   translationOf?: string;
   noindex?: boolean;
   ogImage?: string;
+  /**
+   * false = ne jelenjen meg a hírlevél-modal. Konverziós landingeken (hirdetési
+   * forgalom) a felugró ablak elviszi a figyelmet a lap saját CTA-járól.
+   */
+  newsletter?: boolean;
 }
 
 const currentLang = Astro.props.lang || getLangFromUrl(Astro.url);
@@ -31,7 +36,7 @@ const t = useTranslations(currentLang);
 const defaultDescription = t('meta.defaultDescription');
 const siteName = t('meta.siteName');
 
-const { title, description = defaultDescription, translationOf, noindex = false, ogImage } = Astro.props;
+const { title, description = defaultDescription, translationOf, noindex = false, ogImage, newsletter = true } = Astro.props;
 const defaultOgImage = 'https://beautyflow.pro/images/beautyflow-fb.jpg';
 const finalOgImage = ogImage ? `https://beautyflow.pro${ogImage}` : defaultOgImage;
 
@@ -46,6 +51,10 @@ const huUrl = getAlternateRoute(pathWithoutLang, currentLang, 'hu');
 const enUrl = getAlternateRoute(pathWithoutLang, currentLang, 'en');
 const canonicalUrl = `https://beautyflow.pro${currentUrl}`;
 const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
+// A magyar-only szekciókra (kvíz, 16 bőrtípusoldal) nincs angol változat.
+// Ilyenkor NEM hirdetünk `hreflang="en"`-t: a getAlternateRoute a főoldalra
+// esne vissza, és egy nem-ekvivalens URL-t hirdetni hibás hreflang-pár.
+const hasEnAlternate = hasAlternateRoute(pathWithoutLang);
 ---
 
 <!DOCTYPE html>
@@ -71,7 +80,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
 
     <!-- Alternate language links for SEO -->
     <link rel="alternate" hreflang="hu" href={`https://beautyflow.pro${huUrl}`} />
-    <link rel="alternate" hreflang="en" href={`https://beautyflow.pro${enUrl}`} />
+    {hasEnAlternate && <link rel="alternate" hreflang="en" href={`https://beautyflow.pro${enUrl}`} />}
     <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
 
     <!-- Open Graph -->
@@ -98,7 +107,7 @@ const xDefaultUrl = `https://beautyflow.pro${huUrl}`;
     </main>
     <Footer lang={currentLang} />
     <StickyMobileCTA lang={currentLang} />
-    {currentLang === 'hu' && <NewsletterModal />}
+    {currentLang === 'hu' && newsletter && <NewsletterModal />}
     <LCPTracker />
   </body>
 </html>

@@ -44,6 +44,7 @@ const USER_FROM_HU = 'Kónya Fanni - Beautyflow <info@beautyflow.pro>';
 const USER_FROM_EN = 'Fanni Kónya - Beautyflow <info@beautyflow.pro>';
 
 const treatmentNamesHu: Record<string, string> = {
+  bordiagnosztika: 'Bőrdiagnosztika',
   lezer: 'Dióda Lézeres Szőrtelenítés',
   hydra: 'HydraBeauty Arckezelés',
   smink: 'Tartós Sminktetoválás',
@@ -52,6 +53,7 @@ const treatmentNamesHu: Record<string, string> = {
   pigment: 'Pigmentfolt Eltávolítás',
 };
 const treatmentNamesEn: Record<string, string> = {
+  bordiagnosztika: 'Skin Diagnostics',
   lezer: 'Diode Laser Hair Removal',
   hydra: 'HydraBeauty Facial Treatment',
   smink: 'Permanent Makeup',

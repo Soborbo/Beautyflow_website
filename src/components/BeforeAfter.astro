@@ -22,14 +22,14 @@ const hasImages = Boolean(beforeSrc && afterSrc);
 
 {hasImages && (
   <section class="mt-12">
-    <h2 class="font-heading text-2xl text-[#1e293b] mb-5">Előtte / utána — valódi vendégeink</h2>
+    <h2 class="font-heading text-2xl text-[#1e293b] mb-5">Előtte / utána - valódi vendégeink</h2>
     <div class="grid grid-cols-2 gap-3 sm:gap-5">
       <figure class="m-0">
-        <img src={beforeSrc} alt={`${typeName} — előtte`} loading="lazy" decoding="async" class="w-full rounded-xl object-cover aspect-[4/5]" />
+        <img src={beforeSrc} alt={`${typeName} - előtte`} loading="lazy" decoding="async" class="w-full rounded-xl object-cover aspect-[4/5]" />
         <figcaption class="mt-2 text-center text-sm font-semibold uppercase tracking-wide text-[#6f676e]">Előtte</figcaption>
       </figure>
       <figure class="m-0">
-        <img src={afterSrc} alt={`${typeName} — utána`} loading="lazy" decoding="async" class="w-full rounded-xl object-cover aspect-[4/5]" />
+        <img src={afterSrc} alt={`${typeName} - utána`} loading="lazy" decoding="async" class="w-full rounded-xl object-cover aspect-[4/5]" />
         <figcaption class="mt-2 text-center text-sm font-semibold uppercase tracking-wide text-[#c53f75]">Utána</figcaption>
       </figure>
     </div>
@@ -42,7 +42,7 @@ const hasImages = Boolean(beforeSrc && afterSrc);
 {!hasImages && import.meta.env.DEV && (
   <section class="mt-12">
     <div class="rounded-xl border-2 border-dashed border-[#c53f75]/40 bg-[#fff9f7] p-6 text-center text-sm text-[#6f676e]">
-      <strong>Előtte/utána hely</strong> — ide kerül egy valódi <strong>{typeName}</strong> vendég képe
+      <strong>Előtte/utána hely</strong> - ide kerül egy valódi <strong>{typeName}</strong> vendég képe
       (írásos hozzájárulással). Tedd a fájlokat ide:
       <code>public/images/bortipus/{`{slug}`}-elotte.jpg</code> és <code>-utana.jpg</code>.
       <br /><span class="italic">(Ez a jelölő csak fejlesztői módban látszik.)</span>

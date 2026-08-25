@@ -6,6 +6,7 @@ export {
   getRouteFromUrl,
   getLocalizedPath,
   getAlternateRoute,
+  hasAlternateRoute,
   routeMappings,
   stripTrailingSlash,
 } from "./utils";
