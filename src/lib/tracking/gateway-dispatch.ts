@@ -145,7 +145,16 @@ export function readConsentFromCookie(cookieHeader: string | null): ConsentState
     const idx = part.indexOf('=');
     if (idx < 0) continue;
     if (part.slice(0, idx).trim() === 'cookieyes-consent') {
-      raw = decodeURIComponent(part.slice(idx + 1).trim());
+      try {
+        raw = decodeURIComponent(part.slice(idx + 1).trim());
+      } catch {
+        // Hibás percent-kódolás (`%zz`, csonka `%E0`) URIError-t dob. Ez a
+        // függvény a LEAD-ÚTVONALON fut — egy dobás itt 500-as válasz a
+        // beküldött űrlapra, vagyis elveszett lead egy elrontott süti miatt.
+        // A KAPU degradációja fail closed: nincs explicit jelzés → a gateway a
+        // `require_consent`-re esik. Nem találgatunk, de nem is ejtünk leadet.
+        return undefined;
+      }
       break;
     }
   }
