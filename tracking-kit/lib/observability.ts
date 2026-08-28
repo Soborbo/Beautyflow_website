@@ -19,15 +19,12 @@ interface CodeDef { code: string; severity: DiagSeverity; message: string }
 export const TRACKING_CODES = {
   // 1xxx — gateway / worker connection
   GATEWAY_OK:              { code: 'TRK-1000', severity: 'info',  message: 'Gateway dispatch sent' },
-  GATEWAY_NO_TURNSTILE:    { code: 'TRK-1001', severity: 'warn',  message: 'Gateway dispatch skipped: no Turnstile token' },
   GATEWAY_NETWORK_FAIL:    { code: 'TRK-1002', severity: 'error', message: 'Gateway POST failed (network/transport)' },
   GATEWAY_BEACON_FALLBACK: { code: 'TRK-1003', severity: 'info',  message: 'sendBeacon unavailable/failed; used fetch keepalive' },
-  GATEWAY_DEGRADED_TOKENLESS: { code: 'TRK-1004', severity: 'warn', message: 'Gateway dispatch sent token-less (degraded low-risk) — Turnstile failed but the money signal is preserved' },
-  // 2xxx — Turnstile
-  TURNSTILE_NOT_LOADED:    { code: 'TRK-2001', severity: 'warn',  message: 'Turnstile script not loaded' },
-  TURNSTILE_NO_CONTAINER:  { code: 'TRK-2002', severity: 'warn',  message: 'Turnstile container #cf-turnstile-invisible missing' },
-  TURNSTILE_TIMEOUT:       { code: 'TRK-2003', severity: 'warn',  message: 'Turnstile challenge timed out' },
-  TURNSTILE_NO_SITEKEY:    { code: 'TRK-2004', severity: 'error', message: 'PUBLIC_TURNSTILE_SITE_KEY is empty — server-side dispatch will be skipped' },
+  // A gateway ezt az eventet a bongeszo-utrol 403-mal dobna (TRK-400-017) — a
+  // site backendjenek kell kuldenie a hitelesitett szerver-ingressen. Hangos,
+  // mert kulonben a konverzio ugy vesz el, hogy a dispatch sikeresnek latszik.
+  GATEWAY_SERVER_INGRESS_ONLY: { code: 'TRK-1005', severity: 'warn', message: 'Event is server-ingress-only; the browser leg must not dispatch it' },
   // 3xxx — data integrity
   PII_IN_DATALAYER:        { code: 'TRK-3001', severity: 'error', message: 'PII-shaped key blocked from a dataLayer push' },
 } as const satisfies Record<string, CodeDef>;
@@ -56,6 +53,22 @@ function ring(): TrackingDiagnostic[] {
   return w.__sbTrackingDiag;
 }
 
+/**
+ * A konzol-ag KULON FUGGVENY, es a `severity` PARAMETERKENT erkezik.
+ *
+ * Miert: a Turnstile-kodok kivezetesevel (2026-08-28) elfogyott az utolso
+ * 'warn' bejegyzes a tablabol, es a literal-union leszukulesetol a warn-ag
+ * „lehetetlen osszehasonlitas" tipushibat adna. A helyes valasz NEM az ag
+ * torlese — az a kovetkezo warn-kodot csendben a diag-debug moge rejtene —,
+ * hanem hogy a dontes a szeles `DiagSeverity`-n tortenjen. Egy parameter nem
+ * szukul a kezdoertekere, egy `const` viszont igen.
+ */
+function logToConsole(severity: DiagSeverity, line: string, context?: Record<string, unknown>): void {
+  if (severity === 'error') console.error(line, context ?? '');
+  else if (severity === 'warn') console.warn(line, context ?? '');
+  else if (diagDebug) console.log(line, context ?? '');
+}
+
 /** Emit a coded diagnostic. Returns the record (handy in tests). */
 export function report(key: TrackingCodeKey, context?: Record<string, unknown>): TrackingDiagnostic {
   const def = TRACKING_CODES[key];
@@ -65,10 +78,7 @@ export function report(key: TrackingCodeKey, context?: Record<string, unknown>):
   };
 
   // 1) console — errors/warnings always; info only under diag-debug.
-  const line = `[tracking] ${def.code} ${def.message}`;
-  if (def.severity === 'error') console.error(line, context ?? '');
-  else if (def.severity === 'warn') console.warn(line, context ?? '');
-  else if (diagDebug) console.log(line, context ?? '');
+  logToConsole(def.severity, `[tracking] ${def.code} ${def.message}`, context);
 
   if (typeof window !== 'undefined') {
     // 2) ring buffer (bounded)

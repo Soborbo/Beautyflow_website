@@ -1,44 +1,24 @@
 ---
 /**
- * Turnstile invisible widget — for the event-gateway worker's REQUIRED turnstile_token.
+ * Turnstile `api.js` betöltő — AZ ŰRLAPOKNAK, nem a trackingnek.
  *
- * gateway.ts getTurnstileToken() renders/executes this #cf-turnstile-invisible
- * container, taking the sitekey from the PUBLIC_TURNSTILE_SITE_KEY env.
+ * ── Mi változott (2026-08-28) ────────────────────────────────────────────────
+ * Ez a komponens eredetileg a tracking-dispatch LÁTHATATLAN widgetjét hozta
+ * (`#cf-turnstile-invisible`) + egy prewarm-ot. A gateway viszont 2026 nyara
+ * óta NEM validál Turnstile-t, tehát a token semmit nem ért — cserébe a
+ * `sendToWorker` minden dispatch előtt megvárta a widgetet (10 mp-es
+ * timeouttal), a klikk kritikus útján. A tracking-rész ezért kikerült.
  *
- * Put it in the layout <body> (once per page). Astro env required:
- *   PUBLIC_TURNSTILE_SITE_KEY=0x4AAAA...
+ * ── Miért MARAD mégis ez a komponens ─────────────────────────────────────────
+ * Az `api.js`-t EZ tölti be, oldal-globálisan, és erre épülnek az ŰRLAPOK saját,
+ * LÁTHATÓ widgetjei (`src/lib/forms/turnstile-client.ts` → /api/contact,
+ * /api/boranalizis). Több oldal kommentje is kimondja, hogy „az api.js-t egyszer,
+ * page-globálisan a Layout <Turnstile/>-ja tölti, ezért itt nincs saját api.js".
+ * Ha ezt a fájlt törölnénk, az űrlap-spamvédelem némán elszállna.
+ *
+ * A `?render=explicit` KÖTELEZŐ: enélkül az api.js DOM-ot szkennel `.cf-turnstile`
+ * osztályra, és az auto-render ütközik az űrlapok explicit renderelésével.
  */
 ---
 
-<div id="cf-turnstile-invisible" style="display:none"></div>
-{/*
-  api.js is loaded WITH `?render=explicit` (canonical): NOTHING auto-renders from a
-  `.cf-turnstile` class scan. Every widget on the page is rendered programmatically:
-    - the invisible gateway widget (#cf-turnstile-invisible) by gateway.ts, and
-    - each lead/contact form's own VISIBLE widget by createTurnstile()
-      (src/lib/forms/turnstile-client.ts).
-  Each widget mints independent, single-use tokens — the visible ones for
-  /api/contact + /api/boranalizis, the invisible one for the event-gateway dispatch.
-  Do NOT drop `?render=explicit`: in auto-render mode the explicit widgets and the
-  form widgets contend, and the invisible prewarm widget times out (TRK-2003).
-*/}
 <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-
-<script>
-  import { prewarmTurnstile } from '../lib';
-
-  // Pre-warm: obtain a Turnstile token on load so it's cached (4 min) before the
-  // first conversion dispatch. api.js loads async → poll briefly for window.turnstile.
-  function whenTurnstileReady(attempt = 0) {
-    if (typeof (window as unknown as { turnstile?: unknown }).turnstile !== 'undefined') {
-      prewarmTurnstile();
-      return;
-    }
-    if (attempt > 40) return; // give up after ~10s
-    setTimeout(() => whenTurnstileReady(attempt + 1), 250);
-  }
-
-  function start() { whenTurnstileReady(); }
-  document.addEventListener('astro:page-load', start);
-  if (document.readyState !== 'loading') start();
-</script>

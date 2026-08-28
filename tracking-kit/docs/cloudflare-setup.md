@@ -16,7 +16,7 @@ and `ALLOWED_ORIGINS`/`TURNSTILE_SECRET_KEY` live in the **gateway** worker's KV
 
 | Variable | Required | Notes |
 |----------|:--------:|-------|
-| PUBLIC_TURNSTILE_SITE_KEY | ✅ | Turnstile site key for the `<Turnstile/>` widget |
+| PUBLIC_TURNSTILE_SITE_KEY | ✅ | Turnstile site key az ŰRLAP-widgetekhez (contact / quiz / konzultáció). A tracking-dispatch 2026-08-28 óta NEM kér tokent; a `<Turnstile/>` komponens már csak az `api.js`-t tölti be, amire az űrlapok építenek. |
 | PUBLIC_TRACKING_COUNTRY | Optional | `GB` (default) \| `HU` — phone + formatting |
 | PUBLIC_TRACKING_CURRENCY | Optional | `GBP` (default) \| `HUF` \| `EUR`… — default conversion currency |
 | PUBLIC_TRACKING_LOCALE | Optional | `en` (default) \| `hu` — display strings |

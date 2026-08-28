@@ -8,7 +8,7 @@
  *
  * The earlier in-app /api/track (Meta-only) endpoint is GONE — the server side
  * belongs entirely to the gateway (all 3 platforms + durability). The gateway
- * itself adds the turnstile_token / attribution / consent / fbp / fbc / session_id
+ * itself adds the attribution / consent / fbp / fbc / session_id
  * fields (see gateway.ts).
  */
 
@@ -29,7 +29,7 @@ export {
   type ConversionData,
 } from './events';
 // Gateway dispatch (server side) — also available for direct use.
-export { sendToWorker, getTurnstileToken, prewarmTurnstile, collectAttribution, type ConversionPayload, type UserData } from './gateway';
+export { sendToWorker, collectAttribution, type ConversionPayload, type UserData } from './gateway';
 // Observability — stable diagnostic codes (see docs/OBSERVABILITY-CODES.md).
 export {
   report, getDiagnostics, clearDiagnostics, enableDiagDebug, redactPii,
@@ -104,7 +104,7 @@ export const DEFAULT_GATEWAY_EVENT = 'contact_form_submit';
 
 /**
  * Server-side dispatch to the gateway. Fire-and-forget: the gateway asynchronously
- * obtains the Turnstile token (cached 4 minutes) and adds the attribution/
+ * adds the attribution/
  * consent/fbp/fbc/session_id fields. The browser dataLayer push goes SEPARATELY
  * (events.ts), with the SAME event_id → Meta Pixel↔CAPI dedup.
  */

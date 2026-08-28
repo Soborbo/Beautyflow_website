@@ -4,9 +4,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // and simulate slow/failed workers — events.ts runs for real (true end-to-end browser side).
 vi.mock('../lib/gateway', () => ({
   sendToWorker: vi.fn(() => Promise.resolve(true)),
-  getTurnstileToken: vi.fn(() => Promise.resolve('TOK')),
   collectAttribution: vi.fn(() => ({})),
-  prewarmTurnstile: vi.fn(),
 }));
 
 import {
