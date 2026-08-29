@@ -1,10 +1,22 @@
 /**
- * Astro client-lib: server-side tracking dispatch to the Soborbo Worker.
+ * Astro client-lib: BROWSER-side tracking dispatch to the Soborbo event-gateway.
  *
- * Usage: copy-paste into the Astro site's src/lib/ (Painless, BeautyFlow, etc.).
- * Astro env: the PUBLIC_TURNSTILE_SITE_KEY public variable is required.
+ * NINCS TURNSTILE EBBEN AZ UTBAN, ES NE IS EPITSD VISSZA.
  *
- * Sprint 9 spec in 09-sprint-astro-painless.md.
+ * A gateway 2026 nyara ota NEM validal Turnstile-t (a secret a Cloudflare
+ * teszt-kulcsa volt: minden tokenre `success:true`, mikozben valodi
+ * konverziokat nyelt el). A bongeszo-ut kapuja a gateway Origin allow-listje
+ * es a rate limit, SZERVER-oldalon. A high-value konverziokat (form/lead) a
+ * site backendje kuldi a hitelesitett szerver-ingressen.
+ *
+ * Ami itt allt: minden dispatch elott `await getTurnstileToken()`, benne egy
+ * 10 MASODPERCES timeouttal. A klikk-konverzio kritikus utjan ez pont akkor
+ * varakoztat, amikor a latogato mar navigal (tel:/mailto:) — a beacon igy
+ * elveszhet. A tokenert cserebe a gateway semmit nem adott.
+ *
+ * AZ URLAP-VEDELEM ETTOL FUGGETLEN es MARAD: a sajat, LATHATO widgeteket a
+ * `src/lib/forms/turnstile-client.ts` rendereli az /api/contact es
+ * /api/boranalizis vegpontokhoz, amiket a site maga validal.
  */
 
 import { generateUUID } from './uuid';
@@ -13,24 +25,9 @@ import { report } from './observability';
 
 declare global {
   interface Window {
-    turnstile?: {
-      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
-      reset: (widgetId?: string) => void;
-      execute: (container?: string | HTMLElement) => void;
-      getResponse: (widgetId?: string) => string | undefined;
-    };
     dataLayer: Record<string, unknown>[];
     fbq?: (...args: unknown[]) => void;
   }
-}
-
-interface TurnstileOptions {
-  sitekey: string;
-  callback?: (token: string) => void;
-  'expired-callback'?: () => void;
-  'error-callback'?: () => void;
-  size?: 'normal' | 'compact' | 'invisible';
-  appearance?: 'always' | 'execute' | 'interaction-only';
 }
 
 export interface UserData {
@@ -72,110 +69,53 @@ export interface ConversionPayload {
   attribution?: AttributionParams;
 }
 
-let cachedTurnstileToken: string | undefined;
-let cachedTokenExpiresAt = 0;
-let turnstileWidgetId: string | undefined;
-// A single widget is rendered once. Subsequent calls reset it and route the
-// resolution through this pending pointer, so the original callbacks (which
-// closed over the first call) can still resolve later promises.
-let pendingResolver:
-  | { resolve: (v: string | undefined) => void; timeout: ReturnType<typeof setTimeout> }
-  | undefined;
-
-export async function getTurnstileToken(): Promise<string | undefined> {
-  if (cachedTurnstileToken && Date.now() < cachedTokenExpiresAt) {
-    return cachedTurnstileToken;
-  }
-
-  // Hard config error: without a sitekey the widget can't render, so EVERY
-  // server-side dispatch would be silently skipped. Surface it loudly (TRK-2004)
-  // instead of failing as a generic "no token".
-  if (!import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) {
-    report('TURNSTILE_NO_SITEKEY');
-    return undefined;
-  }
-
-  if (!window.turnstile) {
-    report('TURNSTILE_NOT_LOADED');
-    return undefined;
-  }
-
-  return new Promise((resolve) => {
-    const container = document.getElementById('cf-turnstile-invisible');
-    if (!container) {
-      report('TURNSTILE_NO_CONTAINER');
-      resolve(undefined);
-      return;
-    }
-
-    // If a previous request is still pending, resolve it as undefined
-    // (we'll start a fresh challenge).
-    if (pendingResolver) {
-      clearTimeout(pendingResolver.timeout);
-      pendingResolver.resolve(undefined);
-    }
-
-    const timeout = setTimeout(() => {
-      if (pendingResolver) {
-        const r = pendingResolver;
-        pendingResolver = undefined;
-        report('TURNSTILE_TIMEOUT');
-        r.resolve(undefined);
-      }
-    }, 10000);
-    pendingResolver = { resolve, timeout };
-
-    const onCallback = (token: string) => {
-      if (!pendingResolver) return;
-      const r = pendingResolver;
-      pendingResolver = undefined;
-      clearTimeout(r.timeout);
-      cachedTurnstileToken = token;
-      cachedTokenExpiresAt = Date.now() + 4 * 60 * 1000;
-      r.resolve(token);
-    };
-    const onError = () => {
-      if (!pendingResolver) return;
-      const r = pendingResolver;
-      pendingResolver = undefined;
-      clearTimeout(r.timeout);
-      r.resolve(undefined);
-    };
-
-    if (turnstileWidgetId !== undefined) {
-      // Subsequent calls — reset and re-execute the existing widget.
-      // The original callbacks delegate to the current pendingResolver above.
-      window.turnstile!.reset(turnstileWidgetId);
-      window.turnstile!.execute(container);
-    } else {
-      turnstileWidgetId = window.turnstile!.render(container, {
-        sitekey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
-        // The current Turnstile API rejects `size: 'invisible'` (size accepts only
-        // normal|compact|flexible). `appearance: 'interaction-only'` mints a token
-        // invisibly — the widget only surfaces if a challenge truly needs interaction;
-        // otherwise it stays hidden (and #cf-turnstile-invisible is display:none anyway).
-        appearance: 'interaction-only',
-        callback: onCallback,
-        'error-callback': onError
-      });
-    }
-  });
-}
 
 /**
- * Pre-warm the Turnstile token on page load so it's already cached (4 min) before
- * the first conversion dispatch — removes the invisible-challenge latency from the
- * critical path (a phone/callback/form click would otherwise wait on it). Wired in
- * Turnstile.astro. Best-effort and fire-and-forget: getTurnstileToken() never
- * rejects (it resolves undefined on failure), so the dispatch path still retries.
+ * KET DEGRADACIO, MERT KET KULONBOZO KERDES (kanonikus 6.6.4).
+ *
+ * Egy hibas percent-szekvencia (`%zz`, csonka `%E0`) `URIError`-t dob. A
+ * SZERVER-labon ez a hiba mar orzott (`src/lib/tracking/gateway-dispatch.ts`
+ * `readConsentFromCookie`) — ott a dobas 500-as valasz a bekuldott urlapra,
+ * vagyis elveszett lead. A BONGESZO-labon a kovetkezmeny mas, de nem
+ * artalmatlan: CSEND. A `getCookie` a dispatch utjan is fut (`_fbp`, `_fbc`,
+ * `_ga`, `_gcl_aw`), es egy dobas a `sendToWorker` promise-at utasitja el — a
+ * konverzio nemanan nem megy ki.
+ *
+ * A KAPU (jogalap) fail-closed: egy fel-dekodolt stringbol kiolvasott
+ * „advertisement:yes" hamis jogalap lenne. Az AZONOSITO-olvasas a nyers ertekre
+ * esik vissza: azok azonositok, nem dontesek.
  */
-export function prewarmTurnstile(): void {
-  void getTurnstileToken().catch(() => { /* best-effort warm-up */ });
+function safeDecodeCookieValue(value: string): string | undefined {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return undefined;
+  }
 }
 
-function getCookie(name: string): string | undefined {
+function decodeCookieValueLossy(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function rawCookie(name: string): string | undefined {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : undefined;
+  return match ? match[2] : undefined;
+}
+
+/** Azonosito-olvasas (`_fbp`, `_fbc`, `_ga`, `_gcl_aw`) — lossy, sosem dob. */
+function getCookie(name: string): string | undefined {
+  const raw = rawCookie(name);
+  return raw === undefined ? undefined : decodeCookieValueLossy(raw);
+}
+
+/** Jogalap-olvasas (`cookieyes-consent`) — fail-closed, sosem dob. */
+function getConsentCookie(name: string): string | undefined {
+  const raw = rawCookie(name);
+  return raw === undefined ? undefined : safeDecodeCookieValue(raw);
 }
 
 function extractGAClientId(gaCookie: string | undefined): string | undefined {
@@ -213,7 +153,7 @@ function getConsentState(): ConsentState | undefined {
   const override = (window as unknown as { __trackingConsent?: ConsentState }).__trackingConsent;
   if (override && typeof override === 'object') return override;
 
-  const raw = getCookie('cookieyes-consent');
+  const raw = getConsentCookie('cookieyes-consent');
   if (!raw) return undefined;
 
   const map: Record<string, string> = {};
@@ -395,31 +335,32 @@ export function collectAttribution(): AttributionParams {
   return merged;
 }
 
-// Token-less degraded dispatch (server-side TASK 2). When Turnstile can't produce a
-// token (slow / blocked / CSP), still dispatch LOW-RISK click conversions
-// (tel:/mailto:/whatsapp) so the gateway's degraded mode can accept them
-// rate-limited — otherwise the #1 lead signal (phone) is silently lost with no
-// retry. Higher-risk events (forms, callback) are still skipped: the gateway
-// HARD-REJECTS token-less forms, so dispatching them would just be a wasted beacon.
-// This set must match the worker's DEGRADED_LOW_RISK_EVENTS (src/lib/degraded.ts)
-// EXACTLY — callback_conversion is deliberately excluded on both sides.
-const DEGRADED_LOW_RISK_EVENTS: ReadonlySet<string> = new Set([
+/**
+ * A BONGESZO-UTON ATENGEDETT EVENTEK.
+ *
+ * A gateway a high-value konverziokat (form/lead/purchase) a bongeszo-utrol
+ * 403-mal dobja (TRK-400-017): azokat a site BACKENDJE kuldi a hitelesitett
+ * `/api/event/conversion-server` ingressen, per-site tokennel. Az Origin
+ * curl-bol hamisithato, ezert ez nem kozmetika.
+ *
+ * MIERT KELL EZ A LISTA MOST. Eddig a Turnstile-kapu vegezte ezt a munkat is,
+ * mellekhatáskent: token nelkul CSAK ezt a harom klikk-eventet engedte at, a
+ * tobbit kihagyta. A kapu kivezetesevel ez a felezes elveszne — a magas
+ * kockazatu eventek garantalt-403 beacont termelnenek. Ezert a felosztas most
+ * KIMONDOTT, nem egy mellekhatas: ugyanaz a harom event megy at, mint eddig.
+ */
+const BROWSER_GATEWAY_EVENTS: ReadonlySet<string> = new Set([
   'phone_conversion',
   'email_conversion',
   'whatsapp_conversion'
 ]);
 
 export async function sendToWorker(payload: ConversionPayload): Promise<boolean> {
-  const turnstileToken = await getTurnstileToken();
-  if (!turnstileToken) {
-    if (!DEGRADED_LOW_RISK_EVENTS.has(payload.event_name)) {
-      report('GATEWAY_NO_TURNSTILE', { event_name: payload.event_name });
-      return false;
-    }
-    // Low-risk money signal → dispatch token-less. `turnstile_token` is omitted
-    // from the body below (undefined), so the worker sees `missing_token` and
-    // routes it through the degraded, rate-limited path.
-    report('GATEWAY_DEGRADED_TOKENLESS', { event_name: payload.event_name });
+  if (!BROWSER_GATEWAY_EVENTS.has(payload.event_name)) {
+    // HANGOS diagnosztika, nem nema kihagyas: ha egy hivo ide teved, azt latni
+    // kell — kulonben a konverzio ugy tunik el, hogy a dispatch "sikeres" volt.
+    report('GATEWAY_SERVER_INGRESS_ONLY', { event_name: payload.event_name });
+    return false;
   }
 
   const fbp = getCookie('_fbp');
@@ -429,7 +370,6 @@ export async function sendToWorker(payload: ConversionPayload): Promise<boolean>
 
   const body = JSON.stringify({
     ...payload,
-    turnstile_token: turnstileToken,
     fbp,
     fbc,
     client_id: clientId,

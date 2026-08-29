@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { collectAttribution, sendToWorker, getTurnstileToken, trackConversion } from '../lib/gateway';
+import { collectAttribution, sendToWorker, trackConversion } from '../lib/gateway';
 import { setCookie, setUrl, resetAll, getDataLayer, setCkyConsent } from './helpers';
 
 // CookieYes consent cookie összeállítása (ad = advertisement, an = analytics).
@@ -8,19 +8,6 @@ function ckyCookie(ad: boolean, an: boolean): void {
     'cookieyes-consent',
     `consent:yes,necessary:yes,functional:yes,analytics:${an ? 'yes' : 'no'},advertisement:${ad ? 'yes' : 'no'},other:yes`,
   );
-}
-
-// Turnstile stub: a render azonnal visszahívja a callbacket egy tokennel.
-function stubTurnstile(token = 'TT'): void {
-  const div = document.createElement('div');
-  div.id = 'cf-turnstile-invisible';
-  document.body.appendChild(div);
-  (window as unknown as { turnstile: unknown }).turnstile = {
-    render: (_c: unknown, opts: { callback?: (t: string) => void }) => { opts.callback?.(token); return 'wid'; },
-    reset: () => {},
-    execute: () => {},
-    getResponse: () => token,
-  };
 }
 
 beforeEach(() => resetAll());
@@ -78,24 +65,18 @@ describe('trackConversion — consent-gated (footgun fix)', () => {
   });
 });
 
-describe('getTurnstileToken', () => {
-  it('a stubolt widgetből visszaadja a tokent', async () => {
-    stubTurnstile('ABC');
-    expect(await getTurnstileToken()).toBe('ABC');
-  });
-});
-
 describe('sendToWorker — gateway payload', () => {
-  it('POST /api/event/conversion turnstile_token + consent + attribution mezőkkel', async () => {
+  it('POST /api/event/conversion consent + attribution mezőkkel, turnstile_token NÉLKÜL', async () => {
     ckyCookie(true, true);
     setUrl('/?gclid=G9');
-    stubTurnstile('TT');
     Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: () => false });
     const fetchMock = vi.fn((..._args: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
     vi.stubGlobal('fetch', fetchMock);
 
+    // `contact_form_submit` helyett klikk-event: az előbbi SZERVER-INGRESS-ONLY,
+    // a böngésző-útról a gateway 403-mal dobná. Lásd gateway-browser-split.test.ts.
     const ok = await sendToWorker({
-      event_name: 'contact_form_submit',
+      event_name: 'phone_conversion',
       event_id: 'E1',
       event_time: 1_700_000_000,
       user_data: { email: 'a@b.com' },
@@ -104,11 +85,10 @@ describe('sendToWorker — gateway payload', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toBe('/api/event/conversion');
     const body = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body);
-    expect(body.event_name).toBe('contact_form_submit');
+    expect(body.event_name).toBe('phone_conversion');
     expect(body.event_id).toBe('E1');
-    // a token jelen van (a pontos érték a modul-szintű cache miatt sorrend-függő)
-    expect(typeof body.turnstile_token).toBe('string');
-    expect(body.turnstile_token.length).toBeGreaterThan(0);
+    // A mező VÉGLEG kikerült: a gateway nem validál Turnstile-t.
+    expect('turnstile_token' in body).toBe(false);
     expect(body.user_data.email).toBe('a@b.com');
     expect(body.consent.ad_user_data).toBe('GRANTED');
     expect(body.attribution.gclid).toBe('G9');
