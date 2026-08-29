@@ -1,0 +1,72 @@
+name: Tests
+
+# Az elso CI ebben a repoban. A deploy a Cloudflare Workers Builds oldalan fut
+# (nincs hozza workflow-fajl), ezert ez a workflow tisztan additiv: mer, de nem
+# blokkol deployt.
+#
+# MIERT KELL. A `tracking-kit` 141 tesztje eddig CSAK lokalisan futott. A #67 es
+# a #68 osszjatekat (kod + az uj klikk-ID tesztek) kezzel kellett osszefesulni es
+# lefuttatni a merge elott -- pontosan az a kezi lepes, amit egy CI elvegez.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  kit:
+    name: tracking-kit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # `npm install`, NEM `npm ci`: ebben a repoban egyetlen package-lock.json
+      # sincs kovetve, es az `npm ci` lockfile nelkul EUSAGE-dzsel elhasal.
+      #
+      # A GYOKER-telepites sem elhagyhato, pedig a tesztek a tracking-kit-ben
+      # futnak: a `gateway-dispatch-server.test.ts` a SITE
+      # `src/lib/tracking/gateway-dispatch.ts`-et importalja, az pedig az
+      # `astro/tsconfigs/strict`-et oldja fel. A gyoker node_modules nelkul ez az
+      # EGY fajl transzformacios hibaval kiesik -- 121 helyett 116 eset fut, es a
+      # kimaradas NEM bukas formajaban jelentkezik a szamokban.
+      - name: Fuggosegek (gyoker + kit)
+        run: |
+          npm install --no-audit --no-fund
+          npm --prefix tracking-kit install --no-audit --no-fund
+
+      - name: Teszt-keszlet
+        run: npm --prefix tracking-kit test
+
+      # SZANDEKOSAN NINCS ITT `check:events`. A masteren MA is bukik, ket
+      # kifogassal, es egyik sem javithato ebben a PR-ben:
+      #
+      #   [code -> docs]  a `cta_click` nincs a CANONICAL-EVENTS.md-ben. VALODI
+      #                   res, de dokumentacios munka.
+      #   [code -> gtm]   a `cta_click`-nek nincs CUSTOM_EVENT triggere. Ez
+      #                   TERVEZETT allapot: a BookingClick.astro kimondja, hogy
+      #                   engagement-only esemeny, ami NEM lehet GA4 key event es
+      #                   NEM importalhato Adsbe -- kulonben fantom-konverziot
+      #                   konyvelne a valodi lead mellé. A checkernek viszont
+      #                   nincs kivetel-mechanizmusa: a 2. szabalya minden
+      #                   eseményhez triggert kovetel, egy ures trigger pedig a
+      #                   3. szabalyba (`gtm orphan`) utkozne.
+      #
+      # A kivetel-mechanizmus a KANONIKUS csomag kerdese, nem site-patch.
+
+  build:
+    name: astro build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
