@@ -27,6 +27,7 @@ import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 import { sendEmail, classifyEmailFailure, classifySheetsFailure } from '@/lib/errors/classify';
 import {
   sendGatewayConversion,
+  buildConsentSources,
   readConsentFromCookie,
   isGatewayConfigured,
   type GatewayEnv,
@@ -476,6 +477,9 @@ async function dispatchGatewayConversion(
         utm_campaign: data.utm_campaign || undefined,
       },
       consent: readConsentFromCookie(request.headers.get('Cookie')),
+      // Fazis D: a szerver-lab MEGMONDJA, milyen kod futott. A bongeszo-lab a
+      // vendorolt tracking-kit-ben el -- oda a jelentes a fork-migracioval jon.
+      consentSources: buildConsentSources(request.headers.get('Cookie')),
       eventSourceUrl: request.headers.get('Referer') || undefined,
       clientIpAddress: request.headers.get('CF-Connecting-IP') || undefined,
       clientUserAgent: request.headers.get('User-Agent') || undefined,

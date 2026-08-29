@@ -91,6 +91,11 @@ export interface GatewayConversionInput {
   fbc?: string;
   attribution?: Record<string, string | undefined>;
   consent?: ConsentState;
+  /**
+   * Fazis D telemetria -- lasd `buildConsentSources`. CSAK diagnosztika: semmilyen
+   * kaput nem befolyasol. A hivo adja at: `buildConsentSources(cookieHeader)`.
+   */
+  consentSources?: ConsentSourcesPayload;
   eventSourceUrl?: string;
   /** The REAL end-user's IP/UA — without them the gateway would attribute the
    * conversion to our own Worker's egress IP/UA (wrong geo, worse Meta EMQ). */
@@ -200,6 +205,105 @@ function compact(obj: object): Record<string, unknown> {
   return out;
 }
 
+/**
+ * A SZERVER-LAB verzioja, ahogy a ledgernek jelentjuk.
+ *
+ * MIERT CSAK A SZERVER-LAB. A bongeszo-lab a VENDOROLT `tracking-kit/`-ben el,
+ * es a §3.3 szerint a vendorolt fajlba irt site-patch garantaltan elveszik --
+ * oda a verzio-jelentes a fork-migracioval jon (a kit `package.json`-je 5.0.0-t
+ * mond, mikozben 6.4.x-korabeli kodot visz, es a sodrodas KETIRANYU). EZ A FAJL
+ * viszont SITE-fajl (`src/lib/tracking/`), nem a kit resze -- ide biztonsagos.
+ *
+ * MIERT NEM SIMA SEMVER. Kanonikus semvert (`6.6.5`) irni ide ugyanaz a
+ * hazugsag lenne, ami a kit `package.json`-jet merhetetlenne teszi. A `6.6.4`
+ * elotag azt allitja, ameddig ez a SZERVER-lab atvezetest kapott (a hibas
+ * consent-suti ne 500-azza a lead-vegpontot, #66) -- semmi tobbet.
+ *
+ * MIERT `-` ES NEM `+`. A gateway KET uton olvas verziot:
+ *
+ *   routes/conversion.ts -> parseConsentSources()  ELNEZO (32 karakterre vag)
+ *   routes/consent.ts    -> parseConsentPayload()  SZIGORU, es a
+ *                           `VERSION_RE = /^[A-Za-z0-9_.-]{1,64}$/` NEM engedi
+ *                           a `+`-t -> a bejegyzest ELDOBJA
+ *
+ * Ma csak az elso uton kuldunk, tehat a `+` atmenne -- a sajat CMP-re valo
+ * atallas utan viszont CSENDBEN veszne el a consent-log.
+ *
+ * MIERT NEM `0.0.0-…`. Az `isClientLibVersionBelow` `[0,0,0]`-t olvasna ki ->
+ * MINDEN receiptre tuzelne a TRK-910-006. Ez MERT teny: a painless atmeneti
+ * `0.0.0-painless-fork` jelolese adta a TRK-910-006 EGYETLEN tuzeleset 30 nap
+ * alatt (5 talalat), mig a trapez `6.6.4-trapezlemezes-fork`-ja ures
+ * `finding_codes`-szal erkezik.
+ */
+export const BACKEND_LIB_VERSION = '6.6.4-beautyflow-fork';
+
+/** Egy consent-forras pillanatkepe. `null` = a forras NEM volt elerheto. */
+export interface ConsentSourceSnapshot {
+  analytics: boolean | null;
+  marketing: boolean | null;
+}
+
+export interface ConsentSourcesPayload {
+  cookie: ConsentSourceSnapshot;
+  api: ConsentSourceSnapshot;
+  source_used: 'cookieyes_cookie' | 'none';
+  client_lib_version: string;
+}
+
+/**
+ * Fazis D consent-telemetria a SZERVER-labon.
+ *
+ * Az `api` snapshot itt MINDIG „nem elerheto", es ez nem hiany: nincs bongeszo
+ * ebben a hivasi utban, tehat a CookieYes JS API-jat fogalmilag nem lehet
+ * olvasni. A `null` ezt mondja ki -- a `false` azt allitana, hogy az API nemet
+ * mondott, ami hazugsag lenne.
+ *
+ * Diagnosztika, nem kapu: SEMMILYEN dontest nem befolyasol. Sosem dob, es a
+ * dekodolasa LOSSY -- a KAPU (`readConsentFromCookie`) ugyanarra a sutire
+ * fail-closed marad. Egy telemetria-mezo nem buktathat leadet.
+ */
+export function buildConsentSources(cookieHeader: string | null): ConsentSourcesPayload {
+  const unavailable: ConsentSourceSnapshot = { analytics: null, marketing: null };
+
+  let raw: string | undefined;
+  if (cookieHeader) {
+    for (const part of cookieHeader.split(';')) {
+      const idx = part.indexOf('=');
+      if (idx < 0) continue;
+      if (part.slice(0, idx).trim() !== 'cookieyes-consent') continue;
+      const value = part.slice(idx + 1).trim();
+      try {
+        raw = decodeURIComponent(value);
+      } catch {
+        raw = value;
+      }
+      break;
+    }
+  }
+
+  if (!raw) {
+    return { cookie: unavailable, api: unavailable, source_used: 'none', client_lib_version: BACKEND_LIB_VERSION };
+  }
+
+  const map: Record<string, string> = {};
+  for (const part of raw.split(',')) {
+    const idx = part.indexOf(':');
+    if (idx > 0) map[part.slice(0, idx).trim()] = part.slice(idx + 1).trim();
+  }
+  const cookie: ConsentSourceSnapshot = {
+    analytics: map.analytics === undefined ? null : map.analytics === 'yes',
+    marketing: map.advertisement === undefined ? null : map.advertisement === 'yes',
+  };
+  const present = cookie.analytics !== null || cookie.marketing !== null;
+
+  return {
+    cookie,
+    api: unavailable,
+    source_used: present ? 'cookieyes_cookie' : 'none',
+    client_lib_version: BACKEND_LIB_VERSION,
+  };
+}
+
 export function buildGatewayPayload(input: GatewayConversionInput): Record<string, unknown> {
   // CLAUDE.md #3: never send `value: 0` — Meta logs it as a real value and it skews
   // ROAS. Omit value AND currency together when there is no money value.
@@ -223,6 +327,7 @@ export function buildGatewayPayload(input: GatewayConversionInput): Record<strin
     user_data: userData && Object.keys(userData).length > 0 ? userData : undefined,
     attribution: attribution && Object.keys(attribution).length > 0 ? attribution : undefined,
     consent: input.consent,
+    consent_sources: input.consentSources,
     event_source_url: input.eventSourceUrl,
     client_ip_address: input.clientIpAddress,
     client_user_agent: input.clientUserAgent,
