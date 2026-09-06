@@ -25,6 +25,15 @@ jobs:
         with:
           node-version: 22
 
+      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
+      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
+      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
+      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
+      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
+      # ezt a grafot; lokalisan 11.6.1-gyel megy.
+      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+        run: npm i -g npm@11
+
       # `npm install`, NEM `npm ci`: ebben a repoban egyetlen package-lock.json
       # sincs kovetve, es az `npm ci` lockfile nelkul EUSAGE-dzsel elhasal.
       #
@@ -70,6 +79,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
+      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
+      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
+      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
+      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
+      # ezt a grafot; lokalisan 11.6.1-gyel megy.
+      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+        run: npm i -g npm@11
 
       - run: npm install --no-audit --no-fund
       - run: npm run build
