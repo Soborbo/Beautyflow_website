@@ -25,6 +25,15 @@ jobs:
         with:
           node-version: 22
 
+      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
+      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
+      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
+      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
+      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
+      # ezt a grafot; lokalisan 11.6.1-gyel megy.
+      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+        run: npm i -g npm@11
+
       # `npm install`, NEM `npm ci`: ebben a repoban egyetlen package-lock.json
       # sincs kovetve, es az `npm ci` lockfile nelkul EUSAGE-dzsel elhasal.
       #
@@ -42,21 +51,24 @@ jobs:
       - name: Teszt-keszlet
         run: npm --prefix tracking-kit test
 
-      # SZANDEKOSAN NINCS ITT `check:events`. A masteren MA is bukik, ket
-      # kifogassal, es egyik sem javithato ebben a PR-ben:
+      # A bongeszo-szerzodes ore: kod <-> docs <-> GTM-konteneR. Ez a lepes
+      # korabban KIMARADT, mert a masteren ket kifogassal bukott -- mindketto
+      # most zarva:
       #
-      #   [code -> docs]  a `cta_click` nincs a CANONICAL-EVENTS.md-ben. VALODI
-      #                   res, de dokumentacios munka.
-      #   [code -> gtm]   a `cta_click`-nek nincs CUSTOM_EVENT triggere. Ez
-      #                   TERVEZETT allapot: a BookingClick.astro kimondja, hogy
-      #                   engagement-only esemeny, ami NEM lehet GA4 key event es
-      #                   NEM importalhato Adsbe -- kulonben fantom-konverziot
-      #                   konyvelne a valodi lead mellé. A checkernek viszont
-      #                   nincs kivetel-mechanizmusa: a 2. szabalya minden
-      #                   eseményhez triggert kovetel, egy ures trigger pedig a
-      #                   3. szabalyba (`gtm orphan`) utkozne.
+      #   [code -> docs]  a `cta_click` nem volt a CANONICAL-EVENTS.md-ben.
+      #                   VALODI res volt; dokumentalva.
+      #   [code -> gtm]   a `cta_click`-nek nincs CUSTOM_EVENT triggere, es ez
+      #                   TERVEZETT: engagement-only esemeny, ami NEM lehet GA4
+      #                   key event es NEM importalhato Adsbe -- kulonben
+      #                   fantom-konverziot konyvelne a valodi lead mellett.
+      #                   A checker kivetel-mechanizmusa (a KANONIKUS csomagban
+      #                   keszult el, nem site-patchkent) ezt most kimondhatova
+      #                   teszi: `gtm/no-trigger-events.json`, kotelezo indokkal.
       #
-      # A kivetel-mechanizmus a KANONIKUS csomag kerdese, nem site-patch.
+      # A kivetel NEM csendes felmentes: ha valaha triggert kap a `cta_click`,
+      # vagy ha a kod mar nem emittalja, ez a lepes szol rola.
+      - name: Event-szerzodes (kod <-> docs <-> GTM)
+        run: npm --prefix tracking-kit run check:events
 
   build:
     name: astro build
@@ -67,6 +79,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
+      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
+      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
+      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
+      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
+      # ezt a grafot; lokalisan 11.6.1-gyel megy.
+      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+        run: npm i -g npm@11
 
       - run: npm install --no-audit --no-fund
       - run: npm run build

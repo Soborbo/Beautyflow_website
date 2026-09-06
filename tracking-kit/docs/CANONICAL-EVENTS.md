@@ -44,6 +44,21 @@ so reporting stays unified (but see the double-counting warning above).
 | `scroll_depth` (25/50/75/100) | scroll | regular event |
 | `newsletter_signup` | newsletter success | regular event |
 | `calculator_result_view` | result-page view | regular event |
+| `cta_click` | internal CTA click (`data-track="cta_click"`) | regular event — **no GTM trigger by design** |
+
+> **`cta_click` deliberately has no GTM trigger**, and that is the point of the event.
+> `booking_click` IS a conversion, so it only belongs on a real hand-off (a click that
+> leaves the site for Notino); in Ads the GA4-imported `booking_click` is a PRIMARY
+> goal. Putting an internal CTA — a link that merely navigates to
+> `/ingyenes-konzultacio` — on that event would book a conversion before the visitor
+> submits anything, on top of the lead the form itself reports. `cta_click` is the
+> engagement-only alternative: browser dataLayer, analytics consent, no gateway leg,
+> **not** a GA4 key event and **not** imported into Ads.
+>
+> The trigger check knows this: the event is declared in
+> [`../gtm/no-trigger-events.json`](../gtm/no-trigger-events.json), and
+> `npm run check:events` fails if a trigger ever appears for it (a stale exemption)
+> or if the declaration outlives the code that emits it.
 
 ## GA4 admin tasks (once per property)
 
