@@ -230,12 +230,31 @@ A Meta CAPI mirror `contact_form_submit` + `primary_conversion` néven fut (mint
 - **Foglaló naptár** — jelenleg kézi visszahívás + tel CTA (`eredmeny/[hash].astro`).
 - **Képes kártya illusztrációk** (Q1, Q20) — `QuizApp.astro` (`// TODO: kép`).
 
-### 5. Miért nincs commitolt `package-lock.json`
-A `sharp`, `@tailwindcss/oxide` és a `rolldown` platform-specifikus natív + wasm
-opcionális függőségeket szállít (`@img/sharp-*`, `@emnapi/*`, `@napi-rs/wasm-runtime`).
-Egy Windows-on generált lock **nem tudja** beletenni a Linux-only ágak beágyazott
-`@emnapi` bejegyzéseit, ezért a Cloudflare Linux buildjén a `npm ci` konzisztencia-
-ellenőrzése elhasal (`Missing @emnapi/runtime@1.11.1 from lock file`). Lock nélkül a
-CF `npm install`-t futtat, ami platformhelyesen old fel — ezért a `package-lock.json`
-szándékosan gitignore-olt. Ha újra szeretnél commitolt lockot + `npm ci`-t, azt
-**Linux** környezetben kell generálni (CI vagy `npm install --package-lock-only`).
+### 5. A `package-lock.json` — commitolt, de CSAK Linuxon generálható
+**2026-09-06-tól újra commitolt.** Előtte szándékosan gitignore-olt volt, és az ok
+ma is érvényes: a `sharp`, `@tailwindcss/oxide` és a `rolldown` platform-specifikus
+natív + wasm opcionális függőségeket szállít (`@img/sharp-*`, `@emnapi/*`,
+`@napi-rs/wasm-runtime`), és egy **Windowson** generált lock **nem tudja** beletenni
+a Linux-only ágak beágyazott `@emnapi` bejegyzéseit — a Linux `npm ci` ott elhasal
+(`Missing @emnapi/runtime@… from lock file`).
+
+Ami megváltozott: a régi feljegyzés maga mondta ki a kiutat („Linux környezetben
+kell generálni"), és ez most **futtatható eszköz**, nem kézi caveat:
+
+| lépés | hogyan |
+|---|---|
+| lock generálás | a **`Lockfile (Linux-on generalva)`** workflow (Actions → Run workflow) |
+| ellenőrzés | `node scripts/check-lockfile.mjs <lock> --require-semver` (a CI is futtatja) |
+| beírás | töltsd le a workflow `lockfiles` artifactját, tedd a repóba, commitold |
+
+**A lock frissítése NEM lokális művelet.** Egy Windowson futtatott `npm install`
+utána is kipucolja a wasm32 ágakat — ha megtette, a `check-lockfile` PIROS lesz, és
+újra kell generálni a workflow-val.
+
+Miért volt megéri: lock nélkül minden CI-futás frissen oldott fel a registryből,
+tehát egy idegen publikálás bármikor eltörhette. 2026-09-06-án pontosan ez történt:
+a VÁLTOZATLAN master is bukott (`npm error Cannot read properties of null (reading
+'edgesOut')`), és a „zöld" visszamenőleg sem volt reprodukálható.
+
+Mérve, hogy az akadály elhárult: a workflow a generálás után `npm ci`-t is futtat —
+ugyanazt a konzisztencia-ellenőrzést, amin a CF build annak idején elhasalt.

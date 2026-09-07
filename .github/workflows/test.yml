@@ -25,19 +25,20 @@ jobs:
         with:
           node-version: 22
 
-      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
-      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
-      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
-      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
-      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
-      # ezt a grafot; lokalisan 11.6.1-gyel megy.
-      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+      # Az npm-verzio is a reprodukalhatosag resze: a lockot npm 11 irta, es a
+      # node 22-hoz csomagolt npm 10 arboristja mar egyszer elhasalt ezen a grafon
+      # (`Cannot read properties of null (reading 'edgesOut')`, 2026-09-06, a
+      # VALTOZATLAN masteren is). `npm ci` mellett ez mar nem feloldas-kerdes,
+      # de a toolchain rogzitese olcso.
+      - name: npm 11 (a lockot is ez irta)
         run: npm i -g npm@11
 
-      # `npm install`, NEM `npm ci`: ebben a repoban egyetlen package-lock.json
-      # sincs kovetve, es az `npm ci` lockfile nelkul EUSAGE-dzsel elhasal.
+      # `npm ci`, NEM `npm install`: 2026-09-06 ota van kovetett lockfile
+      # (DEPLOY.md §5). Ez teszi a futast reprodukalhatova -- korabban minden run
+      # frissen oldott fel a registrybol, es egy idegen publikalas eltorte a CI-t
+      # a VALTOZATLAN masteren is.
       #
-      # A GYOKER-telepites sem elhagyhato, pedig a tesztek a tracking-kit-ben
+      # A GYOKER-telepites nem elhagyhato, pedig a tesztek a tracking-kit-ben
       # futnak: a `gateway-dispatch-server.test.ts` a SITE
       # `src/lib/tracking/gateway-dispatch.ts`-et importalja, az pedig az
       # `astro/tsconfigs/strict`-et oldja fel. A gyoker node_modules nelkul ez az
@@ -45,8 +46,17 @@ jobs:
       # kimaradas NEM bukas formajaban jelentkezik a szamokban.
       - name: Fuggosegek (gyoker + kit)
         run: |
-          npm install --no-audit --no-fund
-          npm --prefix tracking-kit install --no-audit --no-fund
+          npm ci --no-audit --no-fund
+          npm --prefix tracking-kit ci --no-audit --no-fund
+
+      # A lock akkor er valamit, ha TELJES. Egy Windowson futtatott `npm install`
+      # kipucolja a wasm32 agak beagyazott `@emnapi` bejegyzeseit, es akkor ez a
+      # `npm ci` Linuxon elhasalna. `--require-semver`: a verzio-szint futasa
+      # KOTELEZO, ne eshessen vissza csendben nev-ellenorzesre.
+      - name: Lockfile-teljesseg
+        run: |
+          node scripts/check-lockfile.mjs package-lock.json --require-semver
+          node scripts/check-lockfile.mjs tracking-kit/package-lock.json --require-semver
 
       - name: Teszt-keszlet
         run: npm --prefix tracking-kit test
@@ -80,14 +90,13 @@ jobs:
         with:
           node-version: 22
 
-      # A node 22-hoz csomagolt npm 10 arboristja elhasal ezen a fugosegi
-      # grafon: `npm error Cannot read properties of null (reading 'edgesOut')`.
-      # Mivel ez a repo NEM kovet lockfile-t, minden run frissen old fel a
-      # registrybol -- 08-29-en meg zold volt, ma mar a VALTOZATLAN master is
-      # bukik ugyanezzel (workflow_dispatch-csel merve). Az npm 11 feloldoja
-      # ezt a grafot; lokalisan 11.6.1-gyel megy.
-      - name: npm 11 (a node 22 npm 10-ese elhasal a feloldason)
+      # Az npm-verzio is a reprodukalhatosag resze: a lockot npm 11 irta, es a
+      # node 22-hoz csomagolt npm 10 arboristja mar egyszer elhasalt ezen a grafon
+      # (`Cannot read properties of null (reading 'edgesOut')`, 2026-09-06, a
+      # VALTOZATLAN masteren is). `npm ci` mellett ez mar nem feloldas-kerdes,
+      # de a toolchain rogzitese olcso.
+      - name: npm 11 (a lockot is ez irta)
         run: npm i -g npm@11
 
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm run build
