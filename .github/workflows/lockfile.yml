@@ -53,7 +53,7 @@ jobs:
 
       # A dontő proba: az `npm ci` ugyanazt a konzisztencia-ellenorzest futtatja,
       # amin a Cloudflare Linux buildje elhasalt.
-      - name: `npm ci` proba (amin a CF build elhasalt)
+      - name: npm ci proba (amin a CF build elhasalt)
         run: |
           npm ci --no-audit --no-fund
           npm --prefix tracking-kit ci --no-audit --no-fund
