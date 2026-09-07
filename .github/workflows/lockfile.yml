@@ -13,6 +13,18 @@ name: Lockfile (Linux-on generalva)
 
 on:
   workflow_dispatch:
+  # Ha a fuggosegek (vagy maga az eszkoz) valtoznak, ELLENORIZZUK, hogy Linuxon
+  # generalhato-e `npm ci`-tiszta lock. Igy a DEPLOY.md §5 akadalya nem elmelet
+  # marad, hanem merve van minden erintett PR-en.
+  #
+  # (A `workflow_dispatch` csak akkor inditható, ha a fajl mar a DEFAULT agon van
+  # — ezert kell ez a trigger ahhoz, hogy az elso futas egyaltalan letrejohessen.)
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'tracking-kit/package.json'
+      - '.github/workflows/lockfile.yml'
+      - 'scripts/check-lockfile.mjs'
 
 jobs:
   generate:
