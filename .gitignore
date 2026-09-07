@@ -37,10 +37,9 @@ pnpm-debug.log*
 .playwright-mcp/
 references/
 
-# npm lockfile is intentionally NOT committed.
-# sharp / @tailwindcss/oxide / rolldown ship platform-specific native+wasm
-# optional deps whose nested @emnapi/@napi-rs entries a Windows-generated lock
-# cannot include for Linux. With a committed lock, Cloudflare's Linux build
-# runs `npm ci` and fails the consistency check; with no lock it runs
-# `npm install` and resolves correctly per-platform. See DEPLOY.md.
-package-lock.json
+# The npm lockfile IS committed again (2026-09-06). It must be generated on
+# LINUX -- run the `Lockfile (Linux-on generalva)` workflow and commit its
+# artifact. A Windows-generated lock silently drops the nested @emnapi entries of
+# the wasm32 optional branches (sharp / @tailwindcss/oxide / rolldown), and then
+# `npm ci` fails on Linux. `scripts/check-lockfile.mjs` measures exactly that, and
+# CI runs it. See DEPLOY.md §5.

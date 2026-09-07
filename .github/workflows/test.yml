@@ -25,10 +25,20 @@ jobs:
         with:
           node-version: 22
 
-      # `npm install`, NEM `npm ci`: ebben a repoban egyetlen package-lock.json
-      # sincs kovetve, es az `npm ci` lockfile nelkul EUSAGE-dzsel elhasal.
+      # Az npm-verzio is a reprodukalhatosag resze: a lockot npm 11 irta, es a
+      # node 22-hoz csomagolt npm 10 arboristja mar egyszer elhasalt ezen a grafon
+      # (`Cannot read properties of null (reading 'edgesOut')`, 2026-09-06, a
+      # VALTOZATLAN masteren is). `npm ci` mellett ez mar nem feloldas-kerdes,
+      # de a toolchain rogzitese olcso.
+      - name: npm 11 (a lockot is ez irta)
+        run: npm i -g npm@11
+
+      # `npm ci`, NEM `npm install`: 2026-09-06 ota van kovetett lockfile
+      # (DEPLOY.md §5). Ez teszi a futast reprodukalhatova -- korabban minden run
+      # frissen oldott fel a registrybol, es egy idegen publikalas eltorte a CI-t
+      # a VALTOZATLAN masteren is.
       #
-      # A GYOKER-telepites sem elhagyhato, pedig a tesztek a tracking-kit-ben
+      # A GYOKER-telepites nem elhagyhato, pedig a tesztek a tracking-kit-ben
       # futnak: a `gateway-dispatch-server.test.ts` a SITE
       # `src/lib/tracking/gateway-dispatch.ts`-et importalja, az pedig az
       # `astro/tsconfigs/strict`-et oldja fel. A gyoker node_modules nelkul ez az
@@ -36,27 +46,39 @@ jobs:
       # kimaradas NEM bukas formajaban jelentkezik a szamokban.
       - name: Fuggosegek (gyoker + kit)
         run: |
-          npm install --no-audit --no-fund
-          npm --prefix tracking-kit install --no-audit --no-fund
+          npm ci --no-audit --no-fund
+          npm --prefix tracking-kit ci --no-audit --no-fund
+
+      # A lock akkor er valamit, ha TELJES. Egy Windowson futtatott `npm install`
+      # kipucolja a wasm32 agak beagyazott `@emnapi` bejegyzeseit, es akkor ez a
+      # `npm ci` Linuxon elhasalna. `--require-semver`: a verzio-szint futasa
+      # KOTELEZO, ne eshessen vissza csendben nev-ellenorzesre.
+      - name: Lockfile-teljesseg
+        run: |
+          node scripts/check-lockfile.mjs package-lock.json --require-semver
+          node scripts/check-lockfile.mjs tracking-kit/package-lock.json --require-semver
 
       - name: Teszt-keszlet
         run: npm --prefix tracking-kit test
 
-      # SZANDEKOSAN NINCS ITT `check:events`. A masteren MA is bukik, ket
-      # kifogassal, es egyik sem javithato ebben a PR-ben:
+      # A bongeszo-szerzodes ore: kod <-> docs <-> GTM-konteneR. Ez a lepes
+      # korabban KIMARADT, mert a masteren ket kifogassal bukott -- mindketto
+      # most zarva:
       #
-      #   [code -> docs]  a `cta_click` nincs a CANONICAL-EVENTS.md-ben. VALODI
-      #                   res, de dokumentacios munka.
-      #   [code -> gtm]   a `cta_click`-nek nincs CUSTOM_EVENT triggere. Ez
-      #                   TERVEZETT allapot: a BookingClick.astro kimondja, hogy
-      #                   engagement-only esemeny, ami NEM lehet GA4 key event es
-      #                   NEM importalhato Adsbe -- kulonben fantom-konverziot
-      #                   konyvelne a valodi lead mellé. A checkernek viszont
-      #                   nincs kivetel-mechanizmusa: a 2. szabalya minden
-      #                   eseményhez triggert kovetel, egy ures trigger pedig a
-      #                   3. szabalyba (`gtm orphan`) utkozne.
+      #   [code -> docs]  a `cta_click` nem volt a CANONICAL-EVENTS.md-ben.
+      #                   VALODI res volt; dokumentalva.
+      #   [code -> gtm]   a `cta_click`-nek nincs CUSTOM_EVENT triggere, es ez
+      #                   TERVEZETT: engagement-only esemeny, ami NEM lehet GA4
+      #                   key event es NEM importalhato Adsbe -- kulonben
+      #                   fantom-konverziot konyvelne a valodi lead mellett.
+      #                   A checker kivetel-mechanizmusa (a KANONIKUS csomagban
+      #                   keszult el, nem site-patchkent) ezt most kimondhatova
+      #                   teszi: `gtm/no-trigger-events.json`, kotelezo indokkal.
       #
-      # A kivetel-mechanizmus a KANONIKUS csomag kerdese, nem site-patch.
+      # A kivetel NEM csendes felmentes: ha valaha triggert kap a `cta_click`,
+      # vagy ha a kod mar nem emittalja, ez a lepes szol rola.
+      - name: Event-szerzodes (kod <-> docs <-> GTM)
+        run: npm --prefix tracking-kit run check:events
 
   build:
     name: astro build
@@ -68,5 +90,13 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm install --no-audit --no-fund
+      # Az npm-verzio is a reprodukalhatosag resze: a lockot npm 11 irta, es a
+      # node 22-hoz csomagolt npm 10 arboristja mar egyszer elhasalt ezen a grafon
+      # (`Cannot read properties of null (reading 'edgesOut')`, 2026-09-06, a
+      # VALTOZATLAN masteren is). `npm ci` mellett ez mar nem feloldas-kerdes,
+      # de a toolchain rogzitese olcso.
+      - name: npm 11 (a lockot is ez irta)
+        run: npm i -g npm@11
+
+      - run: npm ci --no-audit --no-fund
       - run: npm run build

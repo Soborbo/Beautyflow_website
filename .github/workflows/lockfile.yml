@@ -1,0 +1,67 @@
+name: Lockfile (Linux-on generalva)
+
+# MIERT KULON WORKFLOW. A DEPLOY.md §5 rogziti: egy WINDOWSON generalt lock nem
+# tudja beletenni a Linux-only agak beagyazott `@emnapi` bejegyzeseit, ezert a
+# Cloudflare Linux buildjen az `npm ci` konzisztencia-ellenorzese elhasal
+# (`Missing @emnapi/runtime@... from lock file`). A dokumentalt megoldas: a lockot
+# LINUXON kell generalni. Ez a workflow pontosan azt teszi -- kezzel inditva
+# (workflow_dispatch), es artifactkent adja vissza a ket lockfile-t.
+#
+# HASZNALAT: futtasd, ha valtozott a package.json barmelyike; toltsd le az
+# artifactot, tedd a repoba, commitold. A `npm install` Windowson UTANA is
+# kipucolja a wasm32 agakat -- ezert a lock-frissites NEM lokalis muvelet.
+
+on:
+  workflow_dispatch:
+  # Ha a fuggosegek (vagy maga az eszkoz) valtoznak, ELLENORIZZUK, hogy Linuxon
+  # generalhato-e `npm ci`-tiszta lock. Igy a DEPLOY.md §5 akadalya nem elmelet
+  # marad, hanem merve van minden erintett PR-en.
+  #
+  # (A `workflow_dispatch` csak akkor inditható, ha a fajl mar a DEFAULT agon van
+  # — ezert kell ez a trigger ahhoz, hogy az elso futas egyaltalan letrejohessen.)
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'tracking-kit/package.json'
+      - '.github/workflows/lockfile.yml'
+      - 'scripts/check-lockfile.mjs'
+
+jobs:
+  generate:
+    name: lockfile generalas + ellenorzes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm i -g npm@11
+
+      # `--package-lock-only`: nem telepit, csak a fat oldja fel es irja a lockot.
+      - name: Lockfile-ok generalasa
+        run: |
+          npm install --package-lock-only --no-audit --no-fund
+          npm --prefix tracking-kit install --package-lock-only --no-audit --no-fund
+
+      # A generalas ONMAGABAN nem bizonyitek. Az ellenorzes az.
+      - name: Teljesseg-ellenorzes
+        run: |
+          node scripts/check-lockfile.mjs package-lock.json
+          node scripts/check-lockfile.mjs tracking-kit/package-lock.json
+
+      # A dontő proba: az `npm ci` ugyanazt a konzisztencia-ellenorzest futtatja,
+      # amin a Cloudflare Linux buildje elhasalt.
+      - name: npm ci proba (amin a CF build elhasalt)
+        run: |
+          npm ci --no-audit --no-fund
+          npm --prefix tracking-kit ci --no-audit --no-fund
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lockfiles
+          path: |
+            package-lock.json
+            tracking-kit/package-lock.json
+          if-no-files-found: error

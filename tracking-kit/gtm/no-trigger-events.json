@@ -1,0 +1,3 @@
+{
+  "cta_click": "Engagement-only internal CTA (BookingClick.astro): browser dataLayer, analytics consent, no gateway leg. It must NOT be a GA4 key event and must NOT be imported into Ads — a trigger would book a conversion for a visitor who only navigated to /ingyenes-konzultacio, on top of the lead the form itself reports. booking_click stays the conversion; this is deliberately not one."
+}

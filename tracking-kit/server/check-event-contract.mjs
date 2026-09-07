@@ -9,7 +9,7 @@
  *
  *   1. Every emitted browser event is documented in docs/CANONICAL-EVENTS.md.
  *   2. Every emitted browser event has a `CE - X` (CUSTOM_EVENT) trigger in the
- *      GTM container.
+ *      GTM container — unless it is declared GTM-free (see --gtm-exempt below).
  *   3. Every such trigger fires at least one non-paused tag.
  *   4. (warning) GTM CUSTOM_EVENT triggers that no code path emits — possible
  *      dead trigger / drift the other way.
@@ -25,9 +25,29 @@
  *   node server/check-event-contract.mjs \
  *     --src ./lib,./components \
  *     --events ./docs/CANONICAL-EVENTS.md \
- *     --gtm ./gtm/container.json
+ *     --gtm ./gtm/container.json \
+ *     --gtm-exempt ./gtm/no-trigger-events.json
  *
  * `--gtm` is optional; when the file is missing, checks (2)–(4) are skipped.
+ *
+ * DELIBERATELY GTM-FREE EVENTS (--gtm-exempt, optional file)
+ * ---------------------------------------------------------
+ * Some events are engagement-only by design: they must NOT become a GA4 key event
+ * and must NOT be importable into Ads, so they intentionally have no GTM trigger.
+ * Without a way to say so, check (2) leaves the whole script unrunnable in CI —
+ * which is worse than a narrow exemption, because then NOTHING is guarded.
+ *
+ * The file is a flat `{ "<event>": "<why it has no trigger>" }` map. The reason is
+ * REQUIRED and must be non-empty: an exemption without a justification is how a
+ * real drift gets waved through. An exemption only waives check (2); the event must
+ * still be documented (check 1).
+ *
+ * The exemption list is itself guarded, so it cannot rot into a lie:
+ *   - exempt event that DOES have a GTM trigger  → error (the claim is stale;
+ *     someone must re-decide, not silently keep the note)
+ *   - exempt event that no code path emits       → warning (dead config, mirrors
+ *     the symmetric warning in check 4)
+ * Exemptions are also printed on success, so they stay visible rather than silent.
  */
 
 import { readFile, readdir, stat } from 'node:fs/promises';
@@ -40,6 +60,7 @@ const { values: args } = parseArgs({
     src: { type: 'string', default: existsSync('../src') ? './lib,./components,../src' : './lib,./components' },
     events: { type: 'string', default: './docs/CANONICAL-EVENTS.md' },
     gtm: { type: 'string', default: './gtm/container.json' },
+    'gtm-exempt': { type: 'string', default: './gtm/no-trigger-events.json' },
   },
 });
 
@@ -101,6 +122,42 @@ async function eventsInDoc(eventsMdPath) {
   return out;
 }
 
+/**
+ * Loads the deliberately-GTM-free declarations. Missing file = no exemptions (the
+ * common case). Shape problems are reported as errors rather than thrown, so a
+ * malformed file cannot silently degrade into "nothing is exempt".
+ *
+ * @param {string} exemptPath
+ * @returns {Promise<{ exempt: Map<string, string>, errors: string[] }>}
+ */
+async function loadExemptions(exemptPath) {
+  /** @type {Map<string, string>} event -> reason */
+  const exempt = new Map();
+  /** @type {string[]} */
+  const errors = [];
+  if (!existsSync(exemptPath)) return { exempt, errors };
+
+  let parsed;
+  try {
+    parsed = JSON.parse(await readFile(exemptPath, 'utf8'));
+  } catch (e) {
+    errors.push(`[gtm-exempt]   cannot parse ${exemptPath}: ${e.message}`);
+    return { exempt, errors };
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    errors.push(`[gtm-exempt]   ${exemptPath} must be a JSON object of { "event": "reason" }`);
+    return { exempt, errors };
+  }
+  for (const [event, reason] of Object.entries(parsed)) {
+    if (typeof reason !== 'string' || reason.trim() === '') {
+      errors.push(`[gtm-exempt]   '${event}' has no reason — an exemption without a justification is how real drift gets waved through`);
+      continue;
+    }
+    exempt.set(event, reason.trim());
+  }
+  return { exempt, errors };
+}
+
 async function gtmAnalysis(gtmPath) {
   const json = JSON.parse(await readFile(gtmPath, 'utf8'));
   const cv = json.containerVersion ?? json;
@@ -149,8 +206,18 @@ async function main() {
     console.warn(`! GTM container not found at ${args.gtm} — skipping checks (2)–(4).`);
   }
 
-  const errors = [];
+  const { exempt, errors: exemptErrors } = await loadExemptions(args['gtm-exempt']);
+
+  const errors = [...exemptErrors];
   const warnings = [];
+
+  // The exemption list must not rot into a lie: every declared event has to be
+  // one a code path actually emits.
+  for (const event of exempt.keys()) {
+    if (!codeEvents.has(event)) {
+      warnings.push(`[gtm-exempt]   '${event}' is declared GTM-free but no code path emits it (dead exemption?)`);
+    }
+  }
 
   // 1. code → docs
   for (const [event, sites] of codeEvents) {
@@ -161,10 +228,16 @@ async function main() {
   }
 
   if (gtmExists) {
-    // 2. code → GTM trigger
+    // 2. code → GTM trigger (waived for events declared deliberately GTM-free)
     for (const [event, sites] of codeEvents) {
-      if (!gtmEvents.has(event)) {
-        errors.push(`[code → gtm]   '${event}' (${sites[0]}) has no CUSTOM_EVENT trigger in the GTM container`);
+      if (gtmEvents.has(event) || exempt.has(event)) continue;
+      errors.push(`[code → gtm]   '${event}' (${sites[0]}) has no CUSTOM_EVENT trigger in the GTM container`);
+    }
+    // 2b. A stale exemption is worse than none: it documents a decision that
+    // reality has already overruled. Fail so someone re-decides.
+    for (const event of exempt.keys()) {
+      if (gtmEvents.has(event)) {
+        errors.push(`[gtm-exempt]   '${event}' is declared GTM-free but a CUSTOM_EVENT trigger exists — the exemption is stale, remove it or remove the trigger`);
       }
     }
     // 3. GTM trigger → at least one active tag
@@ -187,6 +260,11 @@ async function main() {
   if (errors.length === 0) {
     const gtmPart = gtmExists ? `, ${gtmEvents.size} GTM triggers` : '';
     console.log(`✓ Event contract OK — ${codeEvents.size} browser events in code, ${docEvents.size} doc names${gtmPart}`);
+    // Print exemptions on success too — a waiver nobody ever sees is a waiver
+    // nobody ever revisits.
+    for (const [event, reason] of exempt) {
+      console.log(`  · '${event}' intentionally has no GTM trigger: ${reason}`);
+    }
     process.exit(0);
   }
   console.error(`✗ Event contract drift (${errors.length} issue${errors.length === 1 ? '' : 's'}):\n`);

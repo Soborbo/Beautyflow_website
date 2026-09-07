@@ -4,7 +4,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: false,
-    include: ['tests/**/*.test.ts'],
+    // .mjs too: harnesses for the node-side .mjs tooling (server/*.mjs) live
+    // outside the browser tsconfig on purpose — see the note in
+    // tests/check-event-contract-script.test.mjs.
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.mjs'],
   },
   define: {
     // gateway.ts: Astro public env for the Turnstile sitekey (fixed value in tests)
