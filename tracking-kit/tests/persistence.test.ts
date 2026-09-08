@@ -15,8 +15,18 @@ describe('normalizeEmail', () => {
   it('lowercases + trims', () => {
     expect(normalizeEmail('  Jane@Example.COM ')).toBe('jane@example.com');
   });
-  it('caps length at 254', () => {
-    expect(normalizeEmail('a'.repeat(300) + '@x.com').length).toBe(254);
+  /**
+   * VISELKEDÉS-VÁLTOZÁS (6.6.0). Korábban 254 karakternél CSONKÍTOTT — ami egy
+   * mesterségesen MÁS címet állított elő, mint amit a Worker `hash.ts`
+   * ugyanabból a bemenetből hashelt. 254 oktet fölött a cím érvénytelen
+   * (RFC 5321), ezért eldobjuk. A parity-bizonyíték:
+   * `tests/email-identity-parity.test.ts`.
+   */
+  it('254 oktet fölött ELDOB, nem csonkít', () => {
+    expect(normalizeEmail('a'.repeat(300) + '@x.com')).toBeUndefined();
+  });
+  it('nem e-mail (nincs @) → undefined', () => {
+    expect(normalizeEmail('not-an-email')).toBeUndefined();
   });
 });
 
@@ -26,6 +36,12 @@ describe('normalizePhone — bilingual UK + HU', () => {
   });
   it('HU 06… → +36… (auto-detect, regardless of config)', () => {
     expect(normalizePhone('06 20 123 4567')).toBe('+36201234567');
+  });
+  it('HU 06 landline (10-jegyű) → strip 06, egyezik a szerverrel (nem +36 6…)', () => {
+    // Regresszió: a 10-jegyű 06-os vezetékes a `06 && length===11` gyorsútból
+    // kiesett, és korábban csak a `0`-t vágta → +36612345678 (plusz 6), eltérve a
+    // szerver hash.ts +3612345678-tól → néma EC/CAPI hash-divergencia.
+    expect(normalizePhone('06 1 234 5678', 'HU')).toBe('+3612345678');
   });
   it('keeps already-international (+)', () => {
     expect(normalizePhone('+44 7123 456789')).toBe('+447123456789');
@@ -85,7 +101,43 @@ describe('attribution — first/last touch + source type', () => {
     setUrl('/?utm_source=newsletter&utm_medium=organic'); captureUrlParams(); persistTrackingParams();
     expect(getSourceType()).toBe('organic');
     resetAll(); setCkyConsent({ marketing: true, analytics: true });
+    // A cim eddig igerte a catch-all-t, de a teszt SOSEM allitotta — ez a sor
+    // koti le a szandekos viselkedest: megcimkezett, be nem sorolhato latogato
+    // `referral`, nem `direct`.
+    setUrl('/?utm_source=partnersite'); captureUrlParams(); persistTrackingParams();
+    expect(getSourceType()).toBe('referral');
+    resetAll(); setCkyConsent({ marketing: true, analytics: true });
     expect(getSourceType()).toBe('direct');
+  });
+
+  it('a medium-tabla a valos irasmodokat is felismeri — nem esnek a catch-all-ba', () => {
+    const cases: Array<[string, string]> = [
+      ['cpm', 'paid'],
+      ['display', 'paid'],
+      ['Paid_Social', 'paid'],
+      ['e-mail', 'email'],
+      ['newsletter', 'email'],
+      ['social_media', 'social'],
+      ['affiliate', 'referral'],
+    ];
+    for (const [medium, expected] of cases) {
+      resetAll(); setCkyConsent({ marketing: true, analytics: true });
+      setUrl(`/?utm_source=x&utm_medium=${medium}`);
+      captureUrlParams(); persistTrackingParams();
+      expect(getSourceType(), `utm_medium=${medium}`).toBe(expected);
+    }
+  });
+
+  it('first touch a kulcsszot es a kreativot is megorzi', () => {
+    setUrl('/?utm_source=google&utm_medium=cpc&utm_term=bristol+removals&utm_content=ad_v2');
+    captureUrlParams(); persistTrackingParams();
+    setUrl('/?utm_source=bing&utm_term=later&utm_content=later_ad');
+    captureUrlParams(); persistTrackingParams();
+    const a = getAttribution();
+    expect(a.first_utm_term).toBe('bristol removals');
+    expect(a.first_utm_content).toBe('ad_v2');
+    expect(a.last_utm_term).toBe('later');
+    expect(a.last_utm_content).toBe('later_ad');
   });
 });
 

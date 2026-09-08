@@ -154,7 +154,11 @@ export function setUserDataForEC(ud: EcUserData): void {
 }
 
 function buildConversionPayload(data: ConversionData): Record<string, unknown> {
-  const ud: EcUserData = { email: normalizeEmail(data.email) };
+  const ud: EcUserData = {};
+  // A `normalizeEmail` a 6.6.0 ota `undefined`-ot ad ervenytelen/tullepo
+  // cimre (ELDOB, nem csonkit) — a kulcsot ilyenkor ki sem tesszuk.
+  const normalizedEmail = normalizeEmail(data.email);
+  if (normalizedEmail) ud.email = normalizedEmail;
   if (data.phone && data.phone.length >= 8) ud.phone_number = normalizePhone(data.phone);
   // gtag user_provided_data schema: names go under `address` — top-level
   // first_name/last_name are dropped by the Google Ads (awct) tag.
