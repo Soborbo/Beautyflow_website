@@ -3,13 +3,13 @@
  *
  * Every event checks consent before pushing.
  * Analytics events need analytics consent.
- * Browser conversion events need analytics consent (checked in index.ts).
- * Their Enhanced-Conversions PII side-channel independently needs marketing consent.
+ * Conversion events need marketing consent (checked in index.ts).
  */
 
 import { hasAnalyticsConsent, hasMarketingConsent } from './consent';
-import { getSessionId, getDevice, getAttribution, getPageUrl, normalizeEmail, normalizePhone, sanitizeName } from './persistence';
+import { getSessionId, getDevice, getAttribution, getPageUrl, normalizeEmail, normalizePhone, sanitizeName, registerMarketingPurgeHook } from './persistence';
 import { report, redactPii, enableDiagDebug } from './observability';
+import { generateUUID } from './uuid';
 
 declare global {
   interface Window {
@@ -36,35 +36,66 @@ function push(data: Record<string, unknown>): void {
 
 // ── Event ID ───────────────────────────────────────────────────────
 
+/**
+ * Az `event_id` — a dedup-kulcs, amit a Meta Pixel és a CAPI ugyanarra az
+ * eseményre kap.
+ *
+ * ── MIÉRT NEM SAJÁT TARTALÉKÁG ───────────────────────────────────────────────
+ * Ez a függvény korábban SAJÁT tartalékággal rendelkezett, ami NEM UUID-t adott:
+ * `${Date.now().toString(36)}-${Math.random()…}`. Két baj volt vele:
+ *
+ *   1. A csomag SAJÁT `uuid.ts`-e pont ezt a hibaosztályt utasítja el
+ *      („collisions cause silent dedup failures and ROAS distortion"), tehát a
+ *      csomagon belül KÉT, egymásnak ellentmondó szabály élt ugyanarra a
+ *      kulcsra. Az egyik elvből dobott, a másik némán gyengébbet adott.
+ *   2. A CLAUDE.md 2. pontja `event_id`-t „plain UUID"-ként írja le. Egy
+ *      `m1abc-x8f2k3lq-…` alak a gateway regexén átmegy (`[a-zA-Z0-9_-]+`),
+ *      tehát SEMMI nem jelezte volna, hogy nem UUID.
+ *
+ * Mostantól a kanonikus `generateUUID()` crypto-útjait használja. Az utolsó
+ * mentsvár SZÁNDÉKOSAN v4-ALAKÚ (nem dobás): egy elveszett konverzió rosszabb,
+ * mint egy gyengébb entrópiájú — de továbbra is 122 bites és ütközésmentes
+ * gyakorlatban — azonosító. A `uuid.ts` dobó viselkedése ott marad, ahol a
+ * hívó fel van készülve rá.
+ */
 export function generateEventId(): string {
-  const uuid = typeof crypto !== 'undefined' && crypto.randomUUID
-    ? crypto.randomUUID()
-    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 10)}`;
-  return uuid;
+  try {
+    return generateUUID();
+  } catch {
+    // Nem biztonságos kontextus (http://, régi böngésző): v4-ALAKÚ tartalék.
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  }
 }
 
 // ── Calculator / Quiz ──────────────────────────────────────────────
 
 export function trackCalculatorStart(name: string): void {
   if (!hasAnalyticsConsent()) return;
-  push({ event: 'calculator_start', calculator_name: name, session_id: getSessionId(), device: getDevice() });
+  push({ event: 'quote_calculator_opened', calculator_name: name, session_id: getSessionId(), device: getDevice() });
 }
 
 export function trackCalculatorStep(stepId: string, stepIndex: number, totalSteps?: number): void {
   if (!hasAnalyticsConsent()) return;
-  push({ event: 'calculator_step', step_id: stepId, step_index: stepIndex,
+  push({ event: 'quote_calculator_step_completed', step_id: stepId, step_index: stepIndex,
     ...(totalSteps != null && { total_steps: totalSteps }), session_id: getSessionId() });
 }
 
 export function trackCalculatorOption(stepId: string, value: string | string[]): void {
   if (!hasAnalyticsConsent()) return;
-  push({ event: 'calculator_option', step_id: stepId,
+  push({ event: 'quote_calculator_option_selected', step_id: stepId,
     option_value: Array.isArray(value) ? value.join(',') : value, session_id: getSessionId() });
 }
 
 export function trackCalculatorComplete(name: string): void {
   if (!hasAnalyticsConsent()) return;
-  push({ event: 'calculator_complete', calculator_name: name, session_id: getSessionId(), device: getDevice() });
+  // Canonical: the calculator completion IS the quote conversion (quote_calculator_submitted).
+  // NOTE: the conversion-grade emission (event_id + value + PII side-channel + gateway) comes
+  // from trackLeadSubmit/trackServerEvent; this milestone shares the canonical name. Wire ONE
+  // of them as the actual quote conversion per site.
+  push({ event: 'quote_calculator_submitted', calculator_name: name, session_id: getSessionId(), device: getDevice() });
 }
 
 // ── Conversions (PII) ──────────────────────────────────────────────
@@ -96,27 +127,39 @@ export interface ConversionData {
  */
 export const USER_DATA_ELEMENT_ID = '__sb_user_data__';
 
-/**
- * Shape of the EC side-channel — MUST match gtag's `user_provided_data` schema:
- * names live under `address`, NOT at the top level. The awct (Google Ads
- * conversion) tag silently DROPS top-level `first_name`/`last_name`, so a flat
- * shape looks fine in Preview while quietly losing the name match keys.
- */
-export interface EcAddress {
-  first_name?: string;
-  last_name?: string;
-}
-
-export interface EcUserData {
-  email?: string;
-  phone_number?: string;
-  address?: EcAddress;
-}
-
 declare global {
   interface Window {
-    __sbUserData?: EcUserData;
+    /**
+     * @deprecated A meglévő GTM-konténerek Custom JS változója ezt olvassa,
+     * ezért egyelőre MARAD — de új konténer a `window.sbTracking
+     * .getUserDataForEC()` getterrel dolgozzon. A nyers globális bárki számára
+     * enumerálható; a getter mögött a tár modul-privát, és a visszavonás
+     * determinisztikusan üríti (nem csak egy 5 mp-es időzítő).
+     */
+    __sbUserData?: Record<string, string>;
+    /** Package-owned EC-felület (P6.2). Lásd `getUserDataForEC`. */
+    sbTracking?: { getUserDataForEC: () => Record<string, string> | null };
   }
+}
+
+/**
+ * MODUL-PRIVÁT EC-tár. A getter ebből olvas; a `window.__sbUserData` csak a
+ * régi konténerek miatt íródik mellé, és a takarítás MINDKETTŐT elviszi.
+ */
+let ecUserData: Record<string, string> | null = null;
+
+/**
+ * A GTM „User-Provided Data" változójának KANONIKUS forrása.
+ *
+ * Miért getter és nem globális objektum: a globálist bármelyik third-party
+ * szkript megtalálja egy `Object.keys(window)` sepréssel, és a tartalma
+ * `JSON.stringify`-jal kimenthető. A függvény mögött a tár nem enumerálható,
+ * és — ami fontosabb — EGY helyen van, ahonnan a consent-visszavonás
+ * determinisztikusan ki tudja ütni.
+ */
+export function getUserDataForEC(): Record<string, string> | null {
+  // Másolatot adunk: a hívó (GTM Custom JS) ne tudja a belső állapotot mutálni.
+  return ecUserData ? { ...ecUserData } : null;
 }
 
 /** How long the EC PII stays readable before the auto-clear sweeps it (ms).
@@ -125,16 +168,25 @@ declare global {
 const EC_CLEAR_DELAY_MS = 5_000;
 let ecClearTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Wipe the Enhanced-Conversions side-channel (window object + hidden element). */
+/** Wipe the Enhanced-Conversions side-channel (module store + window + hidden element). */
 export function clearUserDataForEC(): void {
+  ecUserData = null;
   if (typeof window === 'undefined') return;
   try { delete window.__sbUserData; } catch { /* */ }
   try { document.getElementById(USER_DATA_ELEMENT_ID)?.remove(); } catch { /* */ }
 }
 
-export function setUserDataForEC(ud: EcUserData): void {
+// A visszavonás a TÁROLT adaton túl az EPHEMERAL identityt is elviszi. Eddig
+// ezt csak az 5 mp-es időzítő tette, tehát a visszavonás pillanatában a nyers
+// e-mail/telefon ott maradt a lapon — a látogató épp azt kérte, hogy ne.
+registerMarketingPurgeHook(clearUserDataForEC);
+
+export function setUserDataForEC(ud: Record<string, string>): void {
   if (!hasMarketingConsent()) return;
+  ecUserData = { ...ud };
   if (typeof window === 'undefined') return;
+  // Package-owned felület — ezt olvassa az ÚJ GTM-változó.
+  window.sbTracking = { ...(window.sbTracking ?? {}), getUserDataForEC };
   window.__sbUserData = ud;
   try {
     let el = document.getElementById(USER_DATA_ELEMENT_ID);
@@ -154,18 +206,16 @@ export function setUserDataForEC(ud: EcUserData): void {
 }
 
 function buildConversionPayload(data: ConversionData): Record<string, unknown> {
-  const ud: EcUserData = {};
-  // A `normalizeEmail` a 6.6.0 ota `undefined`-ot ad ervenytelen/tullepo
-  // cimre (ELDOB, nem csonkit) — a kulcsot ilyenkor ki sem tesszuk.
+  // Az e-mail mostantól ELDOBHATÓ: `@` nélküli vagy 254 oktetnél hosszabb cím
+  // nem identitás. Korábban a csonkított/érvénytelen alak is bekerült, és a
+  // böngésző-láb olyan `em`-et hashelt, amit a szerver eldobott — aszimmetrikus
+  // user_data ugyanarra az eventre.
+  const ud: Record<string, string> = {};
   const normalizedEmail = normalizeEmail(data.email);
   if (normalizedEmail) ud.email = normalizedEmail;
   if (data.phone && data.phone.length >= 8) ud.phone_number = normalizePhone(data.phone);
-  // gtag user_provided_data schema: names go under `address` — top-level
-  // first_name/last_name are dropped by the Google Ads (awct) tag.
-  const address: EcAddress = {};
-  if (data.firstName) address.first_name = sanitizeName(data.firstName);
-  if (data.lastName) address.last_name = sanitizeName(data.lastName);
-  if (address.first_name || address.last_name) ud.address = address;
+  if (data.firstName) ud.first_name = sanitizeName(data.firstName);
+  if (data.lastName) ud.last_name = sanitizeName(data.lastName);
 
   // PII → hidden side-channel for Enhanced Conversions (NOT the dataLayer).
   setUserDataForEC(ud);
@@ -183,12 +233,14 @@ function buildConversionPayload(data: ConversionData): Record<string, unknown> {
   };
 }
 
+// §2.1: the lead/quote form = quote_calculator_submitted (Meta Lead — the calculator
+// is the ajánlatkérő). The old lead_submit→contact_form_submit (Contact) duality is gone.
 export function pushLeadConversion(data: ConversionData): void {
-  push({ event: 'lead_submit', ...buildConversionPayload(data) });
+  push({ event: 'quote_calculator_submitted', ...buildConversionPayload(data) });
 }
 
 export function pushContactConversion(data: ConversionData): void {
-  push({ event: 'contact_submit', ...buildConversionPayload(data) });
+  push({ event: 'contact_form_submitted', ...buildConversionPayload(data) });
 }
 
 // ── Clicks — durable session dedup ─────────────────────────────────
@@ -231,25 +283,25 @@ export function trackPhoneClick(eventId?: string, dedup = true): boolean {
     if (hasClickFired('phone')) return false;
     markClickFired('phone');
   }
-  push({ event: 'phone_click', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
+  push({ event: 'phone_number_clicked', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
   return true;
 }
 
 export function trackCallbackClick(eventId?: string): boolean {
   if (!hasAnalyticsConsent()) return false;
-  push({ event: 'callback_click', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
+  push({ event: 'callback_request_submitted', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
   return true;
 }
 
 export function trackEmailClick(eventId?: string): boolean {
   if (!hasAnalyticsConsent()) return false;
-  push({ event: 'email_click', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
+  push({ event: 'email_address_clicked', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
   return true;
 }
 
 export function trackWhatsappClick(eventId?: string): boolean {
   if (!hasAnalyticsConsent()) return false;
-  push({ event: 'whatsapp_click', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
+  push({ event: 'whatsapp_button_clicked', ...(eventId && { event_id: eventId }), session_id: getSessionId(), device: getDevice() });
   return true;
 }
 
@@ -270,7 +322,7 @@ export function initFormAbandonTracking(
     if (!started) {
       started = true;
       timer = setTimeout(() => {
-        push({ event: 'form_abandon', form_id: formId, last_field: lastField, session_id: getSessionId() });
+        push({ event: 'form_abandoned', form_id: formId, last_field: lastField, session_id: getSessionId() });
       }, timeoutMs);
     }
   };

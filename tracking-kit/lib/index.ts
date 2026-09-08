@@ -1,35 +1,108 @@
 /**
- * Soborbo Tracking — Unified Entry Point (v5)
+ * Soborbo Tracking — Unified Entry Point (v6, Run 6 contract)
  *
  * Two channels, with a SHARED event_id (dedup):
  *   1) Browser: dataLayer push → GTM → GA4 / Google Ads / Meta Pixel (events.ts)
- *   2) Server: the event-gateway worker (/api/event/conversion) → Meta CAPI +
- *      GA4 MP + Google Ads uploadClickConversions (gateway.ts → sendToWorker)
+ *   2) Server: the event-gateway worker → Meta CAPI (+ TikTok/LinkedIn/MsAds
+ *      click-ID forwarders) on-site. Model 2: on-site GA4 + Google Ads are
+ *      browser-only; the server does Google Ads ONLY offline (CRM lead-status,
+ *      Data Manager API) and sends NO GA4 at all.
  *
- * The earlier in-app /api/track (Meta-only) endpoint is GONE — the server side
- * belongs entirely to the gateway (all 3 platforms + durability). The gateway
- * itself adds the attribution / consent / fbp / fbc / session_id
- * fields (see gateway.ts).
+ * WHO SENDS THE SERVER LEG — the load-bearing split (lib/event-contract.ts):
+ *   - LOW-RISK CLICKS (phone/email/whatsapp/video) → this lib POSTs them to the
+ *     tokenless browser ingress (`/api/event/conversion`), fire-and-forget.
+ *   - HIGH-VALUE CONVERSIONS (quote/callback/contact form, order, purchase) are
+ *     `server_ingress_only`: the gateway 403s them on the browser path
+ *     (TRK-400-017). This lib pushes ONLY their dataLayer leg; the SITE BACKEND
+ *     dispatches the gateway leg via `/api/event/conversion-server` (per-site
+ *     token, service binding) REUSING the browser event_id from the hidden form
+ *     field — so Meta Pixel↔CAPI dedup is unchanged. See
+ *     server/backend/gateway-dispatch.ts and INSTALL.md Step 3.
+ *
+ * There is NO Turnstile in the tracking path (the gateway does not validate it;
+ * a client-side token gate once silently dropped two weeks of click conversions).
  */
 
 export { hasMarketingConsent, hasAnalyticsConsent, hasAnyConsent, onConsentChange, waitForConsent, type ConsentCategory } from './consent';
+// CMP Fázis 2 — a saját consent-modul (provider='sbo' site-ok; default: cookieyes).
+export {
+  readSboConsent, sboConsentAgeSeconds,
+  SBO_CONSENT_COOKIE, SBO_CONSENT_EVENT,
+  type SboConsentState, type SboDecisionKind,
+} from './consent-sbo-state';
+export {
+  applySboDecision, flushPendingSboConsent, postBannerShown, readCkyParallelWindow,
+  type SboDecisionInput, type SboDecisionContext, type SboConsentWirePayload,
+} from './consent-sbo';
+export { isSboConsentProvider, type ConsentProvider } from './config';
 export {
   persistTrackingParams, captureUrlParams, getGclid, getFbclid, getFbp, getFbc,
   getAllTrackingData, getStoredData, getAttribution, getSourceType,
   getSessionId, getDevice, getPageUrl, clearTrackingData,
+  purgeMarketingStorage, purgeAnalyticsStorage, registerMarketingPurgeHook,
+  getStorageReadBlocked, resetStorageReadBlocked, readMarketingLocalStorage,
+  ATTR_STORAGE_KEY,
   normalizeEmail, normalizePhone, sanitizeName,
-  type TrackingData, type AttributionData,
+  type TrackingData, type AttributionData, type StorageReadBlockedReport,
 } from './persistence';
 export {
   trackCalculatorStart, trackCalculatorStep, trackCalculatorOption,
   trackCalculatorComplete, trackPhoneClick, trackCallbackClick,
-  trackEmailClick, trackWhatsappClick, setUserDataForEC, clearUserDataForEC,
+  trackEmailClick, trackWhatsappClick, setUserDataForEC, clearUserDataForEC, getUserDataForEC,
   initScrollTracking, initFormAbandonTracking, enableDebug,
   generateEventId, pushLeadConversion, pushContactConversion,
   type ConversionData,
 } from './events';
-// Gateway dispatch (server side) — also available for direct use.
-export { sendToWorker, collectAttribution, type ConversionPayload, type UserData } from './gateway';
+// Browser-path gateway dispatch — also available for direct use (guarded).
+export {
+  sendToWorker,
+  collectAttribution,
+  getMarketingConsentState,
+  type ConversionPayload,
+  type UserData,
+  type MarketingConsentState
+} from './gateway';
+// A Google klikk-ID szabálya EGY authority — a site-adapterek (pl. a painless
+// `pr_tracking` session-store-ja) ezt használják a saját másolatuk helyett.
+// Az e-mail-identitás EGYETLEN normalizálója — ugyanaz a modul, amit a Worker
+// `src/lib/hash.ts` is importál. Egy identitás → egy byte-string → egy hash.
+export {
+  normalizeEmailIdentity,
+  utf8OctetLength,
+  EMAIL_IDENTITY_MAX_OCTETS
+} from './email-identity';
+export {
+  GOOGLE_CLICK_KEYS,
+  resolveGoogleClickId,
+  pickGoogleClickId,
+  parseGclAwCookie,
+  applyGoogleClickId,
+  type GoogleClickKey,
+  type GoogleClickSource,
+  type ResolvedGoogleClickId,
+  type ClickIdSource
+} from './google-click-id';
+// P5 — commit-after-business-success. A siker-oldal ezzel tüzeli el a submitkor
+// LETETT (de el nem sütött) konverziót, a szerver által visszaadott event_id-vel.
+import { stagePendingConversion, discardPendingConversions } from './conversion-commit';
+
+export {
+  stagePendingConversion,
+  commitPendingConversion,
+  peekPendingConversions,
+  discardPendingConversions,
+  hasBufferedIdentity,
+  PENDING_TTL_MS,
+  type ConversionKind,
+  type PendingConversion,
+  type ConversionIdentity,
+  type CommitOutcome
+} from './conversion-commit';
+// P5.2 — fetch/XHR submit-út: submit → backend → siker-kontraktus → commit,
+// mind ugyanabban a dokumentumban (nincs navigáció, nincs token-szükséglet).
+export { submitTrackedFormAsync, type AsyncSubmitResult, type AsyncSubmitOptions } from './submit';
+// Ingress contract — which events may use the browser path at all.
+export { BROWSER_GATEWAY_EVENTS, SERVER_INGRESS_ONLY_EVENTS, OFFLINE_EVENTS } from './event-contract';
 // Observability — stable diagnostic codes (see docs/OBSERVABILITY-CODES.md).
 export {
   report, getDiagnostics, clearDiagnostics, enableDiagDebug, redactPii,
@@ -40,6 +113,7 @@ import { hasMarketingConsent, hasAnalyticsConsent, onConsentChange } from './con
 import {
   persistTrackingParams, captureUrlParams,
   getGclid, getFbclid, getSessionId, getSourceType, getAttribution, getAllTrackingData,
+  purgeMarketingStorage, purgeAnalyticsStorage, resetStorageReadBlocked,
   normalizePhone,
 } from './persistence';
 import {
@@ -60,13 +134,30 @@ let consentListenerBound = false;
 
 export function initTracking(): void {
   if (window.location.search.includes('debugTracking=1')) enableDebug();
+  // A blokkolt-olvasás jel PER OLDALLETÖLTÉS értendő, és ez a függvény minden
+  // `astro:page-load`-ra lefut — view transition esetén ÚJ navigáció, de UGYANAZ
+  // a dokumentum. Reset nélkül egyetlen korai blokk után a session minden további
+  // oldala `storage_read_blocked=true`-t jelentene, akkor is, ha ott a consent már
+  // megvolt minden olvasás előtt — az arány felfújva, a diagnózis hamis.
+  resetStorageReadBlocked();
   captureUrlParams();
   if (!consentListenerBound) {
     consentListenerBound = true;
-    // A CookieYes ads-kategoriajanak NEVE `advertisement` (nem `marketing`) — a
-    // kanonikus consent.ts a NYERS CookieYes-szotarat adja vissza, a kit korabbi
-    // sajat `marketing` aliasza helyett. Ugyanaz a jogalap, mas kulcsnev.
-    onConsentChange((c) => { if (c.advertisement) persistTrackingParams(); });
+    // Withdrawal must reach the data at rest — until now this callback only had a
+    // grant branch, so `clearTrackingData()` existed but was never wired, and
+    // everything stored under a previous grant simply stayed there. Per category,
+    // because the two are revoked independently: turning marketing off while
+    // analytics stays on must not destroy the session.
+    onConsentChange((c) => {
+      if (c.advertisement) persistTrackingParams();
+      else {
+        purgeMarketingStorage();
+        // A submitkor LETETT, még el nem sütött konverzió is a marketing-jogalapon
+        // áll: visszavonáskor azonnal megy, nem várja meg a commitot vagy a TTL-t.
+        discardPendingConversions();
+      }
+      if (!c.analytics) purgeAnalyticsStorage();
+    });
   }
   if (hasMarketingConsent()) persistTrackingParams();
 }
@@ -81,15 +172,22 @@ export interface LeadSubmitParams {
   value?: number;
   currency?: string;
   contentName?: string;
-  /** Override the gateway event name (default: contact_form_submit). */
-  eventName?: string;
   /**
-   * Reuse an id the CALLER already minted, instead of generating one here.
+   * A SZERVER-lábbal MEGOSZTOTT event_id. Ha megadod, a böngésző-láb EZT
+   * használja generálás helyett — ez a Pixel↔CAPI dedup kulcsa (CLAUDE.md §16).
    *
-   * Needed when the same conversion is also dispatched server-side from the lead
-   * endpoint: the server leg must carry the SAME id, because Meta dedupes the Pixel
-   * and CAPI legs on the (event_name, event_id) pair. Two ids would not "add" a
-   * conversion — they would book the Lead twice.
+   * MIKOR KELL. A `populateHiddenFields`-es klasszikus form-POST útján a lib
+   * generálja az id-t, és a rejtett mező viszi a backendnek — ott nincs dolgod
+   * ezzel a mezővel. A fetch/XHR-alapú folyamatokban viszont a hívó gyakran MÁR
+   * generált egy id-t, elküldte a szervernek, és a böngésző-lábat csak a
+   * business-siker után tüzeli el: ott ezt kell átadni, különben a két láb két
+   * KÜLÖNBÖZŐ id-t használ, és a Meta minden konverziót KÉTSZER könyvel.
+   *
+   * A `trackServerEvent` ugyanezért fogad el `eventId`-t.
+   *
+   * ALTERNATÍVA: a P5 staging (`stageLeadSubmit` → `commitPendingConversion`)
+   * ugyanezt oldja meg, ráadásul túléli a navigációt és kezeli a közben
+   * visszavont hozzájárulást. Ha a folyamatod oda illik, az a gazdagabb út.
    */
   eventId?: string;
 }
@@ -102,14 +200,12 @@ export interface LeadSubmitResult {
   fbclid: string | null;
 }
 
-// Internal type → gateway event name (from the worker's ALLOWED_EVENT_NAMES).
-export const DEFAULT_GATEWAY_EVENT = 'contact_form_submit';
-
 /**
- * Server-side dispatch to the gateway. Fire-and-forget: the gateway asynchronously
- * adds the attribution/
- * consent/fbp/fbc/session_id fields. The browser dataLayer push goes SEPARATELY
- * (events.ts), with the SAME event_id → Meta Pixel↔CAPI dedup.
+ * Browser dispatch to the gateway for LOW-RISK events. `sendToWorker` guards the
+ * event name against the ingress contract (server-only names are blocked with a
+ * loud TRK-1005 instead of a silent gateway 403). Fire-and-forget: the transport
+ * layer adds attribution/consent/fbp/fbc/session_id. The browser dataLayer push
+ * goes SEPARATELY (events.ts) with the SAME event_id → Meta Pixel↔CAPI dedup.
  */
 function dispatchToGateway(
   eventName: string,
@@ -120,7 +216,7 @@ function dispatchToGateway(
     event_name: eventName,
     event_id: eventId,
     event_time: Math.floor(Date.now() / 1000),
-    ...(typeof params.value === 'number' && params.value > 0 ? { value: params.value } : {}),
+    ...(typeof params.value === 'number' ? { value: params.value } : {}),
     ...(params.currency ? { currency: params.currency } : {}),
     user_data: {
       email: params.email,
@@ -131,62 +227,107 @@ function dispatchToGateway(
   });
 }
 
+/**
+ * Lead/quote form submit → BROWSER LEG ONLY (dataLayer → GTM → Pixel/GA4/Ads).
+ *
+ * The gateway leg is DELIBERATELY absent here: `quote_calculator_submitted` is
+ * server-ingress-only (browser path → 403, TRK-400-017). The site backend that
+ * receives the form POST must call the gateway with the SAME event_id — it
+ * arrives in the `event_id` hidden field this lib populates
+ * (`populateHiddenFields`). See server/backend/gateway-dispatch.ts.
+ */
 export function trackLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
   const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
-  const analytics = hasAnalyticsConsent();
-  const marketing = hasMarketingConsent();
-  if (!analytics && !marketing) {
-    return { success: false, consentBlocked: true, eventId, gclid, fbclid };
-  }
+  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
 
   const currency = params.currency || trackingConfig.currency;
 
-  // Browser (GTM) — Meta Pixel / GA4. A GATEWAY-leg SZÁNDÉKOSAN NINCS itt:
-  // a form-konverziók (contact_form_submit → contact_form_submitted) a gateway
-  // Run 6 óta server-ingress-only-k — a böngésző-útról 403 (TRK-400-017). A
-  // site backendje (/api/contact, /api/boranalizis → sendGatewayConversion)
-  // küldi őket UGYANEZZEL az event_id-vel → a Pixel↔CAPI dedup változatlan.
-  if (analytics) {
-    pushLeadConversion({
-      email: params.email, phone: params.phone,
-      firstName: params.firstName, lastName: params.lastName,
-      value: params.value, currency,
-      gclid: gclid || undefined, eventId,
-    });
-  }
+  pushLeadConversion({
+    email: params.email, phone: params.phone,
+    firstName: params.firstName, lastName: params.lastName,
+    value: params.value, currency,
+    gclid: gclid || undefined, eventId,
+  });
 
-  return { success: true, consentBlocked: false, eventId, gclid, fbclid };
-}
-
-export function trackContactSubmit(
-  params: Pick<LeadSubmitParams, 'email' | 'phone' | 'firstName' | 'lastName' | 'eventName' | 'eventId'>,
-): LeadSubmitResult {
-  const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
-  const analytics = hasAnalyticsConsent();
-  const marketing = hasMarketingConsent();
-  if (!analytics && !marketing) {
-    return { success: false, consentBlocked: true, eventId, gclid, fbclid };
-  }
-
-  // Gateway-leg nincs (server-ingress-only event) — lásd trackLeadSubmit. Az
-  // eventId a HÍVÓTÓL jön (a form POST body-jával megosztva), így a böngésző
-  // Pixel Contact és a szerver CAPI Contact ugyanazon (Contact, event_id) páron
-  // dedupál. A név a hidden EC side-channelbe megy (buildConversionPayload), a
-  // dataLayer PII-mentes marad.
-  if (analytics) {
-    pushContactConversion({
-      email: params.email, phone: params.phone,
-      firstName: params.firstName, lastName: params.lastName,
-      eventId, gclid: gclid || undefined,
-    });
-  }
   return { success: true, consentBlocked: false, eventId, gclid, fbclid };
 }
 
 /**
- * Generic server-side event to the gateway (e.g. phone_conversion,
- * callback_conversion, quote_calculator_conversion). The browser dataLayer
- * push must be handled separately (events.ts) with the same event_id if dedup is needed.
+ * P5 — a `trackLeadSubmit` STAGING-párja: ugyanaz a szerződés, csak a dataLayer
+ * push MARAD EL. A konverziót letesszük, és a siker-oldal tüzeli el
+ * (`commitPendingConversion`) a szervertől visszakapott event_id-vel.
+ *
+ * A visszatérési érték szándékosan ugyanaz a `LeadSubmitResult`, hogy a hívó
+ * (TrackedForm) a rejtett mezőket VÁLTOZATLANUL töltse — a szerver lába, és vele
+ * a Pixel↔CAPI dedup kulcsa, egy bitet sem mozdul.
+ */
+export function stageLeadSubmit(params: LeadSubmitParams): LeadSubmitResult {
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
+  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+
+  // A TÁROLT rekord PII-mentes (INV-002); az identity a modul-privát memóriabeli
+  // pufferbe megy, és csak az azonos dokumentumban záruló fetch-utat szolgálja ki.
+  stagePendingConversion(
+    {
+      kind: 'lead', eventId,
+      value: params.value, currency: params.currency || trackingConfig.currency,
+      gclid: gclid || undefined
+    },
+    {
+      email: params.email, phone: params.phone,
+      firstName: params.firstName, lastName: params.lastName,
+    },
+  );
+  return { success: true, consentBlocked: false, eventId, gclid, fbclid };
+}
+
+/** A `trackContactSubmit` staging-párja — lásd `stageLeadSubmit`. */
+export function stageContactSubmit(
+  params: Pick<LeadSubmitParams, 'email' | 'phone'>
+): LeadSubmitResult {
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = generateEventId();
+  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+
+  stagePendingConversion(
+    { kind: 'contact', eventId, gclid: gclid || undefined },
+    { email: params.email, phone: params.phone },
+  );
+  return { success: true, consentBlocked: false, eventId, gclid, fbclid };
+}
+
+/**
+ * Contact form submit → BROWSER LEG ONLY. `contact_form_submitted` is
+ * server-ingress-only — same contract as trackLeadSubmit: the backend sends the
+ * gateway leg with the event_id from the hidden field (vagy a `params.eventId`-vel,
+ * ha a folyamat fetch-alapú).
+ *
+ * A név-mezők a Google Ads Enhanced Conversions rejtett csatornájába mennek
+ * (`setUserDataForEC`), NEM a dataLayerbe — ugyanaz a szabály, mint a leadnél.
+ */
+export function trackContactSubmit(
+  params: Pick<LeadSubmitParams, 'email' | 'phone' | 'firstName' | 'lastName' | 'eventId'>,
+): LeadSubmitResult {
+  const gclid = getGclid(), fbclid = getFbclid(), eventId = params.eventId || generateEventId();
+  if (!hasMarketingConsent()) return { success: false, consentBlocked: true, eventId, gclid, fbclid };
+
+  pushContactConversion({
+    email: params.email, phone: params.phone,
+    firstName: params.firstName, lastName: params.lastName,
+    eventId, gclid: gclid || undefined,
+  });
+  return { success: true, consentBlocked: false, eventId, gclid, fbclid };
+}
+
+/**
+ * Generic BROWSER-PATH event to the gateway (phone_number_clicked,
+ * email_address_clicked, whatsapp_button_clicked, video_play, begin_checkout).
+ * The browser dataLayer push must be handled separately (events.ts) with the same
+ * event_id if dedup is needed.
+ *
+ * GUARDRAIL: server-ingress-only names (quote_calculator_submitted,
+ * callback_request_submitted, contact_form_submitted, order_request_submitted,
+ * purchase) are BLOCKED by sendToWorker with a TRK-1005 error diagnostic — the
+ * gateway would 403 them anyway. Those go through the site backend.
  */
 export function trackServerEvent(
   eventName: string,
@@ -200,10 +341,10 @@ export function trackServerEvent(
 
 // ── Click conversions (phone / callback / email / whatsapp) ─────────
 //
-// These are the #1 lead-gen signals. Each fires up to TWO channels with ONE
-// shared event_id (Meta Pixel↔CAPI dedup):
+// These are the #1 lead-gen signals. phone/email/whatsapp fire up to TWO channels
+// with ONE shared event_id (Meta Pixel↔CAPI dedup):
 //   • browser dataLayer push (events.ts) — gated on ANALYTICS consent (browser GA4)
-//   • server-side gateway dispatch       — gated on MARKETING consent (Meta CAPI + Ads)
+//   • browser-path gateway dispatch      — gated on MARKETING consent (Meta CAPI)
 // The two gates are INDEPENDENT (this matches the skill's consent matrix): a
 // visitor who grants marketing but not analytics still gets the server-side ad
 // conversion — the money signal — even though the browser GA4 event is withheld.
@@ -213,19 +354,25 @@ export function trackServerEvent(
 // a user tapping a tel:/mailto:/wa.me link N times would book N server-side ad
 // conversions (each with a fresh event_id → the worker can't dedup them), poisoning
 // Smart Bidding / Meta optimization.
+//
+// CALLBACK IS THE EXCEPTION: `callback_request_submitted` is server-ingress-only,
+// so the bare CTA click has NO gateway leg (dataLayer only). Where the callback is
+// a real form POST, the backend dispatches the conversion (same contract as
+// trackLeadSubmit).
 
 // Exported so the event-name contract test can assert against the REAL map the code
-// dispatches with (not a copy), guaranteeing they stay in the gateway's allowed set.
+// dispatches with (not a copy), guaranteeing they stay in the gateway's browser set.
+// `null` = no gateway leg (server-ingress-only event; the browser path would 403).
 export const CLICK_GATEWAY_EVENT = {
-  phone: 'phone_conversion',
-  callback: 'callback_conversion',
-  email: 'email_conversion',
-  whatsapp: 'whatsapp_conversion',
+  phone: 'phone_number_clicked',
+  callback: null,
+  email: 'email_address_clicked',
+  whatsapp: 'whatsapp_button_clicked',
 } as const;
 
 function trackClickConversion(
   pushDataLayer: (eventId: string) => void,
-  // null → nincs gateway-leg (server-ingress-only event, a böngésző-út 403-mal dobná)
+  // null → no gateway leg (server-ingress-only event; the browser path would 403)
   gatewayEvent: string | null,
   opts: { dedupName?: string; params?: { email?: string; phone?: string } } = {},
 ): string | null {
@@ -237,12 +384,12 @@ function trackClickConversion(
 
   const eventId = generateEventId();
   if (analytics) pushDataLayer(eventId);                  // browser GA4 (dataLayer)
-  if (marketing && gatewayEvent) dispatchToGateway(gatewayEvent, eventId, params); // server Meta CAPI + Google Ads
+  if (marketing && gatewayEvent) dispatchToGateway(gatewayEvent, eventId, params); // server Meta CAPI
   if (dedupName) markClickFired(dedupName);
   return eventId;
 }
 
-/** Phone click → dataLayer `phone_click` + gateway `phone_conversion` (shared event_id, session-deduped). */
+/** Phone click → dataLayer + gateway `phone_number_clicked` (shared event_id, session-deduped). */
 export function trackPhoneConversion(params: { phone?: string } = {}): string | null {
   // dedup is owned here → pass dedup=false to the dataLayer pusher to avoid double-marking.
   return trackClickConversion((id) => { trackPhoneClick(id, false); }, CLICK_GATEWAY_EVENT.phone, {
@@ -250,24 +397,27 @@ export function trackPhoneConversion(params: { phone?: string } = {}): string | 
   });
 }
 
-/** Callback click → dataLayer `callback_click` + gateway `callback_conversion` (shared event_id, session-deduped). */
+/**
+ * Callback CTA click → dataLayer ONLY (session-deduped). The gateway leg is
+ * deliberately absent: `callback_request_submitted` is server-ingress-only (the
+ * browser path answers 403, TRK-400-017). Where the callback is a form POST, the
+ * backend dispatches the server conversion with the shared event_id; for a bare
+ * CTA click the browser Pixel/GA4 leg is the whole signal.
+ */
 export function trackCallbackConversion(params: { email?: string; phone?: string } = {}): string | null {
-  // Gateway-leg NINCS: a callback_conversion → callback_request_submitted a
-  // gateway Run 6 óta server-ingress-only (böngésző-útról 403). A dataLayer/
-  // Pixel-leg marad; szerver CAPI-t csak backend-es callback-flow küldhet.
-  return trackClickConversion((id) => { trackCallbackClick(id); }, null, {
+  return trackClickConversion((id) => { trackCallbackClick(id); }, CLICK_GATEWAY_EVENT.callback, {
     dedupName: 'callback', params,
   });
 }
 
-/** Email (mailto:) click → dataLayer `email_click` + gateway `email_conversion` (shared event_id, session-deduped). */
+/** Email (mailto:) click → dataLayer + gateway `email_address_clicked` (shared event_id, session-deduped). */
 export function trackEmailConversion(params: { email?: string } = {}): string | null {
   return trackClickConversion((id) => { trackEmailClick(id); }, CLICK_GATEWAY_EVENT.email, {
     dedupName: 'email', params: { email: params.email },
   });
 }
 
-/** WhatsApp click → dataLayer `whatsapp_click` + gateway `whatsapp_conversion` (shared event_id, session-deduped). */
+/** WhatsApp click → dataLayer + gateway `whatsapp_button_clicked` (shared event_id, session-deduped). */
 export function trackWhatsappConversion(params: { phone?: string } = {}): string | null {
   return trackClickConversion((id) => { trackWhatsappClick(id); }, CLICK_GATEWAY_EVENT.whatsapp, {
     dedupName: 'whatsapp', params: { phone: params.phone },
@@ -276,16 +426,13 @@ export function trackWhatsappConversion(params: { phone?: string } = {}): string
 
 // ── Hidden fields ──────────────────────────────────────────────────
 
-export function populateHiddenFields(form: HTMLFormElement, result: LeadSubmitResult): void {
-  // Last-touch UTM/click context for the hidden form fields. getAttribution()
-  // returns first_/last_-prefixed keys (for the Sheets sink), NOT bare utm_*;
-  // getAllTrackingData() is the right source for raw utm_source/medium/... here.
-  const t = getAllTrackingData();
-  const fields: Record<string, string | null | undefined> = {
-    gclid: result.gclid, fbclid: result.fbclid, event_id: result.eventId,
-    utm_source: t.utm_source, utm_medium: t.utm_medium,
-    utm_campaign: t.utm_campaign, utm_content: t.utm_content, utm_term: t.utm_term,
-  };
+/**
+ * Writes gclid/fbclid/event_id/UTM into hidden inputs so the form POST carries
+ * them to the site backend. The `event_id` field is LOAD-BEARING: the backend
+ * reuses it for the gateway dispatch (Pixel↔CAPI dedup) — if it goes missing,
+ * Meta double-counts every lead.
+ */
+function writeHiddenFields(form: HTMLFormElement, fields: Record<string, string | null | undefined>): void {
   for (const [name, value] of Object.entries(fields)) {
     let input = form.querySelector<HTMLInputElement>(`input[name="${name}"]`);
     if (!input) { input = document.createElement('input'); input.type = 'hidden'; input.name = name; form.appendChild(input); }
@@ -293,14 +440,52 @@ export function populateHiddenFields(form: HTMLFormElement, result: LeadSubmitRe
   }
 }
 
+export function populateHiddenFields(form: HTMLFormElement, result: LeadSubmitResult): void {
+  // Last-touch UTM/click context for the hidden form fields. getAttribution()
+  // returns first_/last_-prefixed keys (for the Sheets sink), NOT bare utm_*;
+  // getAllTrackingData() is the right source for raw utm_source/medium/... here.
+  const t = getAllTrackingData();
+  writeHiddenFields(form, {
+    gclid: result.gclid, fbclid: result.fbclid, event_id: result.eventId,
+    utm_source: t.utm_source, utm_medium: t.utm_medium,
+    utm_campaign: t.utm_campaign, utm_content: t.utm_content, utm_term: t.utm_term,
+  });
+}
+
+/**
+ * Thread a SHARED `event_id` (+ current attribution) into a callback/CTA form's
+ * hidden fields, so the site backend's gateway CAPI leg REUSES it → Meta
+ * Pixel↔CAPI dedup (§16). This is the CTA-flow analogue of `populateHiddenFields`:
+ * the callback button pushes the browser dataLayer leg with `eventId`, and this
+ * writes the SAME id into the form the backend will POST. Without it the browser
+ * Pixel Lead (event_id=A) and the server CAPI Lead (event_id=B) do not dedup →
+ * duplicate Meta Leads (K2-H3). `gclid`/`fbclid` are read fresh (the CTA flow has
+ * no `LeadSubmitResult` to carry them).
+ */
+export function attachEventIdToForm(form: HTMLFormElement, eventId: string): void {
+  const t = getAllTrackingData();
+  writeHiddenFields(form, {
+    event_id: eventId, gclid: getGclid() || undefined, fbclid: getFbclid() || undefined,
+    utm_source: t.utm_source, utm_medium: t.utm_medium,
+    utm_campaign: t.utm_campaign, utm_content: t.utm_content, utm_term: t.utm_term,
+  });
+}
+
 // ── Sheets payload (optional CRM/Sheets sink) ────────────────────
 
+/**
+ * NAMING GUARDRAIL: the key is `event_id`, NOT `lead_id`. In the gateway's
+ * vocabulary `lead_id` is EXCLUSIVELY the CRM's own record id (from the CRM
+ * webhook response) — it joins the on-site event to the offline CRM loop. A
+ * client-minted UUID in that column looks populated but joins to nothing, which
+ * is worse than NULL. Keep the two namespaces apart.
+ */
 export function buildSheetsPayload(data: {
   eventType: string; name?: string; email: string; phone?: string;
   value?: number; currency?: string; eventId: string;
 }): Record<string, unknown> {
   return {
-    lead_id: data.eventId, event_type: data.eventType,
+    event_id: data.eventId, event_type: data.eventType,
     submitted_at: new Date().toISOString(),
     session_id: getSessionId(), source_type: getSourceType(),
     name: data.name, email: data.email,

@@ -544,7 +544,6 @@ const breadcrumbSchema = {
         trackCalculatorStart,
         trackCalculatorStep,
         trackCalculatorOption,
-        trackCalculatorComplete,
         trackLeadSubmit,
         waitForTracking,
         getAllTrackingData,
@@ -844,7 +843,6 @@ const breadcrumbSchema = {
             const result = await response.json();
 
             if (result.success) {
-              trackCalculatorComplete(FORM_NAME);
               // Canonical conversion — dataLayer `lead_submit` (browser GTM → GA4 +
               // Google Ads + Meta Pixel Lead) AND gateway `contact_form_submit`
               // (Meta CAPI + Google Ads server-side), sharing one event_id for dedup.
@@ -855,7 +853,6 @@ const breadcrumbSchema = {
                 lastName: formData.lastName,
                 value: 5000,                 // nominal HUF lead value (currency defaults to PUBLIC_TRACKING_CURRENCY)
                 contentName: FORM_NAME,
-                eventName: 'contact_form_submit',
                 eventId,                     // shared with the server leg — see above
               });
               // Hold the loading overlay up, give GTM a beat to fire, then redirect;

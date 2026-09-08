@@ -243,7 +243,6 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     trackCalculatorStart,
     trackCalculatorStep,
     trackCalculatorOption,
-    trackCalculatorComplete,
     trackLeadSubmit,
     waitForTracking,
     getAllTrackingData,
@@ -530,7 +529,6 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
             try { localStorage.setItem(resultStorageKey(result.hash), JSON.stringify(result.result)); } catch { /* ignore */ }
             clearState();
             const value = result.arSav ? Math.round((result.arSav.min + result.arSav.max) / 2) : 5000;
-            trackCalculatorComplete('boranalizis_kviz');
             // Canonical conversion — dataLayer `lead_submit` (browser GTM) + gateway
             // `contact_form_submit` (Meta CAPI + Google Ads), sharing one event_id.
             trackLeadSubmit({
@@ -539,7 +537,6 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
               firstName,
               value,
               contentName: 'boranalizis_kviz',
-              eventName: 'contact_form_submit',
               eventId,                     // shared with the server leg — see above
             });
             await waitForTracking(600);

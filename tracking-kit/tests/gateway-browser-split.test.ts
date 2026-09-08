@@ -20,6 +20,13 @@ import { resetAll } from './helpers';
  * Ezért a felosztás most KIMONDOTT — és pontosan UGYANAZ a három event megy át,
  * mint eddig a degradált ágon. A magas kockázatúakat a site BACKENDJE küldi a
  * hitelesített `/api/event/conversion-server` ingressen, per-site tokennel.
+ *
+ * ── 2026-09-08, eseménynév-cutover ──────────────────────────────────────────
+ * A nevek a KANONIKUS `event-contract.ts` szerint frissültek. A `begin_checkout`
+ * azért került az átengedett listába, mert a `BookingClick.astro` gateway-lába
+ * ezt küldi: a korábbi `booking_click` NINCS a kanonikus halmazban, tehát a
+ * kliens-oldali őr eldobta volna — pontosan ez a néma konverzió-vesztés, amit
+ * ez a fájl hivatott megfogni.
  */
 
 function stubFetch() {
@@ -40,7 +47,7 @@ beforeEach(() => resetAll());
 afterEach(() => vi.unstubAllGlobals());
 
 describe('sendToWorker — a böngésző-úton átengedett klikk-eventek', () => {
-  for (const event of ['phone_conversion', 'email_conversion', 'whatsapp_conversion']) {
+  for (const event of ['phone_number_clicked', 'email_address_clicked', 'whatsapp_button_clicked', 'begin_checkout']) {
     it(`${event}: kimegy, és NINCS benne turnstile_token`, async () => {
       const fetchMock = stubFetch();
       const ok = await sendToWorker({ event_name: event, event_id: 'E', event_time: 1_700_000_000 });
@@ -58,7 +65,7 @@ describe('sendToWorker — a böngésző-úton átengedett klikk-eventek', () =>
 });
 
 describe('sendToWorker — a szerver-ingress-only eventek HANGOSAN elakadnak', () => {
-  for (const event of ['contact_form_submit', 'callback_conversion', 'quote_calculator_conversion']) {
+  for (const event of ['contact_form_submitted', 'callback_request_submitted', 'quote_calculator_submitted']) {
     it(`${event}: nincs hálózati hívás, false, és TRK-1005`, async () => {
       const fetchMock = stubFetch();
       const ok = await sendToWorker({ event_name: event, event_id: 'E', event_time: 1_700_000_000 });

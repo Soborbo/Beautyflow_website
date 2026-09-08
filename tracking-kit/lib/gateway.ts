@@ -1,28 +1,39 @@
 /**
  * Astro client-lib: BROWSER-side tracking dispatch to the Soborbo event-gateway.
  *
- * NINCS TURNSTILE EBBEN AZ UTBAN, ES NE IS EPITSD VISSZA.
+ * Usage: copy-paste into the Astro site's src/lib/ (Painless, BeautyFlow, etc.).
  *
- * A gateway 2026 nyara ota NEM validal Turnstile-t (a secret a Cloudflare
- * teszt-kulcsa volt: minden tokenre `success:true`, mikozben valodi
- * konverziokat nyelt el). A bongeszo-ut kapuja a gateway Origin allow-listje
- * es a rate limit, SZERVER-oldalon. A high-value konverziokat (form/lead) a
- * site backendje kuldi a hitelesitett szerver-ingressen.
+ * SCOPE — read this before "improving" anything:
  *
- * Ami itt allt: minden dispatch elott `await getTurnstileToken()`, benne egy
- * 10 MASODPERCES timeouttal. A klikk-konverzio kritikus utjan ez pont akkor
- * varakoztat, amikor a latogato mar navigal (tel:/mailto:) — a beacon igy
- * elveszhet. A tokenert cserebe a gateway semmit nem adott.
- *
- * AZ URLAP-VEDELEM ETTOL FUGGETLEN es MARAD: a sajat, LATHATO widgeteket a
- * `src/lib/forms/turnstile-client.ts` rendereli az /api/contact es
- * /api/boranalizis vegpontokhoz, amiket a site maga validal.
+ *  - This module serves the BROWSER ingress path only (`/api/event/conversion`,
+ *    tokenless, Origin allow-list + rate limit on the gateway). It may carry ONLY
+ *    the low-risk click/engagement events in `BROWSER_GATEWAY_EVENTS`.
+ *  - High-value conversions (forms/lead/purchase — `SERVER_INGRESS_ONLY_EVENTS`)
+ *    are dispatched by the SITE BACKEND on `/api/event/conversion-server` with the
+ *    per-site token (see server/backend/gateway-dispatch.ts). The gateway 403s
+ *    them here (TRK-400-017). `sendToWorker` HARD-BLOCKS them client-side too, so
+ *    a wiring mistake is a loud diagnostic instead of a silent conversion loss.
+ *  - There is NO Turnstile anywhere in this path. The old Turnstile token gate
+ *    silently swallowed real click conversions for two weeks in production
+ *    (2026-06-28→07-13) while validating against a test secret. Do NOT add a
+ *    "bot check" that can block the dispatch — the gateway's Origin allow-list +
+ *    rate limit is the browser-path control, server-side.
  */
 
+import { hasAnalyticsConsent, hasMarketingConsent, readCookieYesApiConsentRaw } from './consent';
+import { readSboConsent, sboConsentAgeSeconds } from './consent-sbo-state';
+import {
+  getFbp, getFbcCookie, getStorageReadBlocked, readMarketingLocalStorage, ATTR_STORAGE_KEY
+} from './persistence';
+import { CLIENT_LIB_VERSION, isSboConsentProvider, trackingConfig } from './config';
 import { generateUUID } from './uuid';
-import { hasAnalyticsConsent, hasMarketingConsent } from './consent';
-import { ATTR_STORAGE_KEY, readMarketingLocalStorage } from './persistence';
 import { report } from './observability';
+import { BROWSER_GATEWAY_EVENTS, SERVER_INGRESS_ONLY_EVENTS } from './event-contract';
+import {
+  applyGoogleClickId,
+  resolveGoogleClickId,
+  type ResolvedGoogleClickId
+} from './google-click-id';
 
 declare global {
   interface Window {
@@ -31,13 +42,22 @@ declare global {
   }
 }
 
+/**
+ * A gateway `user_data` szerződésének KÜLDŐ oldala. A fogadó oldal a Worker
+ * `PlainUserDataPayload`-ja (`src/types.ts`) — a kettőt a
+ * `tests/user-data-fieldset-parity.test.ts` köti össze, mert egy itt hirdetett,
+ * ott ismeretlen mező NÉMÁN elveszik: se hiba, se log, se metrika.
+ *
+ * A `street` 6.6.3-ban került ki: a Worker sosem fogadta. A `city` marad, de
+ * CSAK valódi strukturált forrásból tölthető — formázott címből parse-olni
+ * tilos (D1).
+ */
 export interface UserData {
   email?: string;
   phone_number?: string;
   first_name?: string;
   last_name?: string;
   city?: string;
-  street?: string;
   postal_code?: string;
   country?: string;
   // Stable user/cookie identifier (Meta external_id → EMQ improvement). The Worker
@@ -70,21 +90,18 @@ export interface ConversionPayload {
   attribution?: AttributionParams;
 }
 
-
 /**
- * KET DEGRADACIO, MERT KET KULONBOZO KERDES (kanonikus 6.6.4).
+ * KÉT DEGRADÁCIÓ, MERT KÉT KÜLÖNBÖZŐ KÉRDÉS.
  *
- * Egy hibas percent-szekvencia (`%zz`, csonka `%E0`) `URIError`-t dob. A
- * SZERVER-labon ez a hiba mar orzott (`src/lib/tracking/gateway-dispatch.ts`
- * `readConsentFromCookie`) — ott a dobas 500-as valasz a bekuldott urlapra,
- * vagyis elveszett lead. A BONGESZO-labon a kovetkezmeny mas, de nem
- * artalmatlan: CSEND. A `getCookie` a dispatch utjan is fut (`_fbp`, `_fbc`,
- * `_ga`, `_gcl_aw`), es egy dobas a `sendToWorker` promise-at utasitja el — a
- * konverzio nemanan nem megy ki.
+ * Egy hibás percent-szekvencia (`%zz`, csonka `%E0`) `URIError`-t dob. A
+ * szerver-lábon ez 2026-08-26-ban lead-vesztést okozott (500 a beküldött
+ * űrlapra), és ott már két helper őrzi. A BÖNGÉSZŐ-lábon ugyanez nem 500-at ad,
+ * hanem CSENDET: a `getCookie` a konverzió-dispatch útján is fut (`_ga`,
+ * `_gcl_aw`), és egy dobás a `sendToWorker` promise-át utasítja el — a
+ * konverzió némán nem megy ki.
  *
- * A KAPU (jogalap) fail-closed: egy fel-dekodolt stringbol kiolvasott
- * „advertisement:yes" hamis jogalap lenne. Az AZONOSITO-olvasas a nyers ertekre
- * esik vissza: azok azonositok, nem dontesek.
+ * A KAPU (jogalap) fail-closed: inkább ne legyen consent, mint hamis consent.
+ * Egy fél-dekódolt stringből kiolvasott „advertisement:yes" hamis jogalap lenne.
  */
 function safeDecodeCookieValue(value: string): string | undefined {
   try {
@@ -94,6 +111,12 @@ function safeDecodeCookieValue(value: string): string | undefined {
   }
 }
 
+/**
+ * A NEM-JOGALAP olvasás (klikk-ID, GA client-ID) a NYERS értékre esik vissza:
+ * ezek azonosítók, nem döntések. Egy `_ga` / `_gcl_aw` érték amúgy sem tartalmaz
+ * percent-kódolást, tehát a nyers érték itt a helyes érték — a dobás viszont a
+ * teljes konverziót vinné el.
+ */
 function decodeCookieValueLossy(value: string): string {
   try {
     return decodeURIComponent(value);
@@ -107,13 +130,13 @@ function rawCookie(name: string): string | undefined {
   return match ? match[2] : undefined;
 }
 
-/** Azonosito-olvasas (`_fbp`, `_fbc`, `_ga`, `_gcl_aw`) — lossy, sosem dob. */
+/** Azonosító-olvasás (`_ga`, `_gcl_aw`) — lossy, sosem dob. */
 function getCookie(name: string): string | undefined {
   const raw = rawCookie(name);
   return raw === undefined ? undefined : decodeCookieValueLossy(raw);
 }
 
-/** Jogalap-olvasas (`cookieyes-consent`) — fail-closed, sosem dob. */
+/** Jogalap-olvasás (`cookieyes-consent`) — fail-closed, sosem dob. */
 function getConsentCookie(name: string): string | undefined {
   const raw = rawCookie(name);
   return raw === undefined ? undefined : safeDecodeCookieValue(raw);
@@ -129,8 +152,7 @@ function extractGAClientId(gaCookie: string | undefined): string | undefined {
 //   GS1: `GS1.1.<session_id>.<...>`
 //   GS2: `GS2.1.s<session_id>$o..$g..`  ← the default for new sessions since 2025-05-06
 // In GS2 a literal `s` precedes the session_id. We handle the optional `s` and the
-// multi-digit version/slot segments too. Without it the MP event does not show up
-// properly in GA4 reports.
+// multi-digit version/slot segments too.
 function extractGASessionId(): string | undefined {
   const match = document.cookie.match(/_ga_[A-Z0-9]+=GS\d+\.\d+\.s?(\d+)/);
   return match ? match[1] : undefined;
@@ -154,6 +176,22 @@ function getConsentState(): ConsentState | undefined {
   const override = (window as unknown as { __trackingConsent?: ConsentState }).__trackingConsent;
   if (override && typeof override === 'object') return override;
 
+  // CMP Fázis 2: provider='sbo' alatt a jelek a SAJÁT sütiből épülnek — ugyanaz
+  // az egy forrás, amiből a dispatch-kapuk is olvasnak (nincs második igazság).
+  // Nincs döntés → undefined → a Worker a require_consent szabálya szerint dönt,
+  // pontosan úgy, mint a hiányzó CookieYes-süti esetén.
+  if (isSboConsentProvider()) {
+    const s = readSboConsent(trackingConfig.policyVersion);
+    if (!s) return undefined;
+    const sig = (yes: boolean): ConsentSignal => (yes ? 'GRANTED' : 'DENIED');
+    return {
+      ad_user_data: sig(s.marketing),
+      ad_personalization: sig(s.marketing),
+      ad_storage: sig(s.marketing),
+      analytics_storage: sig(s.analytics)
+    };
+  }
+
   const raw = getConsentCookie('cookieyes-consent');
   if (!raw) return undefined;
 
@@ -172,6 +210,166 @@ function getConsentState(): ConsentState | undefined {
     ad_personalization: sig(adGranted),
     ad_storage: sig(adGranted),
     analytics_storage: sig(map.analytics === 'yes')
+  };
+}
+
+/**
+ * A MARKETING-CONSENT HÁROMÁLLAPOTÚ — és ez az egyetlen hely, ahol eldől.
+ *
+ * `GRANTED` / `DENIED` / `UNKNOWN`. A kétállapotú (`boolean`) olvasat az F9
+ * egyik visszatérő hibaforrása: az UNKNOWN-t tagadásnak véve TÖRÖLTÜNK egy
+ * korábbi grant alatt tárolt gclid-et (a CMP boot-versenye MINDEN korai
+ * oldalbetöltésen fennáll), tagadásnak NEM véve pedig consent nélkül írtunk
+ * hirdetési azonosítót az eszközre. Egyik sem elfogadható, ezért a harmadik
+ * állapot NEVESÍTVE van.
+ *
+ * A helyes kezelés állapotonként:
+ *   GRANTED → gyűjthet, tárolhat, küldhet
+ *   DENIED  → a visszavonás NYUGALMI ÁLLAPOTBAN is érvényes: purge
+ *   UNKNOWN → NEM ír eszközre és NEM küld drótra, de NEM IS töröl
+ *
+ * Forrás-sorrend: `getConsentState()` (override → saját süti → CookieYes-süti),
+ * és ha az nem tud dönteni, a CookieYes JS API (`hasMarketingConsent`). A JS
+ * API csak GRANTED-et tud állítani; a hiánya UNKNOWN, nem DENIED.
+ */
+export type MarketingConsentState = 'GRANTED' | 'DENIED' | 'UNKNOWN';
+
+export function getMarketingConsentState(): MarketingConsentState {
+  const consent = getConsentState();
+  if (!consent) return hasMarketingConsent() ? 'GRANTED' : 'UNKNOWN';
+  if (consent.ad_user_data === 'GRANTED' || consent.ad_storage === 'GRANTED') return 'GRANTED';
+  if (consent.ad_user_data === 'DENIED' && consent.ad_storage === 'DENIED') return 'DENIED';
+  return 'UNKNOWN';
+}
+
+// ── Fázis D · consent-forrás telemetria (2026-08) ───────────────────────────
+//
+// MÉR, NEM DÖNT. A `getConsentState()` fenti logikája és a lib consent-kapui
+// (hasMarketingConsent / hasAnalyticsConsent) VÁLTOZATLANOK — ez a blokk csak
+// JELENTI, mit látott az egyes forrásokból abban a pillanatban.
+//
+// Miért kell: ma HÁROM olvasat fut ugyanarra a döntésre, és nem tudjuk, hogy
+// eltérnek-e. (1) A dispatch-kapuk a CookieYes JS API-t nézik
+// (`getCkyConsent()`), ami betöltés ELŐTT prod-ban deny-all-t ad. (2) A payload
+// `consent` blokkja a `cookieyes-consent` SÜTIBŐL épül. (3) A gateway harmadszor
+// olvas, a HTTP Cookie headerből. 30 nap adatból 9 olyan `skipped` delivery van,
+// aminek a receiptje GRANTED — a legvalószínűbb magyarázat épp ez a verseny.
+//
+// `null` = a forrás nem volt elérhető abban a pillanatban. NE pótold semmivel:
+// a NULL-mintázat maga a bizonyíték.
+
+export interface ConsentSourceSnapshot {
+  analytics: boolean | null;
+  marketing: boolean | null;
+}
+
+export interface ConsentSourcesPayload {
+  cookie: ConsentSourceSnapshot;
+  api: ConsentSourceSnapshot;
+  source_used: 'cookieyes_cookie' | 'cookieyes_api' | 'override' | 'sbo_cookie' | 'none';
+  client_lib_version: string;
+  /**
+   * A döntés kora másodpercben. CSAK provider='sbo' alatt létezik (a saját süti
+   * timestampet hordoz; a CookieYes-é nem) — a szerver TRK-910-004 (lejárt
+   * consent) kódja erre vár.
+   */
+  consent_age_s?: number;
+  /** Nyers stringek — a gateway CSAK mismatch esetén tárolja (consent_debug). */
+  raw_cookie?: string;
+  raw_api?: string;
+}
+
+const UNAVAILABLE_SOURCE: ConsentSourceSnapshot = { analytics: null, marketing: null };
+
+/** A `cookieyes-consent` süti nyers kategória-térképe (null, ha nincs süti). */
+function readCookieYesCookieRaw(): { raw: string; map: Record<string, string> } | null {
+  if (typeof document === 'undefined') return null;
+  const raw = getConsentCookie('cookieyes-consent');
+  if (!raw) return null;
+  const map: Record<string, string> = {};
+  for (const part of raw.split(',')) {
+    const idx = part.indexOf(':');
+    if (idx > 0) map[part.slice(0, idx).trim()] = part.slice(idx + 1).trim();
+  }
+  return { raw, map };
+}
+
+/**
+ * A consent-források pillanatfelvétele. SOHA nem dob: bármelyik forrás hibája
+ * csak annyit jelent, hogy az a forrás „nem elérhető". Egy telemetria-mező nem
+ * buktathat konverziót.
+ */
+export function collectConsentSources(): ConsentSourcesPayload {
+  let cookie: ConsentSourceSnapshot = { ...UNAVAILABLE_SOURCE };
+  let rawCookie: string | undefined;
+  let cookiePresent = false;
+  try {
+    const c = readCookieYesCookieRaw();
+    if (c) {
+      rawCookie = c.raw;
+      // Csak a TÉNYLEGESEN jelen lévő kulcsokat fordítjuk le; a hiányzó
+      // kategória null marad (nem `false` — az hazugság lenne).
+      cookie = {
+        analytics: c.map.analytics === undefined ? null : c.map.analytics === 'yes',
+        marketing: c.map.advertisement === undefined ? null : c.map.advertisement === 'yes'
+      };
+      cookiePresent = cookie.analytics !== null || cookie.marketing !== null;
+    }
+  } catch {
+    // marad UNAVAILABLE
+  }
+
+  let api: ConsentSourceSnapshot = { ...UNAVAILABLE_SOURCE };
+  let rawApi: string | undefined;
+  let apiPresent = false;
+  try {
+    const categories = readCookieYesApiConsentRaw();
+    if (categories) {
+      api = { analytics: categories.analytics === true, marketing: categories.advertisement === true };
+      apiPresent = true;
+      rawApi = JSON.stringify(categories);
+    }
+  } catch {
+    // marad UNAVAILABLE
+  }
+
+  // MELYIK forrásból épült a payload `consent` blokkja — ez a `getConsentState()`
+  // precedenciája (override → süti → semmi). FIGYELEM: ez SZÁNDÉKOSAN nem
+  // ugyanaz, mint amin a dispatch-kapu dönt (az a JS API) — a kettő eltérése a
+  // mérés tárgya, nem hiba a jelentésben.
+  const hasOverride =
+    typeof window !== 'undefined' &&
+    Boolean((window as unknown as { __trackingConsent?: ConsentState }).__trackingConsent);
+
+  // CMP Fázis 2: provider='sbo' alatt a döntést a saját süti hajtja, és a
+  // döntés kora is ismert (a CookieYes sütije timestamp nélküli — ott a mező
+  // továbbra sincs). A cookie/api snapshotok NEM váltanak jelentést: alattuk
+  // változatlanul a CookieYes olvasata megy — a párhuzamos mérési ablak (2.4)
+  // receipt-oldali evidenciája pont ez.
+  const sboState = !hasOverride && isSboConsentProvider() ? readSboConsent(trackingConfig.policyVersion) : null;
+  const sourceUsed: ConsentSourcesPayload['source_used'] = hasOverride
+    ? 'override'
+    : sboState
+      ? 'sbo_cookie'
+      : isSboConsentProvider()
+        ? 'none'
+        : cookiePresent
+          ? 'cookieyes_cookie'
+          : apiPresent
+            ? 'cookieyes_api'
+            : 'none';
+
+  return {
+    cookie,
+    api,
+    source_used: sourceUsed,
+    client_lib_version: CLIENT_LIB_VERSION,
+    consent_age_s: sboConsentAgeSeconds(sboState),
+    raw_cookie: rawCookie,
+    raw_api: rawApi
+    // CookieYes alatt a `consent_age_s` SZÁNDÉKOSAN hiányzik: a
+    // `cookieyes-consent` süti nem hordoz timestampet, és heurisztikát nem
+    // találunk ki rá — a gateway receiptjén NULL marad.
   };
 }
 
@@ -206,10 +404,10 @@ const ATTR_UTM_PARAMS = [
 ];
 
 function readStoredAttribution(): AttributionParams {
-  // PECR: az OLVASAS is engedelykoteles. Ez a kulcs marketing-scope (klikk-ID-k +
-  // UTM-ek), ezert UGYANAZON az EGY read-gate-en megy at, mint a persistence.ts
-  // getterei — nem egy masodikon. Consent nelkul ures objektum, es a blokk
-  // bekerul a `storage_read_blocked_keys` telemetriaba.
+  // PECR: az OLVASÁS is engedélyköteles. Ez a kulcs marketing-scope (click ID-k +
+  // UTM-ek), ezért ugyanazon az EGY read-gate-en megy át, mint a persistence.ts
+  // getterei — nem egy másodikon. Consent nélkül üres objektum, és a blokk
+  // bekerül a `storage_read_blocked_keys` telemetriába.
   try {
     const raw = readMarketingLocalStorage(ATTR_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as AttributionParams) : {};
@@ -219,12 +417,11 @@ function readStoredAttribution(): AttributionParams {
 }
 
 function writeStoredAttribution(a: AttributionParams): void {
-  // GDPR: attribucio (gclid/fbclid/UTM/landing/referrer) localStorage-be irasa
-  // marketing-storage — consent nelkul TILOS. A `collectAttribution` publikus
-  // export, kozvetlen hivasa enelkul consent nelkul perzisztalna (a persistence.ts
-  // minden irasa is igy gate-el). A READ/in-memory hasznalat gate nelkul mehet; itt
-  // csak a PERSIST lepest zarjuk — a consent ELOTTI landolast a boot efemer
-  // puffere fedi (`captureUrlParams` -> grantkor `persistTrackingParams`).
+  // GDPR: attribúció (gclid/fbclid/UTM/landing/referrer) localStorage-be írása
+  // marketing-storage — consent nélkül TILOS. A `collectAttribution` publikus
+  // export, közvetlen hívása enélkül consent nélkül perzisztálna (a persistence.ts
+  // minden írása is így gate-el). A READ/in-memory használat gate nélkül mehet; itt
+  // csak a PERSIST lépést zárjuk.
   if (!hasMarketingConsent()) return;
   try {
     localStorage.setItem(ATTR_STORAGE_KEY, JSON.stringify(a));
@@ -233,51 +430,19 @@ function writeStoredAttribution(a: AttributionParams): void {
   }
 }
 
-// gclid from the `_gcl_aw` cookie (format: GCL.<ts>.<gclid>) — fallback when the
-// URL no longer has a gclid (e.g. the user converts on an internal page).
-function gclidFromCookie(): string | undefined {
-  const c = getCookie('_gcl_aw');
-  if (!c) return undefined;
-  const parts = c.split('.');
-  return parts.length >= 3 ? parts.slice(2).join('.') : undefined;
-}
-
-// Google click IDs are MUTUALLY EXCLUSIVE: one click yields gclid OR gbraid OR wbraid,
-// never several. This store merged per key, so a returning paid visitor kept the
-// PREVIOUS click's ID alongside the new one and the conversion payload carried two IDs
-// from two different clicks — which the offline upload rejects. So: as soon as the fresh
-// source carries ANY Google click ID, its siblings are dropped. `fbclid`/`msclkid` are
-// other networks and stay untouched.
-const GOOGLE_CLICK_KEYS = ['gclid', 'gbraid', 'wbraid'] as const;
-
-function dropStaleGoogleClickIds(
-  stored: AttributionParams,
-  fresh: AttributionParams,
-): AttributionParams {
-  if (!GOOGLE_CLICK_KEYS.some((k) => fresh[k])) {
-    // No fresh Google click ID. A legacy store may still hold several from the
-    // buggy era — keep `gclid` (the dominant, non-iOS form) and drop the siblings.
-    const present = GOOGLE_CLICK_KEYS.filter((k) => stored[k]);
-    if (present.length < 2) return stored;
-    const keep = present.includes('gclid') ? 'gclid' : present[0];
-    const healed = { ...stored };
-    for (const k of GOOGLE_CLICK_KEYS) if (k !== keep) delete healed[k];
-    return healed;
-  }
-  const cleaned = { ...stored };
-  for (const k of GOOGLE_CLICK_KEYS) if (!fresh[k]) delete cleaned[k];
-  return cleaned;
-}
-
 /**
- * A friss forrásból determinisztikusan EGY Google klikk-ID marad (gclid > gbraid > wbraid).
- * HELYBEN módosít: a hívó `fresh` objektuma `const`, és a felesleges kulcsokat TÖRÖLNI kell.
+ * A TÁROLT klikk-ID-k tisztítása, ha a megoldott ID nem a tárolóból jött.
+ *
+ * A `resolveGoogleClickId` megmondja, MELYIK az egy érvényes Google klikk-ID; ez
+ * a függvény gondoskodik róla, hogy a rekordban ne maradjon mellette testvér.
+ * A nem-Google mezők (utm, fbclid, landing) érintetlenek — ez nem általános
+ * takarítás.
  */
-function keepSingleGoogleClickId(fresh: AttributionParams): void {
-  const present = GOOGLE_CLICK_KEYS.filter((k) => fresh[k]);
-  if (present.length < 2) return;
-  const keep = present.includes('gclid') ? 'gclid' : present[0];
-  for (const k of GOOGLE_CLICK_KEYS) if (k !== keep) delete fresh[k];
+function healGoogleClickIds(
+  merged: AttributionParams,
+  resolved: ResolvedGoogleClickId | undefined
+): void {
+  applyGoogleClickId(merged as Record<string, unknown>, resolved);
 }
 
 export function collectAttribution(): AttributionParams {
@@ -294,90 +459,113 @@ export function collectAttribution(): AttributionParams {
   // user consented. Fall back to the JS API when the cookie/override is absent so
   // the two channels agree. (When the cookie IS present we respect its signals,
   // including an explicit DENIED.) Fail-closed when neither source grants.
-  const consent = getConsentState();
-  const adGranted = consent
-    ? consent.ad_user_data === 'GRANTED' || consent.ad_storage === 'GRANTED'
-    : hasMarketingConsent();
+  const consentState = getMarketingConsentState();
+  const adGranted = consentState === 'GRANTED';
 
+  let urlParams: URLSearchParams | undefined;
   try {
-    const params = new URLSearchParams(window.location.search);
+    urlParams = new URLSearchParams(window.location.search);
     if (adGranted) {
       for (const k of ATTR_CLICK_PARAMS) {
-        const v = params.get(k);
+        const v = urlParams.get(k);
         if (v) fresh[k] = v;
       }
     }
     for (const k of ATTR_UTM_PARAMS) {
-      const v = params.get(k);
+      const v = urlParams.get(k);
       if (v) fresh[k] = v;
     }
   } catch {
     // no-op
   }
 
-  // Only ONE Google click ID may leave this function. Two guards, in order:
-  //  1. The URL itself can carry several (redirect / tag-manager artefact) — collapse to one.
-  //  2. The `_gcl_aw` cookie fallback must NOT fire when the URL already brought a Google
-  //     click ID. Otherwise a returning visitor landing on ?gbraid=… with an old gclid
-  //     cookie gets BOTH marked fresh, `dropStaleGoogleClickIds` keeps both (it only
-  //     prunes `stored`), and the payload carries two IDs from two different clicks —
-  //     exactly the rejection this module exists to prevent.
-  keepSingleGoogleClickId(fresh);
-  if (adGranted && !GOOGLE_CLICK_KEYS.some((k) => fresh[k])) {
-    const g = gclidFromCookie();
-    if (g) fresh.gclid = g;
-  }
+  // A Google klikk-ID döntése NEM ITT lakik: a szabály (kölcsönös kizárás +
+  // URL > `_gcl_aw` cookie > tároló) a `lib/google-click-id.ts` egyetlen
+  // authorityjében van, hogy a site-adapterek ugyanazt használhassák.
+  //
+  // Consent nélkül az URL-t és a sütit KI IS ZÁRJUK a jelöltek közül (nem adjuk
+  // át) — így a tárolt érték marad az egyetlen jelölt. Ez szándékos: az
+  // UNKNOWN-állapot nem törölhet egy korábbi grant alatt eltárolt ID-t, csak a
+  // drótra nem engedi (lentebb).
+  const resolved = resolveGoogleClickId({
+    url: adGranted ? urlParams : undefined,
+    gclAw: adGranted ? getCookie('_gcl_aw') : undefined,
+    stored
+  });
 
-  // Last-touch: the fresh URL signals override the stored ones. A fresh Google click
-  // ID also EVICTS its stored siblings (see dropStaleGoogleClickIds).
-  const merged: AttributionParams = { ...dropStaleGoogleClickIds(stored, fresh), ...fresh };
-
-  // Ad-consent revoked/missing → drop the previously stored click IDs too
-  // (don't persist/send an ad identifier without consent).
-  if (!adGranted) {
-    for (const k of ATTR_CLICK_PARAMS) delete merged[k];
-  }
+  // Last-touch: the fresh URL signals override the stored ones.
+  const merged: AttributionParams = { ...stored, ...fresh };
+  healGoogleClickIds(merged, resolved);
 
   // First-touch landing context (don't overwrite if already present).
   if (!merged.landing_page) merged.landing_page = window.location.href;
   if (!merged.referrer && document.referrer) merged.referrer = document.referrer;
 
+  if (adGranted) {
+    writeStoredAttribution(merged);
+    return merged;
+  }
+
+  // Click-ID handling without a grant is THREE-state, not two:
+  //  - explicit DENIED → honor the revocation at rest too: purge stored
+  //    click IDs and send none.
+  //  - UNKNOWN (no CookieYes cookie yet, JS API not loaded — the boot
+  //    race on every early page-load) → fail-closed on the WIRE (no click
+  //    IDs leave the browser), but do NOT purge IDs stored under a prior
+  //    grant. Treating "unknown" as a denial deleted a consented user's
+  //    gclid before the CMP initialised, orphaning the conversion from
+  //    its ad click.
+  if (consentState === 'DENIED') {
+    for (const k of ATTR_CLICK_PARAMS) delete merged[k];
+    writeStoredAttribution(merged);
+    return merged;
+  }
+
+  // Unknown: persist untouched (fresh contains no click IDs — collection
+  // above is grant-gated), strip click IDs from the outgoing copy only.
   writeStoredAttribution(merged);
-  return merged;
+  const outgoing: AttributionParams = { ...merged };
+  for (const k of ATTR_CLICK_PARAMS) delete outgoing[k];
+  return outgoing;
 }
 
 /**
- * A BONGESZO-UTON ATENGEDETT EVENTEK.
+ * Browser dispatch to the gateway (`/api/event/conversion`).
  *
- * A gateway a high-value konverziokat (form/lead/purchase) a bongeszo-utrol
- * 403-mal dobja (TRK-400-017): azokat a site BACKENDJE kuldi a hitelesitett
- * `/api/event/conversion-server` ingressen, per-site tokennel. Az Origin
- * curl-bol hamisithato, ezert ez nem kozmetika.
+ * GUARDRAIL: only `BROWSER_GATEWAY_EVENTS` pass. A `server_ingress_only` event
+ * (or any name outside the browser allow-list) is refused HERE, with a loud
+ * TRK-1005 diagnostic — the gateway would 403/drop it anyway, but a client-side
+ * block turns "silently lost conversion" into "visible wiring bug". Send those
+ * events from the site backend instead (server/backend/gateway-dispatch.ts).
  *
- * MIERT KELL EZ A LISTA MOST. Eddig a Turnstile-kapu vegezte ezt a munkat is,
- * mellekhatáskent: token nelkul CSAK ezt a harom klikk-eventet engedte at, a
- * tobbit kihagyta. A kapu kivezetesevel ez a felezes elveszne — a magas
- * kockazatu eventek garantalt-403 beacont termelnenek. Ezert a felosztas most
- * KIMONDOTT, nem egy mellekhatas: ugyanaz a harom event megy at, mint eddig.
+ * Transport: `sendBeacon` first (survives page unload — tel:/mailto: clicks
+ * navigate away), `fetch keepalive` fallback. The fetch fallback DOES inspect the
+ * HTTP status: a 4xx/5xx reports TRK-1006 (GATEWAY_REJECTED) instead of lying
+ * "sent". (A queued beacon cannot be inspected — that's inherent to beacons and
+ * acceptable for low-risk click events; the gateway's D1 ledger is the ground
+ * truth either way.)
  */
-const BROWSER_GATEWAY_EVENTS: ReadonlySet<string> = new Set([
-  'phone_conversion',
-  'email_conversion',
-  'whatsapp_conversion'
-]);
-
 export async function sendToWorker(payload: ConversionPayload): Promise<boolean> {
-  if (!BROWSER_GATEWAY_EVENTS.has(payload.event_name)) {
-    // HANGOS diagnosztika, nem nema kihagyas: ha egy hivo ide teved, azt latni
-    // kell — kulonben a konverzio ugy tunik el, hogy a dispatch "sikeres" volt.
+  if (SERVER_INGRESS_ONLY_EVENTS.has(payload.event_name) || !BROWSER_GATEWAY_EVENTS.has(payload.event_name)) {
     report('GATEWAY_SERVER_ONLY_EVENT', { event_name: payload.event_name });
     return false;
   }
 
-  const fbp = getCookie('_fbp');
-  const fbc = getCookie('_fbc');
+  // Meta browser ids. Cookie READ is terminal-storage access under PECR, so it
+  // goes through the same marketing gate as the rest of the package
+  // (persistence.ts getFbp/getFbc) — not a second, ungated `getCookie` path.
+  // `_ga` / `_ga_<stream>` stay here: GA4's own cookies are analytics-scoped and
+  // the browser GA4 leg owns them (Model 2); the gateway sends no GA4.
+  const fbp = getFbp() || undefined;
+  const fbc = getFbcCookie() || undefined;
   const clientId = extractGAClientId(getCookie('_ga'));
   const sessionId = extractGASessionId();
+  // Az attribúció-gyűjtés IS olvas storage-ot (`__sb_attribution`) — ezért előbb
+  // fut le, és CSAK utána készül a telemetria-pillanatkép. Fordítva a saját
+  // blokkja kimaradna a jelentésből, vagyis a mérőműszer pont azt a hozzáférést
+  // nem látná, amiért készült.
+  const attribution = payload.attribution || collectAttribution();
+  const readBlocked = getStorageReadBlocked();
 
   const body = JSON.stringify({
     ...payload,
@@ -386,7 +574,20 @@ export async function sendToWorker(payload: ConversionPayload): Promise<boolean>
     client_id: clientId,
     session_id: sessionId,
     consent: payload.consent || getConsentState(),
-    attribution: payload.attribution || collectAttribution(),
+    // CMP Fázis 2 (1.3): a döntés-lánc azonosítója a konverzió receiptjére —
+    // ezen keresztül oldja fel az offline/replay ág a consent_log AKTUÁLIS
+    // állapotát. CookieYes-provider alatt undefined (a mező ki sem megy), a
+    // szerveren NULL — nem hiba.
+    consent_id: isSboConsentProvider() ? readSboConsent(trackingConfig.policyVersion)?.consentId : undefined,
+    // Fázis D telemetria — a döntést NEM befolyásolja, csak jelenti, mit láttak
+    // a párhuzamos consent-források ebben a pillanatban.
+    consent_sources: collectConsentSources(),
+    // PECR read-gate telemetria: blokkolt-e a consent-kapu storage-OLVASÁST ezen
+    // az oldalletöltésen. GRANTED consent melletti magas arány = betöltési
+    // verseny (a CookieYes API még nem töltött be, amikor olvastunk volna).
+    storage_read_blocked: readBlocked.blocked,
+    storage_read_blocked_keys: readBlocked.keys,
+    attribution,
     event_source_url: payload.event_source_url || location.href
   });
 
@@ -402,12 +603,19 @@ export async function sendToWorker(payload: ConversionPayload): Promise<boolean>
   }
 
   try {
-    await fetch('/api/event/conversion', {
+    const res = await fetch('/api/event/conversion', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body,
       keepalive: true
     });
+    if (!res.ok) {
+      // 403 = Origin not allow-listed OR a server-ingress-only event slipped
+      // through (TRK-400-017 on the gateway); 429 = rate limit; 404 = hostname
+      // missing from SITE_CONFIG KV. All of them mean the conversion did NOT land.
+      report('GATEWAY_REJECTED', { event_name: payload.event_name, status: res.status });
+      return false;
+    }
     report('GATEWAY_OK', { event_name: payload.event_name, transport: 'fetch' });
     return true;
   } catch (err) {
@@ -418,10 +626,11 @@ export async function sendToWorker(payload: ConversionPayload): Promise<boolean>
 
 /**
  * @deprecated Prefer the consent-safe entry points in `index.ts`
- * (`trackLeadSubmit` / `trackServerEvent` / `trackPhoneConversion` …). This
- * low-level helper is kept for direct/advanced use. It is now CONSENT-GATED to
- * match the skill's consent matrix: the dataLayer push needs analytics consent,
- * the gateway dispatch needs marketing consent. Without either it is a no-op.
+ * (`trackServerEvent` / `trackPhoneConversion` …). This low-level helper is kept
+ * for direct/advanced use. It is CONSENT-GATED to match the skill's consent
+ * matrix: the dataLayer push needs analytics consent, the gateway dispatch needs
+ * marketing consent. Without either it is a no-op. The gateway leg only accepts
+ * browser-path events (see `sendToWorker`).
  */
 export async function trackConversion(
   eventName: string,
