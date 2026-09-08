@@ -61,6 +61,13 @@ jobs:
       - name: Teszt-keszlet
         run: npm --prefix tracking-kit test
 
+      # A `typecheck` eddig NEM futott itt -- es emiatt a masteren EszREVETLENUL
+      # piros volt (5x TS2345 a `tests/google-clickid.test.ts`-ben, a #68 ota).
+      # Egy meglevo, de nem futtatott szerszam pontosan annyit er, mint egy nem
+      # letezo: ettol a lepestol kezdve a tipushiba is bukast okoz.
+      - name: Tipusellenorzes
+        run: npm --prefix tracking-kit run typecheck
+
       # A bongeszo-szerzodes ore: kod <-> docs <-> GTM-konteneR. Ez a lepes
       # korabban KIMARADT, mert a masteren ket kifogassal bukott -- mindketto
       # most zarva:
