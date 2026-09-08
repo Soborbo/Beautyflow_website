@@ -63,7 +63,10 @@ export function initTracking(): void {
   captureUrlParams();
   if (!consentListenerBound) {
     consentListenerBound = true;
-    onConsentChange((c) => { if (c.marketing) persistTrackingParams(); });
+    // A CookieYes ads-kategoriajanak NEVE `advertisement` (nem `marketing`) — a
+    // kanonikus consent.ts a NYERS CookieYes-szotarat adja vissza, a kit korabbi
+    // sajat `marketing` aliasza helyett. Ugyanaz a jogalap, mas kulcsnev.
+    onConsentChange((c) => { if (c.advertisement) persistTrackingParams(); });
   }
   if (hasMarketingConsent()) persistTrackingParams();
 }
