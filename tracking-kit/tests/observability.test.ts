@@ -56,9 +56,11 @@ describe('report()', () => {
   it('ring buffer is bounded (no unbounded memory growth)', () => {
     // A korábbi `TURNSTILE_TIMEOUT` kóddal ment; az a Turnstile kivezetésével
     // (2026-08-28) megszűnt. Bármelyik warn-kód megteszi — az eset a gyűrű
-    // korlátosságát méri, nem a konkrét kódot.
+    // korlátosságát méri, nem a konkrét kódot. A `console.warn` némítása miatt
+    // viszont VALÓDI warn-kód kell: egy `error`-severity kód a `console.error`-re
+    // menne, és a némítás mellett zajt hagyna a kimenetben.
     vi.spyOn(console, 'warn').mockImplementation(() => {});
-    for (let i = 0; i < 60; i++) report('GATEWAY_SERVER_INGRESS_ONLY');
+    for (let i = 0; i < 60; i++) report('CONSENT_POST_RETRYABLE');
     expect(getDiagnostics().length).toBeLessThanOrEqual(50);
   });
 });

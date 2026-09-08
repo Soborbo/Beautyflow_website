@@ -359,7 +359,7 @@ export async function sendToWorker(payload: ConversionPayload): Promise<boolean>
   if (!BROWSER_GATEWAY_EVENTS.has(payload.event_name)) {
     // HANGOS diagnosztika, nem nema kihagyas: ha egy hivo ide teved, azt latni
     // kell — kulonben a konverzio ugy tunik el, hogy a dispatch "sikeres" volt.
-    report('GATEWAY_SERVER_INGRESS_ONLY', { event_name: payload.event_name });
+    report('GATEWAY_SERVER_ONLY_EVENT', { event_name: payload.event_name });
     return false;
   }
 
