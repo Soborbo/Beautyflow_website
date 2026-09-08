@@ -18,37 +18,51 @@ funnel-adaptation guide; in case of a name conflict, THIS file wins.)
 
 ## Canonical conversion table
 
-| Conversion | Browser dataLayer (events.ts) | **GA4 event name** (emitted by GTM tag) | Gateway `event_name` | Meta | Google Ads (conversion_actions key) | GA4 Key Event? |
-|---|---|---|---|---|---|:--:|
-| Quote/lead form | `lead_submit` | `contact_form_submit` | `contact_form_submit` | Contact | `contact_form_submit` | ✅ |
-| Contact form | `contact_submit` | `contact_form_submit` | `contact_form_submit` | Contact | `contact_form_submit` | ✅ |
-| Callback | `callback_click` | `callback_conversion` | `callback_conversion` | Lead | `callback_conversion` | ✅ |
-| Phone click | `phone_click` | `phone_conversion` | `phone_conversion` | Contact | `phone_conversion` | ✅ |
-| Email click | `email_click` | `email_conversion` | `email_conversion` | Contact | — | ✅ |
-| WhatsApp click | `whatsapp_click` | `whatsapp_conversion` | `whatsapp_conversion` | Contact | — | ✅ |
-| Booking hand-off | `booking_click` | `booking_click` | `booking_click` | InitiateCheckout | dedicated action only | ✅ |
-| Calculator complete (quote) | `calculator_complete` | `quote_calculator_conversion` | `quote_calculator_conversion` | Lead | `quote_calculator_conversion` | ✅ |
-| Calculator first view | — | `quote_calculator_first_view` | `quote_calculator_first_view` | ViewContent | — | ❌ |
+> **2026-09-08 — eseménynév-cutover.** A `Browser dataLayer` oszlop a KANONIKUS
+> neveket hozza (a `tracking-kit/lib/` 15/15 fájlon a kanonikus 6.6.8). A GTM-triggerek
+> a párhuzamos futás alatt `matches RegEx ^(legacy|kanonikus)$`-szal MINDKÉT nevet
+> elfogadják. A **GA4 oszlopot ekkor ÚJRAMÉRTEM az élő konténerből** (`GTM-W8V3BVGD`):
+> hat sorban sodródott — a tagek `generate_lead`-et küldenek, nem azt, amit ez a
+> táblázat állított. A GA4-nevek a cutovertől **nem** változnak (mindegyik tag
+> bedrótozott `eventName`-et használ), tehát a riport-folytonosság megmarad.
+
+| Conversion | Browser dataLayer (events.ts) | **GA4 event name** (élő GTM-tag) | Gateway `event_name` | Meta | GA4 Key Event? |
+|---|---|---|---|---|:--:|
+| Quote/lead form | `quote_calculator_submitted` | `generate_lead` | `quote_calculator_submitted` | Lead | ✅ |
+| Contact form | `contact_form_submitted` | `generate_lead` | `contact_form_submitted` | Contact | ✅ |
+| Callback | `callback_request_submitted` | `generate_lead` | `callback_request_submitted` | Lead | ✅ |
+| Phone click | `phone_number_clicked` | `phone_click` | `phone_number_clicked` | Contact | ✅ |
+| Email click | `email_address_clicked` | `email_click` | `email_address_clicked` | Contact | ✅ |
+| WhatsApp click | `whatsapp_button_clicked` | `whatsapp_click` | `whatsapp_button_clicked` | Contact | ✅ |
+| Booking hand-off | `begin_checkout` | `booking_click` | `begin_checkout` | InitiateCheckout | ✅ |
+
+> **A „kalkulátor kész" sor megszűnt, nem elveszett.** A kanonikus névtérben a
+> mérföldkő és a quote-konverzió UGYANAZ az esemény (`quote_calculator_submitted`),
+> ezért a `trackCalculatorComplete` hívás kikerült a három konverziós folyamatból —
+> különben egy folyamatban KÉTSZER tüzelne, az elsőnél `event_id` nélkül (duplikált,
+> dedupálhatatlan Meta Lead + `orderId` nélküli Ads-konverzió). Részletek:
+> Serverside `docs/EVENT-CUTOVER-BEAUTYFLOW.md` §3.
 
 **The "GA4 event name" column is the key:** in GTM the browser tag emits THIS name
-(e.g. the GA4 tag firing on the `lead_submit` dataLayer event has GA4 event name
-`contact_form_submit`). If you also use the gateway GA4 MP, it sends the SAME name —
+(e.g. the GA4 tag firing on the `quote_calculator_submitted` dataLayer event has GA4
+event name `generate_lead`). If you also use the gateway GA4 MP, it sends the SAME name —
 so reporting stays unified (but see the double-counting warning above).
 
 ## Engagement (NOT a conversion, does NOT go to the gateway, NOT a Key Event)
 
 | dataLayer event | Purpose | GA4 |
 |---|---|---|
-| `calculator_start` / `calculator_step` / `calculator_option` | funnel | regular event |
-| `form_abandon` | form abandonment | regular event |
+| `quote_calculator_opened` / `quote_calculator_step_completed` / `quote_calculator_option_selected` | funnel | regular event |
+| `form_abandoned` | form abandonment | regular event |
 | `scroll_depth` (25/50/75/100) | scroll | regular event |
 | `newsletter_signup` | newsletter success | regular event |
 | `calculator_result_view` | result-page view | regular event |
 | `cta_click` | internal CTA click (`data-track="cta_click"`) | regular event — **no GTM trigger by design** |
 
 > **`cta_click` deliberately has no GTM trigger**, and that is the point of the event.
-> `booking_click` IS a conversion, so it only belongs on a real hand-off (a click that
-> leaves the site for Notino); in Ads the GA4-imported `booking_click` is a PRIMARY
+> The booking hand-off (`begin_checkout`) IS a conversion, so it only belongs on a real
+> hand-off (a click that leaves the site for Notino); in Ads the GA4-imported
+> `booking_click` is a PRIMARY
 > goal. Putting an internal CTA — a link that merely navigates to
 > `/ingyenes-konzultacio` — on that event would book a conversion before the visitor
 > submits anything, on top of the lead the form itself reports. `cta_click` is the
@@ -62,10 +76,9 @@ so reporting stays unified (but see the double-counting warning above).
 
 ## GA4 admin tasks (once per property)
 
-1. **Key Events (Admin → Events → Mark as key event):**
-   `contact_form_submit`, `callback_conversion`, `phone_conversion`,
-   `email_conversion`, `whatsapp_conversion`, `booking_click`,
-   `quote_calculator_conversion`.
+1. **Key Events (Admin → Events → Mark as key event)** — a GA4-nevek, az élő
+   konténerből mérve: `generate_lead`, `phone_click`, `email_click`,
+   `whatsapp_click`, `booking_click`.
 2. **Custom dimensions (Admin → Custom definitions → event-scoped):**
    `event_id`, `session_id`, `source`, `service`, `device`,
    `calculator_name`, `step_id`. (The campaign parameters — source/medium/campaign —
