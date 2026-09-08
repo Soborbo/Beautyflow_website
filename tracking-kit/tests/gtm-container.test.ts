@@ -163,7 +163,20 @@ describe('Beautyflow production GTM import', () => {
   });
 
   it('does not misreport booking as the Contact Google Ads conversion', () => {
-    const bookingTrigger = cv.trigger.find((t: { name: string }) => t.name === 'CE - booking_click');
+    // A trigger NEVE nem szerződés: a cutover óta `CE - begin_checkout (+legacy)`.
+    // A stabil horgony az, hogy a feltétele illeszkedik-e a booking eseményre.
+    const bookingTrigger = cv.trigger.find(
+      (t: { type: string; customEventFilter?: { type?: string; parameter: { key: string; value: string }[] }[] }) => {
+        if (t.type !== 'CUSTOM_EVENT') return false;
+        const f = t.customEventFilter?.[0];
+        const arg1 = f?.parameter.find((p) => p.key === 'arg1')?.value;
+        if (!arg1) return false;
+        return String(f?.type ?? 'EQUALS').toUpperCase() === 'MATCH_REGEX'
+          ? new RegExp(arg1).test('begin_checkout')
+          : arg1 === 'begin_checkout' || arg1 === 'booking_click';
+      },
+    );
+    expect(bookingTrigger, 'nincs trigger a booking hand-offra').toBeTruthy();
     const adsTags = cv.tag.filter((t: { type: string }) => t.type === 'awct');
     expect(adsTags.some((t: { firingTriggerId: string[] }) =>
       t.firingTriggerId.includes(bookingTrigger.triggerId))).toBe(false);
