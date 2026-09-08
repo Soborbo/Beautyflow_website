@@ -96,6 +96,7 @@ export function externalReferrer(): string | undefined {
  */
 function sanitizeReferrer(raw: string | null | undefined): string | undefined {
   if (!raw) return undefined;
+  if (typeof window === 'undefined' || !window.location?.href) return undefined;
   try {
     const u = new URL(raw, window.location.href);
     if (u.protocol !== 'http:' && u.protocol !== 'https:') return undefined;
@@ -150,6 +151,7 @@ function readStore(): Record<string, string | undefined> {
  */
 function persistEntry(): void {
   if (!entry.landing && !entry.referrer) return;
+  if (typeof window === 'undefined' || !window.location?.origin) return;
   try {
     const stored = readStore();
     // FIRST TOUCH a lemezen is: ami már ott van, azt nem írjuk felül.
@@ -176,9 +178,13 @@ function persistEntry(): void {
  * legvégül maga ez az oldal.
  */
 export function captureEntrySignals(consent?: MarketingConsentState): void {
-  if (typeof window === 'undefined') return;
+  // Nem elég a `typeof window === 'undefined'` őr: a `window` létezhet
+  // RÉSZLEGES `location`-nel is (SSR-shim, teszt-stub, beágyazott kontextus).
+  // Egy dobás itt a teljes űrlap-beküldést vinné magával — a belépési jel
+  // hiánya viszont csak egy üres mező.
+  if (typeof window === 'undefined' || !window.location) return;
   const state = consent ?? getMarketingConsentState();
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search || '');
 
   // DENIED alatt a store-t nem olvassuk vissza: a visszavonás a memóriában lévő
   // olvasatra is álljon, ne csak az írásra.
@@ -188,7 +194,7 @@ export function captureEntrySignals(consent?: MarketingConsentState): void {
     entry.landing =
       storedLandingPath(stored.landing_page) ||
       sanitizeLandingPath(params.get(LANDING_PARAM)) ||
-      window.location.pathname.slice(0, MAX_LEN);
+      (window.location.pathname || '/').slice(0, MAX_LEN);
   }
   if (!entry.referrer) {
     entry.referrer =
@@ -204,6 +210,7 @@ export function captureEntrySignals(consent?: MarketingConsentState): void {
  *  `undefined` — a store-t a gateway is írja, és a formátuma változhat. */
 function storedLandingPath(raw: string | undefined): string | undefined {
   if (!raw) return undefined;
+  if (typeof window === 'undefined' || !window.location?.href) return sanitizeLandingPath(raw);
   try {
     const u = new URL(raw, window.location.href);
     if (u.host !== window.location.host) return undefined;
@@ -218,7 +225,9 @@ function storedLandingPath(raw: string | undefined): string | undefined {
 /** A belépési oldal ÚTVONALA (`/blog/valami`). URL-átvitelhez. */
 export function getEntryLandingPath(): string {
   captureEntrySignals();
-  return entry.landing || (typeof window === 'undefined' ? '/' : window.location.pathname);
+  if (entry.landing) return entry.landing;
+  if (typeof window === 'undefined' || !window.location) return '/';
+  return window.location.pathname || '/';
 }
 
 /**
@@ -229,7 +238,7 @@ export function getEntryLandingPath(): string {
  * illeszkedést.
  */
 export function getEntryLandingUrl(): string {
-  if (typeof window === 'undefined') return '';
+  if (typeof window === 'undefined' || !window.location?.origin) return '';
   return `${window.location.origin}${getEntryLandingPath()}`;
 }
 
@@ -268,7 +277,7 @@ export function entryAttributionFields(): { landing_url: string; referrer: strin
  * Klikk-azonosító innen SOHA nem kerül az URL-be.
  */
 export function entryParamsForNavigation(): Record<string, string> {
-  if (typeof window === 'undefined') return {};
+  if (typeof window === 'undefined' || !window.location) return {};
   captureEntrySignals();
   const out: Record<string, string> = {};
   if (entry.landing) out[LANDING_PARAM] = entry.landing;
@@ -285,7 +294,7 @@ export function entryParamsForNavigation(): Record<string, string> {
  * második lead belépési oldala mindig `/arkalkulator/` lenne.
  */
 export function withEntryParams(path: string): string {
-  if (typeof window === 'undefined') return path;
+  if (typeof window === 'undefined' || !window.location?.origin) return path;
   try {
     const url = new URL(path, window.location.origin);
     for (const [k, v] of Object.entries(entryParamsForNavigation())) {
@@ -377,7 +386,7 @@ function stripEntryParamsFromUrl(): void {
  * Idempotens — a first-touch szabály miatt a második hívás no-op.
  */
 export function initEntryAttribution(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !window.location) return;
   captureEntrySignals();
   initEntryLinkCarry();
   stripEntryParamsFromUrl();
