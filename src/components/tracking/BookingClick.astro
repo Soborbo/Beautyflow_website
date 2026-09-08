@@ -1,20 +1,28 @@
 ---
 /**
- * Beautyflow-specific conversion: booking_click (Notino "Időpontfoglalás" CTA).
+ * Beautyflow-specific conversion: begin_checkout (Notino "Időpontfoglalás" CTA).
+ *
+ * 2026-09-08 eseménynév-cutover: a korábbi `booking_click` MINDKÉT lábon a kanonikus
+ * `begin_checkout` nevet használja. A gateway-lábon ez KÖTELEZŐ volt: a kanonikus
+ * `BROWSER_GATEWAY_EVENTS` nem ismeri a `booking_click`-et, tehát a kliens-oldali őr
+ * eldobta volna — a szerver-láb némán megszűnt volna. A dataLayer-láb együtt mozdult,
+ * hogy ne maradjon két igazság. A GTM `CE - begin_checkout (+legacy)` triggere MINDKÉT
+ * nevet elfogadja, és a rajta lógó három tag eseménynevei változatlanok.
+ *
+ * FIGYELEM: a `data-track="booking_click"` MARKUP-attribútum SZÁNDÉKOSAN maradt —
+ * az DOM-szerződés a sablonokkal, nem eseménynév.
  *
  * The soborbo-tracking kit covers tel:/mailto:/WhatsApp + the lead forms. This
  * project-specific listener fires on any anchor pointing to Notino's salon booking
  * page (or marked data-track="booking_click"):
- *   • browser dataLayer `booking_click` (GTM → GA4 + Meta Pixel InitiateCheckout) — analytics consent
- *   • gateway `booking_click` (Meta CAPI InitiateCheckout) — marketing consent, SAME event_id
+ *   • browser dataLayer `begin_checkout` (GTM → GA4 + Meta Pixel InitiateCheckout) — analytics consent
+ *   • gateway `begin_checkout` (Meta CAPI InitiateCheckout) — marketing consent, SAME event_id
  *
- * NOTE: the event-gateway worker must allow `booking_click` (ALLOWED_EVENT_NAMES +
- * EVENT_NAME_MAP → InitiateCheckout) for the server-side leg to deliver; until then
- * the dispatch is a harmless no-op on the gateway. Per LEAD-FLOW-INCIDENT.md this is
- * the site's dominant high-intent signal, so it must never regress.
+ * Per LEAD-FLOW-INCIDENT.md this is the site's dominant high-intent signal, so it must
+ * never regress.
  *
- * booking_click IS A CONVERSION, SO IT ONLY BELONGS ON A REAL HAND-OFF (a click that
- * leaves the site for Notino). In GTM `CE - booking_click` fires three tags — GA4,
+ * EZ KONVERZIÓ, EZÉRT CSAK VALÓDI ÁTADÁSRA VALÓ (a Notinóra kilépő kattintásra).
+ * In GTM `CE - begin_checkout (+legacy)` fires three tags — GA4,
  * Meta Pixel InitiateCheckout and the Google Ads conversion — and in Ads the GA4-imported
  * `booking_click` action is a PRIMARY goal, so marking an internal link (a CTA that just
  * navigates to /ingyenes-konzultacio) would book a conversion before the visitor submits
@@ -79,10 +87,10 @@
       if (analytics) {
         const w = window as unknown as { dataLayer: Record<string, unknown>[] };
         w.dataLayer = w.dataLayer || [];
-        w.dataLayer.push({ event: 'booking_click', event_id: eventId, source, page_path: location.pathname });
+        w.dataLayer.push({ event: 'begin_checkout', event_id: eventId, source, page_path: location.pathname });
       }
       // Server channel (gateway) — marketing consent. Self-gates internally too.
-      if (marketing) trackServerEvent('booking_click', { eventId });
+      if (marketing) trackServerEvent('begin_checkout', { eventId });
     }, true);
   }
 

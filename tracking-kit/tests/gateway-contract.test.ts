@@ -1,43 +1,37 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { sendToWorker, type ConversionPayload } from '../lib/gateway';
-import { getDiagnostics } from '../lib/observability';
-import { setCookie, setUrl, resetAll } from './helpers';
+import { SERVER_INGRESS_ONLY_EVENTS, BROWSER_GATEWAY_EVENTS } from '../lib/event-contract';
+import { getDiagnostics, clearDiagnostics } from '../lib/observability';
+import { setCookie, setUrl, resetAll, setCkyConsent } from './helpers';
 
-// A Turnstile 2026-08-28-an kikerult a dispatch utjabol (a gateway nem is
-// validalja), ezert a modul-szintu token-cache es a teszt-sorrend fuggosege
-// megszunt. A felosztast most a BROWSER_GATEWAY_EVENTS lista vegzi.
-
+/**
+ * A CookieYes-döntés MINDKÉT felülete: a süti (amit a payload telemetriája
+ * olvas) ÉS a `getCkyConsent()` API (amiből a consent-KAPUK döntenek).
+ *
+ * Korábban itt csak a süti szerepelt, és a tesztek némán a dev-fallbackon
+ * futottak (ismeretlen consent → engedd). Amikor az INV-008 miatt a fallback
+ * explicit opt-inné vált, ez a rejtett függés azonnal kiderült — a teszt
+ * ugyanis nem azt mérte, amit hitt magáról.
+ */
 function ckyCookie(ad: boolean, an: boolean): void {
   setCookie('cookieyes-consent',
     `consent:yes,necessary:yes,functional:yes,analytics:${an ? 'yes' : 'no'},advertisement:${ad ? 'yes' : 'no'},other:yes`);
+  setCkyConsent({ analytics: an, marketing: ad });
 }
 
 function basePayload(): ConversionPayload {
-  return { event_name: 'phone_conversion', event_id: 'E1', event_time: 1_700_000_000,
+  return { event_name: 'phone_number_clicked', event_id: 'E1', event_time: 1_700_000_000,
     value: 380, currency: 'GBP', user_data: { email: 'a@b.com', phone_number: '07123456789' } };
 }
 
 beforeEach(() => {
   resetAll();
+  clearDiagnostics();
   document.body.innerHTML = '';
 });
 afterEach(() => vi.unstubAllGlobals());
 
-describe('gateway contract', () => {
-  it('szerver-ingress-only event: nincs halozat, false, TRK-1005', async () => {
-    // A `contact_form_submit`-et a gateway a bongeszo-utrol 403-mal dobja, ezert
-    // a kliens HANGOSAN elakasztja. Korabban ezt a Turnstile-kapu vegezte
-    // mellekhataskent (TRK-1001) — most kimondott lista donti el.
-    const fetchMock = vi.fn((..._a: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
-    vi.stubGlobal('fetch', fetchMock);
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    const ok = await sendToWorker({ ...basePayload(), event_name: 'contact_form_submit' });
-    expect(ok).toBe(false);
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(getDiagnostics().some((d) => d.code === 'TRK-1005')).toBe(true);
-  });
-
+describe('gateway contract (browser path, Run 6)', () => {
   it('POST body carries the exact server contract (every platform field, right shapes)', async () => {
     ckyCookie(true, true);
     setUrl('/?gclid=G9&utm_source=google&utm_medium=cpc');
@@ -61,7 +55,7 @@ describe('gateway contract', () => {
 
     const body = JSON.parse(init.body);
     // identity + dedup
-    expect(body.event_name).toBe('phone_conversion');
+    expect(body.event_name).toBe('phone_number_clicked');
     expect(body.event_id).toBe('E1');
     expect(Number.isInteger(body.event_time)).toBe(true);
     // value / currency
@@ -69,8 +63,8 @@ describe('gateway contract', () => {
     expect(body.currency).toBe('GBP');
     // raw user_data for server-side hashing (Meta CAPI contract)
     expect(body.user_data).toEqual({ email: 'a@b.com', phone_number: '07123456789' });
-    // A bot-token VEGLEG kikerult: a gateway nem validal Turnstile-t.
-    expect('turnstile_token' in body).toBe(false);
+    // NO bot token — the Turnstile gate is retired; Origin allow-list is server-side
+    expect(body.turnstile_token).toBeUndefined();
     // Meta cookies + GA ids parsed from cookies
     expect(body.fbp).toBe('fb.1.123.456');
     expect(body.fbc).toBe('fb.1.123.fbclidABC');
@@ -84,6 +78,38 @@ describe('gateway contract', () => {
     expect(body.attribution.utm_source).toBe('google');
     // origin/url
     expect(typeof body.event_source_url).toBe('string');
+  });
+
+  it('EVERY server-ingress-only event is blocked client-side: no beacon, no fetch, TRK-1005', async () => {
+    const beacon = vi.fn(() => true);
+    Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: beacon });
+    const fetchMock = vi.fn((..._a: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(SERVER_INGRESS_ONLY_EVENTS.size).toBeGreaterThan(0);
+    for (const name of SERVER_INGRESS_ONLY_EVENTS) {
+      clearDiagnostics();
+      const ok = await sendToWorker({ ...basePayload(), event_name: name });
+      expect(ok, name).toBe(false);
+      const diag = getDiagnostics().find((d) => d.code === 'TRK-1005');
+      expect(diag, name).toBeTruthy();
+      expect(diag!.context?.event_name, name).toBe(name);
+    }
+    expect(beacon).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('an event name OUTSIDE the browser allow-list is blocked too (unknown names cannot leak)', async () => {
+    const beacon = vi.fn(() => true);
+    Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: beacon });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(BROWSER_GATEWAY_EVENTS.has('lead_qualified')).toBe(false); // offline CRM event
+    const ok = await sendToWorker({ ...basePayload(), event_name: 'lead_qualified' });
+    expect(ok).toBe(false);
+    expect(beacon).not.toHaveBeenCalled();
+    expect(getDiagnostics().some((d) => d.code === 'TRK-1005')).toBe(true);
   });
 
   it('transport: sendBeacon success returns true without calling fetch', async () => {
@@ -107,6 +133,19 @@ describe('gateway contract', () => {
     expect(getDiagnostics().some((d) => d.code === 'TRK-1003')).toBe(true);
   });
 
+  it('fetch fallback INSPECTS the status: a 403 returns false and reports TRK-1006', async () => {
+    Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: () => false });
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response('Forbidden origin', { status: 403 }))));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const ok = await sendToWorker(basePayload());
+    expect(ok).toBe(false); // the old code reported GATEWAY_OK here — that lie hid a 403 outage
+    const rej = getDiagnostics().find((d) => d.code === 'TRK-1006');
+    expect(rej).toBeTruthy();
+    expect(rej!.severity).toBe('error');
+    expect(rej!.context?.status).toBe(403);
+  });
+
   it('worker unreachable: fetch rejects → returns false (no throw) and TRK-1002 is reported', async () => {
     Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: () => false });
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('network down'))));
@@ -117,6 +156,6 @@ describe('gateway contract', () => {
     const fail = getDiagnostics().find((d) => d.code === 'TRK-1002');
     expect(fail).toBeTruthy();
     expect(fail!.severity).toBe('error');
-    expect(fail!.context?.event_name).toBe('phone_conversion');
+    expect(fail!.context?.event_name).toBe('phone_number_clicked');
   });
 });

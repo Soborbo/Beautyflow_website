@@ -28,7 +28,13 @@
  * URL-ben utazik (`entryParamsForNavigation`), nem a lemezen.
  */
 
-import { getMarketingConsentState, type MarketingConsentState } from './consent';
+// A háromállapotú marketing-döntés EGYETLEN authorityje a `gateway.ts` — az
+// override → saját süti → CookieYes-süti → JS API sorrendet ismeri, amit egy
+// második olvasat itt csak elsodródni tudna tőle. Ez kör-importot csinál
+// (gateway → entry-attribution → gateway), de MINDKÉT irány függvény-szintű:
+// a hívások futásidőben történnek, modulbetöltéskor egyik sem fut le, és
+// mindkét oldal `function` deklaráció (hoistolt).
+import { getMarketingConsentState, type MarketingConsentState } from './gateway';
 import { readMarketingLocalStorage } from './persistence';
 
 /** A gateway attribúciós blobja — SZÁNDÉKOSAN ugyanaz a kulcs. Egy store, egy

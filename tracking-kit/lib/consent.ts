@@ -124,24 +124,6 @@ export function hasAnalyticsConsent(): boolean {
   return c.analytics === true;
 }
 
-/**
- * A marketing-döntés HÁROM állapota. A `hasMarketingConsent()` boolean-je
- * összemossa a „még nem döntött"-et a „visszavonta"-val, pedig a kettő
- * ellentétes viselkedést kíván. Az INV-008 fail-closed szabály ettől nem
- * lazul: aki ÍRNI vagy KÜLDENI akar, továbbra is a boolean-t kérdezi. Ez az
- * olvasó csak ott kell, ahol a két nem-GRANTED állapotot MEG KELL
- * különböztetni — például a belépési jelnél, ahol a visszavonás a MÁR TÁROLT
- * érték visszaolvasását is tiltja, a „még nem döntött" viszont nem törölheti
- * egy hozzájárult látogató attribúcióját a CMP betöltése előtt.
- */
-export type MarketingConsentState = 'GRANTED' | 'DENIED' | 'UNKNOWN';
-
-export function getMarketingConsentState(): MarketingConsentState {
-  const c = getProviderConsent();
-  if (!c) return allowOnUnknownConsent('marketing') ? 'GRANTED' : 'UNKNOWN';
-  return c.advertisement === true ? 'GRANTED' : 'DENIED';
-}
-
 /** Any non-essential tracking allowed? */
 export function hasAnyConsent(): boolean {
   return hasAnalyticsConsent() || hasMarketingConsent();

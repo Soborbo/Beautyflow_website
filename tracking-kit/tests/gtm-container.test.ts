@@ -31,18 +31,43 @@ describe('gtm/container.json — importable export', () => {
     }
   });
 
-  it('has a Custom Event trigger per canonical dataLayer event', () => {
-    const events = cv.trigger
+  // 2026-09-08 — eseménynév-cutover. A triggerek egy része `matches RegEx`-re állt
+  // (`^(legacy|kanonikus)$`), hogy a kliens-csere pillanatában egyik névnél se legyen
+  // rés. Az `arg1` ott MINTA, nem név, ezért a nyers `toContain` hamis riasztást adna
+  // egy helyes konténerre — ugyanaz a hibaosztály, amit a checkerben is javítottunk.
+  const matchesSomeTrigger = (name: string): boolean =>
+    cv.trigger
       .filter((t: { type: string }) => t.type === 'CUSTOM_EVENT')
-      .map((t: { customEventFilter: { parameter: { key: string; value: string }[] }[] }) =>
-        t.customEventFilter[0].parameter.find((p) => p.key === 'arg1')?.value);
+      .some((t: { customEventFilter: { type?: string; parameter: { key: string; value: string }[] }[] }) => {
+        const f = t.customEventFilter[0];
+        const arg1 = f.parameter.find((p) => p.key === 'arg1')?.value;
+        if (!arg1) return false;
+        return String(f.type ?? 'EQUALS').toUpperCase() === 'MATCH_REGEX'
+          ? new RegExp(arg1).test(name)
+          : arg1 === name;
+      });
+
+  it('minden KANONIKUS dataLayer-eseménynek van Custom Event triggere', () => {
+    for (const name of [
+      'quote_calculator_submitted', 'contact_form_submitted', 'callback_request_submitted',
+      'phone_number_clicked', 'email_address_clicked', 'whatsapp_button_clicked',
+      'begin_checkout', 'quote_calculator_opened', 'quote_calculator_step_completed',
+      'quote_calculator_option_selected', 'form_abandoned',
+      'scroll_depth', 'newsletter_signup', 'calculator_result_view',
+    ]) {
+      expect(matchesSomeTrigger(name), `nincs trigger a(z) '${name}' eseményre`).toBe(true);
+    }
+  });
+
+  it('a LEGACY nevek is fednek — a párhuzamos futás alatt nincs rés', () => {
+    // Ez a cutover lényege: amíg a régi kliens is él (cache, még nem deployolt
+    // oldal), a legacy névnek is találnia kell.
     for (const name of [
       'lead_submit', 'contact_submit', 'callback_click', 'phone_click',
       'email_click', 'whatsapp_click', 'booking_click', 'calculator_complete',
       'calculator_start', 'calculator_step', 'calculator_option', 'form_abandon',
-      'scroll_depth', 'newsletter_signup', 'calculator_result_view',
     ]) {
-      expect(events).toContain(name);
+      expect(matchesSomeTrigger(name), `a legacy '${name}' nevet egyik trigger sem fogadja el`).toBe(true);
     }
   });
 
@@ -138,7 +163,20 @@ describe('Beautyflow production GTM import', () => {
   });
 
   it('does not misreport booking as the Contact Google Ads conversion', () => {
-    const bookingTrigger = cv.trigger.find((t: { name: string }) => t.name === 'CE - booking_click');
+    // A trigger NEVE nem szerződés: a cutover óta `CE - begin_checkout (+legacy)`.
+    // A stabil horgony az, hogy a feltétele illeszkedik-e a booking eseményre.
+    const bookingTrigger = cv.trigger.find(
+      (t: { type: string; customEventFilter?: { type?: string; parameter: { key: string; value: string }[] }[] }) => {
+        if (t.type !== 'CUSTOM_EVENT') return false;
+        const f = t.customEventFilter?.[0];
+        const arg1 = f?.parameter.find((p) => p.key === 'arg1')?.value;
+        if (!arg1) return false;
+        return String(f?.type ?? 'EQUALS').toUpperCase() === 'MATCH_REGEX'
+          ? new RegExp(arg1).test('begin_checkout')
+          : arg1 === 'begin_checkout' || arg1 === 'booking_click';
+      },
+    );
+    expect(bookingTrigger, 'nincs trigger a booking hand-offra').toBeTruthy();
     const adsTags = cv.tag.filter((t: { type: string }) => t.type === 'awct');
     expect(adsTags.some((t: { firingTriggerId: string[] }) =>
       t.firingTriggerId.includes(bookingTrigger.triggerId))).toBe(false);

@@ -1,15 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// A gateway-dispatch mockolva — itt az index.ts vezérlését teszteljük.
+// The gateway transport is mocked — these tests exercise index.ts' CONTROL FLOW:
+// which functions dispatch to the gateway at all, and which are dataLayer-only.
 vi.mock('../lib/gateway', () => ({
   sendToWorker: vi.fn(() => Promise.resolve(true)),
-  getTurnstileToken: vi.fn(() => Promise.resolve('TOK')),
   collectAttribution: vi.fn(() => ({})),
 }));
 
+import { getUserDataForEC } from '../lib/events';
 import {
   trackLeadSubmit, trackContactSubmit, trackServerEvent,
   trackPhoneConversion, trackCallbackConversion, trackEmailConversion, trackWhatsappConversion,
+  attachEventIdToForm,
 } from '../lib/index';
 import { sendToWorker } from '../lib/gateway';
 import { setCkyConsent, resetAll, lastEvent, getDataLayer } from './helpers';
@@ -22,105 +24,142 @@ beforeEach(() => {
   setCkyConsent({ analytics: true, marketing: true });
 });
 
-describe('trackLeadSubmit', () => {
-  // SZERZŐDÉS-VÁLTÁS (gateway Run 6): a form-konverziók server-ingress-only-k —
-  // a böngésző-leg a gateway felé 403-at kapna, ezért NINCS többé
-  // dispatchToGateway; a szerver CAPI-leget a site backendje küldi UGYANEZZEL
-  // az event_id-vel. Itt azt bizonyítjuk, hogy a dataLayer-leg él, a gateway-leg nem.
-  it('pushes dataLayer lead_submit and does NOT dispatch to the gateway (server-ingress-only)', () => {
+describe('trackLeadSubmit — BROWSER LEG ONLY (server_ingress_only contract)', () => {
+  it('pushes dataLayer quote_calculator_submitted and does NOT dispatch to the gateway', () => {
     const r = trackLeadSubmit({ email: 'a@b.com', phone: '07123456789', value: 380, currency: 'GBP' });
     expect(r.success).toBe(true);
     expect(r.consentBlocked).toBe(false);
 
-    const dlEvent = lastEvent('lead_submit')!;
-    // a visszaadott eventId megy a backendnek (hidden mező) → dedup kulcs
+    const dlEvent = lastEvent('quote_calculator_submitted')!;
     expect(dlEvent.event_id).toBe(r.eventId);
+    // THE LOAD-BEARING ASSERTION: no browser gateway leg for a gated form event.
+    // The gateway 403s it (TRK-400-017); the site BACKEND sends the server leg
+    // reusing r.eventId (the hidden field). If this starts failing because someone
+    // re-added a dispatch here, that is a regression to the pre-Run-6 silent-loss bug.
     expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it('analytics-only consent: GA4 dataLayer fires, marketing PII and gateway do not', () => {
+  it('currency defaults from the market config (HU → HUF) on the dataLayer leg', () => {
+    trackLeadSubmit({ email: 'a@b.com', value: 5000 }); // no currency → config default
+    expect(lastEvent('quote_calculator_submitted')!.currency).toBe('HUF');
+  });
+
+  it('without marketing consent: no dataLayer push, no dispatch, consentBlocked', () => {
     setCkyConsent({ analytics: true, marketing: false });
-    const r = trackLeadSubmit({ email: 'a@b.com' });
-    expect(r.success).toBe(true);
-    expect(r.consentBlocked).toBe(false);
-    expect(mockSend).not.toHaveBeenCalled();
-    expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(true);
-    expect((window as unknown as { __sbUserData?: unknown }).__sbUserData).toBeUndefined();
-  });
-
-  it('marketing-only consent: backend/server leg remains allowed, browser GA4 stays off', () => {
-    setCkyConsent({ analytics: false, marketing: true });
-    const r = trackLeadSubmit({ email: 'a@b.com' });
-    expect(r.success).toBe(true);
-    expect(r.consentBlocked).toBe(false);
-    expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(false);
-    expect(mockSend).not.toHaveBeenCalled();
-  });
-
-  it('no consent: no browser event and result is consent-blocked', () => {
-    setCkyConsent({ analytics: false, marketing: false });
     const r = trackLeadSubmit({ email: 'a@b.com' });
     expect(r.success).toBe(false);
     expect(r.consentBlocked).toBe(true);
-    expect(getDataLayer().some((e) => e.event === 'lead_submit')).toBe(false);
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(getDataLayer().some((e) => e.event === 'quote_calculator_submitted')).toBe(false);
+  });
+
+  it('still returns the eventId for the hidden field even when consent-blocked', () => {
+    setCkyConsent({ analytics: false, marketing: false });
+    const r = trackLeadSubmit({ email: 'a@b.com' });
+    expect(r.eventId).toBeTruthy();
   });
 });
 
-describe('trackContactSubmit', () => {
-  it('contact_submit dataLayer-t push-ol, gateway-dispatch NÉLKÜL (server-ingress-only)', () => {
+describe('trackContactSubmit — BROWSER LEG ONLY', () => {
+  it('pushes contact_form_submitted to the dataLayer and does NOT dispatch to the gateway', () => {
     const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
-    expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
+    expect(lastEvent('contact_form_submitted')!.event_id).toBe(r.eventId);
     expect(mockSend).not.toHaveBeenCalled();
   });
+});
 
-  it('uses analytics consent independently from marketing consent', () => {
-    setCkyConsent({ analytics: true, marketing: false });
-    const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456' });
-    expect(r.success).toBe(true);
-    expect(lastEvent('contact_submit')!.event_id).toBe(r.eventId);
-    expect((window as unknown as { __sbUserData?: unknown }).__sbUserData).toBeUndefined();
+describe('megosztott event_id — a fetch-alapú folyamatok Pixel↔CAPI dedupja (CLAUDE.md §16)', () => {
+  // A klasszikus form-POST útján a lib generálja az id-t és a rejtett mező viszi.
+  // A fetch/XHR-alapú folyamatokban a hívó MÁR elküldte a szervernek a saját id-jét,
+  // és a böngésző-lábat csak a business-siker után süti el. Ha ilyenkor a lib
+  // ÚJ id-t generálna, a két láb különböző kulcson állna, és a Meta minden
+  // konverziót KÉTSZER könyvelne.
+  const SERVER_ID = 'srv-3f7a1c-shared';
+
+  it('trackLeadSubmit a MEGADOTT event_id-t használja — a dataLayerben is az szerepel', () => {
+    const r = trackLeadSubmit({ email: 'a@b.com', value: 5000, eventId: SERVER_ID });
+    expect(r.eventId).toBe(SERVER_ID);
+    expect(lastEvent('quote_calculator_submitted')!.event_id).toBe(SERVER_ID);
+  });
+
+  it('eventId NÉLKÜL továbbra is generál — a régi hívások viselkedése nem változik', () => {
+    const r = trackLeadSubmit({ email: 'a@b.com' });
+    expect(r.eventId).toBeTruthy();
+    expect(r.eventId).not.toBe(SERVER_ID);
+    expect(lastEvent('quote_calculator_submitted')!.event_id).toBe(r.eventId);
+  });
+
+  it('trackContactSubmit a MEGADOTT event_id-t használja', () => {
+    const r = trackContactSubmit({ email: 'a@b.com', phone: '0620123456', eventId: SERVER_ID });
+    expect(r.eventId).toBe(SERVER_ID);
+    expect(lastEvent('contact_form_submitted')!.event_id).toBe(SERVER_ID);
+  });
+
+  it('consent-blokk esetén IS a megadott id tér vissza — a rejtett mező és a szerver-láb nem szakad el', () => {
+    setCkyConsent({ analytics: false, marketing: false });
+    const r = trackLeadSubmit({ email: 'a@b.com', eventId: SERVER_ID });
+    expect(r.consentBlocked).toBe(true);
+    expect(r.eventId).toBe(SERVER_ID);
+  });
+
+  it('trackContactSubmit a név-mezőket az EC rejtett csatornájába teszi — a dataLayerbe NEM', () => {
+    trackContactSubmit({
+      email: 'Jane@Email.com', phone: '0620123456',
+      firstName: 'Jane', lastName: 'Doe', eventId: SERVER_ID,
+    });
+    const ud = getUserDataForEC()!;
+    expect(ud.first_name).toBe('Jane');
+    expect(ud.last_name).toBe('Doe');
+    // INV: PII SOHA nem mehet a dataLayerbe (CLAUDE.md §15).
+    const dl = JSON.stringify(getDataLayer());
+    expect(dl).not.toContain('Jane');
+    expect(dl).not.toContain('Doe');
+    expect(dl).not.toContain('Email.com');
   });
 });
 
-describe('trackServerEvent', () => {
-  it('tetszőleges gateway eseményt küld, consent mellett', () => {
-    const id = trackServerEvent('phone_conversion', { value: 0 });
+describe('trackServerEvent — browser-path events', () => {
+  it('dispatches a browser-path event with the returned event_id', () => {
+    const id = trackServerEvent('phone_number_clicked');
     expect(mockSend).toHaveBeenCalledTimes(1);
-    expect(mockSend.mock.calls[0][0].event_name).toBe('phone_conversion');
+    expect(mockSend.mock.calls[0][0].event_name).toBe('phone_number_clicked');
     expect(mockSend.mock.calls[0][0].event_id).toBe(id);
   });
-  it('consent nélkül nem küld', () => {
+  it('does not dispatch without marketing consent', () => {
     setCkyConsent({ marketing: false });
-    trackServerEvent('phone_conversion');
+    trackServerEvent('phone_number_clicked');
     expect(mockSend).not.toHaveBeenCalled();
   });
 });
 
-describe('click conversions — both channels, shared event_id', () => {
-  it('trackPhoneConversion pushes phone_click AND dispatches phone_conversion with the SAME event_id', () => {
+describe('click conversions — channels per the ingress contract', () => {
+  it('trackPhoneConversion pushes phone_number_clicked AND dispatches with the SAME event_id', () => {
     const id = trackPhoneConversion({ phone: '07123456789' });
     expect(id).toBeTruthy();
-    const dl = lastEvent('phone_click')!;
+    const dl = lastEvent('phone_number_clicked')!;
     expect(dl.event_id).toBe(id);
     expect(mockSend).toHaveBeenCalledTimes(1);
     const payload = mockSend.mock.calls[0][0];
-    expect(payload.event_name).toBe('phone_conversion');
+    expect(payload.event_name).toBe('phone_number_clicked');
     expect(payload.event_id).toBe(id);
     expect(payload.user_data.phone_number).toBe('07123456789'); // raw → gateway hashes
   });
 
-  it('maps email/whatsapp to the canonical gateway names; callback is dataLayer-only (gated)', () => {
-    // callback_conversion → callback_request_submitted: server-ingress-only a
-    // gateway-en (403 lenne) → nincs gateway-leg, csak dataLayer.
-    trackCallbackConversion();
-    expect(mockSend).not.toHaveBeenCalled();
-    expect(lastEvent('callback_click')).toBeTruthy();
-    mockSend.mockClear();
+  it('email/whatsapp map to the canonical gateway event names', () => {
     trackEmailConversion({ email: 'a@b.com' });
-    expect(mockSend.mock.calls[0][0].event_name).toBe('email_conversion');
+    expect(mockSend.mock.calls[0][0].event_name).toBe('email_address_clicked');
     mockSend.mockClear();
     trackWhatsappConversion({ phone: '07123456789' });
-    expect(mockSend.mock.calls[0][0].event_name).toBe('whatsapp_conversion');
+    expect(mockSend.mock.calls[0][0].event_name).toBe('whatsapp_button_clicked');
+  });
+
+  it('trackCallbackConversion is dataLayer-ONLY: callback_request_submitted is server-ingress-only', () => {
+    const id = trackCallbackConversion();
+    expect(id).toBeTruthy();
+    // dataLayer leg fires (Pixel/GA4 via GTM)…
+    expect(getDataLayer().some((e) => e.event === 'callback_request_submitted')).toBe(true);
+    // …but there is NO browser gateway leg — the gateway would 403 it (TRK-400-017).
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
   it('phone dedup covers BOTH channels (second click → no dataLayer, no gateway)', () => {
@@ -128,32 +167,29 @@ describe('click conversions — both channels, shared event_id', () => {
     expect(id1).toBeTruthy();
     const id2 = trackPhoneConversion();
     expect(id2).toBeNull();
-    expect(getDataLayer().filter((e) => e.event === 'phone_click')).toHaveLength(1);
+    expect(getDataLayer().filter((e) => e.event === 'phone_number_clicked')).toHaveLength(1);
     expect(mockSend).toHaveBeenCalledTimes(1);
   });
 
-  it('callback/email/whatsapp dedup covers BOTH channels too (second click → no dataLayer, no gateway)', () => {
-    const cases: Array<{ fn: () => string | null; dlEvent: string }> = [
-      { fn: () => trackCallbackConversion(), dlEvent: 'callback_click' },
-      { fn: () => trackEmailConversion({ email: 'a@b.com' }), dlEvent: 'email_click' },
-      { fn: () => trackWhatsappConversion({ phone: '07123456789' }), dlEvent: 'whatsapp_click' },
+  it('callback/email/whatsapp dedup suppresses the second click in the same session', () => {
+    const cases: Array<{ fn: () => string | null; dlEvent: string; gatewayCalls: number }> = [
+      { fn: () => trackCallbackConversion(), dlEvent: 'callback_request_submitted', gatewayCalls: 0 },
+      { fn: () => trackEmailConversion({ email: 'a@b.com' }), dlEvent: 'email_address_clicked', gatewayCalls: 1 },
+      { fn: () => trackWhatsappConversion({ phone: '07123456789' }), dlEvent: 'whatsapp_button_clicked', gatewayCalls: 1 },
     ];
-    for (const { fn, dlEvent } of cases) {
+    for (const { fn, dlEvent, gatewayCalls } of cases) {
       mockSend.mockClear();
       expect(fn(), dlEvent).toBeTruthy();      // first click → fires
       expect(fn(), dlEvent).toBeNull();        // second click same session → suppressed
       expect(getDataLayer().filter((e) => e.event === dlEvent), dlEvent).toHaveLength(1);
-      // callback: nincs gateway-leg (server-ingress-only); email/whatsapp: pontosan 1
-      expect(mockSend, dlEvent).toHaveBeenCalledTimes(dlEvent === 'callback_click' ? 0 : 1);
+      expect(mockSend, dlEvent).toHaveBeenCalledTimes(gatewayCalls);
     }
   });
 
   it('analytics-only consent → dataLayer fires, NO gateway dispatch', () => {
     setCkyConsent({ analytics: true, marketing: false });
     trackPhoneConversion();
-    // dataLayer push allowed under analytics consent…
-    expect(getDataLayer().some((e) => e.event === 'phone_click')).toBe(true);
-    // …but NO server-side dispatch without marketing consent.
+    expect(getDataLayer().some((e) => e.event === 'phone_number_clicked')).toBe(true);
     expect(mockSend).not.toHaveBeenCalled();
   });
 
@@ -161,11 +197,9 @@ describe('click conversions — both channels, shared event_id', () => {
     setCkyConsent({ analytics: false, marketing: true });
     const id = trackPhoneConversion({ phone: '07123456789' });
     expect(id).toBeTruthy();
-    // No browser GA4 event (analytics withheld)…
-    expect(getDataLayer().some((e) => e.event === 'phone_click')).toBe(false);
-    // …but the money signal (Meta CAPI + Ads) reaches the gateway with the shared id.
+    expect(getDataLayer().some((e) => e.event === 'phone_number_clicked')).toBe(false);
     expect(mockSend).toHaveBeenCalledTimes(1);
-    expect(mockSend.mock.calls[0][0].event_name).toBe('phone_conversion');
+    expect(mockSend.mock.calls[0][0].event_name).toBe('phone_number_clicked');
     expect(mockSend.mock.calls[0][0].event_id).toBe(id);
   });
 
@@ -174,5 +208,48 @@ describe('click conversions — both channels, shared event_id', () => {
     expect(trackPhoneConversion()).toBeNull();
     expect(mockSend).not.toHaveBeenCalled();
     expect(getDataLayer()).toHaveLength(0);
+  });
+});
+
+// K2-H3 / §16 — a callback CTA böngésző-Pixel-lába és a backend CAPI-lába UGYANAZT
+// az event_id-t kell viselje, különben a Meta két külön Lead-nek számolja (dupla).
+// A CallbackButton eddig ELDOBTA a trackCallbackConversion() event_id-jét; most a
+// backend POST-olta formba írja (attachEventIdToForm), így a szerver-leg újrahasználja.
+describe('attachEventIdToForm — shared event_id threading (K2-H3)', () => {
+  it('a callback dataLayer-leg event_id-je bekerül a form rejtett event_id mezőjébe (UGYANAZ)', () => {
+    const form = document.createElement('form');
+    document.body.appendChild(form);
+
+    const eventId = trackCallbackConversion();
+    expect(eventId).toBeTruthy();
+    // A böngésző-Pixel-leg (dataLayer) EZT az id-t használta.
+    expect(lastEvent('callback_request_submitted')!.event_id).toBe(eventId);
+
+    // A backend POST-olta formba UGYANEZ kerül → a szerver CAPI-leg dedup-ol.
+    attachEventIdToForm(form, eventId!);
+    const hidden = form.querySelector<HTMLInputElement>('input[name="event_id"]');
+    expect(hidden?.value).toBe(eventId);
+
+    form.remove();
+  });
+
+  it('a callbacknek NINCS böngésző-gateway-lába (server-ingress-only) — a dedup a shared id-n áll', () => {
+    trackCallbackConversion();
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('meglévő event_id mezőt FELÜLÍR (nem duplikál inputot)', () => {
+    const form = document.createElement('form');
+    const pre = document.createElement('input');
+    pre.type = 'hidden'; pre.name = 'event_id'; pre.value = 'stale';
+    form.appendChild(pre);
+    document.body.appendChild(form);
+
+    attachEventIdToForm(form, 'fresh-id');
+    const inputs = form.querySelectorAll('input[name="event_id"]');
+    expect(inputs).toHaveLength(1);
+    expect((inputs[0] as HTMLInputElement).value).toBe('fresh-id');
+
+    form.remove();
   });
 });
