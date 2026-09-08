@@ -73,14 +73,38 @@ function constVar(name, value) {
   return `{{Const - ${name}}}`;
 }
 
-function customEventTrigger(eventName) {
+/**
+ * CUSTOM_EVENT trigger.
+ *
+ * 2026-09-08 — ESEMÉNYNÉV-CUTOVER. A kliens a KANONIKUS neveket emittálja
+ * (`tracking-kit/lib/` 15/15 fájlon a kanonikus mag), a GTM viszont a legacy
+ * nevekre volt kötve. Amíg a régi kliens is élhet (böngésző-cache, még nem
+ * deployolt oldal), MINDKÉT névnek találnia kell — ezért a párhuzamos futás
+ * alatt `matches RegEx ^(legacy|kanonikus)$`.
+ *
+ * MIÉRT ITT: a `gtm/container.json` GENERÁLT fájl. Kézzel átírni annyi, mint a
+ * következő `npm run generate:gtm` futásra bízni a visszaírást — a szabálynak a
+ * generátorban a helye. (Ez a hiba egyszer már megtörtént ebben a körben.)
+ *
+ * A takarítás lépésben a második paraméter elhagyható, és a trigger visszaáll
+ * `EQUALS`-re a kanonikus néven.
+ *
+ * @param {string} eventName        a legacy (vagy egyetlen) név
+ * @param {string} [canonicalName]  a kanonikus név — ha megadod, kettős elfogadás
+ */
+function customEventTrigger(eventName, canonicalName) {
+  const dual = Boolean(canonicalName) && canonicalName !== eventName;
   const triggerId = nextTrig();
   triggers.push({
     accountId: ACC, containerId: CNT, triggerId,
-    name: `CE - ${eventName}`, type: 'CUSTOM_EVENT',
+    name: dual ? `CE - ${canonicalName} (+legacy)` : `CE - ${eventName}`,
+    type: 'CUSTOM_EVENT',
     customEventFilter: [{
-      type: 'EQUALS',
-      parameter: [tmpl('arg0', '{{_event}}'), tmpl('arg1', eventName)],
+      type: dual ? 'MATCH_REGEX' : 'EQUALS',
+      parameter: [
+        tmpl('arg0', '{{_event}}'),
+        tmpl('arg1', dual ? `^(${eventName}|${canonicalName})$` : eventName),
+      ],
     }],
     fingerprint: '0',
   });
@@ -148,18 +172,23 @@ const V_UPD = (() => {
 })();
 
 // ── Triggers (Custom Event) ──────────────────────────────────────────
-const T_LEAD = customEventTrigger('lead_submit');
-const T_CONTACT = customEventTrigger('contact_submit');
-const T_CALLBACK = customEventTrigger('callback_click');
-const T_PHONE = customEventTrigger('phone_click');
-const T_EMAIL = customEventTrigger('email_click');
-const T_WHATSAPP = customEventTrigger('whatsapp_click');
-const T_BOOKING = customEventTrigger('booking_click');
+const T_LEAD = customEventTrigger('lead_submit', 'quote_calculator_submitted');
+const T_CONTACT = customEventTrigger('contact_submit', 'contact_form_submitted');
+const T_CALLBACK = customEventTrigger('callback_click', 'callback_request_submitted');
+const T_PHONE = customEventTrigger('phone_click', 'phone_number_clicked');
+const T_EMAIL = customEventTrigger('email_click', 'email_address_clicked');
+const T_WHATSAPP = customEventTrigger('whatsapp_click', 'whatsapp_button_clicked');
+const T_BOOKING = customEventTrigger('booking_click', 'begin_checkout');
+// SZÁNDÉKOSAN egyetlen, legacy név: a kanonikus névtérben a mérföldkő ugyanaz az
+// esemény, mint a quote-konverzió, ezért a `trackCalculatorComplete` hívás kikerült
+// a kódból. Ez a trigger kifut — a takarítás lépésben ez és a rajta lógó GA4-tag
+// törölhető. Kettős elfogadásúvá tenni HIBA lenne: a GA4 calculator_complete tag a
+// lead-submitre is tüzelne.
 const T_CALC_DONE = customEventTrigger('calculator_complete');
-const T_CALC_START = customEventTrigger('calculator_start');
-const T_CALC_STEP = customEventTrigger('calculator_step');
-const T_CALC_OPT = customEventTrigger('calculator_option');
-const T_ABANDON = customEventTrigger('form_abandon');
+const T_CALC_START = customEventTrigger('calculator_start', 'quote_calculator_opened');
+const T_CALC_STEP = customEventTrigger('calculator_step', 'quote_calculator_step_completed');
+const T_CALC_OPT = customEventTrigger('calculator_option', 'quote_calculator_option_selected');
+const T_ABANDON = customEventTrigger('form_abandon', 'form_abandoned');
 const T_SCROLL = customEventTrigger('scroll_depth');
 const T_NEWSLETTER = customEventTrigger('newsletter_signup');
 const T_RESULT_VIEW = customEventTrigger('calculator_result_view');

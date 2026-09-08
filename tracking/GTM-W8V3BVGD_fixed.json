@@ -1535,11 +1535,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "1",
-        "name": "CE - lead_submit",
+        "name": "CE - quote_calculator_submitted (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1549,7 +1549,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "lead_submit"
+                "value": "^(lead_submit|quote_calculator_submitted)$"
               }
             ]
           }
@@ -1560,11 +1560,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "2",
-        "name": "CE - contact_submit",
+        "name": "CE - contact_form_submitted (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1574,7 +1574,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "contact_submit"
+                "value": "^(contact_submit|contact_form_submitted)$"
               }
             ]
           }
@@ -1585,11 +1585,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "3",
-        "name": "CE - callback_click",
+        "name": "CE - callback_request_submitted (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1599,7 +1599,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "callback_click"
+                "value": "^(callback_click|callback_request_submitted)$"
               }
             ]
           }
@@ -1610,11 +1610,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "4",
-        "name": "CE - phone_click",
+        "name": "CE - phone_number_clicked (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1624,7 +1624,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "phone_click"
+                "value": "^(phone_click|phone_number_clicked)$"
               }
             ]
           }
@@ -1635,11 +1635,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "5",
-        "name": "CE - email_click",
+        "name": "CE - email_address_clicked (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1649,7 +1649,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "email_click"
+                "value": "^(email_click|email_address_clicked)$"
               }
             ]
           }
@@ -1660,11 +1660,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "6",
-        "name": "CE - whatsapp_click",
+        "name": "CE - whatsapp_button_clicked (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1674,7 +1674,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "whatsapp_click"
+                "value": "^(whatsapp_click|whatsapp_button_clicked)$"
               }
             ]
           }
@@ -1685,11 +1685,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "7",
-        "name": "CE - booking_click",
+        "name": "CE - begin_checkout (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1699,7 +1699,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "booking_click"
+                "value": "^(booking_click|begin_checkout)$"
               }
             ]
           }
@@ -1735,11 +1735,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "9",
-        "name": "CE - calculator_start",
+        "name": "CE - quote_calculator_opened (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1749,7 +1749,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "calculator_start"
+                "value": "^(calculator_start|quote_calculator_opened)$"
               }
             ]
           }
@@ -1760,11 +1760,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "10",
-        "name": "CE - calculator_step",
+        "name": "CE - quote_calculator_step_completed (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1774,7 +1774,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "calculator_step"
+                "value": "^(calculator_step|quote_calculator_step_completed)$"
               }
             ]
           }
@@ -1785,11 +1785,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "11",
-        "name": "CE - calculator_option",
+        "name": "CE - quote_calculator_option_selected (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1799,7 +1799,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "calculator_option"
+                "value": "^(calculator_option|quote_calculator_option_selected)$"
               }
             ]
           }
@@ -1810,11 +1810,11 @@
         "accountId": "6252358257",
         "containerId": "196968106",
         "triggerId": "12",
-        "name": "CE - form_abandon",
+        "name": "CE - form_abandoned (+legacy)",
         "type": "CUSTOM_EVENT",
         "customEventFilter": [
           {
-            "type": "EQUALS",
+            "type": "MATCH_REGEX",
             "parameter": [
               {
                 "type": "TEMPLATE",
@@ -1824,7 +1824,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "form_abandon"
+                "value": "^(form_abandon|form_abandoned)$"
               }
             ]
           }
