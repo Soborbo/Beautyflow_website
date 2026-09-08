@@ -25,7 +25,16 @@ import { resetAll, setCkyConsent, setUrl, setCookie } from './helpers';
 
 const GOOGLE_KEYS = ['gclid', 'gbraid', 'wbraid'] as const;
 
-function googleIdsIn(o: Record<string, unknown> | null | undefined): string[] {
+/**
+ * A parameter tipusa pontosan annyit ker, amennyit a helper OLVAS: a harom
+ * Google-kulcsot. A `Record<string, unknown>` tul sokat kert -- a `TrackingData`
+ * (interface, index-szignatura nelkul) nem elegiti ki, ezert a `getStoredData()`
+ * atadasa 5 helyen TS2345-tel bukott. A `typecheck` nem is fut a CI-ban, ezert ez
+ * a masteren eszrevetlen maradt.
+ */
+type GoogleIdBag = Partial<Record<(typeof GOOGLE_KEYS)[number], unknown>>;
+
+function googleIdsIn(o: GoogleIdBag | null | undefined): string[] {
   return o ? GOOGLE_KEYS.filter((k) => o[k]) : [];
 }
 
