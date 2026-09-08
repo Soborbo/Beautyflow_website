@@ -97,6 +97,14 @@ interface BaseFormData {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
+  // ── Belépési jelek ──
+  // A BELÉPÉSI oldal abszolút URL-je: ahol a látogató a webhelyre érkezett.
+  // NEM az `event_source_url` — az az ESEMÉNY helye (a submit-oldal), és a
+  // gateway-láb továbbra is onnan veszi.
+  landing_url?: string;
+  // A KÜLSŐ hivatkozó (origin + útvonal, query nélkül). A kliens
+  // `entry-attribution` modulja szűri: belső hivatkozó ide sosem kerül.
+  referrer?: string;
 }
 
 interface ConsultationFormData extends BaseFormData {
@@ -220,6 +228,11 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
     consent_given: true, // a form csak elfogadott adatkezeléssel küldhető (data.consent)
     marketing_consent: false, // ezen az űrlapon nincs külön marketing-opt-in
     attribution: {
+      // A BELÉPÉSI oldal és a KÜLSŐ hivatkozó. Ez a két mező eddig egyszerűen
+      // HIÁNYZOTT ebből a blokkból: a klikk-azonosítók mentek, a belépési
+      // kontextus nem — a CRM 47 élő során mindkét oszlop NULL volt.
+      landing_url: data.landing_url || undefined,
+      referrer: data.referrer || undefined,
       utm_source: data.utm_source,
       utm_medium: data.utm_medium,
       utm_campaign: data.utm_campaign,
@@ -780,6 +793,14 @@ async function dispatchGatewayConversion(
         utm_source: data.utm_source,
         utm_medium: data.utm_medium,
         utm_campaign: data.utm_campaign,
+        // A böngésző-láb `collectAttribution()`-je ezt a négyet MÁR küldi; a
+        // szerver-láb eddig nem — a két láb ugyanarról a konverzióról mást
+        // mondott. Az `event_source_url` külön marad (Referer): az az ESEMÉNY
+        // helye, nem a belépésé.
+        utm_content: data.utm_content,
+        utm_term: data.utm_term,
+        landing_page: data.landing_url || undefined,
+        referrer: data.referrer || undefined,
       },
       consent: readConsentFromCookie(request.headers.get('Cookie')),
       // Fazis D: a szerver-lab MEGMONDJA, milyen kod futott. A bongeszo-lab a

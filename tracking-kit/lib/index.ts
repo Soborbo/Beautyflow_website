@@ -13,6 +13,15 @@
  */
 
 export { hasMarketingConsent, hasAnalyticsConsent, hasAnyConsent, onConsentChange, waitForConsent, type ConsentCategory } from './consent';
+// Belépési jelek — a látogató ELSŐ oldala nálunk + a KÜLSŐ hivatkozó. A CRM
+// `landing_url`/`referrer` mezője innen töltődik; eddig egyik sem ment ki.
+export {
+  initEntryAttribution, captureEntrySignals, externalReferrer,
+  getEntryLandingPath, getEntryLandingUrl, getEntryReferrer,
+  entryAttributionFields, entryParamsForNavigation, withEntryParams,
+  LANDING_PARAM, REFERRER_PARAM, ENTRY_CARRY_SEGMENTS,
+} from './entry-attribution';
+export { getMarketingConsentState, type MarketingConsentState } from './consent';
 export {
   persistTrackingParams, captureUrlParams, getGclid, getFbclid, getFbp, getFbc,
   getAllTrackingData, getStoredData, getAttribution, getSourceType,
@@ -48,6 +57,7 @@ import {
   hasClickFired, markClickFired,
 } from './events';
 import { sendToWorker } from './gateway';
+import { initEntryAttribution } from './entry-attribution';
 import { trackingConfig } from './config';
 
 // ── Init ───────────────────────────────────────────────────────────
@@ -60,6 +70,10 @@ let consentListenerBound = false;
 
 export function initTracking(): void {
   if (window.location.search.includes('debugTracking=1')) enableDebug();
+  // A BELÉPÉSI JELEK a consent-elágazás ELŐTT: a first touch minden állapotban
+  // rögzül, és az URL-ben átvitt jelet még azelőtt kiolvassuk, hogy a
+  // címsorból kitakarítanánk.
+  initEntryAttribution();
   captureUrlParams();
   if (!consentListenerBound) {
     consentListenerBound = true;

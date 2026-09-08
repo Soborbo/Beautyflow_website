@@ -165,6 +165,7 @@ const formId = `contact-form-${location}`;
     getAllTrackingData,
     getFbc,
     getFbp,
+    entryAttributionFields,
     collectAttribution,
   } from '@tracking/lib';
   import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
@@ -189,6 +190,10 @@ const formId = `contact-form-${location}`;
       msclkid: a.msclkid || '',
       fbc: getFbc() || '',
       fbp: getFbp() || '',
+      // BELÉPÉSI JELEK — a látogató első oldala nálunk és a KÜLSŐ hivatkozó.
+      // Eddig egyik sem ment ki: a CRM `landing_url`/`referrer` oszlopa 47 élő
+      // soron NULLA kitöltött értéket tartalmazott.
+      ...entryAttributionFields(),
     };
   }
 

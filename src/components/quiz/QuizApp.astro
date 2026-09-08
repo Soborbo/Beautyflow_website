@@ -249,6 +249,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     getAllTrackingData,
     getFbc,
     getFbp,
+    entryAttributionFields,
     collectAttribution,
   } from '@tracking/lib';
   import { generateResultHash, resultStorageKey, resultPath } from '@/quiz/lib/hash';
@@ -483,6 +484,8 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           fbc: getFbc() || '', fbp: getFbp() || '',
           utm_source: t.utm_source || '', utm_medium: t.utm_medium || '', utm_campaign: t.utm_campaign || '',
           utm_content: t.utm_content || '', utm_term: t.utm_term || '',
+          // BELÉPÉSI JELEK — lásd `entryAttributionFields()`.
+          ...entryAttributionFields(),
         };
         const hash = generateResultHash();
         const payload = {
@@ -501,6 +504,10 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           fbc: attr.fbc || '', fbp: attr.fbp || '',
           utm_source: attr.utm_source || '', utm_medium: attr.utm_medium || '',
           utm_campaign: attr.utm_campaign || '', utm_content: attr.utm_content || '', utm_term: attr.utm_term || '',
+          // A payload MEZŐNKÉNT sorolja fel az attribúciót, ezért egy `attr`-be
+          // felvett új mező itt külön is kell — enélkül némán a kliensben
+          // maradna. (Pont ez a hibaosztály hagyta üresen a CRM-oszlopokat.)
+          landing_url: attr.landing_url || '', referrer: attr.referrer || '',
         };
 
         // Még nincs Turnstile-token (a widget tölt / lejárt) — ne küldjünk token nélküli
