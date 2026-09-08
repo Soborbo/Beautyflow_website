@@ -31,6 +31,7 @@ import {
   sendGatewayConversion,
   buildConsentSources,
   readConsentFromCookie,
+  readSboConsentCookieHeader,
   isGatewayConfigured,
   type GatewayEnv,
 } from '@/lib/tracking/gateway-dispatch';
@@ -718,8 +719,13 @@ async function dispatchGatewayConversion(
     TRACKING_GATEWAY_TOKEN: raw.TRACKING_GATEWAY_TOKEN as string | undefined,
     SITE_URL: raw.SITE_URL as string | undefined,
     TRACKING_TEST_LEAD_EMAIL: raw.TRACKING_TEST_LEAD_EMAIL as string | undefined,
-    TRACKING_TEST_EVENT_CODE: raw.TRACKING_TEST_EVENT_CODE as string | undefined,
+    TRACKING_POLICY_VERSION: raw.TRACKING_POLICY_VERSION as string | undefined,
   };
+  // Az sbo consent-suti policy-verzio kapuja: a szerver-labnak UGYANAZT a
+  // tajekoztato-verziot kell elvarnia, amit a bongeszo-lab - kulonben egy
+  // KORABBI szovegre adott "igen"-t fogadna el, mikozben a banner ujrakerdez.
+  // CookieYes alatt nincs beallitva -> undefined -> a kapu kimarad (mai viselkedes).
+  const sboOpts = { expectedPolicyVersion: gatewayEnv.TRACKING_POLICY_VERSION };
 
   // Loud, not silent: an unconfigured gateway or a client that sent no event_id is
   // precisely the "leads arrive, Meta sees nothing" state this leg exists to end.
@@ -781,10 +787,11 @@ async function dispatchGatewayConversion(
         utm_medium: data.utm_medium,
         utm_campaign: data.utm_campaign,
       },
-      consent: readConsentFromCookie(request.headers.get('Cookie')),
+      consent: readConsentFromCookie(request.headers.get('Cookie'), sboOpts),
       // Fazis D: a szerver-lab MEGMONDJA, milyen kod futott. A bongeszo-lab a
       // vendorolt tracking-kit-ben el -- oda a jelentes a fork-migracioval jon.
-      consentSources: buildConsentSources(request.headers.get('Cookie')),
+      consentSources: buildConsentSources(request.headers.get('Cookie'), sboOpts),
+      consentId: readSboConsentCookieHeader(request.headers.get('Cookie'), sboOpts)?.consentId,
       eventSourceUrl: request.headers.get('Referer') || undefined,
       clientIpAddress: request.headers.get('CF-Connecting-IP') || undefined,
       clientUserAgent: request.headers.get('User-Agent') || undefined,
