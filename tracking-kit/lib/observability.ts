@@ -17,16 +17,44 @@ export type DiagSeverity = 'info' | 'warn' | 'error';
 interface CodeDef { code: string; severity: DiagSeverity; message: string }
 
 export const TRACKING_CODES = {
-  // 1xxx — gateway / worker connection
+  // 1xxx — gateway / worker connection.
+  // TRK-1001/1004 (Turnstile skip / degraded token-less) and the whole TRK-2xxx
+  // Turnstile block are RETIRED: the gateway no longer validates Turnstile, and
+  // the client never gates a dispatch on a token. Do not reuse the numbers.
   GATEWAY_OK:              { code: 'TRK-1000', severity: 'info',  message: 'Gateway dispatch sent' },
   GATEWAY_NETWORK_FAIL:    { code: 'TRK-1002', severity: 'error', message: 'Gateway POST failed (network/transport)' },
   GATEWAY_BEACON_FALLBACK: { code: 'TRK-1003', severity: 'info',  message: 'sendBeacon unavailable/failed; used fetch keepalive' },
-  // A gateway ezt az eventet a bongeszo-utrol 403-mal dobna (TRK-400-017) — a
-  // site backendjenek kell kuldenie a hitelesitett szerver-ingressen. Hangos,
-  // mert kulonben a konverzio ugy vesz el, hogy a dispatch sikeresnek latszik.
-  GATEWAY_SERVER_INGRESS_ONLY: { code: 'TRK-1005', severity: 'warn', message: 'Event is server-ingress-only; the browser leg must not dispatch it' },
+  GATEWAY_SERVER_ONLY_EVENT: { code: 'TRK-1005', severity: 'error', message: 'Server-ingress-only event blocked from browser dispatch — the site BACKEND must send it via /api/event/conversion-server' },
+  GATEWAY_REJECTED:        { code: 'TRK-1006', severity: 'error', message: 'Gateway rejected the dispatch (non-2xx HTTP status) — the conversion did NOT land' },
   // 3xxx — data integrity
   PII_IN_DATALAYER:        { code: 'TRK-3001', severity: 'error', message: 'PII-shaped key blocked from a dataLayer push' },
+  // 4xxx — saját CMP (Fázis 2). A consent-POST kudarca SOSEM néma: a kliens az
+  // egyetlen őrzője a döntésnek, amíg a gateway 204-gyel nem igazolta a tárolást.
+  CONSENT_STORED:          { code: 'TRK-4000', severity: 'info',  message: 'Consent decision stored by the gateway (204)' },
+  CONSENT_POST_RETRYABLE:  { code: 'TRK-4001', severity: 'warn',  message: 'Consent POST not stored (429/5xx/network) — decision kept pending, resent later with the SAME consent_event_id' },
+  CONSENT_POST_REJECTED:   { code: 'TRK-4002', severity: 'error', message: 'Consent POST rejected (4xx) — dropped from the pending queue; the cookie state still applies locally' },
+  // INV-008 — ISMERETLEN consent mellett engedtünk, mert a site EXPLICIT kérte a
+  // dev-kényelmet. Prodban ez sosem fordulhat elő (DEV=false); ha mégis látod
+  // éles logban, a build rossz flaggel készült.
+  CONSENT_DEV_FALLBACK_ALLOW: { code: 'TRK-4003', severity: 'warn', message: 'Unknown consent ALLOWED by the explicit dev fallback (PUBLIC_TRACKING_DEV_CONSENT_ALLOW=1) — must never happen in production' },
+  // 5xxx — P5 `commit-after-business-success`. A böngésző-konverzió a backend
+  // SIKERE után ég el; ezek a kódok mondják meg, mi lett a letett konverzióval.
+  CONVERSION_COMMITTED:    { code: 'TRK-5000', severity: 'info',  message: 'Staged browser conversion committed after backend success' },
+  CONVERSION_COMMIT_CONSENT_REVOKED: { code: 'TRK-5001', severity: 'warn', message: 'Staged conversion dropped: marketing consent was withdrawn between submit and success page' },
+  // A konverzió elmegy, de Enhanced-Conversions identity nélkül — gyengébb
+  // match-rate. Navigációs (PRG) úton ez azt jelenti, hogy a siker-oldal nem
+  // adott át identityt a szerver-oldali renderből. NEM néma degradáció.
+  CONVERSION_COMMIT_WITHOUT_IDENTITY: { code: 'TRK-5002', severity: 'warn', message: 'Conversion committed without Enhanced-Conversions identity — weaker match; the success page passed no identity' },
+  // fetch-út: a backend válaszát nem lehetett a siker-kontraktus szerint
+  // értelmezni. Fail-closed: NEM commitolunk. Egy „majd csak sikerült" ág itt
+  // pontosan azt a fantom-konverziót termelné újra, amiért a P5 készült.
+  CONVERSION_SUBMIT_RESPONSE_INVALID: { code: 'TRK-5003', severity: 'error', message: 'Form submit response did not match the success contract ({ok:true,event_id}) — no conversion committed' },
+  // fetch-út: a backend elutasított vagy a hálózat elszállt.
+  CONVERSION_SUBMIT_FAILED: { code: 'TRK-5004', severity: 'warn',  message: 'Form submit failed (non-2xx or network) — no conversion committed' },
+  // fetch-út: a backend MÁS event_id-t igazolt vissza, mint amit a böngésző
+  // letett. Ez szerződésszegés (a backendnek a rejtett mező id-jét kell
+  // visszaadnia), és dedup-törést jelentene — nem commitolunk.
+  CONVERSION_SUBMIT_EVENT_ID_MISMATCH: { code: 'TRK-5005', severity: 'error', message: 'Backend confirmed a different event_id than the browser staged — Meta dedup would break; no conversion committed' },
 } as const satisfies Record<string, CodeDef>;
 
 export type TrackingCodeKey = keyof typeof TRACKING_CODES;
@@ -53,32 +81,23 @@ function ring(): TrackingDiagnostic[] {
   return w.__sbTrackingDiag;
 }
 
-/**
- * A konzol-ag KULON FUGGVENY, es a `severity` PARAMETERKENT erkezik.
- *
- * Miert: a Turnstile-kodok kivezetesevel (2026-08-28) elfogyott az utolso
- * 'warn' bejegyzes a tablabol, es a literal-union leszukulesetol a warn-ag
- * „lehetetlen osszehasonlitas" tipushibat adna. A helyes valasz NEM az ag
- * torlese — az a kovetkezo warn-kodot csendben a diag-debug moge rejtene —,
- * hanem hogy a dontes a szeles `DiagSeverity`-n tortenjen. Egy parameter nem
- * szukul a kezdoertekere, egy `const` viszont igen.
- */
-function logToConsole(severity: DiagSeverity, line: string, context?: Record<string, unknown>): void {
-  if (severity === 'error') console.error(line, context ?? '');
-  else if (severity === 'warn') console.warn(line, context ?? '');
-  else if (diagDebug) console.log(line, context ?? '');
-}
-
 /** Emit a coded diagnostic. Returns the record (handy in tests). */
 export function report(key: TrackingCodeKey, context?: Record<string, unknown>): TrackingDiagnostic {
   const def = TRACKING_CODES[key];
+  // Widen: the current code table happens to contain no 'warn' entries, but the
+  // severity contract stays three-level for future codes. (The cast defeats TS's
+  // const-initializer narrowing, which would otherwise flag the 'warn' branch.)
+  const severity = def.severity as DiagSeverity;
   const diag: TrackingDiagnostic = {
-    code: def.code, severity: def.severity, message: def.message, context,
+    code: def.code, severity, message: def.message, context,
     ts: typeof Date !== 'undefined' ? Date.now() : 0,
   };
 
   // 1) console — errors/warnings always; info only under diag-debug.
-  logToConsole(def.severity, `[tracking] ${def.code} ${def.message}`, context);
+  const line = `[tracking] ${def.code} ${def.message}`;
+  if (severity === 'error') console.error(line, context ?? '');
+  else if (severity === 'warn') console.warn(line, context ?? '');
+  else if (diagDebug) console.log(line, context ?? '');
 
   if (typeof window !== 'undefined') {
     // 2) ring buffer (bounded)
@@ -111,8 +130,8 @@ export function clearDiagnostics(): void {
 export const PII_DATALAYER_KEYS: ReadonlySet<string> = new Set([
   'email', 'phone', 'phone_number', 'user_provided_data', 'user_data',
   'first_name', 'last_name', 'name', 'street', 'city', 'postal_code', 'postcode',
-  // Meta Advanced Matching short codes
-  'em', 'ph', 'fn', 'ln',
+  // Meta Advanced Matching short codes (a hash-elt user_data mezőnevei is)
+  'em', 'ph', 'fn', 'ln', 'ct', 'zp', 'st', 'country', 'external_id',
 ]);
 
 /** Delete any PII-shaped keys from `data` IN PLACE; return the names removed. */
