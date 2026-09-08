@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { collectAttribution, sendToWorker, trackConversion } from '../lib/gateway';
+import { getDiagnostics, clearDiagnostics } from '../lib/observability';
 import { setCookie, setUrl, resetAll, getDataLayer, setCkyConsent } from './helpers';
 
-// CookieYes consent cookie összeállítása (ad = advertisement, an = analytics).
+// CookieYes consent cookie (ad = advertisement, an = analytics).
 function ckyCookie(ad: boolean, an: boolean): void {
   setCookie(
     'cookieyes-consent',
@@ -10,11 +11,11 @@ function ckyCookie(ad: boolean, an: boolean): void {
   );
 }
 
-beforeEach(() => resetAll());
+beforeEach(() => { resetAll(); clearDiagnostics(); });
 afterEach(() => vi.unstubAllGlobals());
 
 describe('collectAttribution — consent-gated click IDs', () => {
-  it('ad-consent mellett elkapja a click ID-t + UTM-et az URL-ből', () => {
+  it('with ad consent captures click ID + UTM from the URL', () => {
     ckyCookie(true, true);
     setUrl('/?gclid=G1&utm_source=google&utm_medium=cpc');
     const a = collectAttribution();
@@ -24,7 +25,7 @@ describe('collectAttribution — consent-gated click IDs', () => {
     expect(a.landing_page).toContain('/');
   });
 
-  it('ad-consent NÉLKÜL nincs click ID, de UTM marad', () => {
+  it('WITHOUT ad consent: no click ID, but UTM stays', () => {
     ckyCookie(false, true);
     setUrl('/?gclid=G1&utm_source=newsletter');
     const a = collectAttribution();
@@ -32,7 +33,7 @@ describe('collectAttribution — consent-gated click IDs', () => {
     expect(a.utm_source).toBe('newsletter');
   });
 
-  it('_gcl_aw cookie fallback gclid-hez (ad-consent mellett)', () => {
+  it('_gcl_aw cookie fallback for gclid (with ad consent)', () => {
     ckyCookie(true, true);
     setCookie('_gcl_aw', 'GCL.1700000000.COOKIEGCLID');
     setUrl('/');
@@ -59,38 +60,60 @@ describe('trackConversion — consent-gated (footgun fix)', () => {
     setCkyConsent({ analytics: false, marketing: false });
     const fetchMock = vi.fn((..._args: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
     vi.stubGlobal('fetch', fetchMock);
-    await trackConversion('phone_conversion', { value: 0, user_data: { email: 'a@b.com' } });
+    await trackConversion('phone_number_clicked', { user_data: { email: 'a@b.com' } });
     expect(getDataLayer()).toHaveLength(0);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
-describe('sendToWorker — gateway payload', () => {
-  it('POST /api/event/conversion consent + attribution mezőkkel, turnstile_token NÉLKÜL', async () => {
+describe('sendToWorker — browser-path gateway payload (NO Turnstile anywhere)', () => {
+  it('POSTs /api/event/conversion with consent + attribution and WITHOUT any turnstile_token', async () => {
     ckyCookie(true, true);
     setUrl('/?gclid=G9');
     Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: () => false });
     const fetchMock = vi.fn((..._args: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
     vi.stubGlobal('fetch', fetchMock);
 
-    // `contact_form_submit` helyett klikk-event: az előbbi SZERVER-INGRESS-ONLY,
-    // a böngésző-útról a gateway 403-mal dobná. Lásd gateway-browser-split.test.ts.
     const ok = await sendToWorker({
-      event_name: 'phone_conversion',
+      event_name: 'phone_number_clicked',
       event_id: 'E1',
       event_time: 1_700_000_000,
-      user_data: { email: 'a@b.com' },
+      user_data: { phone_number: '07123456789' },
     });
     expect(ok).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toBe('/api/event/conversion');
     const body = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body);
-    expect(body.event_name).toBe('phone_conversion');
+    expect(body.event_name).toBe('phone_number_clicked');
     expect(body.event_id).toBe('E1');
-    // A mező VÉGLEG kikerült: a gateway nem validál Turnstile-t.
-    expect('turnstile_token' in body).toBe(false);
-    expect(body.user_data.email).toBe('a@b.com');
+    // The Turnstile gate is GONE — a token in the payload means someone re-added
+    // the mechanism that silently dropped two weeks of click conversions.
+    expect(body.turnstile_token).toBeUndefined();
+    expect(body.user_data.phone_number).toBe('07123456789');
     expect(body.consent.ad_user_data).toBe('GRANTED');
     expect(body.attribution.gclid).toBe('G9');
+  });
+
+  it('BLOCKS a server-ingress-only event: no network, false, TRK-1005', async () => {
+    ckyCookie(true, true);
+    const beacon = vi.fn(() => true);
+    Object.defineProperty(navigator, 'sendBeacon', { configurable: true, value: beacon });
+    const fetchMock = vi.fn((..._args: unknown[]) => Promise.resolve(new Response(null, { status: 204 })));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const ok = await sendToWorker({
+      event_name: 'contact_form_submitted',
+      event_id: 'E1',
+      event_time: 1_700_000_000,
+      user_data: { email: 'a@b.com' },
+    });
+    expect(ok).toBe(false);
+    expect(beacon).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+    const diag = getDiagnostics().find((d) => d.code === 'TRK-1005');
+    expect(diag).toBeTruthy();
+    expect(diag!.severity).toBe('error');
+    expect(diag!.context?.event_name).toBe('contact_form_submitted');
   });
 });
