@@ -21,6 +21,7 @@
 
 import { generateUUID } from './uuid';
 import { hasAnalyticsConsent, hasMarketingConsent } from './consent';
+import { ATTR_STORAGE_KEY, readMarketingLocalStorage } from './persistence';
 import { report } from './observability';
 
 declare global {
@@ -179,7 +180,6 @@ function getConsentState(): ConsentState | undefined {
 // persisted in localStorage (the conversion often happens on a different page
 // than the landing). Last-touch wins for click IDs/UTMs; the landing context
 // (landing_page, referrer) is first-touch.
-const ATTR_STORAGE_KEY = '__sb_attribution';
 const ATTR_CLICK_PARAMS = [
   'gclid',
   'gbraid',
@@ -206,8 +206,12 @@ const ATTR_UTM_PARAMS = [
 ];
 
 function readStoredAttribution(): AttributionParams {
+  // PECR: az OLVASAS is engedelykoteles. Ez a kulcs marketing-scope (klikk-ID-k +
+  // UTM-ek), ezert UGYANAZON az EGY read-gate-en megy at, mint a persistence.ts
+  // getterei — nem egy masodikon. Consent nelkul ures objektum, es a blokk
+  // bekerul a `storage_read_blocked_keys` telemetriaba.
   try {
-    const raw = localStorage.getItem(ATTR_STORAGE_KEY);
+    const raw = readMarketingLocalStorage(ATTR_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as AttributionParams) : {};
   } catch {
     return {};
@@ -215,6 +219,13 @@ function readStoredAttribution(): AttributionParams {
 }
 
 function writeStoredAttribution(a: AttributionParams): void {
+  // GDPR: attribucio (gclid/fbclid/UTM/landing/referrer) localStorage-be irasa
+  // marketing-storage — consent nelkul TILOS. A `collectAttribution` publikus
+  // export, kozvetlen hivasa enelkul consent nelkul perzisztalna (a persistence.ts
+  // minden irasa is igy gate-el). A READ/in-memory hasznalat gate nelkul mehet; itt
+  // csak a PERSIST lepest zarjuk — a consent ELOTTI landolast a boot efemer
+  // puffere fedi (`captureUrlParams` -> grantkor `persistTrackingParams`).
+  if (!hasMarketingConsent()) return;
   try {
     localStorage.setItem(ATTR_STORAGE_KEY, JSON.stringify(a));
   } catch {
