@@ -6,21 +6,53 @@
  */
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { buildResponsivePreload } from './responsivePreload';
 
 interface Props {
   src: ImageMetadata;
   alt: string;
   class?: string;
   priority?: boolean;
+  /**
+   * Media query (pl. `(min-width: 1024px)`), amelyen ez a kép a LCP-elem.
+   * Ilyenkor `<link rel="preload">` megy ki rá, a kép maga pedig `lazy` marad —
+   * lásd `responsivePreload.ts`. Kizárja a `priority`-t.
+   */
+  preloadMedia?: string;
 }
 
-const { src, alt, class: className, priority = false } = Astro.props;
+const { src, alt, class: className, priority = false, preloadMedia } = Astro.props;
+
+if (priority && preloadMedia) {
+  throw new Error(
+    '[ContentImage] `priority` és `preloadMedia` egyszerre nem adható meg: az első ' +
+      'minden törésponton eager+high-ra állítja a képet, a második pont ezt váltja ' +
+      'ki törésponthoz kötött preloaddal. Válassz egyet.'
+  );
+}
 
 // HALF pattern from astro-images skill
 // Added 480 for better mobile coverage (382-412px renders)
 const widths = [320, 480, 640, 960, 1280, 1600];
 const sizes = '(min-width: 1024px) 50vw, 100vw';
+const quality = 60;
+
+const preload = preloadMedia
+  ? await buildResponsivePreload({ src, widths, sizes, quality, media: preloadMedia })
+  : null;
 ---
+
+{preload && (
+  <link
+    rel="preload"
+    as="image"
+    type="image/avif"
+    fetchpriority="high"
+    imagesrcset={preload.imagesrcset}
+    imagesizes={preload.imagesizes}
+    media={preload.media}
+  />
+)}
 
 <Picture
   src={src}
@@ -28,7 +60,7 @@ const sizes = '(min-width: 1024px) 50vw, 100vw';
   widths={widths}
   sizes={sizes}
   formats={['avif', 'webp', 'jpg']}
-  quality={60}
+  quality={quality}
   class={className}
   loading={priority ? 'eager' : 'lazy'}
   fetchpriority={priority ? 'high' : undefined}
