@@ -549,6 +549,7 @@ const breadcrumbSchema = {
         getAllTrackingData,
         getFbc,
         getFbp,
+        entryAttributionFields,
         collectAttribution,
       } from '@tracking/lib';
       import { createTurnstile } from '@/lib/forms/turnstile-client';
@@ -577,6 +578,8 @@ const breadcrumbSchema = {
           msclkid: a.msclkid || '',
           fbc: getFbc() || '',
           fbp: getFbp() || '',
+          // BELÉPÉSI JELEK — lásd `entryAttributionFields()`.
+          ...entryAttributionFields(),
         };
       }
 

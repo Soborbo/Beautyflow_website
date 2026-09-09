@@ -24,6 +24,14 @@
  */
 
 export { hasMarketingConsent, hasAnalyticsConsent, hasAnyConsent, onConsentChange, waitForConsent, type ConsentCategory } from './consent';
+// Belépési jelek — a látogató ELSŐ oldala nálunk + a KÜLSŐ hivatkozó. A CRM
+// `landing_url`/`referrer` mezője innen töltődik; eddig egyik sem ment ki.
+export {
+  initEntryAttribution, captureEntrySignals, externalReferrer,
+  getEntryLandingPath, getEntryLandingUrl, getEntryReferrer,
+  entryAttributionFields, entryParamsForNavigation, withEntryParams,
+  LANDING_PARAM, REFERRER_PARAM, ENTRY_CARRY_SEGMENTS,
+} from './entry-attribution';
 // CMP Fázis 2 — a saját consent-modul (provider='sbo' site-ok; default: cookieyes).
 export {
   readSboConsent, sboConsentAgeSeconds,
@@ -122,6 +130,7 @@ import {
   hasClickFired, markClickFired,
 } from './events';
 import { sendToWorker } from './gateway';
+import { initEntryAttribution } from './entry-attribution';
 import { trackingConfig } from './config';
 
 // ── Init ───────────────────────────────────────────────────────────
@@ -134,6 +143,10 @@ let consentListenerBound = false;
 
 export function initTracking(): void {
   if (window.location.search.includes('debugTracking=1')) enableDebug();
+  // A BELÉPÉSI JELEK a consent-elágazás ELŐTT: a first touch minden állapotban
+  // rögzül, és az URL-ben átvitt jelet még azelőtt kiolvassuk, hogy a
+  // címsorból kitakarítanánk.
+  initEntryAttribution();
   // A blokkolt-olvasás jel PER OLDALLETÖLTÉS értendő, és ez a függvény minden
   // `astro:page-load`-ra lefut — view transition esetén ÚJ navigáció, de UGYANAZ
   // a dokumentum. Reset nélkül egyetlen korai blokk után a session minden további

@@ -86,6 +86,10 @@ const QuizSchema = z
     utm_campaign: z.string().max(200).optional().default(''),
     utm_content: z.string().max(200).optional().default(''),
     utm_term: z.string().max(200).optional().default(''),
+    // BELÉPÉSI JELEK. A zod `z.object()` némán ledobja az ismeretlen kulcsokat:
+    // enélkül a kliens hiába küldi őket, a szerverre sosem érnek meg.
+    landing_url: z.string().max(500).optional().default(''),
+    referrer: z.string().max(500).optional().default(''),
   })
   .refine((d) => d.phone.length > 0 || d.email.length > 0, {
     message: 'Telefonszám vagy email kötelező.',
@@ -230,6 +234,10 @@ async function forwardToCrm(
     form_key: 'beautyflow_consult',
     answers,
     attribution: {
+      // A BELÉPÉSI oldal és a KÜLSŐ hivatkozó — eddig mindkettő hiányzott
+      // ebből a blokkból, ahogy az `/api/contact`-ból is.
+      landing_url: data.landing_url || undefined,
+      referrer: data.referrer || undefined,
       utm_source: data.utm_source || undefined,
       utm_medium: data.utm_medium || undefined,
       utm_campaign: data.utm_campaign || undefined,
@@ -481,6 +489,12 @@ async function dispatchGatewayConversion(
         utm_source: data.utm_source || undefined,
         utm_medium: data.utm_medium || undefined,
         utm_campaign: data.utm_campaign || undefined,
+        // Ugyanaz a négy mező, amit a böngésző-láb már küld — a két lábnak nem
+        // szabad mást mondania ugyanarról a konverzióról.
+        utm_content: data.utm_content || undefined,
+        utm_term: data.utm_term || undefined,
+        landing_page: data.landing_url || undefined,
+        referrer: data.referrer || undefined,
       },
       consent: readConsentFromCookie(request.headers.get('Cookie'), sboOpts),
       // Fazis D: a szerver-lab MEGMONDJA, milyen kod futott. A bongeszo-lab a

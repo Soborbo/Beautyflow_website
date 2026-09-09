@@ -5,6 +5,11 @@ vi.mock('../lib/gateway', () => ({
   getTurnstileToken: vi.fn(() => Promise.resolve('TOK')),
   collectAttribution: vi.fn(() => ({})),
   prewarmTurnstile: vi.fn(),
+  // Az `entry-attribution` a haromallapotu consent-olvasot a gateway-bol veszi
+  // (az az EGYETLEN authority: override -> sajat suti -> CookieYes-suti -> JS API).
+  // A teljes mock ezt is le kell fedje, kulonben az `initTracking` elso lepese
+  // — a belepesi jelek rogzitese — undefined-ot hivna.
+  getMarketingConsentState: vi.fn(() => 'GRANTED'),
 }));
 
 import { initTracking } from '../lib/index';
