@@ -60,9 +60,18 @@ const hasEnAlternate = hasAlternateRoute(pathWithoutLang);
 <!DOCTYPE html>
 <html lang={currentLang}>
   <head>
-    <Tracking gtmId={gtmId} cookieYesId={cookieYesId} />
+    {/* A charset-deklaraciot a HTML-szabvany szerint az elso 1024 BAJTON belul
+        kell kiadni, kulonben a bongeszo talalgat (Lighthouse: „Charset
+        declaration ... occurs too late"). MERVE a production HTML-en
+        (2026-09-09, beautyflow.pro): a `<Tracking/>` 1409 bajtnyi inline
+        consent+CMP+GTM bootstrapot ir ki, es a Cloudflare zona-szintu
+        Google-tag injektalasa mar eleve 508 bajtot tesz a `<head>` ele —
+        a charset igy a 1978. bajtra csuszott. Ket taggel elorehozva ~561-re
+        kerul, tehat a zona-injektalas MELLETT is befer az ablakba.
+        Ezert all a `<Tracking/>` a charset+viewport UTAN. */}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Tracking gtmId={gtmId} cookieYesId={cookieYesId} />
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href="/images/Beautyflow-favicon.png" />
