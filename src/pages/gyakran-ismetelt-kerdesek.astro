@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
+import { bookingIsNotino } from '../lib/booking-links';
 
 // FAQ data organized by categories - Általános kérdések FIRST
 const faqCategories = [
@@ -12,7 +13,9 @@ const faqCategories = [
     questions: [
       {
         q: "Hogyan foglalhatok időpontot?",
-        a: "Időpontot a Notino felületén keresztül foglalhat online, vagy telefonon a +36 1 300 9414 számon. Online foglalás esetén válassza ki a kívánt kezelést, helyszínt és időpontot. Visszaigazolást e-mailben küldünk."
+        a: bookingIsNotino
+          ? "Időpontot a Notino felületén keresztül foglalhat online, vagy telefonon a +36 1 300 9414 számon. Online foglalás esetén válassza ki a kívánt kezelést, helyszínt és időpontot. Visszaigazolást e-mailben küldünk."
+          : "Időpontot a weboldalunk online foglalóján foglalhat, vagy telefonon a +36 1 300 9414 számon. Online foglalás esetén válassza ki a szalont, a kívánt kezelést és időpontot. Visszaigazolást e-mailben küldünk."
       },
       {
         q: "Hol találom a szalonokat?",

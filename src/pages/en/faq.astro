@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import { bookingIsNotino } from '../../lib/booking-links';
 
 // FAQ data organized by categories - General Questions FIRST
 const faqCategories = [
@@ -12,7 +13,9 @@ const faqCategories = [
     questions: [
       {
         q: "How can I book an appointment?",
-        a: "You can book an appointment online through the Notino platform, or by phone at +36 1 300 9414. For online booking, select your desired treatment, location, and time slot. We'll send you a confirmation by email."
+        a: bookingIsNotino
+          ? "You can book an appointment online through the Notino platform, or by phone at +36 1 300 9414. For online booking, select your desired treatment, location, and time slot. We'll send you a confirmation by email."
+          : "You can book an appointment through the online booking page on our website, or by phone at +36 1 300 9414. For online booking, select the salon, your desired treatment and time slot. We'll send you a confirmation by email."
       },
       {
         q: "Where are the salons located?",

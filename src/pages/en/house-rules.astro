@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import { bookingIsNotino } from '../../lib/booking-links';
 
 const effectiveFrom = 'August 1, 2026';
 ---
@@ -41,11 +42,19 @@ const effectiveFrom = 'August 1, 2026';
         <section>
           <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Rescheduling and Cancellation</h2>
           <ul class="list-disc pl-6 text-gray-600 space-y-2">
-            <li><strong>More than 48 hours in advance:</strong> free of charge via the online booking system.</li>
+            {bookingIsNotino ? (
+              <li><strong>More than 48 hours in advance:</strong> free of charge via the online booking system.</li>
+            ) : (
+              <li><strong>More than 48 hours in advance:</strong> free of charge via the link in your confirmation email; to change an appointment, cancel it and book a new one.</li>
+            )}
             <li><strong>Within 48 hours:</strong> accepted EXCLUSIVELY by phone at <a href="tel:+36308346204" class="text-[#c53f75] underline">+36 30 834 6204</a>.</li>
             <li>Cancellation within 48 hours: <strong>25%</strong> of the treatment price is payable.</li>
             <li>Cancellation within 24 hours: <strong>50%</strong> of the treatment price is payable, calculated from the start of the appointment.</li>
-            <li>We CANNOT accept cancellations or modifications sent as replies to SMS, push, or email notifications from the Notino system, or via private messages or email.</li>
+            {bookingIsNotino ? (
+              <li>We CANNOT accept cancellations or modifications sent as replies to SMS, push, or email notifications from the Notino system, or via private messages or email.</li>
+            ) : (
+              <li>We CANNOT accept cancellations sent as replies to emails or via private messages — within 48 hours by phone only.</li>
+            )}
           </ul>
           <p class="text-gray-600 leading-relaxed mt-4">
             📆 Any rescheduling within 48 hours qualifies as a cancellation and will be invoiced.
