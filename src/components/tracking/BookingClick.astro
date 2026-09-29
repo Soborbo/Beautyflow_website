@@ -1,6 +1,7 @@
 ---
 /**
- * Beautyflow-specific conversion: begin_checkout (Notino "Időpontfoglalás" CTA).
+ * Beautyflow-specific conversion: begin_checkout (Notino "Időpontfoglalás" CTA, vagy a saját
+ * foglaló: crm.beautyflow.pro/book — src/lib/booking-links.ts).
  *
  * 2026-09-08 eseménynév-cutover: a korábbi `booking_click` MINDKÉT lábon a kanonikus
  * `begin_checkout` nevet használja. A gateway-lábon ez KÖTELEZŐ volt: a kanonikus
@@ -14,14 +15,19 @@
  *
  * The soborbo-tracking kit covers tel:/mailto:/WhatsApp + the lead forms. This
  * project-specific listener fires on any anchor pointing to Notino's salon booking
- * page (or marked data-track="booking_click"):
+ * page or the own booker (crm.beautyflow.pro/book), or marked data-track="booking_click":
  *   • browser dataLayer `begin_checkout` (GTM → GA4 + Meta Pixel InitiateCheckout) — analytics consent
  *   • gateway `begin_checkout` (Meta CAPI InitiateCheckout) — marketing consent, SAME event_id
  *
  * Per LEAD-FLOW-INCIDENT.md this is the site's dominant high-intent signal, so it must
  * never regress.
  *
- * EZ KONVERZIÓ, EZÉRT CSAK VALÓDI ÁTADÁSRA VALÓ (a Notinóra kilépő kattintásra).
+ * EZ KONVERZIÓ, EZÉRT CSAK VALÓDI ÁTADÁSRA VALÓ (a Notinóra vagy a saját foglalóra
+ * (crm.beautyflow.pro/book) kilépő kattintásra).
+ *
+ * A saját foglaló más origin, a weboldal localStorage-át nem látja: a klikk-ID-ket és az
+ * utm-eket (CSAK marketing-consenttel) a kattintáskor a linkre tesszük. `msclkid`-et a
+ * tracking-tár nem tárol, ezért nincs a listában.
  * In GTM `CE - begin_checkout (+legacy)` fires three tags — GA4,
  * Meta Pixel InitiateCheckout and the Google Ads conversion — and in Ads the GA4-imported
  * `booking_click` action is a PRIMARY goal, so marking an internal link (a CTA that just
@@ -35,7 +41,22 @@
 ---
 
 <script>
-  import { hasAnalyticsConsent, hasMarketingConsent, generateEventId, trackServerEvent } from '@tracking/lib';
+  import { hasAnalyticsConsent, hasMarketingConsent, generateEventId, trackServerEvent, getAllTrackingData } from '@tracking/lib';
+
+  const CRM_BOOK = /^https:\/\/crm\.beautyflow\.pro\/book/i;
+  const FORWARD = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign'] as const;
+
+  /** A saját foglaló linkjére a tárolt klikk-ID-k — CSAK marketing-consenttel, és csak ha még nincs ott. */
+  function withClickIds(href: string): string {
+    if (!CRM_BOOK.test(href) || !hasMarketingConsent()) return href;
+    const u = new URL(href);
+    const d = getAllTrackingData();
+    for (const k of FORWARD) {
+      const v = d[k];
+      if (v && !u.searchParams.has(k)) u.searchParams.set(k, v);
+    }
+    return u.toString();
+  }
 
   type TrackedClick = { link: HTMLAnchorElement; kind: 'booking' | 'cta' };
 
@@ -45,6 +66,7 @@
     if (!link) return null;
     const href = link.getAttribute('href') || '';
     if (/notino\.hu\/szalonok\/beautyflow/i.test(href)) return { link, kind: 'booking' };
+    if (CRM_BOOK.test(href)) return { link, kind: 'booking' };
     if (link.dataset.track === 'booking_click') return { link, kind: 'booking' };
     if (link.dataset.track === 'cta_click') return { link, kind: 'cta' };
     return null;
@@ -76,6 +98,14 @@
         w.dataLayer = w.dataLayer || [];
         w.dataLayer.push({ event: 'cta_click', source: inferSource(link), page_path: location.pathname });
         return;
+      }
+
+      // Mindig az EREDETI href-ből számolunk: ha a marketing-consent közben visszavonódott,
+      // a korábban ráírt klikk-ID-k nem maradhatnak a linken.
+      const href = link.dataset.bookingHref ?? link.getAttribute('href') ?? '';
+      if (CRM_BOOK.test(href)) {
+        link.dataset.bookingHref = href;
+        link.href = withClickIds(href);
       }
 
       if (!analytics && !marketing) return;
