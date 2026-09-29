@@ -13,7 +13,7 @@ import lezeresSzortelenites from '../assets/images/lezeres-szortelenites-beautyf
 import hydrabeautyArckezeles from '../assets/images/hydrabeauty-arckezeles.jpg';
 import sminktetovalasBudapest from '../assets/images/sminktetovalas-budapest-beautyflow.jpg';
 import carbonPeelingLezeres from '../assets/images/carbon-peeling-lezeres.jpg';
-import { bookingLinkAttrs, bookingUrl } from '../lib/booking-links';
+import { bookingIsNotino, bookingLinkAttrs, bookingUrl } from '../lib/booking-links';
 
 // Location data
 const location = {
@@ -638,7 +638,11 @@ const breadcrumbSchema = {
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner px-6 pb-6 text-gray-600">
-                <p>Időpontot a Notino felületén keresztül foglalhatsz online bármikor, vagy telefonon a {location.phoneDisplay} számon nyitvatartási időben. Online foglalás esetén válaszd ki a Beautyflow Buda helyszínt, a kívánt kezelést és a neked megfelelő időpontot.</p>
+                {bookingIsNotino ? (
+                  <p>Időpontot a Notino felületén keresztül foglalhatsz online bármikor, vagy telefonon a {location.phoneDisplay} számon nyitvatartási időben. Online foglalás esetén válaszd ki a Beautyflow Buda helyszínt, a kívánt kezelést és a neked megfelelő időpontot.</p>
+                ) : (
+                  <p>Időpontot a weboldalunk online foglalóján foglalhatsz bármikor, vagy telefonon a {location.phoneDisplay} számon nyitvatartási időben. Online foglalás esetén válaszd ki a Beautyflow Buda helyszínt, a kívánt kezelést és a neked megfelelő időpontot.</p>
+                )}
               </div>
             </div>
           </div>

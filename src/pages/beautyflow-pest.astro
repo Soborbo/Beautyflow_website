@@ -13,7 +13,7 @@ import lezeresSzortelenites from '../assets/images/lezeres-szortelenites-beautyf
 import hydrabeautyArckezeles from '../assets/images/hydrabeauty-arckezeles.jpg';
 import sminktetovalasBudapest from '../assets/images/sminktetovalas-budapest-beautyflow.jpg';
 import carbonPeelingLezeres from '../assets/images/carbon-peeling-lezeres.jpg';
-import { bookingLinkAttrs, bookingUrl } from '../lib/booking-links';
+import { bookingIsNotino, bookingLinkAttrs, bookingUrl } from '../lib/booking-links';
 
 // Location data
 const location = {
@@ -659,7 +659,11 @@ const breadcrumbSchema = {
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner px-6 pb-6 text-gray-600">
-                <p>Online foglaláshoz válaszd a Notino felületen a Beautyflow Pest helyszínt. Telefonon is elérhetők vagyunk a {location.phoneDisplay} számon hétfőtől péntekig 08:00-18:00 között, szombaton 10:00-20:00 között.</p>
+                {bookingIsNotino ? (
+                  <p>Online foglaláshoz válaszd a Notino felületen a Beautyflow Pest helyszínt. Telefonon is elérhetők vagyunk a {location.phoneDisplay} számon hétfőtől péntekig 08:00-18:00 között, szombaton 10:00-20:00 között.</p>
+                ) : (
+                  <p>Online foglaláshoz válaszd a weboldalunk online foglalóján a Beautyflow Pest helyszínt. Telefonon is elérhetők vagyunk a {location.phoneDisplay} számon hétfőtől péntekig 08:00-18:00 között, szombaton 10:00-20:00 között.</p>
+                )}
               </div>
             </div>
           </div>

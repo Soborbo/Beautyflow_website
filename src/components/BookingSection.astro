@@ -1,6 +1,7 @@
 ---
 import { ContentImage, FixedImage } from './images';
-import bookingImage from '../assets/images/notino-beautyflow.jpg';
+import notinoBookingImage from '../assets/images/notino-beautyflow.jpg';
+import salonImage from '../assets/images/Beautyflow-buda.jpg';
 import notinoIcon from '../assets/images/notino-ikon.png';
 import { type Locale, defaultLang } from '../i18n';
 import { bookingIsNotino, bookingLinkAttrs } from '../lib/booking-links';
@@ -14,6 +15,7 @@ const { lang = defaultLang } = Astro.props;
 const content = {
   hu: {
     imageAlt: 'Notino foglalás applikáció',
+    crmImageAlt: 'A Beautyflow Buda szalon',
     title: 'Foglalj időpontot gyorsan és egyszerűen',
     description: 'Gyors, kényelmes, egyszerű és biztonságos foglalás hivatalos partnerünk, a közkedvelt Notino oldalán.',
     crmTitle: 'Foglalj időpontot online',
@@ -23,6 +25,7 @@ const content = {
   },
   en: {
     imageAlt: 'Notino booking app',
+    crmImageAlt: 'The Beautyflow Buda salon',
     title: 'Book an appointment quickly and easily',
     description: 'Fast, convenient, simple and secure booking through our official partner, the popular Notino platform.',
     crmTitle: 'Book an appointment online',
@@ -34,6 +37,8 @@ const content = {
 
 const t = content[lang];
 
+const bookingImage = bookingIsNotino ? notinoBookingImage : salonImage;
+const imageAlt = bookingIsNotino ? t.imageAlt : t.crmImageAlt;
 const title = bookingIsNotino ? t.title : t.crmTitle;
 const description = bookingIsNotino ? t.description : t.crmDescription;
 ---
@@ -44,7 +49,7 @@ const description = bookingIsNotino ? t.description : t.crmDescription;
     <div class="w-full lg:w-1/2">
       <ContentImage
         src={bookingImage}
-        alt={t.imageAlt}
+        alt={imageAlt}
         class="w-full h-full object-cover"
       />
     </div>
