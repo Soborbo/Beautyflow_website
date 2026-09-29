@@ -56,11 +56,39 @@ function resolveEntry(from, name) {
   }
 }
 
+// A package.json `overrides`-a felulirja a fuggoseg sajat range-et — az `npm ci`
+// ezt koveteli meg a locktol, nem az eredetit. Nelkule minden override (pl. egy
+// biztonsagi javitas miatt feljebb huzott `sharp`) hamis VERZIO-UTKOZES lenne.
+// Kezelt alakok: "nev": "range", "nev": "$gyoker-dep", "szulo": { "nev": ... },
+// es { ".": ... } a sajat verziora.
+const rootPkgPath = lockPath.replace(/package-lock\.json$/, 'package.json');
+let rootPkg = {};
+try { rootPkg = JSON.parse(readFileSync(rootPkgPath, 'utf8')); } catch { /* nincs mellette package.json */ }
+const overrides = rootPkg.overrides ?? {};
+const rootDeps = { ...(rootPkg.devDependencies ?? {}), ...(rootPkg.dependencies ?? {}) };
+
+function overrideValue(v) {
+  if (v && typeof v === 'object') v = v['.'];
+  if (typeof v !== 'string') return null;
+  return v.startsWith('$') ? rootDeps[v.slice(1)] ?? null : v;
+}
+
+/** A `parentKey` lock-bejegyzes `dep` fuggosegere ervenyes range (override-dal). */
+function effectiveRange(parentKey, dep, range) {
+  const parent = parentKey.slice(parentKey.lastIndexOf('node_modules/') + 'node_modules/'.length);
+  const scoped = overrides[parent];
+  if (parentKey && scoped && typeof scoped === 'object' && dep in scoped) {
+    return overrideValue(scoped[dep]) ?? range;
+  }
+  return overrideValue(overrides[dep]) ?? range;
+}
+
 const missing = [];
 const mismatched = [];
 for (const [key, entry] of Object.entries(pkgs)) {
   const deps = { ...(entry.dependencies ?? {}), ...(entry.optionalDependencies ?? {}) };
-  for (const [dep, range] of Object.entries(deps)) {
+  for (const [dep, declared] of Object.entries(deps)) {
+    const range = effectiveRange(key, dep, declared);
     const who = key.replace('node_modules/', '') || '<root>';
     const target = resolveEntry(key, dep);
     if (!target) { missing.push(`${who} → ${dep}@${range}`); continue; }
