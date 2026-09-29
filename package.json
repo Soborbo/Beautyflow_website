@@ -36,6 +36,11 @@
     "wrangler": "^4.143.0"
   },
   "overrides": {
-    "vite": "^8"
+    "vite": "^8",
+    "sharp": "$sharp",
+    "deepmerge-ts": "^8",
+    "miniflare": {
+      "undici": "^7.29.1"
+    }
   }
 }
