@@ -45,6 +45,11 @@ export const ERROR_CODES = {
   /** Top-level catch in POST handler — bug / unexpected failure path. */
   CONTACT_UNHANDLED: 'CONTACT-UNHANDLED-001',
 
+  // ---- Lead-idempotencia (/api/contact + /api/boranalizis) --------------
+  /** Az idempotencia-tároló (Cache API / KV) olvasása vagy írása elbukott —
+   *  a beküldés lefut, de egy elveszett válasz utáni retry duplikálhat. */
+  LEAD_IDEMPOTENCY_STORE_FAILED: 'LEAD-IDEMPOTENCY-001',
+
   // ---- Server-side conversion → Soborbo event-gateway --------------------
   // These are the "leads arrive, Meta sees nothing" codes. They must be loud:
   // every one of them means a delivered lead produced NO conversion, which is

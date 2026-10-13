@@ -27,6 +27,15 @@ import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
 import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError } from '@/lib/errors/classify';
 import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
+import { checkPhone, phoneErrorMessage, PHONE_MAX_LENGTH } from '@/lib/forms/phone';
+import { normalizeLeadGoogleClickId } from '@/lib/forms/click-id';
+import {
+  isValidIdempotencyKey,
+  resolveIdempotencyStore,
+  runIdempotent,
+  type IdempotentResult,
+} from '@/lib/forms/idempotency';
+import { upstreamSignal } from '@/lib/forms/upstream-timeout';
 import {
   sendGatewayConversion,
   buildConsentSources,
@@ -134,18 +143,13 @@ function isValidEmail(email: string): boolean {
 const MAX_LENGTHS = {
   firstName: 100,
   lastName: 100,
-  phone: 32,
+  phone: PHONE_MAX_LENGTH,
   message: 2000,
   locationLabel: 50,
   treatmentId: 50,
 } as const;
 const MAX_TREATMENTS = 10;
 const MAX_BODY_BYTES = 50_000;
-
-function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s\-()]/g, '');
-  return /^(\+36|06|36)?[0-9]{9}$/.test(cleaned);
-}
 
 function formatTimestamp(): string {
   return new Date().toLocaleString('hu-HU', {
@@ -253,6 +257,7 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
     method: 'POST',
     headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
     body: JSON.stringify(body),
+    signal: upstreamSignal(),
   });
   if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
   try {
@@ -591,6 +596,7 @@ async function getGoogleAccessToken(serviceAccountEmail: string, privateKey: str
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion: jwt,
     }),
+    signal: upstreamSignal(),
   });
   if (!response.ok) throw new SheetsCallError(`Token failed: ${await response.text()}`, 'token', response.status);
   return (await response.json() as { access_token: string }).access_token;
@@ -604,6 +610,7 @@ async function getSheetGid(sheetId: string, accessToken: string, tabName: string
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties(sheetId,title)`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
+    signal: upstreamSignal(),
   });
   if (!response.ok) throw new SheetsCallError(`Sheets metadata error: ${await response.text()}`, 'metadata', response.status);
   const body = (await response.json()) as {
@@ -698,6 +705,7 @@ async function writeToGoogleSheet(data: ContactFormData, env: GoogleEnv): Promis
         },
       ],
     }),
+    signal: upstreamSignal(),
   });
   if (!response.ok) throw new SheetsCallError(`Sheets error: ${await response.text()}`, 'write', response.status);
 }
@@ -838,6 +846,231 @@ async function dispatchGatewayConversion(
   }
 }
 
+function toResponse(r: IdempotentResult): Response {
+  return new Response(JSON.stringify(r.body), {
+    status: r.status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+function fail(status: number, error: string): IdempotentResult {
+  return { status, body: { success: false, error } };
+}
+
+/**
+ * Turnstile + mezőellenőrzés + kézbesítés (e-mailek, Sheets, CRM, gateway).
+ * A `runIdempotent` ezt legfeljebb egyszer futtatja SIKERESEN egy event_id-re.
+ */
+async function verifyAndDeliver(data: ContactFormData, env: RuntimeEnv, request: Request, ip: string): Promise<IdempotentResult> {
+  // Turnstile — fail CLOSED: a missing secret means a misconfigured
+  // deploy, and silently accepting unverified submissions would turn a
+  // config mistake into an open spam channel. Local dev gets a
+  // Turnstile test secret via .dev.vars.
+  if (!env.TURNSTILE_SECRET_KEY) {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_CONFIG_TURNSTILE_MISSING,
+      message: 'TURNSTILE_SECRET_KEY not configured — rejecting all submits (fail closed)',
+      source: '/api/contact',
+      request,
+    });
+    return fail(503, 'A küldés átmenetileg nem elérhető. Kérjük hívj minket: +36 1 300 9414');
+  }
+  {
+    const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip || undefined);
+    if (!result.success) {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_TURNSTILE_REJECTED,
+        message: 'Turnstile verification rejected submit',
+        source: '/api/contact',
+        request,
+        context: { errors: result.errors, formType: data.formType },
+      });
+      // Granular: network failure to the verify API vs genuine token reject.
+      const turnNetwork = (result.errors || []).includes('network-error');
+      reportServerError({
+        code: turnNetwork ? 'TURN-VERIFY-003' : 'TURN-VERIFY-001',
+        message: turnNetwork ? 'Turnstile verify API unreachable' : 'Turnstile server verification failed',
+        source: '/api/contact',
+        request,
+        context: { errorCodes: result.errors ?? [], errorMessage: (result.errors ?? []).join(', ') },
+      });
+      return fail(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
+    }
+  }
+
+  // Type-specific field requirements
+  if (data.formType === 'consultation') {
+    if (!Array.isArray(data.treatments) || data.treatments.length === 0) {
+      return fail(400, 'Kérjük válassz legalább egy kezelést.');
+    }
+    if (
+      data.treatments.length > MAX_TREATMENTS ||
+      data.treatments.some((t) => typeof t !== 'string' || t.length > MAX_LENGTHS.treatmentId)
+    ) {
+      return fail(400, 'Érvénytelen kezelés lista.');
+    }
+  } else if (data.formType === 'location') {
+    if (!data.locationId || !['buda', 'pest'].includes(data.locationId)) {
+      return fail(400, 'Érvénytelen helyszín.');
+    }
+    if (typeof data.locationLabel !== 'string' || data.locationLabel.length > MAX_LENGTHS.locationLabel) {
+      return fail(400, 'Érvénytelen helyszín megnevezés.');
+    }
+    if (data.message && (typeof data.message !== 'string' || data.message.length > MAX_LENGTHS.message)) {
+      return fail(400, 'Az üzenet túl hosszú (legfeljebb 2000 karakter).');
+    }
+  } else {
+    return fail(400, 'Ismeretlen űrlap típus.');
+  }
+
+  if (!data.firstName || data.firstName.trim().length < 2 || data.firstName.length > MAX_LENGTHS.firstName) {
+    return fail(400, 'Kérjük add meg a keresztneved.');
+  }
+  if (!data.lastName || data.lastName.trim().length < 2 || data.lastName.length > MAX_LENGTHS.lastName) {
+    return fail(400, 'Kérjük add meg a vezetékneved.');
+  }
+  {
+    // Ugyanaz a szabály, mint a kliensen (`lib/forms/phone.ts`): magyar és
+    // országkódos külföldi szám is mehet. Az EN oldal angol üzenetet kap.
+    const phoneCheck = checkPhone(data.phone);
+    if (!phoneCheck.ok) {
+      return fail(400, phoneErrorMessage(phoneCheck.reason, data.lang === 'en' ? 'en' : 'hu'));
+    }
+  }
+  if (!isValidEmail(data.email)) {
+    return fail(400, 'Kérjük adj meg egy érvényes email címet.');
+  }
+  if (!data.consent) {
+    return fail(400, 'Az adatvédelmi szabályzat elfogadása kötelező.');
+  }
+
+  if (!env.RESEND_API_KEY) {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_CONFIG_RESEND_MISSING,
+      message: 'RESEND_API_KEY not configured — every submit returns 500',
+      source: '/api/contact',
+      request,
+    });
+    return fail(500, 'Email szolgáltatás nem elérhető. Kérjük hívj minket: +36 1 300 9414');
+  }
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const googleEnv: GoogleEnv = {
+    sheetId: env.GOOGLE_SHEETS_ID,
+    serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    privateKey: env.GOOGLE_PRIVATE_KEY,
+  };
+
+  const results = await Promise.allSettled([
+    sendAdminEmail(resend, data),
+    sendUserEmail(resend, data),
+    writeToGoogleSheet(data, googleEnv),
+    forwardToCrm(data, env), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
+  ]);
+  // A CRM belső lead-azonosítója (ha a webhook sikerült) — a gateway-dispatch
+  // lead_id-je, hogy a ledger a CRM offline-loophoz joinolható legyen.
+  const crmLeadId =
+    results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+
+  const adminResult = results[0];
+  const userResult = results[1];
+  const sheetResult = results[2];
+
+  const bothEmailsFailed =
+    adminResult.status === 'rejected' && userResult.status === 'rejected';
+
+  if (bothEmailsFailed) {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED,
+      message: 'Resend admin AND user emails both failed — lead may be lost',
+      source: '/api/contact',
+      request,
+      cause: (adminResult as PromiseRejectedResult).reason,
+      context: {
+        formType: data.formType,
+        adminReason: String((adminResult as PromiseRejectedResult).reason),
+        userReason: String((userResult as PromiseRejectedResult).reason),
+        lead: {
+          name: `${data.lastName} ${data.firstName}`,
+          email: data.email,
+          phone: data.phone,
+        },
+      },
+      fingerprint: `${ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED}:${data.formType}`,
+    });
+  } else {
+    if (adminResult.status === 'rejected') {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_EMAIL_ADMIN_FAILED,
+        message: 'Resend admin notification email failed',
+        source: '/api/contact',
+        request,
+        cause: adminResult.reason,
+        context: { formType: data.formType },
+      });
+    }
+    if (userResult.status === 'rejected') {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_EMAIL_USER_FAILED,
+        message: 'Resend user confirmation email failed',
+        source: '/api/contact',
+        request,
+        cause: userResult.reason,
+        context: { formType: data.formType },
+      });
+    }
+  }
+
+  // Granular provider classification (the "why" behind a channel failure).
+  // Fingerprint defaults to the code, so admin+user failing for the same
+  // root cause dedupe to one pipeline notification.
+  if (adminResult.status === 'rejected') {
+    const c = classifyEmailFailure(adminResult.reason, 'admin');
+    reportServerError({ code: c.code, message: 'Contact admin email — Resend failure', source: '/api/contact', request, cause: adminResult.reason, context: c.context });
+  }
+  if (userResult.status === 'rejected') {
+    const c = classifyEmailFailure(userResult.reason, 'user');
+    reportServerError({ code: c.code, message: 'Contact user email — Resend failure', source: '/api/contact', request, cause: userResult.reason, context: c.context });
+  }
+
+  if (sheetResult.status === 'rejected') {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_SHEETS_APPEND_FAILED,
+      message: 'Google Sheets append failed — lead in email + logs only',
+      source: '/api/contact',
+      request,
+      cause: sheetResult.reason,
+      context: {
+        formType: data.formType,
+        lead: {
+          name: `${data.lastName} ${data.firstName}`,
+          email: data.email,
+          phone: data.phone,
+        },
+      },
+    });
+    const c = classifySheetsFailure(sheetResult.reason);
+    reportServerError({ code: c.code, message: 'Contact Sheets — API failure', source: '/api/contact', request, cause: sheetResult.reason, context: c.context });
+  }
+
+  if (bothEmailsFailed) {
+    return fail(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
+  }
+
+  // ── Server-side conversion → Soborbo event-gateway ───────────────────────
+  // Fired on the SUCCESS path only, exactly like the browser's trackLeadSubmit.
+  // A retry of the SAME submission reuses its event_id (client-side
+  // `submission-id.ts`), and a retry after a success is answered from the
+  // idempotency store without reaching this line — so one lead books one
+  // conversion, never two.
+  //
+  // Never throws: the lead is already delivered, and tracking must not turn a
+  // delivered lead into an error page.
+  await dispatchGatewayConversion(data, request, crmLeadId);
+
+  return { status: 200, body: { success: true } };
+}
+
 export const POST: APIRoute = async (context) => {
   const { request } = context;
   try {
@@ -860,6 +1093,9 @@ export const POST: APIRoute = async (context) => {
     } catch {
       return jsonError(400, 'Érvénytelen kérés formátum.');
     }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return jsonError(400, 'Érvénytelen kérés formátum.');
+    }
 
     // Honeypot — silently succeed
     if (data.website) {
@@ -869,211 +1105,31 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
+    // Legfeljebb EGY Google klikk-ID (gclid > gbraid > wbraid) — egy régi kliens
+    // kettős ID-je se jusson a CRM-be / Sheetsbe / a gateway-be.
+    normalizeLeadGoogleClickId(data);
+
     const env = readEnv();
 
-    // Turnstile — fail CLOSED: a missing secret means a misconfigured
-    // deploy, and silently accepting unverified submissions would turn a
-    // config mistake into an open spam channel. Local dev gets a
-    // Turnstile test secret via .dev.vars.
-    if (!env.TURNSTILE_SECRET_KEY) {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_CONFIG_TURNSTILE_MISSING,
-        message: 'TURNSTILE_SECRET_KEY not configured — rejecting all submits (fail closed)',
-        source: '/api/contact',
-        request,
-      });
-      return jsonError(503, 'A küldés átmenetileg nem elérhető. Kérjük hívj minket: +36 1 300 9414');
-    }
-    {
-      const result = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip || undefined);
-      if (!result.success) {
+    // Idempotencia: ugyanarra az event_id-re a kézbesítés legfeljebb egyszer fut
+    // sikeresen. A visszajátszás a Turnstile ELŐTT történik — az eredeti kérés
+    // már átment rajta, a retry pedig jellemzően elhasznált tokent hoz.
+    const idemKey = isValidIdempotencyKey(data.event_id) ? `contact:${data.event_id}` : undefined;
+    const outcome = await runIdempotent({
+      store: idemKey ? resolveIdempotencyStore({ origin: new URL(request.url).origin }) : null,
+      key: idemKey,
+      execute: () => verifyAndDeliver(data, env, request, ip),
+      onStoreError: (cause, op) =>
         reportServerError({
-          code: ERROR_CODES.CONTACT_TURNSTILE_REJECTED,
-          message: 'Turnstile verification rejected submit',
+          code: ERROR_CODES.LEAD_IDEMPOTENCY_STORE_FAILED,
+          message: `Idempotency store ${op} failed`,
           source: '/api/contact',
           request,
-          context: { errors: result.errors, formType: data.formType },
-        });
-        // Granular: network failure to the verify API vs genuine token reject.
-        const turnNetwork = (result.errors || []).includes('network-error');
-        reportServerError({
-          code: turnNetwork ? 'TURN-VERIFY-003' : 'TURN-VERIFY-001',
-          message: turnNetwork ? 'Turnstile verify API unreachable' : 'Turnstile server verification failed',
-          source: '/api/contact',
-          request,
-          context: { errorCodes: result.errors ?? [], errorMessage: (result.errors ?? []).join(', ') },
-        });
-        return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
-      }
-    }
-
-    // Type-specific field requirements
-    if (data.formType === 'consultation') {
-      if (!Array.isArray(data.treatments) || data.treatments.length === 0) {
-        return jsonError(400, 'Kérjük válassz legalább egy kezelést.');
-      }
-      if (
-        data.treatments.length > MAX_TREATMENTS ||
-        data.treatments.some((t) => typeof t !== 'string' || t.length > MAX_LENGTHS.treatmentId)
-      ) {
-        return jsonError(400, 'Érvénytelen kezelés lista.');
-      }
-    } else if (data.formType === 'location') {
-      if (!data.locationId || !['buda', 'pest'].includes(data.locationId)) {
-        return jsonError(400, 'Érvénytelen helyszín.');
-      }
-      if (typeof data.locationLabel !== 'string' || data.locationLabel.length > MAX_LENGTHS.locationLabel) {
-        return jsonError(400, 'Érvénytelen helyszín megnevezés.');
-      }
-      if (data.message && (typeof data.message !== 'string' || data.message.length > MAX_LENGTHS.message)) {
-        return jsonError(400, 'Az üzenet túl hosszú (legfeljebb 2000 karakter).');
-      }
-    } else {
-      return jsonError(400, 'Ismeretlen űrlap típus.');
-    }
-
-    if (!data.firstName || data.firstName.trim().length < 2 || data.firstName.length > MAX_LENGTHS.firstName) {
-      return jsonError(400, 'Kérjük add meg a keresztneved.');
-    }
-    if (!data.lastName || data.lastName.trim().length < 2 || data.lastName.length > MAX_LENGTHS.lastName) {
-      return jsonError(400, 'Kérjük add meg a vezetékneved.');
-    }
-    if (typeof data.phone !== 'string' || data.phone.length > MAX_LENGTHS.phone || !isValidPhone(data.phone)) {
-      return jsonError(400, 'Kérjük adj meg egy érvényes telefonszámot.');
-    }
-    if (!isValidEmail(data.email)) {
-      return jsonError(400, 'Kérjük adj meg egy érvényes email címet.');
-    }
-    if (!data.consent) {
-      return jsonError(400, 'Az adatvédelmi szabályzat elfogadása kötelező.');
-    }
-
-    if (!env.RESEND_API_KEY) {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_CONFIG_RESEND_MISSING,
-        message: 'RESEND_API_KEY not configured — every submit returns 500',
-        source: '/api/contact',
-        request,
-      });
-      return jsonError(500, 'Email szolgáltatás nem elérhető. Kérjük hívj minket: +36 1 300 9414');
-    }
-    const resend = new Resend(env.RESEND_API_KEY);
-
-    const googleEnv: GoogleEnv = {
-      sheetId: env.GOOGLE_SHEETS_ID,
-      serviceAccountEmail: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      privateKey: env.GOOGLE_PRIVATE_KEY,
-    };
-
-    const results = await Promise.allSettled([
-      sendAdminEmail(resend, data),
-      sendUserEmail(resend, data),
-      writeToGoogleSheet(data, googleEnv),
-      forwardToCrm(data, env), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
-    ]);
-    // A CRM belső lead-azonosítója (ha a webhook sikerült) — a gateway-dispatch
-    // lead_id-je, hogy a ledger a CRM offline-loophoz joinolható legyen.
-    const crmLeadId =
-      results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
-
-    const adminResult = results[0];
-    const userResult = results[1];
-    const sheetResult = results[2];
-
-    const bothEmailsFailed =
-      adminResult.status === 'rejected' && userResult.status === 'rejected';
-
-    if (bothEmailsFailed) {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED,
-        message: 'Resend admin AND user emails both failed — lead may be lost',
-        source: '/api/contact',
-        request,
-        cause: (adminResult as PromiseRejectedResult).reason,
-        context: {
-          formType: data.formType,
-          adminReason: String((adminResult as PromiseRejectedResult).reason),
-          userReason: String((userResult as PromiseRejectedResult).reason),
-          lead: {
-            name: `${data.lastName} ${data.firstName}`,
-            email: data.email,
-            phone: data.phone,
-          },
-        },
-        fingerprint: `${ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED}:${data.formType}`,
-      });
-    } else {
-      if (adminResult.status === 'rejected') {
-        reportServerError({
-          code: ERROR_CODES.CONTACT_EMAIL_ADMIN_FAILED,
-          message: 'Resend admin notification email failed',
-          source: '/api/contact',
-          request,
-          cause: adminResult.reason,
-          context: { formType: data.formType },
-        });
-      }
-      if (userResult.status === 'rejected') {
-        reportServerError({
-          code: ERROR_CODES.CONTACT_EMAIL_USER_FAILED,
-          message: 'Resend user confirmation email failed',
-          source: '/api/contact',
-          request,
-          cause: userResult.reason,
-          context: { formType: data.formType },
-        });
-      }
-    }
-
-    // Granular provider classification (the "why" behind a channel failure).
-    // Fingerprint defaults to the code, so admin+user failing for the same
-    // root cause dedupe to one pipeline notification.
-    if (adminResult.status === 'rejected') {
-      const c = classifyEmailFailure(adminResult.reason, 'admin');
-      reportServerError({ code: c.code, message: 'Contact admin email — Resend failure', source: '/api/contact', request, cause: adminResult.reason, context: c.context });
-    }
-    if (userResult.status === 'rejected') {
-      const c = classifyEmailFailure(userResult.reason, 'user');
-      reportServerError({ code: c.code, message: 'Contact user email — Resend failure', source: '/api/contact', request, cause: userResult.reason, context: c.context });
-    }
-
-    if (sheetResult.status === 'rejected') {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_SHEETS_APPEND_FAILED,
-        message: 'Google Sheets append failed — lead in email + logs only',
-        source: '/api/contact',
-        request,
-        cause: sheetResult.reason,
-        context: {
-          formType: data.formType,
-          lead: {
-            name: `${data.lastName} ${data.firstName}`,
-            email: data.email,
-            phone: data.phone,
-          },
-        },
-      });
-      const c = classifySheetsFailure(sheetResult.reason);
-      reportServerError({ code: c.code, message: 'Contact Sheets — API failure', source: '/api/contact', request, cause: sheetResult.reason, context: c.context });
-    }
-
-    if (bothEmailsFailed) {
-      return jsonError(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
-    }
-
-    // ── Server-side conversion → Soborbo event-gateway ───────────────────────
-    // Fired on the SUCCESS path only, exactly like the browser's trackLeadSubmit:
-    // a submit that returned 500 makes the user retry, and a retry mints a fresh
-    // event_id — firing here too would book two Leads for one customer.
-    //
-    // Never throws: the lead is already delivered, and tracking must not turn a
-    // delivered lead into an error page.
-    await dispatchGatewayConversion(data, request, crmLeadId);
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
+          cause,
+          context: { op },
+        }),
     });
+    return toResponse(outcome);
   } catch (err) {
     reportServerError({
       code: ERROR_CODES.CONTACT_UNHANDLED,

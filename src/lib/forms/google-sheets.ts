@@ -10,6 +10,7 @@
  */
 
 import { SheetsCallError } from '@/lib/errors/classify';
+import { upstreamSignal } from '@/lib/forms/upstream-timeout';
 
 function bytesToBase64(bytes: Uint8Array): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -87,6 +88,7 @@ export async function getGoogleAccessToken(serviceAccountEmail: string, privateK
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt }),
+    signal: upstreamSignal(),
   });
   if (!response.ok) throw new SheetsCallError(`Token failed: ${await response.text()}`, 'token', response.status);
   return (await response.json() as { access_token: string }).access_token;
@@ -94,7 +96,7 @@ export async function getGoogleAccessToken(serviceAccountEmail: string, privateK
 
 export async function getSheetGid(sheetId: string, accessToken: string, tabName: string): Promise<number> {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties(sheetId,title)`;
-  const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` }, signal: upstreamSignal() });
   if (!response.ok) throw new SheetsCallError(`Sheets metadata error: ${await response.text()}`, 'metadata', response.status);
   const body = (await response.json()) as { sheets?: { properties?: { sheetId?: number; title?: string } }[] };
   const sheet = body.sheets?.find((s) => s.properties?.title === tabName);
@@ -125,7 +127,7 @@ export async function insertRowAtTop(
   const requests: unknown[] = [];
   try {
     const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets(properties(sheetId,gridProperties(columnCount)))`;
-    const metaRes = await fetch(metaUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    const metaRes = await fetch(metaUrl, { headers: { Authorization: `Bearer ${accessToken}` }, signal: upstreamSignal() });
     if (metaRes.ok) {
       const meta = (await metaRes.json()) as {
         sheets?: { properties?: { sheetId?: number; gridProperties?: { columnCount?: number } } }[];
@@ -157,6 +159,7 @@ export async function insertRowAtTop(
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ requests }),
+    signal: upstreamSignal(),
   });
   if (!response.ok) throw new SheetsCallError(`Sheets error: ${await response.text()}`, 'write', response.status);
 }
