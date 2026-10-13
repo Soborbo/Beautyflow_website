@@ -424,6 +424,9 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   'CONTACT-TURNSTILE-001':       { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'Turnstile elutasított egy submitet (bot vagy lejárt token)', requiredContext: ['formType', 'errors'] },
   'CONTACT-UNHANDLED-001':       { severity: 'ERROR',    retryable: false, userImpact: 'blocked',  message: 'Top-level catch a contact POST handlerben', requiredContext: [] },
 
+  // ---- Lead-idempotencia ------------------------------------------------
+  'LEAD-IDEMPOTENCY-001':        { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Idempotencia-tároló (Cache API / KV) hiba — egy retry duplikálhat', requiredContext: ['op'] },
+
   // ---- /api/boranalizis (bőranalízis kvíz) ------------------------------
   'QUIZ-CONFIG-TURNSTILE-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'TURNSTILE_SECRET_KEY nincs beállítva — quiz submitek elutasítva', requiredContext: [] },
   'QUIZ-TURNSTILE-001':          { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'Turnstile elutasított egy quiz submitet', requiredContext: ['errors'] },

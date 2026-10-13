@@ -316,7 +316,9 @@ const breadcrumbSchema = {
                   autocomplete="tel"
                   class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#c53f75] focus:outline-none transition-colors text-lg"
                   placeholder="+36 30 123 4567"
+                  aria-describedby="phone-error"
                 />
+                <p id="phone-error" class="hidden mt-1.5 text-sm text-red-600" role="alert"></p>
               </div>
 
               <div class="flex gap-3">
@@ -468,7 +470,10 @@ const breadcrumbSchema = {
 
             <!-- Error Message -->
             <div id="error-message" class="hidden absolute bottom-4 left-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg z-50">
-              <p id="error-text">An error occurred, please try again.</p>
+              <div class="flex items-start gap-3">
+                <p id="error-text" class="flex-1">An error occurred, please try again.</p>
+                <button id="error-close" type="button" class="-mr-1 px-1 text-xl leading-none text-red-700 hover:text-red-900" aria-label="Close">&times;</button>
+              </div>
             </div>
 
           </div>
@@ -553,6 +558,9 @@ const breadcrumbSchema = {
         collectAttribution,
       } from '@tracking/lib';
       import { createTurnstile } from '@/lib/forms/turnstile-client';
+      import { checkPhone, phoneErrorMessage } from '@/lib/forms/phone';
+      import { resolveLeadGoogleClickId } from '@/lib/forms/click-id';
+      import { createSubmissionIdKeeper } from '@/lib/forms/submission-id';
 
       const FORM_ID = 'consultation-calculator-en';
       const FORM_NAME = 'consultation_calculator';
@@ -566,15 +574,18 @@ const breadcrumbSchema = {
         const t = getAllTrackingData();
         const a = collectAttribution();
         return {
-          gclid: t.gclid || a.gclid || '',
+          // Google klikk-ID: LEGFELJEBB EGY (gclid > gbraid > wbraid), egyetlen
+          // forrásból — a korábbi kulcsonkénti összefésülés kettőt is küldhetett.
+          ...resolveLeadGoogleClickId(
+            a as Record<string, string | undefined>,
+            t as Record<string, string | undefined>,
+          ),
           fbclid: t.fbclid || a.fbclid || '',
           utm_source: t.utm_source || '',
           utm_medium: t.utm_medium || '',
           utm_campaign: t.utm_campaign || '',
           utm_content: t.utm_content || '',
           utm_term: t.utm_term || '',
-          gbraid: t.gbraid || a.gbraid || '',
-          wbraid: t.wbraid || a.wbraid || '',
           msclkid: a.msclkid || '',
           fbc: getFbc() || '',
           fbp: getFbp() || '',
@@ -584,8 +595,16 @@ const breadcrumbSchema = {
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        // fires once per page-load (analytics-consented calculator funnel start)
-        trackCalculatorStart(FORM_NAME);
+        // A kalkulátor-indítás az ELSŐ valódi interakcióra tüzel (mint a kvízben),
+        // nem az oldalbetöltésre — különben minden látogatás „megnyitott
+        // kalkulátornak" számított, és a tölcsér első lépése értelmetlen lett.
+        // A `?kezeles=` előválasztás szintetikus eseménye (isTrusted=false) nem számít.
+        let calculatorStarted = false;
+        function markStarted(e: Event) {
+          if (calculatorStarted || !e.isTrusted) return;
+          calculatorStarted = true;
+          trackCalculatorStart(FORM_NAME);
+        }
 
         let currentStep = 1;
 
@@ -638,6 +657,20 @@ const breadcrumbSchema = {
           ? createTurnstile(turnstileEl, turnstileEl.dataset.sitekey || '')
           : null;
 
+        // Első interakció bármelyik lépésen (capture: a lépések saját handlerei előtt).
+        steps.forEach((stepEl) => {
+          for (const type of ['change', 'input', 'click'] as const) {
+            stepEl.addEventListener(type, markStarted, { capture: true });
+          }
+        });
+
+        // Stabil event_id ugyanarra a tartalomra (szerveroldali idempotencia).
+        const submissionId = createSubmissionIdKeeper();
+        const phoneError = document.getElementById('phone-error');
+        document.getElementById('error-close')?.addEventListener('click', () => {
+          errorMessage?.classList.add('hidden');
+        });
+
         // Show/hide steps
         function showStep(step: number) {
           steps.forEach(s => s.classList.add('hidden'));
@@ -656,6 +689,9 @@ const breadcrumbSchema = {
               dot.classList.remove('bg-[#c53f75]');
             }
           });
+
+          // Lépésváltáskor a korábbi hibaüzenet már nem releváns.
+          errorMessage?.classList.add('hidden');
 
           // Render the bot-check the moment its step becomes visible.
           if (step === 4) turnstile?.ensureRendered();
@@ -722,27 +758,40 @@ const breadcrumbSchema = {
           }
         });
 
-        // Step 3: Phone validation
-        function validatePhone(phone: string): boolean {
-          const cleaned = phone.replace(/[\s\-\(\)]/g, '');
-          const patterns = [
-            /^\+36[0-9]{9}$/,
-            /^06[0-9]{9}$/,
-            /^[0-9]{9}$/,
-            /^36[0-9]{9}$/
-          ];
-          return patterns.some(p => p.test(cleaned));
+        // Step 3: Phone validation — közös szabály (`lib/forms/phone.ts`): magyar
+        // és országkódos külföldi szám is mehet. A gomb nem tiltódik le némán:
+        // érvénytelen számnál konkrét, inline hibaüzenetet mutatunk.
+        const PHONE_LANG = 'en' as const;
+        function showPhoneError(message: string | null) {
+          if (!phoneError) return;
+          phoneError.textContent = message || '';
+          phoneError.classList.toggle('hidden', !message);
+          phoneInput.setAttribute('aria-invalid', message ? 'true' : 'false');
+        }
+
+        function checkPhoneInput(): boolean {
+          const res = checkPhone(formData.phone);
+          showPhoneError(res.ok ? null : phoneErrorMessage(res.reason, PHONE_LANG));
+          return res.ok;
         }
 
         phoneInput.addEventListener('input', () => {
           formData.phone = phoneInput.value.trim();
-          btnStep3.disabled = !validatePhone(formData.phone);
+          btnStep3.disabled = formData.phone.length === 0;
+          // Gépelés közben csak akkor frissítünk, ha már látszik hiba (ne villogjon).
+          if (phoneError && !phoneError.classList.contains('hidden')) checkPhoneInput();
+        });
+
+        phoneInput.addEventListener('blur', () => {
+          if (formData.phone) checkPhoneInput();
         });
 
         btnStep3.addEventListener('click', () => {
-          if (validatePhone(formData.phone)) {
+          if (checkPhoneInput()) {
             trackCalculatorStep('phone', 3, TOTAL_STEPS);
             showStep(4);
+          } else {
+            phoneInput.focus();
           }
         });
 
@@ -820,6 +869,8 @@ const breadcrumbSchema = {
 
           loadingOverlay?.classList.remove('hidden');
           errorMessage?.classList.add('hidden');
+          // Dupla kattintás / türelmetlen újrakattintás ellen: a küldés idejére tiltva.
+          btnSubmit.disabled = true;
 
           const trackingData = getTrackingData();
 
@@ -834,8 +885,13 @@ const breadcrumbSchema = {
             // ONE id for this conversion, shared by the server dispatch inside
             // /api/contact and the browser's trackLeadSubmit below. Meta dedupes the
             // CAPI and Pixel legs on (event_name, event_id) — two ids would book the
-            // Lead twice rather than once (CLAUDE.md #16).
-            const eventId = crypto.randomUUID();
+            // Lead twice rather than once (CLAUDE.md #16). STABIL a próbálkozások
+            // között (ugyanaz a tartalom → ugyanaz az id): a szerver ez alapján
+            // ismeri fel az elveszett válasz utáni újraküldést, és nem duplikál.
+            const eventId = submissionId.idFor(JSON.stringify([
+              formData.treatments, formData.firstName, formData.lastName,
+              formData.phone, formData.email, formData.lang,
+            ]));
 
             const response = await fetch('/api/contact', {
               method: 'POST',
@@ -860,6 +916,7 @@ const breadcrumbSchema = {
               });
               // Hold the loading overlay up, give GTM a beat to fire, then redirect;
               // the gateway dispatch uses sendBeacon/keepalive so it survives unload.
+              submissionId.reset();
               await waitForTracking(600);
               window.location.href = '/en/thank-you';
             } else {
@@ -867,20 +924,22 @@ const breadcrumbSchema = {
               // Token is single-use — reset so the user can retry.
               turnstile?.reset();
               showError(result.error || 'An error occurred, please try again.');
+              validateStep4();
             }
           } catch (error) {
             loadingOverlay?.classList.add('hidden');
             turnstile?.reset();
             showError('An error occurred while submitting. Please try again later.');
+            validateStep4();
           }
         });
 
+        // NEM tűnik el magától: a korábbi 5 mp-es auto-hide a Turnstile-töltés
+        // figyelmeztetését is eltüntette, mielőtt a vendég elolvashatta volna.
+        // Bezárás: × gomb, lépésváltás vagy új beküldés.
         function showError(message: string) {
           if (errorText) errorText.textContent = message;
           errorMessage?.classList.remove('hidden');
-          setTimeout(() => {
-            errorMessage?.classList.add('hidden');
-          }, 5000);
         }
       });
     </script>

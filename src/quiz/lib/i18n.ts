@@ -53,7 +53,7 @@ const strings = {
     'A következő lépés egy alapos, személyes bőranalízis a szalonban. Az 5 000 Ft teljes egészében levásárolható, ha nálunk folytatod a kezelést.',
   'result.ctaButton': 'Időpontot kérek a bőranalízisre',
   'result.notFound':
-    'Ezt az eredményt nem találjuk ezen az eszközön. Elküldtük emailben is — nézd meg a postaládád! Ha kérdésed van, hívj minket: +36 1 300 9414.',
+    'Az eredményedet azon az eszközön mutatjuk meg, ahol a kvízt kitöltötted. Ha megadtad az e-mail-címed, a bőrprofilodat elküldtük e-mailben is — nézd meg a postaládád (a Promóciók és a Spam mappát is). Ha csak telefonszámot adtál meg, hamarosan visszahívunk; vagy kérj visszahívást most.',
 } as const;
 
 export type QuizStringKey = keyof typeof strings;

@@ -6,7 +6,9 @@
  *   2. Zod safeParse (szerveroldali validáció)
  *   3. Cloudflare Turnstile (fail closed)
  *   4. Ajánló-motor: recommend(answers)  →  profil + irány + flagek
- *   5. KV-be mentés (cross-device eredmény, best-effort)
+ *   5. KV-be mentés (cross-device eredmény, best-effort — CSAK ha a QUIZ_RESULTS
+ *      binding be van kötve; lásd wrangler.jsonc. Nélküle az eredmény ugyanazon
+ *      az eszközön a kliens tárolójából jelenik meg, más eszközön nem.)
  *   6. Resend → szalon értesítés (profil/kezelés/ársáv/flagek/válaszok)
  *   7. Resend → vendég visszaigazolás az eredmény-linkkel (Fanni hangján)
  *   8. Google Sheets „Boranalizis" fül (best-effort)
@@ -34,6 +36,16 @@ import {
   type GatewayEnv,
 } from '@/lib/tracking/gateway-dispatch';
 import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
+import { isValidPhone, PHONE_MAX_LENGTH } from '@/lib/forms/phone';
+import { normalizeLeadGoogleClickId } from '@/lib/forms/click-id';
+import {
+  isValidIdempotencyKey,
+  resolveIdempotencyStore,
+  runIdempotent,
+  type IdempotentResult,
+} from '@/lib/forms/idempotency';
+import { zodIssueToHu } from '@/lib/forms/validation-hu';
+import { upstreamSignal } from '@/lib/forms/upstream-timeout';
 import { getGoogleAccessToken, getSheetGid, insertRowAtTop } from '@/lib/forms/google-sheets';
 import { recommend } from '@/quiz/lib/recommendation';
 import { SECTIONS } from '@/quiz/config/questions';
@@ -42,6 +54,7 @@ import { generateResultHash, resultEmailUrl } from '@/quiz/lib/hash';
 import { computeBaumannCode, type BaumannResult } from '@/quiz/lib/baumann';
 import { baumannByCode } from '@/data/baumannTypes';
 import type { Recommendation } from '@/quiz/lib/types';
+import type { StoredQuizResult } from '@/quiz/lib/result-store';
 
 export const prerender = false;
 
@@ -60,7 +73,7 @@ const QuizSchema = z
   .object({
     answers: z.record(z.string().max(60), answerValue),
     firstName: z.string().trim().min(2, 'Kérjük add meg a keresztneved.').max(100),
-    phone: z.string().trim().max(32).optional().default(''),
+    phone: z.string().trim().max(PHONE_MAX_LENGTH).optional().default(''),
     email: z.string().trim().max(320).optional().default(''),
     consentHealth: z.literal(true, {
       message: 'Az egészségügyi adatok kezeléséhez való hozzájárulás kötelező.',
@@ -98,6 +111,12 @@ const QuizSchema = z
   .refine((d) => d.email === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email), {
     message: 'Érvénytelen email cím.',
     path: ['email'],
+  })
+  // Ugyanaz a telefonszám-szabály, mint a kliensen és a /api/contact-ban
+  // (`lib/forms/phone.ts`). Eddig a kvíz telefonszámát senki nem ellenőrizte.
+  .refine((d) => d.phone === '' || isValidPhone(d.phone), {
+    message: 'Kérjük adj meg egy érvényes telefonszámot (pl. +36 30 123 4567; külföldi számnál országkóddal).',
+    path: ['phone'],
   });
 
 type QuizData = z.infer<typeof QuizSchema>;
@@ -257,6 +276,7 @@ async function forwardToCrm(
     method: 'POST',
     headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
     body: JSON.stringify(body),
+    signal: upstreamSignal(),
   });
   if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
   try {
@@ -411,7 +431,7 @@ function jsonError(status: number, error: string): Response {
 
 /**
  * Pushes the quiz conversion to the event-gateway from the server, so it survives
- * the browser losing the race against the hard navigation to /bortipus/<slug>.
+ * the browser losing the race against the hard navigation to /eredmeny/<hash>.
  *
  * Consent comes from the SAME CookieYes cookie the browser lib reads (it rides
  * along with this POST), so the two legs cannot disagree. beautyflow's gateway
@@ -526,6 +546,138 @@ async function dispatchGatewayConversion(
   }
 }
 
+function toResponse(r: IdempotentResult): Response {
+  return new Response(JSON.stringify(r.body), { status: r.status, headers: { 'Content-Type': 'application/json' } });
+}
+
+function fail(status: number, error: string): IdempotentResult {
+  return { status, body: { success: false, error } };
+}
+
+type CfLocals = { cfContext?: { waitUntil?: (p: Promise<unknown>) => void } };
+
+/**
+ * Turnstile + ajánló-motor + kézbesítés. A `runIdempotent` ezt legfeljebb egyszer
+ * futtatja SIKERESEN egy event_id-re.
+ */
+async function verifyAndDeliver(data: QuizData, env: QuizEnv, request: Request, ip: string, locals: unknown): Promise<IdempotentResult> {
+  // Turnstile — fail closed
+  if (!env.TURNSTILE_SECRET_KEY) {
+    reportServerError({ code: ERROR_CODES.QUIZ_CONFIG_TURNSTILE_MISSING, message: 'TURNSTILE_SECRET_KEY not configured — rejecting quiz submits', source: '/api/boranalizis', request });
+    return fail(503, `A küldés átmenetileg nem elérhető. Kérjük hívj minket: ${PHONE}`);
+  }
+  {
+    const r = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip || undefined);
+    if (!r.success) {
+      reportServerError({ code: ERROR_CODES.QUIZ_TURNSTILE_REJECTED, message: 'Turnstile rejected quiz submit', source: '/api/boranalizis', request, context: { errors: r.errors } });
+      // Granular: distinguish a network failure to the verify API from a
+      // genuine token rejection so the pipeline routes them differently.
+      const turnNetwork = (r.errors || []).includes('network-error');
+      reportServerError({
+        code: turnNetwork ? 'TURN-VERIFY-003' : 'TURN-VERIFY-001',
+        message: turnNetwork ? 'Turnstile verify API unreachable' : 'Turnstile server verification failed',
+        source: '/api/boranalizis', request,
+        context: { errorCodes: r.errors ?? [], errorMessage: (r.errors ?? []).join(', ') },
+      });
+      return fail(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
+    }
+  }
+
+  if (!env.RESEND_API_KEY) {
+    reportServerError({ code: ERROR_CODES.QUIZ_CONFIG_RESEND_MISSING, message: 'RESEND_API_KEY not configured', source: '/api/boranalizis', request });
+    return fail(500, `Email szolgáltatás nem elérhető. Kérjük hívj minket: ${PHONE}`);
+  }
+
+  // --- Ajánló-motor (tiszta függvény) ---
+  const rec = recommend(data.answers);
+  const baumann = computeBaumannCode(data.answers); // 16 publikus oldal célpontja
+  const baumannName = baumannByCode[baumann.code]?.displayName;
+  const salon = salonFromAnswers(data.answers);
+  const hash = generateResultHash();
+  const resultUrl = resultEmailUrl(hash, env.SITE_URL || 'https://beautyflow.pro');
+  // Az eredmény-oldal rekordja: ugyanez megy a KV-ba ÉS a kliens tárolójába.
+  const stored: StoredQuizResult = {
+    ...rec,
+    baumann: { code: baumann.code, slug: baumann.slug, ...(baumannName ? { name: baumannName } : {}) },
+  };
+
+  // --- KV mentés (best-effort, cross-device eredmény) ---
+  // Kész kódút: amint a QUIZ_RESULTS binding be van kötve (wrangler.jsonc), az
+  // e-mailes eredmény-link MÁS eszközön is működik. Binding nélkül kimarad.
+  if (env.QUIZ_RESULTS) {
+    // Astro 6 / @astrojs/cloudflare v13: the ExecutionContext moved from
+    // locals.runtime.ctx to locals.cfContext.
+    const cfCtx = (locals as CfLocals).cfContext;
+    const put = env.QUIZ_RESULTS.put(hash, JSON.stringify(stored), { expirationTtl: KV_TTL_SECONDS }).catch((e) => {
+      reportServerError({ code: ERROR_CODES.QUIZ_KV_STORE_FAILED, message: 'KV result store failed', source: '/api/boranalizis', request, cause: e });
+      reportServerError({ code: 'KV-WRITE-001', message: 'KV.put() threw', source: '/api/boranalizis', request, cause: e, context: { key: hash, errorMessage: e instanceof Error ? e.message : String(e) } });
+    });
+    if (cfCtx?.waitUntil) cfCtx.waitUntil(put); else await put;
+  }
+
+  const resend = new Resend(env.RESEND_API_KEY);
+  const results = await Promise.allSettled([
+    sendSalonEmail(resend, data, rec, baumann, salon, resultUrl),
+    sendUserEmail(resend, data, rec, resultUrl),
+    writeToSheet(env, data, rec, baumann, salon, hash),
+    forwardToCrm(data, rec, baumann, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
+  ]);
+
+  const [adminR, userR, sheetR] = results;
+  const bothEmailsFailed = adminR.status === 'rejected' && userR.status === 'rejected';
+
+  if (bothEmailsFailed) {
+    reportServerError({
+      code: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED, message: 'Quiz salon AND user emails failed — lead may be lost',
+      source: '/api/boranalizis', request, cause: (adminR as PromiseRejectedResult).reason,
+      context: { lead: { name: data.firstName, email: data.email, phone: data.phone }, adminReason: String((adminR as PromiseRejectedResult).reason), userReason: String((userR as PromiseRejectedResult).reason) },
+      fingerprint: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED,
+    });
+  } else {
+    if (adminR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_ADMIN_FAILED, message: 'Quiz salon email failed', source: '/api/boranalizis', request, cause: adminR.reason });
+    if (userR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_USER_FAILED, message: 'Quiz user email failed', source: '/api/boranalizis', request, cause: userR.reason });
+  }
+  // Granular provider classification (the "why" behind a channel failure).
+  // Fingerprint defaults to the code, so admin+user failing for the same
+  // root cause (e.g. auth) dedupe to one pipeline notification.
+  if (adminR.status === 'rejected') {
+    const c = classifyEmailFailure(adminR.reason, 'salon');
+    reportServerError({ code: c.code, message: 'Quiz salon email — Resend failure', source: '/api/boranalizis', request, cause: adminR.reason, context: c.context });
+  }
+  if (userR.status === 'rejected') {
+    const c = classifyEmailFailure(userR.reason, 'user');
+    reportServerError({ code: c.code, message: 'Quiz user email — Resend failure', source: '/api/boranalizis', request, cause: userR.reason, context: c.context });
+  }
+  if (sheetR.status === 'rejected') {
+    reportServerError({ code: ERROR_CODES.QUIZ_SHEETS_APPEND_FAILED, message: 'Quiz Sheets append failed', source: '/api/boranalizis', request, cause: sheetR.reason, context: { lead: { name: data.firstName, email: data.email, phone: data.phone } } });
+    const c = classifySheetsFailure(sheetR.reason);
+    reportServerError({ code: c.code, message: 'Quiz Sheets — API failure', source: '/api/boranalizis', request, cause: sheetR.reason, context: c.context });
+  }
+
+  if (bothEmailsFailed) {
+    return fail(500, `Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);
+  }
+
+  // ── Server-side conversion → Soborbo event-gateway ───────────────────────
+  // Success path only, mirroring the browser's trackLeadSubmit. A retry of the
+  // SAME submission reuses its event_id and, after a success, is answered from
+  // the idempotency store without reaching this line — one lead, one conversion.
+  // Never throws; the result is already earned.
+  // Value = the midpoint of the quiz's own price band, so both legs agree.
+  const quizValue = rec.arSav ? Math.round((rec.arSav.min + rec.arSav.max) / 2) : 5000;
+  // A CRM lead-kulcsa (a webhook válaszából) → gateway lead_id (ledger↔CRM join).
+  const crmLeadId =
+    results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+  await dispatchGatewayConversion(data, request, quizValue, crmLeadId);
+
+  // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott: a kliens
+  // a `result`-ot a saját tárolójába menti, és az /eredmeny/<hash> onnan rajzol.
+  return {
+    status: 200,
+    body: { success: true, hash, result: stored, arSav: rec.arSav, baumann: stored.baumann },
+  };
+}
+
 export const POST: APIRoute = async (context) => {
   const { request, locals } = context;
   try {
@@ -547,118 +699,27 @@ export const POST: APIRoute = async (context) => {
 
     const parsed = QuizSchema.safeParse(raw);
     if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return jsonError(400, first?.message || 'Hiányzó vagy érvénytelen adatok.');
+      // A zod strukturális üzenetei angolok — a magyar oldalon magyarul jelezzük.
+      return jsonError(400, zodIssueToHu(parsed.error.issues[0]));
     }
-    const data = parsed.data;
+    // Legfeljebb EGY Google klikk-ID (gclid > gbraid > wbraid).
+    const data = normalizeLeadGoogleClickId(parsed.data);
 
     const env = readEnv();
 
-    // Turnstile — fail closed
-    if (!env.TURNSTILE_SECRET_KEY) {
-      reportServerError({ code: ERROR_CODES.QUIZ_CONFIG_TURNSTILE_MISSING, message: 'TURNSTILE_SECRET_KEY not configured — rejecting quiz submits', source: '/api/boranalizis', request });
-      return jsonError(503, `A küldés átmenetileg nem elérhető. Kérjük hívj minket: ${PHONE}`);
-    }
-    {
-      const r = await verifyTurnstile(data.turnstileToken || '', env.TURNSTILE_SECRET_KEY, ip || undefined);
-      if (!r.success) {
-        reportServerError({ code: ERROR_CODES.QUIZ_TURNSTILE_REJECTED, message: 'Turnstile rejected quiz submit', source: '/api/boranalizis', request, context: { errors: r.errors } });
-        // Granular: distinguish a network failure to the verify API from a
-        // genuine token rejection so the pipeline routes them differently.
-        const turnNetwork = (r.errors || []).includes('network-error');
-        reportServerError({
-          code: turnNetwork ? 'TURN-VERIFY-003' : 'TURN-VERIFY-001',
-          message: turnNetwork ? 'Turnstile verify API unreachable' : 'Turnstile server verification failed',
-          source: '/api/boranalizis', request,
-          context: { errorCodes: r.errors ?? [], errorMessage: (r.errors ?? []).join(', ') },
-        });
-        return jsonError(400, 'Robot-ellenőrzés sikertelen. Kérjük frissítsd az oldalt és próbáld újra.');
-      }
-    }
-
-    if (!env.RESEND_API_KEY) {
-      reportServerError({ code: ERROR_CODES.QUIZ_CONFIG_RESEND_MISSING, message: 'RESEND_API_KEY not configured', source: '/api/boranalizis', request });
-      return jsonError(500, `Email szolgáltatás nem elérhető. Kérjük hívj minket: ${PHONE}`);
-    }
-
-    // --- Ajánló-motor (tiszta függvény) ---
-    const rec = recommend(data.answers);
-    const baumann = computeBaumannCode(data.answers); // 16 publikus oldal célpontja
-    const salon = salonFromAnswers(data.answers);
-    const hash = generateResultHash();
-    const resultUrl = resultEmailUrl(hash, env.SITE_URL || 'https://beautyflow.pro');
-
-    // --- KV mentés (best-effort, cross-device eredmény) ---
-    if (env.QUIZ_RESULTS) {
-      // Astro 6 / @astrojs/cloudflare v13: the ExecutionContext moved from
-      // locals.runtime.ctx to locals.cfContext.
-      const cfCtx = (locals as { cfContext?: { waitUntil?: (p: Promise<unknown>) => void } }).cfContext;
-      const put = env.QUIZ_RESULTS.put(hash, JSON.stringify(rec), { expirationTtl: KV_TTL_SECONDS }).catch((e) => {
-        reportServerError({ code: ERROR_CODES.QUIZ_KV_STORE_FAILED, message: 'KV result store failed', source: '/api/boranalizis', request, cause: e });
-        reportServerError({ code: 'KV-WRITE-001', message: 'KV.put() threw', source: '/api/boranalizis', request, cause: e, context: { key: hash, errorMessage: e instanceof Error ? e.message : String(e) } });
-      });
-      if (cfCtx?.waitUntil) cfCtx.waitUntil(put); else await put;
-    }
-
-    const resend = new Resend(env.RESEND_API_KEY);
-    const results = await Promise.allSettled([
-      sendSalonEmail(resend, data, rec, baumann, salon, resultUrl),
-      sendUserEmail(resend, data, rec, resultUrl),
-      writeToSheet(env, data, rec, baumann, salon, hash),
-      forwardToCrm(data, rec, baumann, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
-    ]);
-
-    const [adminR, userR, sheetR] = results;
-    const bothEmailsFailed = adminR.status === 'rejected' && userR.status === 'rejected';
-
-    if (bothEmailsFailed) {
-      reportServerError({
-        code: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED, message: 'Quiz salon AND user emails failed — lead may be lost',
-        source: '/api/boranalizis', request, cause: (adminR as PromiseRejectedResult).reason,
-        context: { lead: { name: data.firstName, email: data.email, phone: data.phone }, adminReason: String((adminR as PromiseRejectedResult).reason), userReason: String((userR as PromiseRejectedResult).reason) },
-        fingerprint: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED,
-      });
-    } else {
-      if (adminR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_ADMIN_FAILED, message: 'Quiz salon email failed', source: '/api/boranalizis', request, cause: adminR.reason });
-      if (userR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_USER_FAILED, message: 'Quiz user email failed', source: '/api/boranalizis', request, cause: userR.reason });
-    }
-    // Granular provider classification (the "why" behind a channel failure).
-    // Fingerprint defaults to the code, so admin+user failing for the same
-    // root cause (e.g. auth) dedupe to one pipeline notification.
-    if (adminR.status === 'rejected') {
-      const c = classifyEmailFailure(adminR.reason, 'salon');
-      reportServerError({ code: c.code, message: 'Quiz salon email — Resend failure', source: '/api/boranalizis', request, cause: adminR.reason, context: c.context });
-    }
-    if (userR.status === 'rejected') {
-      const c = classifyEmailFailure(userR.reason, 'user');
-      reportServerError({ code: c.code, message: 'Quiz user email — Resend failure', source: '/api/boranalizis', request, cause: userR.reason, context: c.context });
-    }
-    if (sheetR.status === 'rejected') {
-      reportServerError({ code: ERROR_CODES.QUIZ_SHEETS_APPEND_FAILED, message: 'Quiz Sheets append failed', source: '/api/boranalizis', request, cause: sheetR.reason, context: { lead: { name: data.firstName, email: data.email, phone: data.phone } } });
-      const c = classifySheetsFailure(sheetR.reason);
-      reportServerError({ code: c.code, message: 'Quiz Sheets — API failure', source: '/api/boranalizis', request, cause: sheetR.reason, context: c.context });
-    }
-
-    if (bothEmailsFailed) {
-      return jsonError(500, `Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);
-    }
-
-    // ── Server-side conversion → Soborbo event-gateway ───────────────────────
-    // Success path only, mirroring the browser's trackLeadSubmit: a 500 makes the
-    // user retry, and a retry mints a fresh event_id — firing here too would book
-    // two Leads for one guest. Never throws; the result is already earned.
-    // Value = the midpoint of the quiz's own price band, so both legs agree.
-    const quizValue = rec.arSav ? Math.round((rec.arSav.min + rec.arSav.max) / 2) : 5000;
-    // A CRM lead-kulcsa (a webhook válaszából) → gateway lead_id (ledger↔CRM join).
-    const crmLeadId =
-      results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
-    await dispatchGatewayConversion(data, request, quizValue, crmLeadId);
-
-    // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott
-    // (a kliens localStorage-be is menti a result objektumot).
-    return new Response(JSON.stringify({ success: true, hash, result: rec, arSav: rec.arSav, baumann }), {
-      status: 200, headers: { 'Content-Type': 'application/json' },
+    // Idempotencia: ugyanarra az event_id-re a kézbesítés legfeljebb egyszer fut
+    // sikeresen; a retry ugyanazt a hash-t és eredményt kapja vissza (a vendég
+    // így a SAJÁT eredményét látja, nem egy másodikat). A visszajátszás a
+    // Turnstile ELŐTT — az eredeti kérés már átment rajta.
+    const idemKey = isValidIdempotencyKey(data.event_id) ? `quiz:${data.event_id}` : undefined;
+    const outcome = await runIdempotent({
+      store: idemKey ? resolveIdempotencyStore({ origin: new URL(request.url).origin }) : null,
+      key: idemKey,
+      execute: () => verifyAndDeliver(data, env, request, ip, locals),
+      onStoreError: (cause, op) =>
+        reportServerError({ code: ERROR_CODES.LEAD_IDEMPOTENCY_STORE_FAILED, message: `Idempotency store ${op} failed`, source: '/api/boranalizis', request, cause, context: { op } }),
     });
+    return toResponse(outcome);
   } catch (err) {
     reportServerError({ code: ERROR_CODES.QUIZ_UNHANDLED, message: err instanceof Error ? err.message : 'Unknown error', source: '/api/boranalizis', request, cause: err });
     return jsonError(500, `Hiba történt a küldés közben. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);

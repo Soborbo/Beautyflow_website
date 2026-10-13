@@ -36,6 +36,7 @@
 
 <script>
   import { hasAnalyticsConsent, hasMarketingConsent, generateEventId, trackServerEvent } from '@tracking/lib';
+  import { markOnce } from '@/lib/tracking/once';
 
   type TrackedClick = { link: HTMLAnchorElement; kind: 'booking' | 'cta' };
 
@@ -80,8 +81,13 @@
 
       if (!analytics && !marketing) return;
 
-      const eventId = generateEventId();
       const source = inferSource(link);
+      // Munkamenetenként, forrásonként EGYSZER. Ez konverzió (Ads PRIMARY goal):
+      // a többszöri kattintás (vissza a Notinóról, újrakattintás) eddig minden
+      // alkalommal új begin_checkout-ot — és új Ads-konverziót — könyvelt.
+      if (!markOnce(`bf_begin_checkout_${source}`, 'session')) return;
+
+      const eventId = generateEventId();
 
       // Browser channel (dataLayer) — analytics consent. PII-free.
       if (analytics) {

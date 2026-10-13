@@ -169,6 +169,9 @@ const formId = `contact-form-${location}`;
     collectAttribution,
   } from '@tracking/lib';
   import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
+  import { checkPhone, phoneErrorMessage } from '@/lib/forms/phone';
+  import { resolveLeadGoogleClickId } from '@/lib/forms/click-id';
+  import { createSubmissionIdKeeper } from '@/lib/forms/submission-id';
 
   // Attribution for the /api/contact POST body (CRM + Google Sheets sink). Sourced
   // from the canonical lib: getAllTrackingData() covers gclid/gbraid/wbraid/fbclid/utm_*,
@@ -178,15 +181,18 @@ const formId = `contact-form-${location}`;
     const t = getAllTrackingData();
     const a = collectAttribution();
     return {
-      gclid: t.gclid || a.gclid || '',
+      // Google klikk-ID: LEGFELJEBB EGY (gclid > gbraid > wbraid), egyetlen
+      // forrásból — a korábbi kulcsonkénti összefésülés kettőt is küldhetett.
+      ...resolveLeadGoogleClickId(
+        a as Record<string, string | undefined>,
+        t as Record<string, string | undefined>,
+      ),
       fbclid: t.fbclid || a.fbclid || '',
       utm_source: t.utm_source || '',
       utm_medium: t.utm_medium || '',
       utm_campaign: t.utm_campaign || '',
       utm_content: t.utm_content || '',
       utm_term: t.utm_term || '',
-      gbraid: t.gbraid || a.gbraid || '',
-      wbraid: t.wbraid || a.wbraid || '',
       msclkid: a.msclkid || '',
       fbc: getFbc() || '',
       fbp: getFbp() || '',
@@ -203,6 +209,8 @@ const formId = `contact-form-${location}`;
       form.dataset.trackBound = '1';
       const formName = `contact_form_${form.dataset.location || 'location'}`;
       const startedAt = Date.now();
+      // Stabil event_id ugyanarra a tartalomra (szerveroldali idempotencia).
+      const submissionId = createSubmissionIdKeeper();
 
       // Cloudflare Turnstile — rendered explicitly (api.js is loaded with
       // ?render=explicit page-globally). Render now so the token is ready by the
@@ -235,6 +243,20 @@ const formId = `contact-form-${location}`;
         }
 
         if (errEl) errEl.classList.add('hidden');
+
+        // Telefonszám — ugyanaz a szabály, mint a szerveren (magyar vagy
+        // országkódos külföldi szám); konkrét hibaüzenet, nem némaság.
+        {
+          const pc = checkPhone(String(new FormData(form).get('phone') || ''));
+          if (!pc.ok) {
+            if (errEl) {
+              errEl.textContent = phoneErrorMessage(pc.reason, 'hu');
+              errEl.classList.remove('hidden');
+            }
+            return;
+          }
+        }
+
         if (submitBtn) submitBtn.disabled = true;
         labelEl?.classList.add('hidden');
         spinnerEl?.classList.remove('hidden');
@@ -281,8 +303,11 @@ const formId = `contact-form-${location}`;
           // legs: the server dispatch inside /api/contact and the browser's
           // trackLeadSubmit below. Meta dedupes the CAPI and Pixel legs on the
           // (event_name, event_id) pair — two ids would book the Lead twice, not
-          // once (CLAUDE.md #16).
-          const eventId = crypto.randomUUID();
+          // once (CLAUDE.md #16). STABIL a próbálkozások között (ugyanaz a
+          // tartalom → ugyanaz az id), így a szerver idempotens.
+          const eventId = submissionId.idFor(JSON.stringify([
+            data.locationId, data.firstName, data.lastName, data.email, data.phone, data.message,
+          ]));
 
           const res = await fetch('/api/contact', {
             method: 'POST',
@@ -292,6 +317,7 @@ const formId = `contact-form-${location}`;
           const result = await res.json();
 
           if (result.success) {
+            submissionId.reset();
             // A per-salon kapcsolat-űrlap = Meta Contact (üzleti döntés 2026-07-15):
             // dataLayer `contact_submit` (böngésző GTM → Meta Pixel Contact) ÉS a
             // gateway `contact_form_submitted` (Meta CAPI Contact), UGYANAZZAL az
