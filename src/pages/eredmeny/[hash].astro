@@ -5,15 +5,17 @@
  * Csak a kontakt beküldése után érhető el értelmesen (kapu).
  * Az eredmény forrása sorrendben:
  *   1. KV (QUIZ_RESULTS) — ha be van kötve (cross-device, email-link).
- *   2. localStorage (ugyanazon az eszközön) — kliensoldali fallback.
- *   3. „Elküldtük emailben" üzenet.
+ *      JELENLEG NINCS bekötve (wrangler.jsonc), a kódút kész.
+ *   2. localStorage / sessionStorage (ugyanazon az eszközön) — a kvíz a beküldés
+ *      után ide menti az eredményt, majd ide navigál (KV nélkül is működik).
+ *   3. Őszinte fallback: ezen az eszközön nem érhető el → e-mail / visszahívás.
  *
  * Az eredmény IRÁNY, NEM diagnózis (kötelező figyelmeztetés a UI-ban).
  */
 import QuizLayout from '../../layouts/QuizLayout.astro';
 import { isValidResultHash } from '../../quiz/lib/hash';
 import { t } from '../../quiz/lib/i18n';
-import type { Recommendation } from '../../quiz/lib/types';
+import type { StoredQuizResult } from '../../quiz/lib/result-store';
 import { env as cfEnv } from 'cloudflare:workers';
 
 export const prerender = false;
@@ -24,18 +26,19 @@ const validHash = typeof hash === 'string' && isValidResultHash(hash);
 // KV olvasás, ha a binding be van kötve (lásd wrangler.jsonc TODO).
 // Astro 6 / @astrojs/cloudflare v13: a binding a `cloudflare:workers`
 // env modulból jön (a régi Astro.locals.runtime.env már dob).
-let serverResult: Recommendation | null = null;
+let serverResult: StoredQuizResult | null = null;
 if (validHash) {
   const kv = (cfEnv as Record<string, unknown>).QUIZ_RESULTS as { get?: (k: string, t: 'json') => Promise<unknown> } | undefined;
   if (kv?.get) {
     try {
-      serverResult = (await kv.get(hash as string, 'json')) as Recommendation | null;
+      serverResult = (await kv.get(hash as string, 'json')) as StoredQuizResult | null;
     } catch { /* best-effort — fallback localStorage-ra */ }
   }
 }
 
 const PHONE = '+36 1 300 9414';
 const PHONE_HREF = 'tel:+3613009414';
+const CALLBACK_HREF = '/ingyenes-konzultacio';
 ---
 
 <QuizLayout title="A bőrprofilod | Beautyflow">
@@ -47,20 +50,28 @@ const PHONE_HREF = 'tel:+3613009414';
     <!-- Tartalom ide renderelődik kliensoldalon (#result-body) -->
     <div id="result-body"></div>
 
-    <!-- Fallback: nincs adat ezen az eszközön -->
+    <!-- Fallback: nincs adat ezen az eszközön. ŐSZINTE szöveg: a cross-device
+         eredmény-tároló (KV) nincs bekötve, így innen tényleg nem tudjuk megmutatni
+         — nem ígérjük, hogy „úton van". -->
     <div id="result-fallback" class="hidden rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
-      <h1 class="font-heading mb-3 text-2xl text-gray-900">A bőrprofilod úton van ✨</h1>
+      <h1 class="font-heading mb-3 text-2xl text-gray-900">Az eredmény ezen az eszközön nem érhető el</h1>
       <p class="text-gray-600">{t('result.notFound')}</p>
-      <a href={PHONE_HREF} class="mt-5 inline-block rounded-full bg-[#c53f75] px-6 py-3 font-semibold text-white hover:bg-[#a33460]">
-        Hívj minket: {PHONE}
-      </a>
+      <div class="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <a href={CALLBACK_HREF} class="inline-block rounded-full bg-[#c53f75] px-6 py-3 font-semibold text-white hover:bg-[#a33460]">
+          Visszahívást kérek
+        </a>
+        <a href={PHONE_HREF} class="inline-block rounded-full border-2 border-[#c53f75] px-6 py-2.5 font-semibold text-[#c53f75] hover:bg-[#c53f75]/5">
+          Hívj minket: {PHONE}
+        </a>
+      </div>
     </div>
   </div>
 </QuizLayout>
 
 <script>
-  import { resultStorageKey } from '@/quiz/lib/hash';
+  import { loadQuizResult, isStoredQuizResult, type StoredQuizResult } from '@/quiz/lib/result-store';
   import { hasAnalyticsConsent } from '@tracking/lib';
+  import { markOnce } from '@/lib/tracking/once';
   import type { Recommendation } from '@/quiz/lib/types';
 
   const PHONE = '+36 1 300 9414';
@@ -77,7 +88,22 @@ const PHONE_HREF = 'tel:+3613009414';
     return 'Egyedi ajánlat a bőrdiagnosztika után';
   }
 
-  function render(r: Recommendation) {
+  /** Link a Baumann-bőrtípus publikus oldalára (ha az eredmény hordozza a kódot). */
+  function baumannHtml(r: StoredQuizResult): string {
+    const b = r.baumann;
+    if (!b || !/^[a-z]{4}$/.test(b.slug)) return '';
+    const title = b.name ? `${esc(b.code)} — ${esc(b.name)}` : esc(b.code);
+    return `
+      <section class="mb-6 rounded-2xl border border-[#c53f75]/20 bg-white p-5 text-center">
+        <p class="text-sm text-gray-500">A Baumann-bőrtípusod:</p>
+        <p class="font-heading mt-1 text-2xl text-gray-900">${title}</p>
+        <a href="/bortipus/${esc(b.slug)}" class="mt-3 inline-block font-semibold text-[#c53f75] underline hover:text-[#a33460]">
+          Mit jelent ez a bőrtípus? Részletek és ápolási tippek →
+        </a>
+      </section>`;
+  }
+
+  function render(r: StoredQuizResult, hash: string) {
     const body = document.getElementById('result-body')!;
     const isSafeRoute = r.safe;
     const treatmentsHtml = r.treatments
@@ -105,6 +131,8 @@ const PHONE_HREF = 'tel:+3613009414';
         <p class="text-sm text-gray-500">A bőröd profilja:</p>
         <p class="font-heading mt-1 text-2xl capitalize text-gray-900">${esc(r.profile.label)}</p>
       </section>
+
+      ${baumannHtml(r)}
 
       ${
         isSafeRoute
@@ -159,7 +187,9 @@ const PHONE_HREF = 'tel:+3613009414';
     `;
     body.classList.remove('hidden');
     // Analytics-consented view event (browser dataLayer → GTM/GA4). PII-free.
-    if (hasAnalyticsConsent()) {
+    // Hash-enként EGYSZER: korábban minden megnyitás (újratöltés, e-mail-link
+    // újranyitása) új calculator_result_view-t könyvelt.
+    if (hasAnalyticsConsent() && (!hash || markOnce(`bf_result_view_${hash}`, 'local'))) {
       const w = window as unknown as { dataLayer: Record<string, unknown>[] };
       w.dataLayer = w.dataLayer || [];
       w.dataLayer.push({ event: 'calculator_result_view', route: r.utvonal, safe: r.safe });
@@ -171,20 +201,18 @@ const PHONE_HREF = 'tel:+3613009414';
     if (!root) return;
     const hash = root.dataset.hash || '';
 
-    let data: Recommendation | null = null;
+    let data: StoredQuizResult | null = null;
     const embedded = document.getElementById('quiz-result-data');
     if (embedded?.textContent) {
-      try { data = JSON.parse(embedded.textContent) as Recommendation; } catch { /* ignore */ }
-    }
-    if (!data && hash) {
       try {
-        const raw = localStorage.getItem(resultStorageKey(hash));
-        if (raw) data = JSON.parse(raw) as Recommendation;
+        const parsed = JSON.parse(embedded.textContent) as unknown;
+        if (isStoredQuizResult(parsed)) data = parsed;
       } catch { /* ignore */ }
     }
+    if (!data && hash) data = loadQuizResult(hash);
 
-    if (data && data.profile) {
-      render(data);
+    if (data) {
+      render(data, hash);
     } else {
       document.getElementById('result-fallback')?.classList.remove('hidden');
     }

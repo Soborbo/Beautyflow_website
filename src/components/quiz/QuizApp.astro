@@ -251,13 +251,19 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     entryAttributionFields,
     collectAttribution,
   } from '@tracking/lib';
-  import { generateResultHash, resultStorageKey, resultPath } from '@/quiz/lib/hash';
+  import { generateResultHash, resultPath } from '@/quiz/lib/hash';
+  import { saveQuizResult, isStoredQuizResult } from '@/quiz/lib/result-store';
   import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
+  import { checkPhone, phoneErrorMessage } from '@/lib/forms/phone';
+  import { resolveLeadGoogleClickId } from '@/lib/forms/click-id';
+  import { createSubmissionIdKeeper } from '@/lib/forms/submission-id';
 
   const STATE_KEY = 'bf_quiz_state';
   const FORM_ID = 'boranalizis';
 
-  type QuizState = { idx: number; answers: Record<string, string | string[]>; startedAt: number };
+  // `completed`: a MÁR befejezett (előre-lépéssel elhagyott) lépések qid-jei —
+  // a step_completed csak ezekre tüzel, egyszer (visszalépés / újratöltés nem).
+  type QuizState = { idx: number; answers: Record<string, string | string[]>; startedAt: number; completed?: string[] };
 
   function loadState(): QuizState {
     try {
@@ -335,13 +341,19 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
       updateChrome(idx);
       if (pushHistory) history.pushState({ quizStep: idx }, '', '');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      const el = steps[idx];
-      if (el?.dataset.qtype === 'gate') {
-        trackCalculatorStep('kontakt', idx);
-        ensureTurnstile();
-      } else if (el?.dataset.qid) {
-        trackCalculatorStep(el.dataset.qid, idx);
-      }
+      // A lépés MEGJELENÍTÉSE nem „completed" — a step_completed korábban itt
+      // tüzelt, így a visszaállítás, a Vissza gomb és a böngésző-vissza is
+      // befejezett lépést könyvelt. Most csak az előre-lépés (`goNext`) számít.
+      if (steps[idx]?.dataset.qtype === 'gate') ensureTurnstile();
+    }
+
+    /** step_completed — lépésenként EGYSZER, csak valódi előre-lépéskor. */
+    function trackStepCompleted(stepId: string, idx: number) {
+      const done = state.completed || (state.completed = []);
+      if (done.includes(stepId)) return;
+      done.push(stepId);
+      saveState(state);
+      trackCalculatorStep(stepId, idx);
     }
 
     function updateNextEnabled(stepEl: HTMLElement) {
@@ -416,6 +428,8 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
 
     function goNext(fromIdx: number) {
       if (state.idx !== fromIdx) return; // időközben elnavigált
+      const qid = steps[fromIdx]?.dataset.qid;
+      if (qid) trackStepCompleted(qid, fromIdx);
       show(Math.min(fromIdx + 1, lastIdx));
     }
 
@@ -444,6 +458,9 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     }
 
     // ---- Kapu beküldés ----
+    // Stabil event_id ugyanarra a tartalomra: egy elveszett válasz utáni
+    // újraküldést a szerver felismer, és nem küld második leadet.
+    const submissionId = createSubmissionIdKeeper();
     setupGate();
     function setupGate() {
       const form = document.getElementById('quiz-gate') as HTMLFormElement;
@@ -470,6 +487,10 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         if (website) { clearState(); window.location.href = '/koszonjuk'; return; }
         if (firstName.length < 2) { showErr('Kérjük add meg a keresztneved.'); return; }
         if (!phone && !email) { showErr('Kérjük adj meg telefonszámot vagy email címet.'); return; }
+        if (phone) {
+          const pc = checkPhone(phone);
+          if (!pc.ok) { showErr(phoneErrorMessage(pc.reason, 'hu')); return; }
+        }
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Kérjük adj meg egy érvényes email címet.'); return; }
         if (!consentHealth) { showErr('Az egészségügyi adatok kezeléséhez való hozzájárulás kötelező.'); return; }
 
@@ -478,8 +499,12 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
         const t = getAllTrackingData();
         const c = collectAttribution();
         const attr = {
-          gclid: t.gclid || c.gclid || '', fbclid: t.fbclid || c.fbclid || '',
-          gbraid: t.gbraid || c.gbraid || '', wbraid: t.wbraid || c.wbraid || '', msclkid: c.msclkid || '',
+          // Google klikk-ID: LEGFELJEBB EGY, egyetlen forrásból (lásd click-id.ts).
+          ...resolveLeadGoogleClickId(
+            c as Record<string, string | undefined>,
+            t as Record<string, string | undefined>,
+          ),
+          fbclid: t.fbclid || c.fbclid || '', msclkid: c.msclkid || '',
           fbc: getFbc() || '', fbp: getFbp() || '',
           utm_source: t.utm_source || '', utm_medium: t.utm_medium || '', utm_campaign: t.utm_campaign || '',
           utm_content: t.utm_content || '', utm_term: t.utm_term || '',
@@ -522,18 +547,31 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           // ONE id for this conversion, shared by the server dispatch inside
           // /api/boranalizis and the browser's trackLeadSubmit below. Meta dedupes
           // the CAPI and Pixel legs on (event_name, event_id) — two ids would book
-          // the Lead twice rather than once (CLAUDE.md #16).
-          const eventId = crypto.randomUUID();
+          // the Lead twice rather than once (CLAUDE.md #16). STABIL a
+          // próbálkozások között (ugyanaz a tartalom → ugyanaz az id), így a
+          // szerver idempotens: egy elveszett válasz utáni retry nem duplikál.
+          const eventId = submissionId.idFor(JSON.stringify([
+            state.answers, firstName, phone, email, consentHealth, consentMarketing,
+          ]));
 
           const res = await fetch('/api/boranalizis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...payload, event_id: eventId }),
           });
-          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string }; error?: string };
+          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string; name?: string }; error?: string };
 
           if (result.success && result.hash) {
-            try { localStorage.setItem(resultStorageKey(result.hash), JSON.stringify(result.result)); } catch { /* ignore */ }
+            // Az eredményt ezen az eszközön tároljuk (localStorage, tartalékként
+            // sessionStorage) — az /eredmeny/<hash> innen rajzol KV nélkül is.
+            if (isStoredQuizResult(result.result)) {
+              saveQuizResult(result.hash, {
+                ...result.result,
+                ...(result.baumann ? { baumann: result.baumann } : {}),
+              });
+            }
+            trackStepCompleted('kontakt', lastIdx);
+            submissionId.reset();
             clearState();
             const value = result.arSav ? Math.round((result.arSav.min + result.arSav.max) / 2) : 5000;
             // Canonical conversion — dataLayer `lead_submit` (browser GTM) + gateway
@@ -547,14 +585,11 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
               eventId,                     // shared with the server leg — see above
             });
             await waitForTracking(600);
-            // A kvíz kitöltőjét a saját publikus bőrtípus-oldalára érkeztetjük
-            // (a 16 Baumann-oldal a becsapódási pont). Ha a kód valamiért
-            // hiányzik, a régi privát eredményoldalra esünk vissza.
-            if (result.baumann?.slug) {
-              window.location.href = `/bortipus/${result.baumann.slug}`;
-            } else {
-              window.location.href = resultPath(result.hash);
-            }
+            // A kitöltő a SAJÁT, személyre szabott eredményét látja (profil +
+            // javasolt irány + ár), onnan link vezet a Baumann-bőrtípus oldalára.
+            // Korábban a generikus /bortipus/<slug> oldalra került, így aki csak
+            // telefonszámot adott meg (nincs e-mail), sosem látta az eredményét.
+            window.location.href = resultPath(result.hash);
           } else {
             showErr(result.error || 'Hiba történt. Kérjük próbáld újra.');
             // Egyszer-használatos token elfogyott — reset, hogy a vendég újra tudja küldeni.

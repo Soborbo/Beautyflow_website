@@ -72,10 +72,15 @@
     "TRACKING_TEST_LEAD_EMAIL": "gateway-smoke-test@soborbo.co.uk",
     "TRACKING_TEST_EVENT_CODE": "TEST_BEAUTYFLOW"
   }
-  // TODO: KV a bőranalízis kvíz eredmény-tárolásához (cross-device eredmény-link).
-  //   A kvíz e binding NÉLKÜL is működik: az eredményt a kliens localStorage-be
-  //   menti és az emailben is elküldjük. A KV csak a más eszközről nyitott
-  //   eredmény-linkhez kell. Bekötés:
+  // TODO (TULAJDONOSI TEENDŐ): KV a bőranalízis kvíz eredmény-tárolásához
+  //   (cross-device eredmény-link). A kód KÉSZ (api/boranalizis.ts írja,
+  //   eredmeny/[hash].astro olvassa), csak a binding hiányzik.
+  //   A kvíz e binding NÉLKÜL is működik UGYANAZON az eszközön: beküldés után a
+  //   kliens localStorage-be (tartalékként sessionStorage-be) menti az eredményt,
+  //   és az /eredmeny/<hash> oldalra navigál. MÁS eszközön (pl. az e-mailes link
+  //   telefonról) KV nélkül az oldal őszintén jelzi, hogy itt nem érhető el.
+  //   Megjegyzés: a lead-idempotencia (api/contact + api/boranalizis) KV binding
+  //   hiányában a Cache API-t használja (lib/forms/idempotency.ts). Bekötés:
   //     1) npx wrangler kv namespace create QUIZ_RESULTS
   //     2) másold az id-t ide és vedd ki a kommentből:
   //   "kv_namespaces": [
