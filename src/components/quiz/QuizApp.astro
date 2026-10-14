@@ -252,7 +252,9 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     collectAttribution,
   } from '@tracking/lib';
   import { generateResultHash, resultPath } from '@/quiz/lib/hash';
-  import { saveQuizResult, isStoredQuizResult } from '@/quiz/lib/result-store';
+  import { handOffQuizResult } from '@/quiz/lib/result-handoff';
+  import { resultHtml, pushResultViewOnce } from '@/quiz/lib/result-view';
+  import { hasAnalyticsConsent } from '@tracking/lib';
   import { createTurnstile, type TurnstileHandle } from '@/lib/forms/turnstile-client';
   import { checkPhone, phoneErrorMessage } from '@/lib/forms/phone';
   import { resolveLeadGoogleClickId } from '@/lib/forms/click-id';
@@ -294,6 +296,9 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
 
     let state = loadState();
     let started = false;
+    // Beküldés után (helyben megjelenített eredmény) a lépés-motor leáll: a
+    // böngésző-vissza ne rajzolja vissza a lépéseket és ne írja újra az állapotot.
+    let finished = false;
 
     function markStarted() {
       if (started) return;
@@ -437,6 +442,7 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
     backBtn.addEventListener('click', () => { if (state.idx > 0) history.back(); });
 
     window.addEventListener('popstate', (e) => {
+      if (finished) return;
       const s = (e.state && (e.state as { quizStep?: number }).quizStep);
       if (typeof s === 'number') show(s, false);
       else show(Math.max(0, state.idx - 1), false);
@@ -559,17 +565,14 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...payload, event_id: eventId }),
           });
-          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string; name?: string }; error?: string };
+          const result = await res.json() as { success: boolean; hash?: string; result?: unknown; arSav?: { min: number; max: number } | null; baumann?: { code: string; slug: string; name?: string }; emailDelivered?: boolean; error?: string };
 
           if (result.success && result.hash) {
             // Az eredményt ezen az eszközön tároljuk (localStorage, tartalékként
             // sessionStorage) — az /eredmeny/<hash> innen rajzol KV nélkül is.
-            if (isStoredQuizResult(result.result)) {
-              saveQuizResult(result.hash, {
-                ...result.result,
-                ...(result.baumann ? { baumann: result.baumann } : {}),
-              });
-            }
+            // Ha EGYIK tároló sem írható, nem navigálunk vakon (KV nélkül az
+            // eredmény-oldal üres fallbacket adna): helyben jelenítjük meg.
+            const handoff = handOffQuizResult(result.hash, result.result, result.baumann);
             trackStepCompleted('kontakt', lastIdx);
             submissionId.reset();
             clearState();
@@ -584,6 +587,10 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
               contentName: 'boranalizis_kviz',
               eventId,                     // shared with the server leg — see above
             });
+            if (handoff.action === 'inline') {
+              showInlineResult(handoff.record, result.hash, result.emailDelivered === true);
+              return;
+            }
             await waitForTracking(600);
             // A kitöltő a SAJÁT, személyre szabott eredményét látja (profil +
             // javasolt irány + ár), onnan link vezet a Baumann-bőrtípus oldalára.
@@ -601,6 +608,30 @@ const PRIVACY_URL = '/adatvedelmi-tajekoztato';
           btn.disabled = false; label?.classList.remove('hidden'); spinner?.classList.add('hidden');
         }
       });
+    }
+
+    /**
+     * A szerver eredménye UGYANAZON az oldalon — ha a böngésző nem tudta menteni.
+     * Őszinte szöveg: az oldal elhagyása után ezen az eszközön nem lesz elérhető;
+     * e-mailt csak akkor említünk, ha a szerver szerint ki is ment.
+     */
+    function showInlineResult(record: Parameters<typeof resultHtml>[0], hash: string, emailed: boolean) {
+      finished = true;
+      stickyCta.classList.add('hidden');
+      const note = emailed
+        ? 'A böngésződ nem engedte elmenteni az eredményt, ezért itt mutatjuk meg. Az eredmény-linket e-mailben is elküldtük.'
+        : 'A böngésződ nem engedte elmenteni az eredményt, ezért itt mutatjuk meg — ha elhagyod az oldalt, ezen az eszközön nem lesz újra elérhető. Kérdés esetén hívj minket: +36 1 300 9414.';
+      const wrap = document.createElement('div');
+      wrap.id = 'quiz-inline-result';
+      wrap.innerHTML = resultHtml(record);
+      const p = document.createElement('p');
+      p.className = 'mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-gray-700';
+      p.setAttribute('role', 'status');
+      p.textContent = note;
+      wrap.prepend(p);
+      root!.replaceChildren(wrap);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      pushResultViewOnce(record, hash, hasAnalyticsConsent());
     }
 
     // ---- Indítás: visszaállítás localStorage-ből ----
