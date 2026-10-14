@@ -65,7 +65,7 @@ import { generateResultHash, resultEmailUrl } from '@/quiz/lib/hash';
 import { computeBaumannCode, type BaumannResult } from '@/quiz/lib/baumann';
 import { baumannByCode } from '@/data/baumannTypes';
 import type { Recommendation } from '@/quiz/lib/types';
-import type { StoredQuizResult } from '@/quiz/lib/result-store';
+import { QUIZ_RESULT_TTL_SECONDS, type StoredQuizResult } from '@/quiz/lib/result-store';
 
 export const prerender = false;
 
@@ -73,7 +73,7 @@ const ADMIN_TO = 'info@beautyflow.pro';
 const ADMIN_FROM = 'Beautyflow <info@beautyflow.pro>';
 const USER_FROM_HU = 'Kónya Fanni - Beautyflow <info@beautyflow.pro>';
 const PHONE = '+36 1 300 9414';
-const KV_TTL_SECONDS = 60 * 60 * 24 * 60; // 60 nap
+const KV_TTL_SECONDS = QUIZ_RESULT_TTL_SECONDS; // 60 nap — ugyanaz, mint a böngészőben tárolt eredményé
 const MAX_BODY_BYTES = 60_000;
 
 // ---- Zod séma ----------------------------------------------------------
