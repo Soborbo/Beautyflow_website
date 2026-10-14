@@ -9,9 +9,13 @@
  *   5. KV-be mentés (cross-device eredmény, best-effort — CSAK ha a QUIZ_RESULTS
  *      binding be van kötve; lásd wrangler.jsonc. Nélküle az eredmény ugyanazon
  *      az eszközön a kliens tárolójából jelenik meg, más eszközön nem.)
- *   6. Resend → szalon értesítés (profil/kezelés/ársáv/flagek/válaszok)
- *   7. Resend → vendég visszaigazolás az eredmény-linkkel (Fanni hangján)
- *   8. Google Sheets „Boranalizis" fül (best-effort)
+ *   6. ÜZLETI fogadók párhuzamosan: Resend → szalon értesítés
+ *      (profil/kezelés/ársáv/flagek/válaszok), Google Sheets „Boranalizis" fül,
+ *      CRM webhook (a két utóbbi opcionális konfiguráció)
+ *   7. Döntés (lib/forms/lead-delivery.ts): siker ⇔ legalább egy üzleti fogadó
+ *      ténylegesen átvette. Kimaradó fogadó (pl. nincs e-mail cím) nem siker.
+ *   8. Csak elfogadott leadre: Resend → vendég visszaigazolás az eredmény-
+ *      linkkel (Fanni hangján) — külön `customerEmail` státusz; gateway-konverzió.
  *
  * Env (Cloudflare dashboard / wrangler secret put):
  *   RESEND_API_KEY, TURNSTILE_SECRET_KEY  — kötelező
@@ -45,6 +49,13 @@ import {
   type IdempotentResult,
 } from '@/lib/forms/idempotency';
 import { zodIssueToHu } from '@/lib/forms/validation-hu';
+import {
+  runSink,
+  decideLeadAcceptance,
+  customerEmailStatus,
+  sinkSummary,
+  readCrmAcceptance,
+} from '@/lib/forms/lead-delivery';
 import { upstreamSignal } from '@/lib/forms/upstream-timeout';
 import { getGoogleAccessToken, getSheetGid, insertRowAtTop } from '@/lib/forms/google-sheets';
 import { recommend } from '@/quiz/lib/recommendation';
@@ -212,6 +223,15 @@ function answersSummary(answers: QuizData['answers']): string {
   return lines.join('\n');
 }
 
+/** Kimaradó (nem konfigurált) fogadó = `skipped`, nem siker. */
+function crmConfigured(env: QuizEnv): boolean {
+  return !!(env.CRM_WEBHOOK_URL && env.CRM_WEBHOOK_SECRET);
+}
+
+function sheetsConfigured(env: QuizEnv): boolean {
+  return !!(env.GOOGLE_SHEETS_ID && env.GOOGLE_SERVICE_ACCOUNT_EMAIL && env.GOOGLE_PRIVATE_KEY);
+}
+
 // Visszatérés: a CRM belső lead-azonosítója (a webhook `{ success, id }`
 // válaszából), ha megvan és a gateway lead_id-formátumának megfelel — a
 // gateway-dispatch lead_id-je, hogy a ledger a /lead-status offline-loophoz
@@ -278,18 +298,8 @@ async function forwardToCrm(
     body: JSON.stringify(body),
     signal: upstreamSignal(),
   });
-  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
-  try {
-    const resBody = (await res.json()) as { id?: unknown };
-    const rawId =
-      typeof resBody?.id === 'string' ? resBody.id
-      : typeof resBody?.id === 'number' && Number.isFinite(resBody.id) ? String(resBody.id)
-      : undefined;
-    if (rawId && /^[a-zA-Z0-9_-]{8,64}$/.test(rawId)) return rawId;
-  } catch {
-    // non-JSON válasz → lead id nélkül megyünk tovább
-  }
-  return undefined;
+  // A 2xx önmagában nem üzleti siker: `{ success: false }` → elutasítás (dob).
+  return readCrmAcceptance(res);
 }
 
 // ---- Emailek -----------------------------------------------------------
@@ -616,65 +626,95 @@ async function verifyAndDeliver(data: QuizData, env: QuizEnv, request: Request, 
   }
 
   const resend = new Resend(env.RESEND_API_KEY);
-  const results = await Promise.allSettled([
-    sendSalonEmail(resend, data, rec, baumann, salon, resultUrl),
-    sendUserEmail(resend, data, rec, resultUrl),
-    writeToSheet(env, data, rec, baumann, salon, hash),
-    forwardToCrm(data, rec, baumann, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
+
+  // ── 1. ÜZLETI fogadók (párhuzamosan) ─────────────────────────────────────
+  // Csak ezek döntik el a sikert (lib/forms/lead-delivery.ts). Egy KIMARADÓ
+  // fogadó (nincs konfigurálva) `skipped`, NEM siker — korábban a kimaradó
+  // ügyféllevél „fulfilled" Promise-a sikernek számított.
+  const [salonR, sheetR, crmR] = await Promise.all([
+    runSink(true, () => sendSalonEmail(resend, data, rec, baumann, salon, resultUrl)),
+    runSink(sheetsConfigured(env), () => writeToSheet(env, data, rec, baumann, salon, hash)),
+    runSink(crmConfigured(env), () => forwardToCrm(data, rec, baumann, env)),
   ]);
+  const acceptance = decideLeadAcceptance({ salonEmail: salonR, sheets: sheetR, crm: crmR });
 
-  const [adminR, userR, sheetR] = results;
-  const bothEmailsFailed = adminR.status === 'rejected' && userR.status === 'rejected';
+  // ── 2. Ügyféllevél — CSAK elfogadott leadre, külön státusszal ────────────
+  // Nem elfogadott leadre nem küldünk „megkaptuk" levelet (a retry sem
+  // duplikálja), és a hibája sosem buktatja az elfogadott leadet.
+  const userR = acceptance.accepted
+    ? await runSink(!!data.email, () => sendUserEmail(resend, data, rec, resultUrl))
+    : null;
+  const customerEmail = customerEmailStatus(userR);
 
-  if (bothEmailsFailed) {
+  // ── 3. Hibajelentés fogadónként ──────────────────────────────────────────
+  const lead = { name: data.firstName, email: data.email, phone: data.phone };
+  const sinks = sinkSummary({ salonEmail: salonR, sheets: sheetR, crm: crmR, customerEmail: userR });
+  if (salonR.status === 'failed') {
+    reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_ADMIN_FAILED, message: 'Quiz salon email failed', source: '/api/boranalizis', request, cause: salonR.error, context: { sinks } });
+    const c = classifyEmailFailure(salonR.error, 'salon');
+    reportServerError({ code: c.code, message: 'Quiz salon email — Resend failure', source: '/api/boranalizis', request, cause: salonR.error, context: c.context });
+  }
+  if (userR?.status === 'failed') {
+    reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_USER_FAILED, message: 'Quiz user email failed (lead accepted)', source: '/api/boranalizis', request, cause: userR.error, context: { sinks } });
+    const c = classifyEmailFailure(userR.error, 'user');
+    reportServerError({ code: c.code, message: 'Quiz user email — Resend failure', source: '/api/boranalizis', request, cause: userR.error, context: c.context });
+  }
+  if (salonR.status === 'failed' && userR?.status === 'failed') {
     reportServerError({
-      code: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED, message: 'Quiz salon AND user emails failed — lead may be lost',
-      source: '/api/boranalizis', request, cause: (adminR as PromiseRejectedResult).reason,
-      context: { lead: { name: data.firstName, email: data.email, phone: data.phone }, adminReason: String((adminR as PromiseRejectedResult).reason), userReason: String((userR as PromiseRejectedResult).reason) },
+      code: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED, message: 'Quiz salon AND user emails failed — lead is only in CRM/Sheets',
+      source: '/api/boranalizis', request, cause: salonR.error,
+      context: { lead, adminReason: String(salonR.error), userReason: String(userR.error), sinks },
       fingerprint: ERROR_CODES.QUIZ_EMAIL_BOTH_FAILED,
     });
-  } else {
-    if (adminR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_ADMIN_FAILED, message: 'Quiz salon email failed', source: '/api/boranalizis', request, cause: adminR.reason });
-    if (userR.status === 'rejected') reportServerError({ code: ERROR_CODES.QUIZ_EMAIL_USER_FAILED, message: 'Quiz user email failed', source: '/api/boranalizis', request, cause: userR.reason });
   }
-  // Granular provider classification (the "why" behind a channel failure).
-  // Fingerprint defaults to the code, so admin+user failing for the same
-  // root cause (e.g. auth) dedupe to one pipeline notification.
-  if (adminR.status === 'rejected') {
-    const c = classifyEmailFailure(adminR.reason, 'salon');
-    reportServerError({ code: c.code, message: 'Quiz salon email — Resend failure', source: '/api/boranalizis', request, cause: adminR.reason, context: c.context });
+  if (sheetR.status === 'failed') {
+    reportServerError({ code: ERROR_CODES.QUIZ_SHEETS_APPEND_FAILED, message: 'Quiz Sheets append failed', source: '/api/boranalizis', request, cause: sheetR.error, context: { lead } });
+    const c = classifySheetsFailure(sheetR.error);
+    reportServerError({ code: c.code, message: 'Quiz Sheets — API failure', source: '/api/boranalizis', request, cause: sheetR.error, context: c.context });
   }
-  if (userR.status === 'rejected') {
-    const c = classifyEmailFailure(userR.reason, 'user');
-    reportServerError({ code: c.code, message: 'Quiz user email — Resend failure', source: '/api/boranalizis', request, cause: userR.reason, context: c.context });
-  }
-  if (sheetR.status === 'rejected') {
-    reportServerError({ code: ERROR_CODES.QUIZ_SHEETS_APPEND_FAILED, message: 'Quiz Sheets append failed', source: '/api/boranalizis', request, cause: sheetR.reason, context: { lead: { name: data.firstName, email: data.email, phone: data.phone } } });
-    const c = classifySheetsFailure(sheetR.reason);
-    reportServerError({ code: c.code, message: 'Quiz Sheets — API failure', source: '/api/boranalizis', request, cause: sheetR.reason, context: c.context });
+  if (crmR.status === 'failed') {
+    reportServerError({ code: ERROR_CODES.LEAD_CRM_FORWARD_FAILED, message: 'Quiz CRM webhook failed', source: '/api/boranalizis', request, cause: crmR.error, context: { sinks } });
   }
 
-  if (bothEmailsFailed) {
-    return fail(500, `Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);
+  if (!acceptance.accepted) {
+    // Egyetlen üzleti fogadó sem vette át a leadet → valódi hiba. Nincs
+    // ügyféllevél, nincs konverzió, nincs idempotencia-jelölés (a retry újra
+    // megpróbálhatja).
+    reportServerError({
+      code: ERROR_CODES.LEAD_NOT_ACCEPTED, message: 'Quiz lead accepted by NO business sink — lead may be lost',
+      source: '/api/boranalizis', request, cause: salonR.error ?? sheetR.error ?? crmR.error,
+      context: { sinks, lead }, fingerprint: `${ERROR_CODES.LEAD_NOT_ACCEPTED}:quiz`,
+    });
+    return fail(500, `Nem sikerült rögzíteni a jelentkezésed. Kérjük próbáld újra később, vagy hívj minket: ${PHONE}`);
   }
 
   // ── Server-side conversion → Soborbo event-gateway ───────────────────────
-  // Success path only, mirroring the browser's trackLeadSubmit. A retry of the
-  // SAME submission reuses its event_id and, after a success, is answered from
-  // the idempotency store without reaching this line — one lead, one conversion.
-  // Never throws; the result is already earned.
+  // CSAK elfogadott leadre, mirroring the browser's trackLeadSubmit. A retry of
+  // the SAME submission reuses its event_id and, after a success, is answered
+  // from the idempotency store without reaching this line — one lead, one
+  // conversion. Never throws; the result is already earned.
   // Value = the midpoint of the quiz's own price band, so both legs agree.
   const quizValue = rec.arSav ? Math.round((rec.arSav.min + rec.arSav.max) / 2) : 5000;
   // A CRM lead-kulcsa (a webhook válaszából) → gateway lead_id (ledger↔CRM join).
-  const crmLeadId =
-    results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+  const crmLeadId = crmR.status === 'delivered' ? crmR.value : undefined;
   await dispatchGatewayConversion(data, request, quizValue, crmLeadId);
 
   // A vendég akkor is megkapja az eredményt, ha a Sheets/KV elbukott: a kliens
-  // a `result`-ot a saját tárolójába menti, és az /eredmeny/<hash> onnan rajzol.
+  // a `result`-ot a saját tárolójába menti, és az /eredmeny/<hash> onnan rajzol
+  // (ha a tároló sem írható, a kvíz ugyanazon az oldalon jeleníti meg).
   return {
     status: 200,
-    body: { success: true, hash, result: stored, arSav: rec.arSav, baumann: stored.baumann },
+    body: {
+      success: true,
+      leadAccepted: true,
+      durable: acceptance.acceptedBy.some((k) => k !== 'salonEmail'),
+      customerEmail,
+      emailDelivered: customerEmail === 'sent',
+      hash,
+      result: stored,
+      arSav: rec.arSav,
+      baumann: stored.baumann,
+    },
   };
 }
 

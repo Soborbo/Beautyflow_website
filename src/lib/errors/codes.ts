@@ -49,6 +49,11 @@ export const ERROR_CODES = {
   /** Az idempotencia-tároló (Cache API / KV) olvasása vagy írása elbukott —
    *  a beküldés lefut, de egy elveszett válasz utáni retry duplikálhat. */
   LEAD_IDEMPOTENCY_STORE_FAILED: 'LEAD-IDEMPOTENCY-001',
+  /** EGYETLEN üzleti fogadó (szalon/admin-levél, Sheets, CRM) sem fogadta a
+   *  leadet — a vendég hibát kap, a lead elveszhet. (lib/forms/lead-delivery.ts) */
+  LEAD_NOT_ACCEPTED: 'LEAD-ACCEPT-001',
+  /** A CRM lead-webhook elbukott (nem-2xx, `success:false`, időtúllépés). */
+  LEAD_CRM_FORWARD_FAILED: 'LEAD-CRM-001',
 
   // ---- Server-side conversion → Soborbo event-gateway --------------------
   // These are the "leads arrive, Meta sees nothing" codes. They must be loud:

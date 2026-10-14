@@ -417,7 +417,7 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   // ---- /api/contact -----------------------------------------------------
   'CONTACT-EMAIL-ADMIN-001':     { severity: 'ERROR',    retryable: true,  userImpact: 'degraded', message: 'Resend admin értesítő email elutasítva', requiredContext: ['formType'] },
   'CONTACT-EMAIL-USER-001':      { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'Resend visszaigazoló email elutasítva (admin megkapta a leadet)', requiredContext: ['formType'] },
-  'CONTACT-EMAIL-BOTH-001':      { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Admin ÉS user email is failed — lead elveszhet', requiredContext: ['formType', 'adminReason', 'userReason', 'lead'] },
+  'CONTACT-EMAIL-BOTH-001':      { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Admin ÉS user email is failed — a lead CSAK a CRM/Sheets-ben van (ha ott sincs: LEAD-ACCEPT-001)', requiredContext: ['formType', 'adminReason', 'userReason', 'lead'] },
   'CONTACT-SHEETS-001':          { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Google Sheets append failed (lead emailben + logban megvan)', requiredContext: ['formType', 'lead'] },
   'CONTACT-CONFIG-RESEND-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'RESEND_API_KEY nincs beállítva — minden submit 500', requiredContext: [] },
   'CONTACT-CONFIG-TURNSTILE-001':{ severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'TURNSTILE_SECRET_KEY nincs beállítva — submitek elutasítva (fail closed)', requiredContext: [] },
@@ -425,13 +425,15 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   'CONTACT-UNHANDLED-001':       { severity: 'ERROR',    retryable: false, userImpact: 'blocked',  message: 'Top-level catch a contact POST handlerben', requiredContext: [] },
 
   // ---- Lead-idempotencia ------------------------------------------------
-  'LEAD-IDEMPOTENCY-001':        { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Idempotencia-tároló (Cache API / KV) hiba — egy retry duplikálhat', requiredContext: ['op'] },
+  'LEAD-IDEMPOTENCY-001':        { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Idempotencia-tároló (Cache API) hiba — egy retry duplikálhat', requiredContext: ['op'] },
+  'LEAD-ACCEPT-001':             { severity: 'CRITICAL', retryable: true,  userImpact: 'blocked',  message: 'Egyetlen üzleti fogadó (admin-levél, Sheets, CRM) sem fogadta a leadet — lead elveszhet', requiredContext: ['sinks', 'lead'] },
+  'LEAD-CRM-001':                { severity: 'ERROR',    retryable: true,  userImpact: 'degraded', message: 'CRM lead-webhook elbukott (nem-2xx / success:false / időtúllépés)', requiredContext: ['sinks'] },
 
   // ---- /api/boranalizis (bőranalízis kvíz) ------------------------------
   'QUIZ-CONFIG-TURNSTILE-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'TURNSTILE_SECRET_KEY nincs beállítva — quiz submitek elutasítva', requiredContext: [] },
   'QUIZ-TURNSTILE-001':          { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'Turnstile elutasított egy quiz submitet', requiredContext: ['errors'] },
   'QUIZ-CONFIG-RESEND-001':      { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'RESEND_API_KEY nincs beállítva — quiz submitek 500', requiredContext: [] },
-  'QUIZ-EMAIL-BOTH-001':         { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Szalon ÉS user email is failed — quiz lead elveszhet', requiredContext: ['lead', 'adminReason', 'userReason'] },
+  'QUIZ-EMAIL-BOTH-001':         { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Szalon ÉS user email is failed — a quiz lead CSAK a CRM/Sheets-ben van (ha ott sincs: LEAD-ACCEPT-001)', requiredContext: ['lead', 'adminReason', 'userReason'] },
   'QUIZ-EMAIL-ADMIN-001':        { severity: 'ERROR',    retryable: true,  userImpact: 'degraded', message: 'Szalon értesítő email failed (user megkapta a leadet + eredményt)', requiredContext: [] },
   'QUIZ-EMAIL-USER-001':         { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'User visszaigazoló/eredmény email failed (szalon értesítve)', requiredContext: [] },
   'QUIZ-SHEETS-001':             { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Google Sheets append failed (lead emailben + logban megvan)', requiredContext: ['lead'] },

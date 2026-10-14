@@ -7,9 +7,13 @@
  *   1. Parse + honeypot + time check (light validation)
  *   2. Cloudflare Turnstile (server-verified, fail closed)
  *   3. Field validation (email, phone, consent, etc.)
- *   4. Resend → admin notification (info@beautyflow.pro)
- *   5. Resend → user confirmation (Fanni's voice, HU/EN)
- *   6. Google Sheets append (best-effort, optional)
+ *   4. ÜZLETI fogadók párhuzamosan: Resend admin-értesítő (info@beautyflow.pro),
+ *      Google Sheets (opcionális), CRM webhook (opcionális)
+ *   5. Döntés (lib/forms/lead-delivery.ts): siker ⇔ legalább egy üzleti fogadó
+ *      ténylegesen átvette. Kimaradó fogadó nem siker; a levelek hibája nem
+ *      buktat el egy CRM/Sheets által már rögzített leadet.
+ *   6. Csak elfogadott leadre: Resend → vendég-visszaigazolás (Fanni hangján,
+ *      HU/EN) — külön `customerEmail` státusz, sosem buktat; gateway-konverzió.
  *
  * Env vars (set on Cloudflare dashboard or via wrangler secret put):
  *   RESEND_API_KEY               — required
@@ -36,6 +40,13 @@ import {
   type IdempotentResult,
 } from '@/lib/forms/idempotency';
 import { upstreamSignal } from '@/lib/forms/upstream-timeout';
+import {
+  runSink,
+  decideLeadAcceptance,
+  customerEmailStatus,
+  sinkSummary,
+  readCrmAcceptance,
+} from '@/lib/forms/lead-delivery';
 import {
   sendGatewayConversion,
   buildConsentSources,
@@ -202,9 +213,11 @@ function readEnv(): RuntimeEnv {
 
 /**
  * Best-effort forward of the lead to the CRM (`/api/webhook/lead`, Bearer-auth).
- * Maps the contact form to the CRM's snake_case lead schema. Runs inside the
- * submit pipeline's Promise.allSettled, so a CRM failure NEVER fails the form
- * (email + Sheets still capture the lead). Skips silently if not configured.
+ * Maps the contact form to the CRM's snake_case lead schema. One of the
+ * business sinks (lib/forms/lead-delivery.ts): a CRM failure alone never fails
+ * the form while the admin e-mail or Sheets captured the lead. Not configured →
+ * the sink is `skipped` (never counted as acceptance). A 2xx `{ success:false }`
+ * body is a rejection.
  *
  * Visszatérés: a CRM belső lead-azonosítója (a webhook `{ success, id }`
  * válaszából), ha megvan és a gateway lead_id-formátumának megfelel — ezzel
@@ -212,6 +225,15 @@ function readEnv(): RuntimeEnv {
  * dispatchnek lead_id-ként továbbadnia (ledger↔CRM join). Hiányában undefined
  * (a NULL detektálható; egy CRM-nek ismeretlen kulcs nem az).
  */
+/** Kimaradó (nem konfigurált) fogadó = `skipped`, nem siker. */
+function crmConfigured(env: RuntimeEnv): boolean {
+  return !!(env.CRM_WEBHOOK_URL && env.CRM_WEBHOOK_SECRET);
+}
+
+function sheetsConfigured(env: GoogleEnv): boolean {
+  return !!(env.sheetId && env.serviceAccountEmail && env.privateKey);
+}
+
 async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<string | undefined> {
   const url = env.CRM_WEBHOOK_URL;
   const secret = env.CRM_WEBHOOK_SECRET;
@@ -259,18 +281,8 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
     body: JSON.stringify(body),
     signal: upstreamSignal(),
   });
-  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
-  try {
-    const resBody = (await res.json()) as { id?: unknown };
-    const rawId =
-      typeof resBody?.id === 'string' ? resBody.id
-      : typeof resBody?.id === 'number' && Number.isFinite(resBody.id) ? String(resBody.id)
-      : undefined;
-    if (rawId && /^[a-zA-Z0-9_-]{8,64}$/.test(rawId)) return rawId;
-  } catch {
-    // non-JSON válasz → lead id nélkül megyünk tovább
-  }
-  return undefined;
+  // A 2xx önmagában nem üzleti siker: `{ success: false }` → elutasítás (dob).
+  return readCrmAcceptance(res);
 }
 
 // ---- Email senders -----------------------------------------------------
@@ -961,104 +973,114 @@ async function verifyAndDeliver(data: ContactFormData, env: RuntimeEnv, request:
     privateKey: env.GOOGLE_PRIVATE_KEY,
   };
 
-  const results = await Promise.allSettled([
-    sendAdminEmail(resend, data),
-    sendUserEmail(resend, data),
-    writeToGoogleSheet(data, googleEnv),
-    forwardToCrm(data, env), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
+  // ── 1. ÜZLETI fogadók (párhuzamosan) — csak ezek döntik el a sikert ──────
+  // (lib/forms/lead-delivery.ts). Kimaradó (nem konfigurált) fogadó = `skipped`,
+  // nem siker. Ha a CRM/Sheets rögzítette a leadet, a levelek hibája NEM
+  // fordíthatja 500-ra — különben a vendég újraküld, és a CRM/Sheets
+  // mellékhatás megismétlődik (az idempotencia csak sikert jelöl).
+  const [adminResult, sheetResult, crmResult] = await Promise.all([
+    runSink(true, () => sendAdminEmail(resend, data)),
+    runSink(sheetsConfigured(googleEnv), () => writeToGoogleSheet(data, googleEnv)),
+    runSink(crmConfigured(env), () => forwardToCrm(data, env)),
   ]);
-  // A CRM belső lead-azonosítója (ha a webhook sikerült) — a gateway-dispatch
-  // lead_id-je, hogy a ledger a CRM offline-loophoz joinolható legyen.
-  const crmLeadId =
-    results[3].status === 'fulfilled' ? (results[3].value as string | undefined) : undefined;
+  const acceptance = decideLeadAcceptance({ adminEmail: adminResult, sheets: sheetResult, crm: crmResult });
 
-  const adminResult = results[0];
-  const userResult = results[1];
-  const sheetResult = results[2];
+  // ── 2. Ügyféllevél — CSAK elfogadott leadre, külön státusszal ────────────
+  const userResult = acceptance.accepted
+    ? await runSink(!!data.email, () => sendUserEmail(resend, data))
+    : null;
+  const customerEmail = customerEmailStatus(userResult);
 
-  const bothEmailsFailed =
-    adminResult.status === 'rejected' && userResult.status === 'rejected';
+  // ── 3. Hibajelentés fogadónként ──────────────────────────────────────────
+  const lead = { name: `${data.lastName} ${data.firstName}`, email: data.email, phone: data.phone };
+  const sinks = sinkSummary({ adminEmail: adminResult, sheets: sheetResult, crm: crmResult, customerEmail: userResult });
 
-  if (bothEmailsFailed) {
+  if (adminResult.status === 'failed') {
     reportServerError({
-      code: ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED,
-      message: 'Resend admin AND user emails both failed — lead may be lost',
+      code: ERROR_CODES.CONTACT_EMAIL_ADMIN_FAILED,
+      message: 'Resend admin notification email failed',
       source: '/api/contact',
       request,
-      cause: (adminResult as PromiseRejectedResult).reason,
+      cause: adminResult.error,
+      context: { formType: data.formType, sinks },
+    });
+    // Granular provider classification (the "why" behind a channel failure).
+    const c = classifyEmailFailure(adminResult.error, 'admin');
+    reportServerError({ code: c.code, message: 'Contact admin email — Resend failure', source: '/api/contact', request, cause: adminResult.error, context: c.context });
+  }
+  if (userResult?.status === 'failed') {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_EMAIL_USER_FAILED,
+      message: 'Resend user confirmation email failed (lead accepted)',
+      source: '/api/contact',
+      request,
+      cause: userResult.error,
+      context: { formType: data.formType, sinks },
+    });
+    const c = classifyEmailFailure(userResult.error, 'user');
+    reportServerError({ code: c.code, message: 'Contact user email — Resend failure', source: '/api/contact', request, cause: userResult.error, context: c.context });
+  }
+  if (adminResult.status === 'failed' && userResult?.status === 'failed') {
+    reportServerError({
+      code: ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED,
+      message: 'Resend admin AND user emails both failed — lead is only in CRM/Sheets',
+      source: '/api/contact',
+      request,
+      cause: adminResult.error,
       context: {
         formType: data.formType,
-        adminReason: String((adminResult as PromiseRejectedResult).reason),
-        userReason: String((userResult as PromiseRejectedResult).reason),
-        lead: {
-          name: `${data.lastName} ${data.firstName}`,
-          email: data.email,
-          phone: data.phone,
-        },
+        adminReason: String(adminResult.error),
+        userReason: String(userResult.error),
+        lead,
+        sinks,
       },
       fingerprint: `${ERROR_CODES.CONTACT_EMAIL_BOTH_FAILED}:${data.formType}`,
     });
-  } else {
-    if (adminResult.status === 'rejected') {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_EMAIL_ADMIN_FAILED,
-        message: 'Resend admin notification email failed',
-        source: '/api/contact',
-        request,
-        cause: adminResult.reason,
-        context: { formType: data.formType },
-      });
-    }
-    if (userResult.status === 'rejected') {
-      reportServerError({
-        code: ERROR_CODES.CONTACT_EMAIL_USER_FAILED,
-        message: 'Resend user confirmation email failed',
-        source: '/api/contact',
-        request,
-        cause: userResult.reason,
-        context: { formType: data.formType },
-      });
-    }
   }
-
-  // Granular provider classification (the "why" behind a channel failure).
-  // Fingerprint defaults to the code, so admin+user failing for the same
-  // root cause dedupe to one pipeline notification.
-  if (adminResult.status === 'rejected') {
-    const c = classifyEmailFailure(adminResult.reason, 'admin');
-    reportServerError({ code: c.code, message: 'Contact admin email — Resend failure', source: '/api/contact', request, cause: adminResult.reason, context: c.context });
-  }
-  if (userResult.status === 'rejected') {
-    const c = classifyEmailFailure(userResult.reason, 'user');
-    reportServerError({ code: c.code, message: 'Contact user email — Resend failure', source: '/api/contact', request, cause: userResult.reason, context: c.context });
-  }
-
-  if (sheetResult.status === 'rejected') {
+  if (sheetResult.status === 'failed') {
     reportServerError({
       code: ERROR_CODES.CONTACT_SHEETS_APPEND_FAILED,
-      message: 'Google Sheets append failed — lead in email + logs only',
+      message: 'Google Sheets append failed',
       source: '/api/contact',
       request,
-      cause: sheetResult.reason,
-      context: {
-        formType: data.formType,
-        lead: {
-          name: `${data.lastName} ${data.firstName}`,
-          email: data.email,
-          phone: data.phone,
-        },
-      },
+      cause: sheetResult.error,
+      context: { formType: data.formType, lead },
     });
-    const c = classifySheetsFailure(sheetResult.reason);
-    reportServerError({ code: c.code, message: 'Contact Sheets — API failure', source: '/api/contact', request, cause: sheetResult.reason, context: c.context });
+    const c = classifySheetsFailure(sheetResult.error);
+    reportServerError({ code: c.code, message: 'Contact Sheets — API failure', source: '/api/contact', request, cause: sheetResult.error, context: c.context });
+  }
+  if (crmResult.status === 'failed') {
+    reportServerError({
+      code: ERROR_CODES.LEAD_CRM_FORWARD_FAILED,
+      message: 'Contact CRM webhook failed',
+      source: '/api/contact',
+      request,
+      cause: crmResult.error,
+      context: { formType: data.formType, sinks },
+    });
   }
 
-  if (bothEmailsFailed) {
-    return fail(500, 'Email küldési hiba. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
+  if (!acceptance.accepted) {
+    // Egyetlen üzleti fogadó sem vette át → valódi hiba: nincs ügyféllevél,
+    // nincs konverzió, nincs idempotencia-jelölés (a retry újra próbálhat).
+    reportServerError({
+      code: ERROR_CODES.LEAD_NOT_ACCEPTED,
+      message: 'Contact lead accepted by NO business sink — lead may be lost',
+      source: '/api/contact',
+      request,
+      cause: adminResult.error ?? sheetResult.error ?? crmResult.error,
+      context: { formType: data.formType, sinks, lead },
+      fingerprint: `${ERROR_CODES.LEAD_NOT_ACCEPTED}:${data.formType}`,
+    });
+    return fail(500, 'Nem sikerült rögzíteni a jelentkezésed. Kérjük próbáld újra később, vagy hívj minket: +36 1 300 9414');
   }
+
+  // A CRM belső lead-azonosítója (ha a webhook sikerült) — a gateway-dispatch
+  // lead_id-je, hogy a ledger a CRM offline-loophoz joinolható legyen.
+  const crmLeadId = crmResult.status === 'delivered' ? crmResult.value : undefined;
 
   // ── Server-side conversion → Soborbo event-gateway ───────────────────────
-  // Fired on the SUCCESS path only, exactly like the browser's trackLeadSubmit.
+  // Fired on the ACCEPTED path only, exactly like the browser's trackLeadSubmit.
   // A retry of the SAME submission reuses its event_id (client-side
   // `submission-id.ts`), and a retry after a success is answered from the
   // idempotency store without reaching this line — so one lead books one
@@ -1068,7 +1090,16 @@ async function verifyAndDeliver(data: ContactFormData, env: RuntimeEnv, request:
   // delivered lead into an error page.
   await dispatchGatewayConversion(data, request, crmLeadId);
 
-  return { status: 200, body: { success: true } };
+  return {
+    status: 200,
+    body: {
+      success: true,
+      leadAccepted: true,
+      durable: acceptance.acceptedBy.some((k) => k !== 'adminEmail'),
+      customerEmail,
+      emailDelivered: customerEmail === 'sent',
+    },
+  };
 }
 
 export const POST: APIRoute = async (context) => {
