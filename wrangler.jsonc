@@ -79,8 +79,9 @@
   //   kliens localStorage-be (tartalékként sessionStorage-be) menti az eredményt,
   //   és az /eredmeny/<hash> oldalra navigál. MÁS eszközön (pl. az e-mailes link
   //   telefonról) KV nélkül az oldal őszintén jelzi, hogy itt nem érhető el.
-  //   Megjegyzés: a lead-idempotencia (api/contact + api/boranalizis) KV binding
-  //   hiányában a Cache API-t használja (lib/forms/idempotency.ts). Bekötés:
+  //   Megjegyzés: a lead-idempotencia (api/contact + api/boranalizis) a Cache
+  //   API-t használja (15 perc, adatközpontonként) — a QUIZ_RESULTS binding ezt
+  //   NEM változtatja meg (lásd lib/forms/idempotency.ts). Bekötés:
   //     1) npx wrangler kv namespace create QUIZ_RESULTS
   //     2) másold az id-t ide és vedd ki a kommentből:
   //   "kv_namespaces": [

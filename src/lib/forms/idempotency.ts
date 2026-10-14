@@ -17,10 +17,22 @@
  *     blokkolhatja a következőt;
  *   • ugyanazon isolate-on belül a párhuzamos duplakattintás a futó kérésre vár.
  *
- * Tároló: a per-isolate memória NEM elég (a retry másik isolate-ra eshet). Ha
- * van KV binding, az a jobb (globális); jelenleg a wrangler.jsonc-ben nincs, ezért
- * a Cache API-t használjuk rövid TTL-lel (adatközpontonként él, de egy retry
- * jellemzően ugyanabba az adatközpontba érkezik). A tároló-felület cserélhető.
+ * Tároló — ŐSZINTÉN a korlátokról:
+ *   • A per-isolate memória (`inflight`) csak az UGYANAZON isolate-ra érkező,
+ *     párhuzamos kérést fogja meg (duplakattintás).
+ *   • Élesben a Cache API (`caches.default`) a tároló, 15 perces TTL-lel
+ *     (`IDEMPOTENCY_TTL_SECONDS`). A Cache API ADATKÖZPONTONKÉNT (colo) él, nem
+ *     globális és nem garantáltan tartós: egy másik adatközpontba eső retry
+ *     (pl. mobilhálózat-váltás után), egy 15 percnél későbbi retry, vagy egy
+ *     kiürített cache-bejegyzés NEM ismerhető fel — ilyenkor a lead duplán
+ *     kézbesülhet. Ez best-effort védelem az elveszett válasz utáni azonnali
+ *     újraküldés ellen, nem pontosan-egyszer garancia.
+ *   • A kvíz-eredmény `QUIZ_RESULTS` KV bindingja ÖNMAGÁBAN NEM teszi KV-alapúvá
+ *     az idempotenciát: a két endpoint a `resolveIdempotencyStore`-t `kv` nélkül
+ *     hívja. Globális (KV) idempotenciához egy dedikált binding és a hívások
+ *     módosítása kell (a KV maga is végül-konzisztens, ~60 mp terjedéssel).
+ *   • `astro dev` / Node alatt nincs `caches.default` → csak a per-isolate védelem.
+ * A tároló-felület cserélhető; tároló-hiba sosem buktatja a beküldést.
  */
 
 export interface IdempotencyStore {
@@ -88,7 +100,10 @@ export function cacheApiIdempotencyStore(origin: string, cache?: CacheLike | nul
   };
 }
 
-/** KV, ha van; különben Cache API; különben null. */
+/**
+ * KV, ha a hívó EXPLICIT átad egyet; különben Cache API; különben null.
+ * Jelenleg mindkét endpoint `kv` nélkül hív → élesben a Cache API fut.
+ */
 export function resolveIdempotencyStore(opts: { kv?: unknown; origin: string }): IdempotencyStore | null {
   const kv = opts.kv as KvLike | undefined;
   if (kv && typeof kv.get === 'function' && typeof kv.put === 'function') return kvIdempotencyStore(kv);

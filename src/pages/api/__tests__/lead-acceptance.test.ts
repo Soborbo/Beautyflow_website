@@ -181,6 +181,20 @@ describe('/api/boranalizis — üzleti elfogadás', () => {
     expect(h.emailsSent).toEqual([]);
   });
 
+  it('a QUIZ_RESULTS binding az eredményt tárolja, de az idempotenciát NEM teszi KV-alapúvá', async () => {
+    const kvKeys: string[] = [];
+    const kv = { get: vi.fn(async () => null), put: vi.fn(async (k: string) => { kvKeys.push(k); }) };
+    h.env.QUIZ_RESULTS = kv;
+    const body = quiz();
+    const first = await sendQuiz(body);
+    expect(first.status).toBe(200);
+    expect(kvKeys).toEqual([first.body.hash]); // csak az eredmény-rekord
+    expect(kv.get).not.toHaveBeenCalled();
+    const retry = await sendQuiz(body); // a Cache API-ból játszik vissza
+    expect(retry.body.duplicate).toBe(true);
+    expect(kvKeys.some((k) => k.startsWith('idem:'))).toBe(false);
+  });
+
   it('a megosztott HU/EN telefonszabály marad: érvénytelen szám → 400 magyar üzenettel', async () => {
     const r = await sendQuiz(quiz({ phone: '123' }));
     expect(r.status).toBe(400);
