@@ -1,1 +1,69 @@
 /sitemap.xml /sitemap-index.xml 301
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trailing-slash canonicalisation (301, slash → non-slash), az OKH mintájára.
+#
+# A wrangler.jsonc html_handling:"drop-trailing-slash" a perjeles változatot
+# 307-tel irányítja, ami ideiglenes, nem konszolidál jelet. A GSC ezért mindkét
+# változatot indexelte (pl. /beautyflow-buda/ 5,1 és /beautyflow-buda 10,6 pozíció,
+# marketing audit 2026-10-06). Az alábbi szabályok 301-re emelik.
+# Mindkét mechanizmus ugyanarra mutat (slash → non-slash); ne fordítsd meg,
+# különben végtelen átirányítás lesz, mert a _redirects fut előbb.
+# Új indexelhető oldalnál ide is vedd fel a sort.
+# ─────────────────────────────────────────────────────────────────────────────
+/anti-aging/ /anti-aging 301
+/arak/ /arak 301
+/beautyflow-buda/ /beautyflow-buda 301
+/beautyflow-pest/ /beautyflow-pest 301
+/biopen-q2/ /biopen-q2 301
+/bordiagnosztika/ /bordiagnosztika 301
+/bortipus/ /bortipus 301
+/bortipus/drnt/ /bortipus/drnt 301
+/bortipus/drnw/ /bortipus/drnw 301
+/bortipus/drpt/ /bortipus/drpt 301
+/bortipus/drpw/ /bortipus/drpw 301
+/bortipus/dsnt/ /bortipus/dsnt 301
+/bortipus/dsnw/ /bortipus/dsnw 301
+/bortipus/dspt/ /bortipus/dspt 301
+/bortipus/dspw/ /bortipus/dspw 301
+/bortipus/ornt/ /bortipus/ornt 301
+/bortipus/ornw/ /bortipus/ornw 301
+/bortipus/orpt/ /bortipus/orpt 301
+/bortipus/orpw/ /bortipus/orpw 301
+/bortipus/osnt/ /bortipus/osnt 301
+/bortipus/osnw/ /bortipus/osnw 301
+/bortipus/ospt/ /bortipus/ospt 301
+/bortipus/ospw/ /bortipus/ospw 301
+/carbon-peeling/ /carbon-peeling 301
+/dioda-lezeres-szortelenites/ /dioda-lezeres-szortelenites 301
+/en/ /en 301
+/en/about/ /en/about 301
+/en/anti-aging/ /en/anti-aging 301
+/en/beautyflow-buda/ /en/beautyflow-buda 301
+/en/beautyflow-pest/ /en/beautyflow-pest 301
+/en/biopen-q2/ /en/biopen-q2 301
+/en/carbon-peeling/ /en/carbon-peeling 301
+/en/faq/ /en/faq 301
+/en/free-consultation/ /en/free-consultation 301
+/en/green-sea-peel/ /en/green-sea-peel 301
+/en/house-rules/ /en/house-rules 301
+/en/hydrabeauty/ /en/hydrabeauty 301
+/en/knowledge-base/ /en/knowledge-base 301
+/en/knowledge-base/diode-laser-hair-removal-everything-you-need-to-know/ /en/knowledge-base/diode-laser-hair-removal-everything-you-need-to-know 301
+/en/laser-hair-removal/ /en/laser-hair-removal 301
+/en/permanent-makeup/ /en/permanent-makeup 301
+/en/pigment-removal/ /en/pigment-removal 301
+/en/prices/ /en/prices 301
+/en/skin-diagnostics/ /en/skin-diagnostics 301
+/en/tattoo-removal/ /en/tattoo-removal 301
+/green-sea-peel/ /green-sea-peel 301
+/gyakran-ismetelt-kerdesek/ /gyakran-ismetelt-kerdesek 301
+/hazirend/ /hazirend 301
+/hydrabeauty/ /hydrabeauty 301
+/ingyenes-konzultacio/ /ingyenes-konzultacio 301
+/lezeres-tetovalas-eltavolitas/ /lezeres-tetovalas-eltavolitas 301
+/pigmentfolt-eltavolitas/ /pigmentfolt-eltavolitas 301
+/rolunk/ /rolunk 301
+/sminktetovalas/ /sminktetovalas 301
+/tudastar/ /tudastar 301
+/tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell/ /tudastar/dioda-lezeres-szortelenites-minden-amit-tudnod-kell 301
