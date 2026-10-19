@@ -189,3 +189,31 @@ export function classifySheetsFailure(reason: unknown): ClassifiedReport {
   if (status != null && status >= 500) return { code: 'SHEETS-API-005', context };
   return { code: 'SHEETS-WRITE-001', context };
 }
+
+// ---------------------------------------------------------------------------
+// CRM lead-webhook
+// ---------------------------------------------------------------------------
+
+/** Thrown by the handlers' `forwardToCrm()` on a non-2xx webhook response,
+ *  carrying the HTTP status so the failure report can include it. The message
+ *  deliberately contains only the status — never the lead payload. */
+export class CrmWebhookError extends Error {
+  readonly status: number;
+  constructor(status: number) {
+    super(`CRM webhook ${status}`);
+    this.name = 'CrmWebhookError';
+    this.status = status;
+  }
+}
+
+/** PII-free context for a rejected CRM forward: the HTTP status (null for a
+ *  network error / timeout) and a short reason. The reason is built from the
+ *  status or the error *name* + runtime message only (the request body — name,
+ *  phone, email — never ends up in an error we construct), capped at 120 chars. */
+export function crmFailureContext(reason: unknown): { statusCode: number | null; reason: string } {
+  if (reason instanceof CrmWebhookError) {
+    return { statusCode: reason.status, reason: `http_${reason.status}` };
+  }
+  const raw = reason instanceof Error ? `${reason.name}: ${reason.message}` : String(reason);
+  return { statusCode: null, reason: raw.slice(0, 120) };
+}
