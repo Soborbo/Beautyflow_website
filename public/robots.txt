@@ -5,11 +5,11 @@ Allow: /
 # Sitemap
 Sitemap: https://beautyflow.pro/sitemap-index.xml
 
-# Block AI training crawlers (opt-out)
+# Block AI training crawlers (opt-out).
+# A ChatGPT-User (felhasználói kérésre letöltés) és az OAI-SearchBot (ChatGPT
+# keresés) engedélyezett: a chatgpt.com forgalom 35%-os lead-arányt hoz
+# (marketing audit 2026-10-06). A tanítási botok tiltása marad.
 User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
 Disallow: /
 
 User-agent: Google-Extended
