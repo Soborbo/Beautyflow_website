@@ -44,6 +44,8 @@ export const ERROR_CODES = {
   CONTACT_TURNSTILE_REJECTED: 'CONTACT-TURNSTILE-001',
   /** Top-level catch in POST handler — bug / unexpected failure path. */
   CONTACT_UNHANDLED: 'CONTACT-UNHANDLED-001',
+  /** CRM lead-webhook forward failed (lead still in email + Sheets, CRM out of sync). */
+  CONTACT_CRM_FORWARD_FAILED: 'CONTACT-CRM-001',
 
   // ---- Server-side conversion → Soborbo event-gateway --------------------
   // These are the "leads arrive, Meta sees nothing" codes. They must be loud:
@@ -76,6 +78,8 @@ export const ERROR_CODES = {
   QUIZ_KV_STORE_FAILED: 'QUIZ-KV-001',
   /** Top-level catch in quiz POST handler — bug / unexpected path. */
   QUIZ_UNHANDLED: 'QUIZ-UNHANDLED-001',
+  /** CRM lead-webhook forward failed (lead still in email + Sheets, CRM out of sync). */
+  QUIZ_CRM_FORWARD_FAILED: 'QUIZ-CRM-001',
 
   // ---- /api/webhook/resend ----------------------------------------------
   // A Resend 200-as accept NEM kézbesítés. Ezek a kódok az egyetlen jel arról,

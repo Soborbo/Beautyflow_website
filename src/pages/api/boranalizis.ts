@@ -24,7 +24,7 @@ import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
-import { sendEmail, classifyEmailFailure, classifySheetsFailure } from '@/lib/errors/classify';
+import { sendEmail, classifyEmailFailure, classifySheetsFailure, CrmWebhookError, crmFailureContext } from '@/lib/errors/classify';
 import {
   sendGatewayConversion,
   buildConsentSources,
@@ -258,7 +258,7 @@ async function forwardToCrm(
     headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
+  if (!res.ok) throw new CrmWebhookError(res.status);
   try {
     const resBody = (await res.json()) as { id?: unknown };
     const rawId =
@@ -608,7 +608,7 @@ export const POST: APIRoute = async (context) => {
       forwardToCrm(data, rec, baumann, env), // CRM lead-webhook (best-effort; sosem buktatja a kvízt)
     ]);
 
-    const [adminR, userR, sheetR] = results;
+    const [adminR, userR, sheetR, crmR] = results;
     const bothEmailsFailed = adminR.status === 'rejected' && userR.status === 'rejected';
 
     if (bothEmailsFailed) {
@@ -637,6 +637,12 @@ export const POST: APIRoute = async (context) => {
       reportServerError({ code: ERROR_CODES.QUIZ_SHEETS_APPEND_FAILED, message: 'Quiz Sheets append failed', source: '/api/boranalizis', request, cause: sheetR.reason, context: { lead: { name: data.firstName, email: data.email, phone: data.phone } } });
       const c = classifySheetsFailure(sheetR.reason);
       reportServerError({ code: c.code, message: 'Quiz Sheets — API failure', source: '/api/boranalizis', request, cause: sheetR.reason, context: c.context });
+    }
+
+    // CRM forward failure — best-effort leg (never fails the quiz), but it must
+    // not stay silent. Context is PII-free on purpose.
+    if (crmR.status === 'rejected') {
+      reportServerError({ code: ERROR_CODES.QUIZ_CRM_FORWARD_FAILED, message: 'Quiz CRM lead-webhook forward failed — lead in email + Sheets, missing from CRM', source: '/api/boranalizis', request, cause: crmR.reason, context: crmFailureContext(crmR.reason) });
     }
 
     if (bothEmailsFailed) {
