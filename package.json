@@ -10,8 +10,8 @@
     "cf-typegen": "wrangler types",
     "astro": "astro",
     "check": "astro check",
-    "test": "vitest run --root tracking-kit",
-    "test:tracking": "vitest run --root tracking-kit",
+    "test": "cd tracking-kit && vitest run",
+    "test:tracking": "cd tracking-kit && vitest run",
     "typecheck:tracking": "tsc -p tracking-kit/tsconfig.json",
     "generate:gtm": "node tracking-kit/gtm/gen-container.mjs tracking-kit/gtm/container.json && node tracking-kit/gtm/gen-container.mjs tracking/GTM-W8V3BVGD_fixed.json tracking/beautyflow.gtm.json",
     "verify:clickids": "npx tsx scripts/verify-tracking-clickids.mjs"
