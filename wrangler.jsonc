@@ -7,6 +7,12 @@
   "main": "./src/worker.ts",
   "compatibility_date": "2025-05-13",
   "compatibility_flags": ["nodejs_compat"],
+  // Szerveroldali hibagyűjtés: a Soborbo error-notifier Tail Worker megkapja ennek
+  // a workernek minden eseményét (uncaught exception → SRV-FUNC-001, ill. a
+  // `__pipeline:"error"` console.error sorok) → ERROR_KV / error-admin.
+  "tail_consumers": [
+    { "service": "error-notifier" }
+  ],
   // Napi füstteszt: szintetikus lead a TELJES szerver-láncon át a Meta TEST
   // streambe. Szándékosan nem kerek perc.
   "triggers": { "crons": ["47 4 * * *"] },
