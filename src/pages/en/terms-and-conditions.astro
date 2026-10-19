@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import { bookingIsNotino } from '../../lib/booking-links';
 
 const lastUpdated = 'July 17, 2026';
 ---
@@ -55,7 +56,9 @@ const lastUpdated = 'July 17, 2026';
         <section>
           <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">3. Booking</h2>
           <p class="text-gray-600 leading-relaxed mb-4">
-            Appointments can be booked via the Notino.hu platform, by phone, or in person.
+            {bookingIsNotino
+              ? 'Appointments can be booked via the Notino.hu platform, by phone, or in person.'
+              : 'Appointments can be booked via the online booking page on our website, by phone, or in person.'}
             A booking becomes final upon confirmation.
           </p>
           <p class="text-gray-600 leading-relaxed">
@@ -73,7 +76,11 @@ const lastUpdated = 'July 17, 2026';
             <li>Cancellations within 24 hours incur a fee of <strong>50%</strong> of the treatment price.</li>
             <li>Rescheduling within 48 hours qualifies as a cancellation and is subject to the above conditions.</li>
             <li>Cancellations within 48 hours are accepted exclusively by phone (+36 30 834 6204).</li>
-            <li>Replies to automated SMS or email messages sent by the Notino system do not qualify as official cancellations or modifications.</li>
+            {bookingIsNotino ? (
+              <li>Replies to automated SMS or email messages sent by the Notino system do not qualify as official cancellations or modifications.</li>
+            ) : (
+              <li>Replies to automated email messages sent by the booking system do not qualify as official cancellations or modifications.</li>
+            )}
             <li>If the client has an outstanding cancellation fee, a new appointment can only be booked after it has been settled.</li>
           </ul>
         </section>

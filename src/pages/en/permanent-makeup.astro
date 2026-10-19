@@ -31,16 +31,14 @@ import ajakImage from '../../assets/images/ajak-sminktetovalas.jpg';
 import sminktetovalasMb from '../../assets/images/sminktetovalas-mb.jpg';
 
 import type { ImageMetadata } from 'astro';
-
-const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
-const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
+import { bookingUrl } from '../../lib/booking-links';
 
 const locations = [
   {
     name: 'Beautyflow Buda',
     address: '1116 Budapest, Vegyesz u. 1.',
     image: '/images/Beautyflow-buda.jpg',
-    bookingUrl: notinoUrlBuda,
+    bookingUrl: bookingUrl('buda'),
     hours: [
       { days: 'Monday - Friday', time: '08:00 - 20:00' },
       { days: 'Saturday', time: '10:00 - 20:00' },
@@ -51,7 +49,7 @@ const locations = [
     name: 'Beautyflow Pest',
     address: '1135 Budapest, Reitter Ferenc u. 90.',
     image: '/images/Beautyflow-Pest.jpg',
-    bookingUrl: notinoUrlPest,
+    bookingUrl: bookingUrl('pest'),
     hours: [
       { days: 'Monday - Friday', time: '08:00 - 18:00' },
       { days: 'Saturday', time: '10:00 - 20:00' },

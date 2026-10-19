@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
+import { bookingIsNotino } from '../lib/booking-links';
 
 const effectiveFrom = '2026. augusztus 1.';
 ---
@@ -41,11 +42,19 @@ const effectiveFrom = '2026. augusztus 1.';
         <section>
           <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">Módosítás, lemondás</h2>
           <ul class="list-disc pl-6 text-gray-600 space-y-2">
-            <li><strong>48 órán túl:</strong> az online foglalási rendszeren keresztül ingyenesen módosítható.</li>
+            {bookingIsNotino ? (
+              <li><strong>48 órán túl:</strong> az online foglalási rendszeren keresztül ingyenesen módosítható.</li>
+            ) : (
+              <li><strong>48 órán túl:</strong> a visszaigazoló e-mailben kapott linken ingyenesen lemondható; módosításhoz mondd le, és foglalj új időpontot.</li>
+            )}
             <li><strong>48 órán belül:</strong> KIZÁRÓLAG telefonon fogadjuk, az alábbi számon: <a href="tel:+36308346204" class="text-[#c53f75] underline">+36 30 834 6204</a>.</li>
             <li>48 órán belüli lemondás esetén a kezelés díjának <strong>25%-a</strong> fizetendő.</li>
             <li>24 órán belüli lemondás esetén a kezelés díjának <strong>50%-a</strong> fizetendő, az időpont kezdetéhez viszonyítva.</li>
-            <li>Lemondást, módosítást a Notino által küldött SMS-, push- és e-mail-értesítésre válaszolva, privát üzenetben vagy e-mailben NEM TUDUNK ELFOGADNI.</li>
+            {bookingIsNotino ? (
+              <li>Lemondást, módosítást a Notino által küldött SMS-, push- és e-mail-értesítésre válaszolva, privát üzenetben vagy e-mailben NEM TUDUNK ELFOGADNI.</li>
+            ) : (
+              <li>E-mailre, privát üzenetre válaszolva lemondást NEM TUDUNK ELFOGADNI — 48 órán belül kizárólag telefonon.</li>
+            )}
           </ul>
           <p class="text-gray-600 leading-relaxed mt-4">
             📆 Minden 48 órán belüli módosítás lemondásnak minősül és számlázásra kerül.

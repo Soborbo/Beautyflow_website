@@ -12,15 +12,13 @@ import pcosImg from '../assets/images/pcos-szortelenites.jpg';
 import dijakImg from '../assets/images/beautyflow-dijak.webp';
 import vipImg from '../assets/images/beautyflow-dijak.webp'; // TODO: replace with actual VIP stamp card image
 import notinoIcon from '../assets/images/notino-ikon.png';
+import { bookingIsNotino, bookingLinkAttrs } from '../lib/booking-links';
 
 interface Props {
   lang?: Locale;
 }
 
 const { lang = defaultLang } = Astro.props;
-
-const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
-const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
 const featureImages = [aiGepImg, szegyenlosImg, legkorImg, higienaImg, testmeretImg, nyitvaImg, idoImg, pcosImg, dijakImg, vipImg];
 
@@ -94,22 +92,20 @@ const features = t.features.map((f, i) => ({ ...f, image: featureImages[i] }));
     <!-- Dual Booking Buttons -->
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
       <a
-        href={notinoUrlBuda}
-        target="_blank"
-        rel="noopener"
+        {...bookingLinkAttrs('buda')}
         class="px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all"
       >
         {t.budaBtn}
       </a>
 
-      <div class="hidden sm:block">
-        <FixedImage src={notinoIcon} alt="Notino" width={48} class="w-12 h-12" />
-      </div>
+      {bookingIsNotino && (
+        <div class="hidden sm:block">
+          <FixedImage src={notinoIcon} alt="Notino" width={48} class="w-12 h-12" />
+        </div>
+      )}
 
       <a
-        href={notinoUrlPest}
-        target="_blank"
-        rel="noopener"
+        {...bookingLinkAttrs('pest')}
         class="px-8 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm tracking-wide rounded-full shadow-lg hover:bg-[#a33460] hover:shadow-xl transition-all"
       >
         {t.pestBtn}

@@ -4,6 +4,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import { FixedImage } from '../../components/images';
 import fanniImg from '../../assets/images/Konya-Fanni-sq.jpg';
+import { bookingLinkAttrs } from '../../lib/booking-links';
 
 const hours = [
   { day: 'Monday', range: '08:00 – 20:00' },
@@ -87,11 +88,8 @@ const hours = [
               Back to homepage
             </a>
             <a
-              href="https://www.notino.hu/szalonok/beautyflow"
-              target="_blank"
-              rel="noopener"
+              {...bookingLinkAttrs('any')}
               class="block text-center px-6 py-3 bg-white text-[#c53f75] font-semibold uppercase tracking-wide rounded-full border-2 border-[#c53f75] hover:bg-[#fdf8f6] transition-all duration-300"
-              data-track="booking_click"
               data-source="thank_you"
             >
               Book online

@@ -3,6 +3,7 @@ import { ContentImage } from './images';
 import budaImage from '../assets/images/Beautyflow-buda.jpg';
 import pestImage from '../assets/images/Beautyflow-Pest.jpg';
 import { type Locale, defaultLang } from '../i18n';
+import { bookingTargetAttrs, bookingUrl } from '../lib/booking-links';
 
 interface Props {
   lang?: Locale;
@@ -39,7 +40,7 @@ const locations = [
     address: '1116 Budapest, Vegyész u. 1.',
     addressMobile: '1116 Budapest,\nVegyész utca 1.',
     image: budaImage,
-    bookingUrl: 'https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom',
+    bookingUrl: bookingUrl('buda'),
     hours: t.hours,
     slideFrom: 'left'
   },
@@ -48,7 +49,7 @@ const locations = [
     address: '1135 Budapest, Reitter Ferenc u. 90.',
     addressMobile: '1135 Budapest,\nReitter Ferenc utca 90.',
     image: pestImage,
-    bookingUrl: 'https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom',
+    bookingUrl: bookingUrl('pest'),
     hours: t.hours,
     slideFrom: 'right'
   }
@@ -87,8 +88,8 @@ const locations = [
           <div class="text-center mb-6">
             <a
               href={location.bookingUrl}
-              target="_blank"
-              rel="noopener"
+              data-track="booking_click"
+              {...bookingTargetAttrs()}
               class="inline-block bg-[#c53f75] text-white font-semibold uppercase text-sm px-8 py-3 rounded-full hover:bg-[#a33460] transition-colors"
             >
               {t.bookNow}
