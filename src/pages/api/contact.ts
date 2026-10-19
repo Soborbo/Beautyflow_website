@@ -208,7 +208,11 @@ function readEnv(): RuntimeEnv {
  * dispatchnek lead_id-ként továbbadnia (ledger↔CRM join). Hiányában undefined
  * (a NULL detektálható; egy CRM-nek ismeretlen kulcs nem az).
  */
-async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<string | undefined> {
+async function forwardToCrm(
+  data: ContactFormData,
+  env: RuntimeEnv,
+  request: Request,
+): Promise<string | undefined> {
   const url = env.CRM_WEBHOOK_URL;
   const secret = env.CRM_WEBHOOK_SECRET;
   if (!url || !secret) return; // not configured → skip
@@ -227,7 +231,16 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
     message,
     source_type: 'form' as const,
     consent_given: true, // a form csak elfogadott adatkezeléssel küldhető (data.consent)
-    marketing_consent: false, // ezen az űrlapon nincs külön marketing-opt-in
+    // A CookieYes/sbo ad-consent a forrás, NEM külön űrlap-opt-in (olyan nincs ezen a
+    // formon). A gateway /lead-status GDPR-kapujában a consent-receipt az elsődleges
+    // evidencia, a CRM-flag csak fallback — de a fix false itt a CRM-felületen minden
+    // leadet consent-nélkülinek mutatott, miközben a receipt GRANTED volt. Ugyanazzal
+    // a policy-verzió-kapuval olvasva, mint a gateway-dispatch (sboOpts).
+    marketing_consent:
+      readConsentFromCookie(request.headers.get('Cookie'), {
+        expectedPolicyVersion: (cfEnv as unknown as Record<string, unknown>)
+          .TRACKING_POLICY_VERSION as string | undefined,
+      })?.ad_storage === 'GRANTED',
     attribution: {
       // A BELÉPÉSI oldal és a KÜLSŐ hivatkozó. Ez a két mező eddig egyszerűen
       // HIÁNYZOTT ebből a blokkból: a klikk-azonosítók mentek, a belépési
@@ -969,7 +982,7 @@ export const POST: APIRoute = async (context) => {
       sendAdminEmail(resend, data),
       sendUserEmail(resend, data),
       writeToGoogleSheet(data, googleEnv),
-      forwardToCrm(data, env), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
+      forwardToCrm(data, env, request), // CRM lead-webhook (best-effort; sosem buktatja a beküldést)
     ]);
     // A CRM belső lead-azonosítója (ha a webhook sikerült) — a gateway-dispatch
     // lead_id-je, hogy a ledger a CRM offline-loophoz joinolható legyen.
