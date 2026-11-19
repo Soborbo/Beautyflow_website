@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import { bookingLinkAttrs } from '../../lib/booking-links';
 
 // Valid from 2026. 09. 01. (Árlista_202609.pdf)
 const priceListValidFrom = '1 September 2026';
@@ -365,8 +366,6 @@ const treatmentSections: TreatmentSection[] = [
   },
 ];
 
-const notinoUrl = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
-
 const categories = [
   { id: 'laser-packages', label: 'Laser packages', color: categoryColors['lezeres'] },
   { id: 'laser-passes', label: 'Laser passes', color: categoryColors['lezeres'] },
@@ -564,7 +563,7 @@ const breadcrumbSchema = {
         </div>
 
         <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
+          <a {...bookingLinkAttrs('any')} class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
             Book an appointment
           </a>
         </div>
@@ -633,7 +632,7 @@ const breadcrumbSchema = {
         </div>
 
         <div class="mt-6 text-center">
-          <a href={notinoUrl} target="_blank" rel="noopener" class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
+          <a {...bookingLinkAttrs('any')} class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all" style={`background-color: ${categoryColors['lezeres'].primary};`}>
             Book an appointment
           </a>
         </div>
@@ -693,9 +692,7 @@ const breadcrumbSchema = {
 
           <div class="mt-6 text-center">
             <a
-              href={section.ctaHref ?? notinoUrl}
-              target={section.ctaHref ? undefined : '_blank'}
-              rel={section.ctaHref ? undefined : 'noopener'}
+              {...(section.ctaHref ? { href: section.ctaHref } : bookingLinkAttrs('any'))}
               class="cta-btn inline-block text-white font-semibold px-8 py-3 rounded-full transition-all"
               style={`background-color: ${section.color.primary};`}
             >

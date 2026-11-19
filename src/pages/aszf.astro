@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
+import { bookingIsNotino } from '../lib/booking-links';
 
 const lastUpdated = '2026. július 17.';
 ---
@@ -55,7 +56,9 @@ const lastUpdated = '2026. július 17.';
         <section>
           <h2 class="font-heading text-xl text-gray-900 mb-4 uppercase font-bold">3. Időpontfoglalás</h2>
           <p class="text-gray-600 leading-relaxed mb-4">
-            Időpont foglalása a Notino.hu platformon, telefonon vagy személyesen lehetséges.
+            {bookingIsNotino
+              ? 'Időpont foglalása a Notino.hu platformon, telefonon vagy személyesen lehetséges.'
+              : 'Időpont foglalása a weboldalon elérhető online foglalón, telefonon vagy személyesen lehetséges.'}
             A foglalás a visszaigazolást követően válik véglegessé.
           </p>
           <p class="text-gray-600 leading-relaxed">
@@ -73,7 +76,11 @@ const lastUpdated = '2026. július 17.';
             <li>24 órán belüli lemondás esetén a kezelés díjának <strong>50%-a</strong> fizetendő.</li>
             <li>48 órán belüli időpont-módosítás lemondásnak minősül, ezért a fenti feltételek vonatkoznak rá.</li>
             <li>48 órán belüli lemondást kizárólag telefonon fogadunk (+36 30 834 6204).</li>
-            <li>A Notino rendszer által automatikusan küldött SMS-re vagy e-mailre érkező válaszüzenetek nem minősülnek hivatalos lemondásnak vagy módosításnak.</li>
+            {bookingIsNotino ? (
+              <li>A Notino rendszer által automatikusan küldött SMS-re vagy e-mailre érkező válaszüzenetek nem minősülnek hivatalos lemondásnak vagy módosításnak.</li>
+            ) : (
+              <li>A foglalási rendszer által automatikusan küldött e-mailre érkező válaszüzenetek nem minősülnek hivatalos lemondásnak vagy módosításnak.</li>
+            )}
             <li>Amennyiben a vendégnek lemondási díjtartozása áll fenn, új időpont kizárólag annak rendezését követően foglalható.</li>
           </ul>
         </section>

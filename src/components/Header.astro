@@ -1,5 +1,6 @@
 ---
 import { type Locale, defaultLang, getLocalizedPath, getAlternateRoute, stripTrailingSlash } from '../i18n';
+import { bookingLinkAttrs } from '../lib/booking-links';
 
 interface Props {
   lang?: Locale;
@@ -100,9 +101,6 @@ const currentMenuItems = menuItems[lang].map(item => ({
     href: getLocalizedPath(child.href, lang),
   })),
 }));
-
-const notinoUrlBuda = "https://www.notino.hu/szalonok/beautyflow?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow&af_xp=custom";
-const notinoUrlPest = "https://www.notino.hu/szalonok/beautyflow-pest?source_caller=ui&shortlink=lbbsjxf8&c=salon_detail_redirect&pid=notino_partner&deep_link_value=https%3A%2F%2Fnotino.hu%2Fszalonok%2Fbeautyflow-pest&af_xp=custom";
 
 const consultationPath = getLocalizedPath(lang === 'hu' ? '/ingyenes-konzultacio' : '/free-consultation', lang);
 const bookingLabel = lang === 'hu' ? 'Időpontfoglalás' : 'Book Appointment';
@@ -259,13 +257,13 @@ const flags = {
       </button>
       <div class="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 min-w-[160px]">
         <div class="bg-white rounded-lg shadow-xl py-2 border border-gray-100">
-          <a href={notinoUrlBuda} target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#c53f75]/10 hover:text-[#c53f75] transition-colors">
+          <a {...bookingLinkAttrs('buda')} class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#c53f75]/10 hover:text-[#c53f75] transition-colors">
             <svg class="w-4 h-4 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
             Buda
           </a>
-          <a href={notinoUrlPest} target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#c53f75]/10 hover:text-[#c53f75] transition-colors">
+          <a {...bookingLinkAttrs('pest')} class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#c53f75]/10 hover:text-[#c53f75] transition-colors">
             <svg class="w-4 h-4 text-[#c53f75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
@@ -368,17 +366,13 @@ const flags = {
       <p class="text-xs text-gray-500 text-center mb-2 uppercase tracking-wide">{bookingLabel}</p>
       <div class="flex gap-2">
         <a
-          href={notinoUrlBuda}
-          target="_blank"
-          rel="noopener"
+          {...bookingLinkAttrs('buda')}
           class="flex-1 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm text-center rounded-full hover:bg-[#a33460] transition-colors"
         >
           Buda
         </a>
         <a
-          href={notinoUrlPest}
-          target="_blank"
-          rel="noopener"
+          {...bookingLinkAttrs('pest')}
           class="flex-1 py-3 bg-[#c53f75] text-white font-semibold uppercase text-sm text-center rounded-full hover:bg-[#a33460] transition-colors"
         >
           Pest
