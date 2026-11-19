@@ -1,7 +1,8 @@
 // Foglalási linkek EGY helyen (D-BF5). BOOKING_PROVIDER: 'notino' = a mai állapot; 'crm' = a saját
-// online foglaló (crm.beautyflow.pro/book). Visszaállás = ez az egy sor.
+// online foglaló (crm.beautyflow.pro/book). Az éles build alapja 'notino'; a PUBLIC_BOOKING_PROVIDER=crm
+// build-változó csak előnézeti buildhez való, hogy a CRM-foglalót a beautyflow.pro érintése nélkül lássuk.
 export type BookingSite = 'buda' | 'pest' | 'any';
-export const BOOKING_PROVIDER = 'notino' as 'notino' | 'crm';
+export const BOOKING_PROVIDER: 'notino' | 'crm' = import.meta.env.PUBLIC_BOOKING_PROVIDER === 'crm' ? 'crm' : 'notino';
 export const bookingIsNotino: boolean = BOOKING_PROVIDER === 'notino';
 
 // Az 'any' a Buda-szalon partner-linkje (a Notino ezen a slugon listázza a céget); az árak-oldal eddig is
