@@ -423,6 +423,10 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   'CONTACT-CONFIG-TURNSTILE-001':{ severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'TURNSTILE_SECRET_KEY nincs beállítva — submitek elutasítva (fail closed)', requiredContext: [] },
   'CONTACT-TURNSTILE-001':       { severity: 'WARN',     retryable: true,  userImpact: 'degraded', message: 'Turnstile elutasított egy submitet (bot vagy lejárt token)', requiredContext: ['formType', 'errors'] },
   'CONTACT-UNHANDLED-001':       { severity: 'ERROR',    retryable: false, userImpact: 'blocked',  message: 'Top-level catch a contact POST handlerben', requiredContext: [] },
+  // ERROR (nem WARN): a reportServerError a WARN-t console.warn-nal írja, amit az
+  // error-notifier Tail Worker NEM olvas (csak level === 'error') — így a CRM-kiesés
+  // újra néma lenne.
+  'CONTACT-CRM-001':             { severity: 'ERROR',    retryable: true,  userImpact: 'none',     message: 'CRM lead-webhook továbbítás failed (lead emailben + Sheetsben megvan, CRM-ből hiányzik)', requiredContext: ['formType', 'statusCode', 'reason'] },
 
   // ---- /api/boranalizis (bőranalízis kvíz) ------------------------------
   'QUIZ-CONFIG-TURNSTILE-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'TURNSTILE_SECRET_KEY nincs beállítva — quiz submitek elutasítva', requiredContext: [] },
@@ -434,6 +438,7 @@ export const PROJECT_CODES: Record<string, ErrorCodeDef> = {
   'QUIZ-SHEETS-001':             { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'Google Sheets append failed (lead emailben + logban megvan)', requiredContext: ['lead'] },
   'QUIZ-KV-001':                 { severity: 'WARN',     retryable: true,  userImpact: 'none',     message: 'KV eredmény-mentés failed (eredmény localStorage-ben + emailben megvan)', requiredContext: [] },
   'QUIZ-UNHANDLED-001':          { severity: 'ERROR',    retryable: false, userImpact: 'blocked',  message: 'Top-level catch a quiz POST handlerben', requiredContext: [] },
+  'QUIZ-CRM-001':                { severity: 'ERROR',    retryable: true,  userImpact: 'none',     message: 'CRM lead-webhook továbbítás failed (quiz lead emailben + Sheetsben megvan, CRM-ből hiányzik)', requiredContext: ['statusCode', 'reason'] },
 
   // ---- /api/webhook/resend ----------------------------------------------
   'WEBHOOK-RESEND-BOUNCE-001':   { severity: 'CRITICAL', retryable: false, userImpact: 'blocked',  message: 'Admin értesítő visszapattant — a szalon NEM kapta meg a leadet', requiredContext: ['emailId', 'to', 'subject', 'bounce'] },

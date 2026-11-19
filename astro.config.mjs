@@ -28,12 +28,14 @@ export default defineConfig({
           '/koszonjuk',
           '/aszf',
           '/adatvedelmi-tajekoztato',
+          '/hazirend',
           // A kvíz QuizLayouttal renderel, ami alapból `noindex` — a SEO belépő
           // helyette a /bordiagnosztika landing és a /bortipus hub.
           '/boranalizis',
           '/en/thank-you',
           '/en/terms-and-conditions',
           '/en/privacy-policy',
+          '/en/house-rules',
         ]);
         const path = new URL(page).pathname.replace(/\/+$/, '');
         return !noindexPaths.has(path);

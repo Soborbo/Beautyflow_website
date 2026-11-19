@@ -25,7 +25,7 @@ import { Resend } from 'resend';
 import { verifyTurnstile } from '@/lib/forms/turnstile';
 import { escapeHtml, escapeSubject } from '@/lib/forms/sanitize';
 import { ERROR_CODES, reportServerError } from '@/lib/errors/codes';
-import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError } from '@/lib/errors/classify';
+import { sendEmail, classifyEmailFailure, classifySheetsFailure, SheetsCallError, CrmWebhookError, crmFailureContext } from '@/lib/errors/classify';
 import { checkRateLimit, RATE_LIMIT_CONTACT_MAX } from '@/lib/forms/rate-limit';
 import {
   sendGatewayConversion,
@@ -254,7 +254,7 @@ async function forwardToCrm(data: ContactFormData, env: RuntimeEnv): Promise<str
     headers: { 'content-type': 'application/json', Authorization: `Bearer ${secret}` },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`CRM webhook ${res.status}`);
+  if (!res.ok) throw new CrmWebhookError(res.status);
   try {
     const resBody = (await res.json()) as { id?: unknown };
     const rawId =
@@ -979,6 +979,21 @@ export const POST: APIRoute = async (context) => {
     const adminResult = results[0];
     const userResult = results[1];
     const sheetResult = results[2];
+
+    // CRM forward failure — best-effort leg, so the user-facing result is
+    // unchanged, but a dead CRM webhook must not stay silent (it did: the
+    // rejection was simply discarded). Context is PII-free on purpose.
+    const crmResult = results[3];
+    if (crmResult.status === 'rejected') {
+      reportServerError({
+        code: ERROR_CODES.CONTACT_CRM_FORWARD_FAILED,
+        message: 'CRM lead-webhook forward failed — lead in email + Sheets, missing from CRM',
+        source: '/api/contact',
+        request,
+        cause: crmResult.reason,
+        context: { formType: data.formType, ...crmFailureContext(crmResult.reason) },
+      });
+    }
 
     const bothEmailsFailed =
       adminResult.status === 'rejected' && userResult.status === 'rejected';
